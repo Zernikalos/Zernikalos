@@ -4,7 +4,7 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 
-class MrSurfaceView: GLSurfaceView {
+actual class MrSurfaceView: GLSurfaceView {
 
     private val renderer: MrRenderer = MrRenderer()
 
