@@ -22,7 +22,12 @@ abstract class MrObject {
     @JsName("children")
     lateinit var children: Array<@Polymorphic MrObject>
 
-    abstract fun initialize(ctx: MrRenderingContext)
+    fun initialize(ctx: MrRenderingContext) {
+        internalInitialize(ctx)
+        children.forEach { child -> child.initialize(ctx) }
+    }
+
+    protected abstract fun internalInitialize(ctx: MrRenderingContext)
 }
 
 @Serializable

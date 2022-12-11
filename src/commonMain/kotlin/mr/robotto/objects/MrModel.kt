@@ -15,7 +15,8 @@ class MrModel: MrObject() {
     lateinit var mesh: MrMesh
     lateinit var shaderProgram: MrShaderProgram
 
-    override fun initialize(ctx: MrRenderingContext) {
+    override fun internalInitialize(ctx: MrRenderingContext) {
+        println("Model initialization")
         shaderProgram.initialize(ctx)
         mesh.initialize(ctx)
     }

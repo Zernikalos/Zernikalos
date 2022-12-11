@@ -11,12 +11,15 @@ class MrScene: MrComponent<MrSceneData, MrSceneRender>() {
 }
 
 class MrSceneData: MrComponentData() {
-    val clearColor: MrVector4 = MrVector4(.5f, .5f, .5f, .5f)
+    val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
+    val clearColor: MrVector4 = MrVector4(.5f, .5f, .5f, 1.0f)
     val clearMask: Int = BufferBit.COLOR_BUFFER or BufferBit.DEPTH_BUFFER
 }
 
 class MrSceneRender: MrComponentRender<MrSceneData>() {
     override fun internalInitialize() {
+        val vp = data.viewport
+        context.viewport(0, 0, 700, 700)
     }
 
     override fun render() {
