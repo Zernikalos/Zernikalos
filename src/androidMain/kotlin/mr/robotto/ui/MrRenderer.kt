@@ -4,7 +4,6 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import mr.robotto.MrRenderingContext
 import mr.robotto.components.MrViewport
-import mr.robotto.components.MrViewportData
 import mr.robotto.loader.MrLoader
 import mr.robotto.objects.MrModel
 import mr.robotto.objects.MrObject
@@ -17,7 +16,6 @@ class MrRenderer: GLSurfaceView.Renderer {
     private val scene: MrViewport = MrViewport()
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
-        scene.data = MrViewportData()
         scene.initialize(context)
 
         val loader = MrLoader()

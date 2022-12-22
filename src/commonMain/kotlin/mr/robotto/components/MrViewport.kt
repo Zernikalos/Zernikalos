@@ -3,29 +3,19 @@ package mr.robotto.components
 import mr.robotto.BufferBit
 import mr.robotto.math.MrVector4
 
-class MrViewport: MrComponent<MrViewportData, MrViewportRender>() {
-
-    override var data: MrViewportData = MrViewportData()
-    override var renderer: MrViewportRender = MrViewportRender()
-
-}
-
-class MrViewportData: MrComponentData() {
+class MrViewport: MrComponent() {
     val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
     val clearColor: MrVector4 = MrVector4(.5f, .5f, .5f, 1.0f)
     val clearMask: Int = BufferBit.COLOR_BUFFER or BufferBit.DEPTH_BUFFER
-}
 
-class MrViewportRender: MrComponentRender<MrViewportData>() {
-    override fun internalInitialize() {
-        val vp = data.viewport
+    override fun renderInitialize() {
+        val vp = viewport
         context.viewport(0, 0, 700, 700)
     }
 
     override fun render() {
-        val v = data.clearColor
+        val v = clearColor
         context.clearColor(v.x, v.y, v.z, v.w)
-        context.clear(data.clearMask)
+        context.clear(clearMask)
     }
-
 }

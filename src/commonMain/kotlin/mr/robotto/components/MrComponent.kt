@@ -8,7 +8,21 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import mr.robotto.MrRenderingContext
 
-abstract class MrComponent<D: MrComponentData, R: MrComponentRender<D>> {
+abstract class MrComponent {
+
+    protected lateinit var context: MrRenderingContext
+
+    fun initialize(ctx: MrRenderingContext) {
+        context = ctx
+        renderInitialize()
+    }
+
+    protected abstract fun renderInitialize()
+
+    abstract fun render()
+}
+
+abstract class MrExtendedComponent<D: MrComponentData, R: MrComponentRender<D>> {
 
     abstract var data: D
     abstract var renderer: R
@@ -42,7 +56,7 @@ abstract class MrComponentRender<D: MrComponentData> {
 
 }
 
-abstract class MrComponentSerializer<T: MrComponent<E, *>, E: MrComponentData>: KSerializer<T> {
+abstract class MrComponentSerializer<T: MrExtendedComponent<E, *>, E: MrComponentData>: KSerializer<T> {
 
     abstract val deserializationStrategy: DeserializationStrategy<E>
 
