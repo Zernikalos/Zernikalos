@@ -20,14 +20,26 @@ abstract class MrObject {
     lateinit var name: String
 
     @JsName("children")
-    lateinit var children: Array<@Polymorphic MrObject>
+    var children: Array<@Polymorphic MrObject> = emptyArray()
 
     fun initialize(ctx: MrRenderingContext) {
         internalInitialize(ctx)
         children.forEach { child -> child.initialize(ctx) }
     }
 
+    fun render() {
+        internalRender()
+        children.forEach { child -> child.render() }
+    }
+
+    fun addChild(child: MrObject) {
+        children += child
+    }
+
     protected abstract fun internalInitialize(ctx: MrRenderingContext)
+
+    protected abstract fun internalRender()
+
 }
 
 @Serializable

@@ -19,7 +19,7 @@ android {
     compileSdk=33
 
     defaultConfig {
-        minSdk=28
+        minSdk=24
         targetSdk=33
 
         testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
@@ -55,7 +55,7 @@ kotlin {
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
                 output?.library = "mrrobotto"
-                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
+                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
             }
         }
     }

@@ -3,8 +3,8 @@ package mr.robotto.ui
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import mr.robotto.MrRenderingContext
-import mr.robotto.components.MrScene
-import mr.robotto.components.MrSceneData
+import mr.robotto.components.MrViewport
+import mr.robotto.components.MrViewportData
 import mr.robotto.loader.MrLoader
 import mr.robotto.objects.MrModel
 import mr.robotto.objects.MrObject
@@ -14,10 +14,10 @@ import javax.microedition.khronos.opengles.GL10
 class MrRenderer: GLSurfaceView.Renderer {
 
     private val context: MrRenderingContext = MrRenderingContext()
-    private val scene: MrScene = MrScene()
+    private val scene: MrViewport = MrViewport()
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
-        scene.data = MrSceneData()
+        scene.data = MrViewportData()
         scene.initialize(context)
 
         val loader = MrLoader()

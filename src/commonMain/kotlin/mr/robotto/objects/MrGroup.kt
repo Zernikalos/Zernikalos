@@ -10,6 +10,10 @@ import mr.robotto.MrRenderingContext
 class MrGroup: MrObject() {
     override fun internalInitialize(ctx: MrRenderingContext) {
     }
+
+    override fun internalRender() {
+
+    }
 }
 
 @Serializable

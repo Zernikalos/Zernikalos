@@ -1,6 +1,7 @@
 package mr.robotto
 
 import android.opengl.GLES30
+import java.nio.ByteBuffer
 
 actual class MrRenderingContext {
 
@@ -58,6 +59,41 @@ actual class MrRenderingContext {
         return GLES30.glGetShaderInfoLog(shader.id as Int)
     }
 
+    actual fun createBuffer(): GLWrap {
+        val buff: IntArray = IntArray(1)
+        GLES30.glGenBuffers(1, buff, 0)
+        val id = buff[0]
+        return GLWrap(id)
+    }
+
+    actual fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap) {
+        GLES30.glBindBuffer(targetType.value, buffer.id as Int)
+    }
+
+    actual fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType) {
+        val buff = ByteBuffer.wrap(dataArray)
+        GLES30.glBufferData(targetType.value, dataArray.size, buff, usageType.value)
+    }
+
+    actual fun enableVertexAttrib(index: Int) {
+        GLES30.glEnableVertexAttribArray(index)
+    }
+
+    actual fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) {
+        GLES30.glVertexAttribPointer(index, size, type, normalized, stride, offset)
+    }
+
+    actual fun createVertexArray(): GLWrap {
+        val buff: IntArray = IntArray(1)
+        GLES30.glGenVertexArrays(1, buff, 0)
+        val id = buff[0]
+        return GLWrap(id)
+    }
+
+    actual fun bindVertexArray(vao: GLWrap) {
+        GLES30.glBindVertexArray(vao.id as Int)
+    }
+
 }
 
 actual object BufferBit {
@@ -68,4 +104,13 @@ actual object BufferBit {
 actual object ShaderType {
     actual val VERTEX_SHADER: Int = GLES30.GL_VERTEX_SHADER
     actual val FRAGMENT_SHADER: Int = GLES30.GL_FRAGMENT_SHADER
+}
+
+actual object ExpectBufferTargetType {
+    actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
+    actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER
+}
+
+actual object ExpectBufferUsageType {
+    actual val STATIC_DRAW: Int = GLES30.GL_STATIC_DRAW
 }

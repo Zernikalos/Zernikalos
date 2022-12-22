@@ -32,6 +32,20 @@ expect class MrRenderingContext {
 
     fun getShaderInfoLog(shader: GLWrap): String
 
+    fun createBuffer(): GLWrap
+
+    fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap)
+
+    fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType)
+
+    fun enableVertexAttrib(index: Int)
+
+    fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
+
+    fun createVertexArray(): GLWrap
+
+    fun bindVertexArray(vao: GLWrap)
+
 }
 
 @OptIn(ExperimentalJsExport::class)
@@ -49,4 +63,22 @@ expect object ShaderType {
 
     @SerialName("fragment")
     val FRAGMENT_SHADER: Int
+}
+
+enum class BufferTargetType(val value: Int) {
+    ARRAY_BUFFER(ExpectBufferTargetType.ARRAY_BUFFER),
+    ELEMENT_ARRAY_BUFFER(ExpectBufferTargetType.ELEMENT_ARRAY_BUFFER)
+}
+
+expect object ExpectBufferTargetType {
+    val ARRAY_BUFFER: Int
+    val ELEMENT_ARRAY_BUFFER: Int
+}
+
+enum class BufferUsageType(val value: Int) {
+    STATIC_DRAW(ExpectBufferUsageType.STATIC_DRAW)
+}
+
+expect object ExpectBufferUsageType {
+    val STATIC_DRAW: Int
 }
