@@ -1,6 +1,5 @@
 package mr.robotto
 
-import kotlinx.serialization.SerialName
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
 
@@ -77,6 +76,10 @@ actual class MrRenderingContext {
         return gl.getShaderInfoLog(shader.id as WebGLShader) ?: ""
     }
 
+    actual fun bindAttribLocation(program: GLWrap, index: Int, attrName: String) {
+        gl.bindAttribLocation(program.id as WebGLProgram, index, attrName)
+    }
+
     actual fun createBuffer(): GLWrap {
         val id = gl.createBuffer()
         return GLWrap(id)
@@ -108,16 +111,14 @@ actual class MrRenderingContext {
         gl.bindVertexArray(vao.id as WebGLVertexArrayObject)
     }
 
+    actual fun drawArrays(mode: Int, first: Int, count: Int) {
+        gl.drawArrays(mode, first, count)
+    }
+
 }
 
-actual object BufferBit {
-    actual val COLOR_BUFFER: Int = WebGLRenderingContext.COLOR_BUFFER_BIT
-    actual val DEPTH_BUFFER: Int = WebGLRenderingContext.DEPTH_BUFFER_BIT
-}
-
-actual object ShaderType {
-    actual val VERTEX_SHADER: Int = WebGLRenderingContext.VERTEX_SHADER
-    actual val FRAGMENT_SHADER: Int = WebGLRenderingContext.FRAGMENT_SHADER
+actual object ExpectTypes {
+    actual val FLOAT: Int = WebGLRenderingContext.FLOAT
 }
 
 actual object ExpectBufferTargetType {
@@ -127,4 +128,18 @@ actual object ExpectBufferTargetType {
 
 actual object ExpectBufferUsageType {
     actual val STATIC_DRAW: Int = WebGLRenderingContext.STATIC_DRAW
+}
+
+actual object ExpectBufferBit {
+    actual val COLOR_BUFFER: Int = WebGLRenderingContext.COLOR_BUFFER_BIT
+    actual val DEPTH_BUFFER: Int = WebGLRenderingContext.DEPTH_BUFFER_BIT
+}
+
+actual object ExpectShaderType {
+    actual val VERTEX_SHADER: Int = WebGLRenderingContext.VERTEX_SHADER
+    actual val FRAGMENT_SHADER: Int = WebGLRenderingContext.FRAGMENT_SHADER
+}
+
+actual object ExpectDrawModes {
+    actual val TRIANGLES: Int = WebGLRenderingContext.TRIANGLES
 }

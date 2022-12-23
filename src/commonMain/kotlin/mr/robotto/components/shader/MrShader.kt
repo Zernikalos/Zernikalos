@@ -28,8 +28,8 @@ class MrShader(val type: String, val source: String): MrComponent() {
     override fun render() {
     }
 
-    private fun createShader(shaderType: Int): GLWrap {
-        return context.createShader(shaderType)
+    private fun createShader(shaderType: ShaderType): GLWrap {
+        return context.createShader(shaderType.value)
     }
 
     private fun compileShader(shader: GLWrap, source: String) {

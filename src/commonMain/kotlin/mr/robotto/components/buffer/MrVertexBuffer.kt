@@ -3,6 +3,7 @@ package mr.robotto.components.buffer
 import mr.robotto.BufferTargetType
 import mr.robotto.BufferUsageType
 import mr.robotto.GLWrap
+import mr.robotto.Types
 import mr.robotto.components.MrComponent
 
 class MrVertexBuffer: MrComponent() {
@@ -20,6 +21,8 @@ class MrVertexBuffer: MrComponent() {
 
         context.bindBuffer(targetType, buffer)
         context.bufferData(targetType, dataArray, usageType)
+        context.enableVertexAttrib(0)
+        context.vertexAttribPointer(0, 3, Types.FLOAT.value, false, 0, 0)
         // context.vertexAttribPointer()
         //context.bindBuffer(data.targetType, GLWrap(0))
     }

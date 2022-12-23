@@ -29,13 +29,17 @@ class MrShaderProgram: MrComponent() {
         fragmentShader.initialize(context)
         attachShader(program, fragmentShader)
 
-        attributes.forEach { (_, value) -> value.initialize(context) }
+        attributes.values.forEach { attr ->
+            attr.initialize(context)
+            attr.bindLocation(program)
+        }
 
         program.link()
         uniforms.forEach { it.initialize(context) }
     }
 
     override fun render() {
+        program.render()
     }
 
     private fun attachShader(program: MrProgram, shader: MrShader) {

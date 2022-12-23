@@ -59,6 +59,10 @@ actual class MrRenderingContext {
         return GLES30.glGetShaderInfoLog(shader.id as Int)
     }
 
+    actual fun bindAttribLocation(program: GLWrap, index: Int, attrName: String) {
+        GLES30.glBindAttribLocation(program.id as Int, index, attrName)
+    }
+
     actual fun createBuffer(): GLWrap {
         val buff: IntArray = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)
@@ -94,16 +98,15 @@ actual class MrRenderingContext {
         GLES30.glBindVertexArray(vao.id as Int)
     }
 
+    actual fun drawArrays(mode: Int, first: Int, count: Int) {
+        GLES30.glDrawArrays(mode, first, count)
+    }
+
+
 }
 
-actual object BufferBit {
-    actual val COLOR_BUFFER: Int = GLES30.GL_COLOR_BUFFER_BIT
-    actual val DEPTH_BUFFER: Int = GLES30.GL_DEPTH_BUFFER_BIT
-}
-
-actual object ShaderType {
-    actual val VERTEX_SHADER: Int = GLES30.GL_VERTEX_SHADER
-    actual val FRAGMENT_SHADER: Int = GLES30.GL_FRAGMENT_SHADER
+actual object ExpectTypes {
+    actual val FLOAT: Int = GLES30.GL_FLOAT
 }
 
 actual object ExpectBufferTargetType {
@@ -113,4 +116,18 @@ actual object ExpectBufferTargetType {
 
 actual object ExpectBufferUsageType {
     actual val STATIC_DRAW: Int = GLES30.GL_STATIC_DRAW
+}
+
+actual object ExpectBufferBit {
+    actual val COLOR_BUFFER: Int = GLES30.GL_COLOR_BUFFER_BIT
+    actual val DEPTH_BUFFER: Int = GLES30.GL_DEPTH_BUFFER_BIT
+}
+
+actual object ExpectShaderType {
+    actual val VERTEX_SHADER: Int = GLES30.GL_VERTEX_SHADER
+    actual val FRAGMENT_SHADER: Int = GLES30.GL_FRAGMENT_SHADER
+}
+
+actual object ExpectDrawModes {
+    actual val TRIANGLES: Int = GLES30.GL_TRIANGLES
 }
