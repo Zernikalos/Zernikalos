@@ -3,26 +3,16 @@ package mr.robotto.loader
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromHexString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import mr.robotto.objects.*
+import kotlin.js.ExperimentalJsExport
+import kotlin.js.JsExport
 
-/* val module = SerializersModule {
-    polymorphic(MrNode::class) {
-        defaultDeserializer { className: String? ->
-            when(className) {
-                "Model" -> return@defaultDeserializer MrModelSerializer()
-                "Group" -> return@defaultDeserializer MrGroupSerializer()
-
-                else -> {return@defaultDeserializer MrModelSerializer()}
-            }
-        }
-        // subclass(MrModel::class)
-    }
-} */
-
-@OptIn(ExperimentalSerializationApi::class)
-val module2 = SerializersModule {
+@OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
+val mrObjectModule = SerializersModule {
     polymorphic(MrObject::class) {
         defaultDeserializer { className: String? ->
             when(className) {
@@ -32,23 +22,42 @@ val module2 = SerializersModule {
                 else -> {return@defaultDeserializer MrModel.serializer()}
             }
         }
-        // subclass(MrModel::class)
     }
 
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-val format = Cbor {
-    // serializersModule = module
-    serializersModule = module2
+val cborFormat = Cbor {
+    serializersModule = mrObjectModule
     ignoreUnknownKeys = true
-    //encodeDefaults = true
+}
+
+val jsonFormat = Json {
+    serializersModule = mrObjectModule
+    ignoreUnknownKeys = true
 }
 
 class MrLoader {
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun load(hexString: String): MrObject {
-        return format.decodeFromHexString(hexString)
+    fun hexCborLoad(hexString: String): MrObject {
+        return cborFormat.decodeFromHexString(hexString)
     }
+
+    fun jsonStringLoad(jsonString: String): MrObject {
+        return jsonFormat.decodeFromString(jsonString)
+    }
+
+}
+
+@JsExport
+@OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
+fun loadFromCborString(hexString: String): MrObject {
+    return cborFormat.decodeFromHexString(hexString)
+}
+
+@JsExport
+@OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
+fun loadFromJsonString(jsonString: String): MrObject {
+    return jsonFormat.decodeFromString(jsonString)
 }

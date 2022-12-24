@@ -18,6 +18,6 @@ class MrRobotto() {
 
     fun load(hexString: String): MrObject {
         val loader = MrLoader()
-        return loader.load(hexString)
+        return loader.hexCborLoad(hexString)
     }
 }

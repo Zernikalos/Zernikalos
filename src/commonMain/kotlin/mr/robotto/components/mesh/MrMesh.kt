@@ -21,7 +21,7 @@ class MrMesh(val indices: Array<Int>, val attributes: Map<String, MrAttribute>):
 
     override fun render() {
         vao.render()
-        context.drawArrays(DrawModes.TRIANGLES.value, 0, 24)
+        context.drawArrays(DrawModes.TRIANGLES.value, 0, 36)
     }
 
 }
