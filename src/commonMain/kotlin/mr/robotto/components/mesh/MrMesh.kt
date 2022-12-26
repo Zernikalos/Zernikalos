@@ -4,19 +4,26 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.DrawModes
 import mr.robotto.components.*
+import mr.robotto.components.buffer.MrBuffer
 import mr.robotto.components.buffer.MrVertexArray
 
 @Serializable
-class MrMesh(val indices: Array<Int>, val attributes: Map<String, MrAttribute>): MrComponent() {
+class MrMesh(): MrComponent() {
+    lateinit var attributeKeys: Map<String, MrAttributeKey>
+    lateinit var indices: MrBuffer
+    lateinit var vertices: Map<String, MrBuffer>
 
     @Transient
     val vao: MrVertexArray = MrVertexArray()
 
     override fun renderInitialize() {
         vao.initialize(context)
-        // attributes.values.forEach { attr -> attr.initialize(context) }
-        val attr = attributes["position"]
-        attr?.initialize(context)
+
+        attributeKeys.forEach { (name, attr) ->
+            val buffer = vertices[name]
+            buffer?.initialize(context)
+            attr.initialize(context)
+        }
     }
 
     override fun render() {

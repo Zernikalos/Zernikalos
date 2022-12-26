@@ -71,11 +71,14 @@ enum class Types(val value: Int) {
 }
 
 enum class BufferTargetType(val value: Int) {
+    @SerialName("array")
     ARRAY_BUFFER(ExpectBufferTargetType.ARRAY_BUFFER),
+    @SerialName("element")
     ELEMENT_ARRAY_BUFFER(ExpectBufferTargetType.ELEMENT_ARRAY_BUFFER)
 }
 
 enum class BufferUsageType(val value: Int) {
+    @SerialName("static-draw")
     STATIC_DRAW(ExpectBufferUsageType.STATIC_DRAW)
 }
 

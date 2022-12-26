@@ -1,0 +1,36 @@
+package mr.robotto.components.buffer
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.cbor.ByteString
+import mr.robotto.BufferTargetType
+import mr.robotto.BufferUsageType
+import mr.robotto.GLWrap
+import mr.robotto.components.MrComponent
+
+@Serializable
+class MrBuffer(@ByteString val dataArray: ByteArray): MrComponent() {
+    @Transient
+    lateinit var buffer: GLWrap
+
+    var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
+    var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
+
+
+    override fun renderInitialize() {
+        buffer = context.createBuffer()
+        // TODO Check errors
+        //        if (!data.buffer) {
+        //            throw Error("Unable to create buffer")
+        //        }
+
+        context.bindBuffer(targetBuffer, buffer)
+        context.bufferData(targetBuffer, dataArray, usage)
+        //context.enableVertexAttrib(0)
+        //context.vertexAttribPointer(0, 3, Types.FLOAT.value, false, 0, 0)
+    }
+
+    override fun render() {
+        TODO("Not yet implemented")
+    }
+}
