@@ -130,4 +130,5 @@ actual object ExpectShaderType {
 
 actual object ExpectDrawModes {
     actual val TRIANGLES: Int = GLES30.GL_TRIANGLES
+    actual val LINES: Int = GLES30.GL_LINES
 }

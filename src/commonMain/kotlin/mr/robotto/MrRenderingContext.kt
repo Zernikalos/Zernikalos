@@ -95,7 +95,8 @@ enum class ShaderType(val value: Int) {
 }
 
 enum class DrawModes(val value: Int) {
-    TRIANGLES(ExpectDrawModes.TRIANGLES)
+    TRIANGLES(ExpectDrawModes.TRIANGLES),
+    LINES(ExpectDrawModes.LINES)
 }
 
 expect object ExpectTypes {
@@ -123,4 +124,5 @@ expect object ExpectBufferUsageType {
 
 expect object ExpectDrawModes {
     val TRIANGLES: Int
+    val LINES: Int
 }

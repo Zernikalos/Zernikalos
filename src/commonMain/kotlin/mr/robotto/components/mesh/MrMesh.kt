@@ -8,7 +8,7 @@ import mr.robotto.components.buffer.MrBuffer
 import mr.robotto.components.buffer.MrVertexArray
 
 @Serializable
-class MrMesh(): MrComponent() {
+class MrMesh: MrComponent() {
     lateinit var attributeKeys: Map<String, MrAttributeKey>
     lateinit var indices: MrBuffer
     lateinit var vertices: Map<String, MrBuffer>

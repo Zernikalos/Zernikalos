@@ -142,4 +142,5 @@ actual object ExpectShaderType {
 
 actual object ExpectDrawModes {
     actual val TRIANGLES: Int = WebGLRenderingContext.TRIANGLES
+    actual val LINES: Int = WebGLRenderingContext.LINES
 }

@@ -2,17 +2,17 @@ package mr.robotto.components.buffer
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.cbor.ByteString
 import mr.robotto.BufferTargetType
 import mr.robotto.BufferUsageType
 import mr.robotto.GLWrap
 import mr.robotto.components.MrComponent
 
 @Serializable
-class MrBuffer(@ByteString val dataArray: ByteArray): MrComponent() {
+class MrBuffer: MrComponent() {
     @Transient
     lateinit var buffer: GLWrap
 
+    lateinit var dataArray: ByteArray
     var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
     var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
 
@@ -31,6 +31,5 @@ class MrBuffer(@ByteString val dataArray: ByteArray): MrComponent() {
     }
 
     override fun render() {
-        TODO("Not yet implemented")
     }
 }
