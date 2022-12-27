@@ -70,6 +70,11 @@ kotlin {
 
     
     sourceSets {
+        all {
+            languageSettings.optIn("mr.robotto.OptInAnnotation")
+            languageSettings.optIn("kotlin.js.ExperimentalJsExport")
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
