@@ -78,6 +78,9 @@ class MrMatrix4f {
 
     companion object {
 
+        val Identity: MrMatrix4f
+            get() = MrMatrix4f()
+
         fun identity(result: MrMatrix4f) {
             result.values[0]  = 1.0f
             result.values[1]  = 0.0f

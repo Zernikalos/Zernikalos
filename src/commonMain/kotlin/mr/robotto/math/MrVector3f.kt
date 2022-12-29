@@ -64,7 +64,17 @@ class MrVector3f(var x: Float, var y: Float, var z: Float) {
         Companion.cross(this, this, v)
     }
 
+    fun copy(v: MrVector3f) {
+        Companion.copy(this, v)
+    }
+
     companion object {
+
+        val Zero: MrVector3f
+            get() = MrVector3f()
+
+        val Ones: MrVector3f
+            get() = MrVector3f(1.0f)
 
         fun copy(result: MrVector3f, v: MrVector3f) {
             result.x = v.x

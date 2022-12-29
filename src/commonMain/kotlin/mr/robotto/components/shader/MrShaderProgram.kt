@@ -6,7 +6,7 @@ import kotlinx.serialization.Transient
 import mr.robotto.components.*
 
 @Serializable
-class MrShaderProgram: MrComponent() {
+class MrShaderProgram: MrComponent {
     @Transient
     val program: MrProgram = MrProgram()
 
@@ -15,10 +15,25 @@ class MrShaderProgram: MrComponent() {
     @SerialName("fragmentShader")
     lateinit var fragmentShader: MrShader
 
-    var attributes: Map<String, MrShaderAttribute> = HashMap()
+    val attributes: HashMap<String, MrAttribute> = HashMap()
 
     @Transient
-    var uniforms: List<MrShaderUniform> = ArrayList()
+    var uniforms: HashMap<String, MrUniform> = HashMap()
+
+    constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IMrShaderAttribute>, uniforms: Map<String, IMrShaderUniform>) {
+        vertexShader = MrShader("vertex", vertexShaderSource)
+        fragmentShader = MrShader("fragment", fragmentShaderSource)
+
+        attributes.forEach { (key, attrInput) ->
+            val name = attrInput.attributeName
+            this.attributes[name] = MrAttribute(attrInput.index, attrInput.attributeName)
+        }
+
+        uniforms.forEach { (key, uniformInput) ->
+            val name = uniformInput.uniformName
+            this.uniforms[name] = MrUniform(name)
+        }
+    }
 
     override fun renderInitialize() {
         program.initialize(context)
@@ -35,7 +50,7 @@ class MrShaderProgram: MrComponent() {
         }
 
         program.link()
-        uniforms.forEach { it.initialize(context) }
+        uniforms.values.forEach { it.initialize(context) }
     }
 
     override fun render() {

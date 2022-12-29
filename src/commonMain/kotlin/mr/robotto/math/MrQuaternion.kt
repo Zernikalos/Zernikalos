@@ -78,6 +78,9 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
 
     companion object {
 
+        val Identity: MrQuaternion
+            get() = MrQuaternion()
+
         fun identity(result: MrQuaternion) {
             result.setValues(1.0f, 0.0f, 0.0f, 0.0f)
         }

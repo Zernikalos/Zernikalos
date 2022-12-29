@@ -42,7 +42,7 @@ class MrShader(val type: String, val source: String): MrComponent() {
         val compilerError = context.getError()
         if (compilerStatus != "" || compilerError > 0) {
             context.deleteShader(shader)
-            throw Error("Error compiling shader")
+            throw Error("Error compiling shader $compilerStatus")
         }
     }
 
