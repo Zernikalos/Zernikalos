@@ -1,6 +1,5 @@
 package mr.robotto.objects
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mr.robotto.MrRenderingContext
@@ -9,11 +8,11 @@ import mr.robotto.components.shader.MrShaderProgram
 import kotlin.js.JsExport
 
 @JsExport
-@Serializable(with = MrModelSerializer::class)
+@Serializable
 @SerialName("Model")
 class MrModel: MrObject() {
-    lateinit var mesh: MrMesh
-    lateinit var shaderProgram: MrShaderProgram
+    private lateinit var mesh: MrMesh
+    private lateinit var shaderProgram: MrShaderProgram
 
     override fun internalInitialize(ctx: MrRenderingContext) {
         shaderProgram.initialize(ctx)
@@ -24,21 +23,4 @@ class MrModel: MrObject() {
         shaderProgram.render()
         mesh.render()
     }
-}
-
-@Serializable
-class MrModelData(val mesh: MrMesh, val shaderProgram: MrShaderProgram) : MrObjectData()
-
-class MrModelSerializer: MrNodeSerializer<MrModel, MrModelData>() {
-    override val dataDeserializationStrategy: DeserializationStrategy<MrModelData> = MrModelData.serializer()
-
-    override fun createDeserializationInstance(): MrModel {
-        return MrModel()
-    }
-
-    override fun assignMembers(data: MrModel, surrogate: MrModelData) {
-        data.mesh = surrogate.mesh
-        data.shaderProgram = surrogate.shaderProgram
-    }
-
 }
