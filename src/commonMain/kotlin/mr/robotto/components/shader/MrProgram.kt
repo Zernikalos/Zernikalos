@@ -5,7 +5,7 @@ import mr.robotto.components.MrComponent
 
 class MrProgram: MrComponent() {
 
-    lateinit var program: GLWrap
+    lateinit var programId: GLWrap
 
     override fun renderInitialize() {
         val p = createProgram()
@@ -14,15 +14,15 @@ class MrProgram: MrComponent() {
             val err = context.getError()
             throw Error("Unable to create program ${err}")
         } */
-        program = p
+        programId = p
     }
 
     override fun render() {
-        context.useProgram(program)
+        context.useProgram(programId)
     }
 
     fun link() {
-        context.linkProgram(program)
+        context.linkProgram(programId)
     }
 
     private fun createProgram(): GLWrap {

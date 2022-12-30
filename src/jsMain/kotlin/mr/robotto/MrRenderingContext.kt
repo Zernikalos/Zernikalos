@@ -80,6 +80,15 @@ actual class MrRenderingContext {
         gl.bindAttribLocation(program.id as WebGLProgram, index, attrName)
     }
 
+    actual fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap {
+        val id = gl.getUniformLocation(program.id as WebGLProgram, uniformName)
+        return GLWrap(id)
+    }
+
+    actual fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray) {
+        gl.uniformMatrix4fv(uniform.id as WebGLUniformLocation, transpose, values.toTypedArray())
+    }
+
     actual fun createBuffer(): GLWrap {
         val id = gl.createBuffer()
         return GLWrap(id)

@@ -4,9 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.components.*
+import mr.robotto.math.MrMatrix4f
 
 @Serializable
-class MrShaderProgram: MrComponent {
+class MrShaderProgram(): MrComponent() {
     @Transient
     val program: MrProgram = MrProgram()
 
@@ -17,21 +18,18 @@ class MrShaderProgram: MrComponent {
 
     val attributes: HashMap<String, MrAttribute> = HashMap()
 
-    @Transient
     var uniforms: HashMap<String, MrUniform> = HashMap()
 
-    constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IMrShaderAttribute>, uniforms: Map<String, IMrShaderUniform>) {
+    constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IMrShaderAttribute>, uniforms: Map<String, IMrShaderUniform>) : this() {
         vertexShader = MrShader("vertex", vertexShaderSource)
         fragmentShader = MrShader("fragment", fragmentShaderSource)
 
         attributes.forEach { (key, attrInput) ->
-            val name = attrInput.attributeName
-            this.attributes[name] = MrAttribute(attrInput.index, attrInput.attributeName)
+            this.attributes[key] = MrAttribute(attrInput.index, attrInput.attributeName)
         }
 
         uniforms.forEach { (key, uniformInput) ->
-            val name = uniformInput.uniformName
-            this.uniforms[name] = MrUniform(name)
+            this.uniforms[key] = MrUniform(key, uniformInput.count, uniformInput.type)
         }
     }
 
@@ -50,15 +48,24 @@ class MrShaderProgram: MrComponent {
         }
 
         program.link()
-        uniforms.values.forEach { it.initialize(context) }
+        uniforms.values.forEach { uniform ->
+            uniform.initialize(context)
+            uniform.bindLocation(program)
+        }
     }
 
     override fun render() {
         program.render()
+        uniforms.values.forEach {
+            val m = MrMatrix4f.Identity
+            // m.translate(0f, 0f, -6f)
+            m[2, 3] = -6f
+            it.bindValue(m.values)
+        }
     }
 
     private fun attachShader(program: MrProgram, shader: MrShader) {
-        context.attachShader(program.program, shader.shader)
+        context.attachShader(program.programId, shader.shader)
     }
 
 }

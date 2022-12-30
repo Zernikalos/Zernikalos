@@ -15,7 +15,7 @@ class MrAttribute(val index: Int, val attributeName: String): MrComponent() {
     }
 
     fun bindLocation(program: MrProgram) {
-        context.bindAttribLocation(program.program, index, attributeName)
+        context.bindAttribLocation(program.programId, index, attributeName)
     }
 
     override fun render() {

@@ -63,6 +63,15 @@ actual class MrRenderingContext {
         GLES30.glBindAttribLocation(program.id as Int, index, attrName)
     }
 
+    actual fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap {
+        val id = GLES30.glGetUniformLocation(program.id as Int, uniformName)
+        return GLWrap(id)
+    }
+
+    actual fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray) {
+        GLES30.glUniformMatrix4fv(uniform.id as Int, count, transpose, values, 0)
+    }
+
     actual fun createBuffer(): GLWrap {
         val buff: IntArray = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)

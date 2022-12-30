@@ -53,11 +53,15 @@ class MrMatrix4f {
     }
 
     fun transpose() {
-        MrMatrix4f.transpose(this, this)
+        Companion.transpose(this, this)
     }
 
     fun translate(translation: MrVector3f) {
         translateIp(this, translation)
+    }
+
+    fun translate(x: Float, y: Float, z: Float) {
+        translateIp(this, x, y, z)
     }
 
     fun invert() {
@@ -139,12 +143,25 @@ class MrMatrix4f {
         }
 
         fun transpose(result: MrMatrix4f, m: MrMatrix4f) {
-            for (i in 0..3) {
-                val k = i * 4
-                result.values[i] = m.values[k];
-                result.values[i + 4] = m.values[k + 1];
-                result.values[i + 8] = m.values[k + 2];
-                result.values[i + 12] = m.values[k + 3];
+//            for (i in 0..3) {
+//                val k = i * 4
+//                result.values[i] = m.values[k]
+//                result.values[i + 4] = m.values[k + 1]
+//                result.values[i + 8] = m.values[k + 2]
+//                result.values[i + 12] = m.values[k + 3]
+//            }
+
+            // https://en.wikipedia.org/wiki/In-place_matrix_transposition
+            for (i in 0.. 3) {
+                for (j in i+1..3) {
+                    // (i, j)
+                    val k1 = 4 * j + i
+                    // (j, i)
+                    val k2 = 4 * i + j
+                    val tmp = result.values[k2]
+                    result.values[k2] = result.values[k1]
+                    result.values[k1] = tmp
+                }
             }
         }
 
@@ -158,8 +175,16 @@ class MrMatrix4f {
         }
 
         fun translateIp(result: MrMatrix4f, translation: MrVector3f) {
+            innerTranslate(result, translation.x, translation.y, translation.z)
+        }
+
+        fun translateIp(result: MrMatrix4f, x: Float, y: Float, z: Float) {
+            innerTranslate(result, x, y, z)
+        }
+
+        private fun innerTranslate(result: MrMatrix4f, x: Float, y: Float, z: Float) {
             for (i in 0..3) {
-                result.values[12 + i] = result.values[i] * translation.x + result.values[4 + i] * translation.y + result.values[8 + i] * translation.z + result.values[12 + i]
+                result.values[12 + i] = result.values[i] * x + result.values[4 + i] * y + result.values[8 + i] * z + result.values[12 + i]
             }
         }
 

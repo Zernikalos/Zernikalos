@@ -38,6 +38,12 @@ expect class MrRenderingContext {
 
     fun bindAttribLocation(program: GLWrap, index: Int, attrName: String)
 
+    /** UNIFORMS **/
+
+    fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap
+
+    fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray)
+
     /** VBO **/
 
     fun createBuffer(): GLWrap
