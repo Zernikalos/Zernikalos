@@ -9,9 +9,9 @@ import mr.robotto.components.buffer.MrVertexArray
 
 @Serializable
 class MrMesh: MrComponent() {
-    lateinit var attributeKeys: Map<String, MrAttributeKey>
-    lateinit var indices: MrBuffer
-    lateinit var vertices: Map<String, MrBuffer>
+    private lateinit var attributeKeys: Map<String, MrAttributeKey>
+    private lateinit var indices: MrBuffer
+    private lateinit var vertices: Map<String, MrBuffer>
 
     @Transient
     val vao: MrVertexArray = MrVertexArray()

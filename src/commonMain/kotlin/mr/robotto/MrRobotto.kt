@@ -1,6 +1,6 @@
 package mr.robotto
 
-import mr.robotto.loader.MrLoader
+import mr.robotto.loader.loadFromCborString
 import mr.robotto.objects.MrObject
 import mr.robotto.ui.MrSurfaceView
 import kotlin.js.ExperimentalJsExport
@@ -17,7 +17,6 @@ class MrRobotto() {
     }
 
     fun load(hexString: String): MrObject {
-        val loader = MrLoader()
-        return loader.hexCborLoad(hexString)
+        return loadFromCborString(hexString)
     }
 }

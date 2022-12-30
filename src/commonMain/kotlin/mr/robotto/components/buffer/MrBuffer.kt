@@ -12,9 +12,9 @@ class MrBuffer: MrComponent() {
     @Transient
     lateinit var buffer: GLWrap
 
-    lateinit var dataArray: ByteArray
-    var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
-    var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
+    private lateinit var dataArray: ByteArray
+    private var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
+    private var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
 
 
     override fun renderInitialize() {

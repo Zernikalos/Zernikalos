@@ -7,7 +7,7 @@ import mr.robotto.ShaderType
 import mr.robotto.components.*
 
 @Serializable
-class MrShader(val type: String, val source: String): MrComponent() {
+class MrShader(private val type: String, private val source: String): MrComponent() {
 
     @Transient var shader: GLWrap = GLWrap()
 

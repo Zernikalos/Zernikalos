@@ -9,7 +9,7 @@ interface IMrShaderAttribute {
 }
 
 @Serializable
-class MrAttribute(val index: Int, val attributeName: String): MrComponent() {
+class MrAttribute(private val index: Int, private val attributeName: String): MrComponent() {
 
     override fun renderInitialize() {
     }

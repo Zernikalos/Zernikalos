@@ -12,7 +12,7 @@ interface IMrShaderUniform {
 }
 
 @Serializable
-class MrUniform(val uniformName: String, val count: Int, val type: MrTypes): MrComponent() {
+class MrUniform(private val uniformName: String, private val count: Int, val type: MrTypes): MrComponent() {
     @Transient
     lateinit var uniformId: GLWrap
 

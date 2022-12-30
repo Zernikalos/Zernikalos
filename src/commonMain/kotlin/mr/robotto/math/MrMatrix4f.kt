@@ -32,19 +32,19 @@ class MrMatrix4f {
 
     operator fun plus(m: MrMatrix4f): MrMatrix4f {
         val result = MrMatrix4f()
-        MrMatrix4f.add(result, this, m)
+        add(result, this, m)
         return result
     }
 
     operator fun minus(m: MrMatrix4f): MrMatrix4f {
         val result = MrMatrix4f()
-        MrMatrix4f.subtract(result, this, m)
+        subtract(result, this, m)
         return result
     }
 
     operator fun times(m: MrMatrix4f): MrMatrix4f {
         val result = MrMatrix4f()
-        MrMatrix4f.mult(result, this, m)
+        mult(result, this, m)
         return result
     }
 
@@ -53,7 +53,7 @@ class MrMatrix4f {
     }
 
     fun transpose() {
-        Companion.transpose(this, this)
+        transposeIp(this)
     }
 
     fun translate(translation: MrVector3f) {
@@ -122,35 +122,37 @@ class MrMatrix4f {
         fun mult(result: MrMatrix4f, lm: MrMatrix4f, rm: MrMatrix4f) {
             for (i in 0 .. 3) {
                 val rm_i0 = rm.values[4 * i]
-                var ri0 = lm.values[0] * rm_i0;
-                var ri1 = lm.values[1] * rm_i0;
-                var ri2 = lm.values[2] * rm_i0;
-                var ri3 = lm.values[3] * rm_i0;
+                var ri0 = lm.values[0] * rm_i0
+                var ri1 = lm.values[1] * rm_i0
+                var ri2 = lm.values[2] * rm_i0
+                var ri3 = lm.values[3] * rm_i0
 
                 for (j in 1..3) {
-                    val rm_ij = rm.values[j + 4 * i];
-                    ri0 += lm.values[4 * j] * rm_ij;
-                    ri1 += lm.values[1 + 4 * j] * rm_ij;
-                    ri2 += lm.values[2 + 4 * j] * rm_ij;
-                    ri3 += lm.values[3 + 4 * j] * rm_ij;
+                    val rm_ij = rm.values[j + 4 * i]
+                    ri0 += lm.values[4 * j] * rm_ij
+                    ri1 += lm.values[1 + 4 * j] * rm_ij
+                    ri2 += lm.values[2 + 4 * j] * rm_ij
+                    ri3 += lm.values[3 + 4 * j] * rm_ij
                 }
 
-                result.values[4 * i] = ri0;
-                result.values[1 + 4 * i] = ri1;
-                result.values[2 + 4 * i] = ri2;
-                result.values[3 + 4 * i] = ri3;
+                result.values[4 * i] = ri0
+                result.values[1 + 4 * i] = ri1
+                result.values[2 + 4 * i] = ri2
+                result.values[3 + 4 * i] = ri3
             }
         }
 
         fun transpose(result: MrMatrix4f, m: MrMatrix4f) {
-//            for (i in 0..3) {
-//                val k = i * 4
-//                result.values[i] = m.values[k]
-//                result.values[i + 4] = m.values[k + 1]
-//                result.values[i + 8] = m.values[k + 2]
-//                result.values[i + 12] = m.values[k + 3]
-//            }
+            for (i in 0..3) {
+                val k = i * 4
+                result.values[i] = m.values[k]
+                result.values[i + 4] = m.values[k + 1]
+                result.values[i + 8] = m.values[k + 2]
+                result.values[i + 12] = m.values[k + 3]
+            }
+        }
 
+        fun transposeIp(result: MrMatrix4f) {
             // https://en.wikipedia.org/wiki/In-place_matrix_transposition
             for (i in 0.. 3) {
                 for (j in i+1..3) {
@@ -282,7 +284,7 @@ class MrMatrix4f {
             result.values[14] = dst14 * invDet
             result.values[15] = dst15 * invDet
 
-            return true;
+            return true
         }
 
         fun lookAt(result: MrMatrix4f, eye: MrVector3f, center: MrVector3f, up: MrVector3f) {

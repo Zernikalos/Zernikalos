@@ -6,7 +6,7 @@ import mr.robotto.Types
 import mr.robotto.components.*
 
 @Serializable
-class MrAttributeKey(val index: Int, val size: Int, val count: Int, val normalized: Boolean, val offset: Int, val stride: Int): MrComponent() {
+class MrAttributeKey(private val index: Int, private val size: Int, private val count: Int, private val normalized: Boolean, private val offset: Int, private val stride: Int): MrComponent() {
 
     override fun renderInitialize() {
         context.enableVertexAttrib(index)

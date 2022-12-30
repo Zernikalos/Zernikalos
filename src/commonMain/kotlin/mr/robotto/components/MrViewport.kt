@@ -4,9 +4,9 @@ import mr.robotto.BufferBit
 import mr.robotto.math.MrVector4f
 
 class MrViewport: MrComponent() {
-    val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
-    val clearColor: MrVector4f = MrVector4f(.2f, .2f, .2f, 1.0f)
-    val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
+    private val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
+    private val clearColor: MrVector4f = MrVector4f(.2f, .2f, .2f, 1.0f)
+    private val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 
     override fun renderInitialize() {
         val vp = viewport

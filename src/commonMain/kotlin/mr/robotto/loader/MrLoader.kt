@@ -37,19 +37,6 @@ val jsonFormat = Json {
     ignoreUnknownKeys = true
 }
 
-class MrLoader {
-
-    @OptIn(ExperimentalSerializationApi::class)
-    fun hexCborLoad(hexString: String): MrObject {
-        return cborFormat.decodeFromHexString(hexString)
-    }
-
-    fun jsonStringLoad(jsonString: String): MrObject {
-        return jsonFormat.decodeFromString(jsonString)
-    }
-
-}
-
 @JsExport
 @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
 fun loadFromCborString(hexString: String): MrObject {

@@ -16,9 +16,9 @@ class MrShaderProgram(): MrComponent() {
     @SerialName("fragmentShader")
     lateinit var fragmentShader: MrShader
 
-    val attributes: HashMap<String, MrAttribute> = HashMap()
+    private val attributes: HashMap<String, MrAttribute> = HashMap()
 
-    var uniforms: HashMap<String, MrUniform> = HashMap()
+    private var uniforms: HashMap<String, MrUniform> = HashMap()
 
     constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IMrShaderAttribute>, uniforms: Map<String, IMrShaderUniform>) : this() {
         vertexShader = MrShader("vertex", vertexShaderSource)

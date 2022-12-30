@@ -4,7 +4,7 @@ import mr.robotto.GLWrap
 import mr.robotto.components.MrComponent
 
 class MrVertexArray: MrComponent() {
-    lateinit var vao: GLWrap
+    private lateinit var vao: GLWrap
 
     override fun renderInitialize() {
         val auxVao = context.createVertexArray()
