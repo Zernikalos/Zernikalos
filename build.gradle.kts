@@ -1,12 +1,18 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    val kotlinVersion = "1.7.20"
+
+    kotlin("multiplatform") version kotlinVersion
     id("com.android.library") version "7.3.1" apply true
-    id("org.jetbrains.kotlin.android") version "1.7.20" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20" apply true
+    id("org.jetbrains.kotlin.android") version kotlinVersion apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion apply true
 }
 
 group = "mr.robotto"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
+
+ext {
+    version = "1.8.0"
+}
 
 repositories {
     gradlePluginPortal()
@@ -21,6 +27,8 @@ android {
     defaultConfig {
         minSdk=24
         targetSdk=33
+
+        version="0.0.1"
 
         testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
         // consumerProguardFiles="consumer-rules.pro"
@@ -82,17 +90,19 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
+        //val commonTest by getting {
+        //    dependencies {
+        //        implementation(kotlin("test"))
+        //    }
+        //}
         // val jvmMain by getting
         // val jvmTest by getting
-        val androidMain by getting
-        val androidTest by getting
+        val androidMain by getting {
+
+        }
+        // val androidTest by getting
         val jsMain by getting
-        val jsTest by getting
+        // val jsTest by getting
         // val nativeMain by getting
         // val nativeTest by getting
     }
