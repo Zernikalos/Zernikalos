@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     val kotlinVersion = "1.7.20"
 
@@ -39,20 +41,38 @@ android {
 
 }
 
+
+val lwjglVersion = "3.3.1"
+
+val lwjglNatives = Pair(
+    System.getProperty("os.name")!!,
+    System.getProperty("os.arch")!!
+).let { (name, arch) ->
+    when {
+        arrayOf("Linux", "FreeBSD", "SunOS", "Unit").any { name.startsWith(it) } ->
+            "natives-linux"
+        arrayOf("Mac OS X", "Darwin").any { name.startsWith(it) }                ->
+            "natives-macos-arm64"
+        arrayOf("Windows").any { name.startsWith(it) }                           ->
+            "natives-windows"
+        else -> throw Error("Unrecognized or unsupported platform. Please set \"lwjglNatives\" manually")
+    }
+}
+
 kotlin {
     android {
 
     }
 
-    /* jvm {
+    jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "18"
         }
         // withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
-    } */
+    }
 
     js(IR) {
         browser {
@@ -95,7 +115,25 @@ kotlin {
         //        implementation(kotlin("test"))
         //    }
         //}
-        // val jvmMain by getting
+
+        val jvmMain by getting {
+            dependencies {
+                // implementation("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+                implementation("org.lwjgl:lwjgl:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
+//                runtimeOnly("org.lwjgl.lwjgl", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl.lwjgl-assimp", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl.lwjgl-glfw", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl.lwjgl-openal", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl.lwjgl-opengl", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl.lwjgl-stb", classifier = lwjglNatives)
+            }
+        }
         // val jvmTest by getting
         val androidMain by getting {
 
