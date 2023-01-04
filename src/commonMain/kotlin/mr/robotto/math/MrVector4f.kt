@@ -9,6 +9,8 @@ class MrVector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
 
     constructor(v: Float): this(v, v, v, v)
 
+    constructor(v: MrVector3f) : this(v.x, v.y, v.z, 1.0f)
+
     val values: FloatArray
         get() = floatArrayOf(x, y, z, w)
 
@@ -20,6 +22,16 @@ class MrVector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
         this.y = y
         this.z = z
         this.w = w
+    }
+
+    operator fun set(i: Int, value: Float) {
+        when(i) {
+            0 -> x = value
+            1 -> y = value
+            2 -> z = value
+            3 -> w = value
+            else -> throw Error("Out of bounds array access")
+        }
     }
 
     operator fun plus(v: MrVector4f): MrVector4f {

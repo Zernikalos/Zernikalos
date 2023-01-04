@@ -76,7 +76,18 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
         Companion.fromMatrix4(this, m)
     }
 
+    fun copy(q: MrQuaternion) {
+        Companion.copy(this, q)
+    }
+
     companion object {
+
+        fun copy(result: MrQuaternion, q: MrQuaternion) {
+            result.w = q.w
+            result.x = q.x
+            result.y = q.y
+            result.z = q.z
+        }
 
         val Identity: MrQuaternion
             get() = MrQuaternion()
@@ -139,41 +150,52 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
 
         fun normalize(result: MrQuaternion, q: MrQuaternion) {
             val n = q.norm2
-            MrQuaternion.multScalar(result, 1 / n, q);
+            MrQuaternion.multScalar(result, 1 / n, q)
         }
 
         fun invert(result: MrQuaternion, q: MrQuaternion) {
-            val n2 = MrQuaternion.dot(q, q);
-            MrQuaternion.conjugate(result, q);
-            MrQuaternion.multScalar(result, n2, result);
+            val n2 = MrQuaternion.dot(q, q)
+            MrQuaternion.conjugate(result, q)
+            MrQuaternion.multScalar(result, n2, result)
         }
 
         fun rotate(result: MrQuaternion, q: MrQuaternion, angle: Float, axis: MrVector3f) {
-            val opRot = MrQuaternion(q.w, q.x, q.y, q.z);
-            MrQuaternion.fromAngleAxis(opRot, angle, axis);
-            MrQuaternion.mult(result, result, opRot);
+            val opRot = MrQuaternion(q.w, q.x, q.y, q.z)
+            MrQuaternion.fromAngleAxis(opRot, angle, axis)
+            MrQuaternion.mult(result, result, opRot)
         }
 
-        private fun fromAngleAxis(result: MrQuaternion, angle: Float, axis: MrVector3f) {
+        fun fromVec3(result: MrQuaternion, v: MrVector3f) {
+            result.w = 0f
+            result.x = v.x
+            result.y = v.y
+            result.z = v.z
+        }
+
+        fun fromAngleAxis(result: MrQuaternion, angle: Float, axis: MrVector3f) {
+            fromAngleAxis(result, angle, axis.x, axis.y, axis.z)
+        }
+
+        fun fromAngleAxis(result: MrQuaternion, angle: Float, x: Float, y: Float, z: Float) {
             //Axis normalization
-            var norm: Float = axis.norm2;
-            norm = 1.0f / norm;
-            val xn = axis.x * norm
-            val yn = axis.y * norm
-            val zn = axis.z * norm
+            var norm: Float = MrVector3f.norm2(x, y, z)
+            norm = 1.0f / norm
+            val xn = x * norm
+            val yn = y * norm
+            val zn = z * norm
 
             //Calc of cos(angle/2) and sin(angle/2)
-            val a: Float = angle / 2.0f * (PI.toFloat()/180); // Math.toRadians(angle / 2);
-            val c: Float = cos(a);
-            val s: Float = sin(a);
+            val a: Float = angle / 2.0f * (PI.toFloat()/180) // Math.toRadians(angle / 2)
+            val c: Float = cos(a)
+            val s: Float = sin(a)
 
             //The values of the quaternion will be
             //[cos(angle/2), axis.x*sin(angle/2), axis.y*sin(angle/2), axis.z*sin(angle/2)]
             result.w = c
-            result.x = s * xn;
-            result.y = s * yn;
-            result.z = s * zn;
-            MrQuaternion.normalize(result, result);
+            result.x = s * xn
+            result.y = s * yn
+            result.z = s * zn
+            MrQuaternion.normalize(result, result)
         }
 
         //TODO: Optimize this method
@@ -229,11 +251,11 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
         }
 
         fun slerp(result: MrQuaternion, t: Float, q1: MrQuaternion, q2: MrQuaternion) {
-            result.w = (1 - t) * q1.w + t * q2.w;
-            result.x = (1 - t) * q1.x + t * q2.x;
-            result.y = (1 - t) * q1.y + t * q2.y;
-            result.z = (1 - t) * q1.z + t * q2.z;
-            MrQuaternion.normalize(result, result);
+            result.w = (1 - t) * q1.w + t * q2.w
+            result.x = (1 - t) * q1.x + t * q2.x
+            result.y = (1 - t) * q1.y + t * q2.y
+            result.z = (1 - t) * q1.z + t * q2.z
+            MrQuaternion.normalize(result, result)
         }
 
     }

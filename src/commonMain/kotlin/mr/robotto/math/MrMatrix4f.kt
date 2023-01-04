@@ -20,6 +20,10 @@ class MrMatrix4f {
         this.values = values.copyOf()
     }
 
+    operator fun get(i: Int): Float {
+        return values[i]
+    }
+
     operator fun get(i: Int, j: Int): Float {
         val k = 4 * j + i
         return values[k]
@@ -28,6 +32,10 @@ class MrMatrix4f {
     operator fun set(i: Int, j: Int, v: Float) {
         val k = 4 * j + i
         values[k] = v
+    }
+
+    operator fun set(i: Int, v: Float) {
+        values[i] = v
     }
 
     operator fun plus(m: MrMatrix4f): MrMatrix4f {
@@ -57,15 +65,19 @@ class MrMatrix4f {
     }
 
     fun translate(translation: MrVector3f) {
-        translateIp(this, translation)
+        translate(this, translation)
     }
 
     fun translate(x: Float, y: Float, z: Float) {
-        translateIp(this, x, y, z)
+        translate(this, x, y, z)
     }
 
     fun invert() {
         Companion.invert(this, this)
+    }
+
+    fun scale(s: MrVector3f) {
+        Companion.scale(this, s)
     }
 
     private fun checkDimension(values: Array<Float>) {
@@ -142,6 +154,27 @@ class MrMatrix4f {
             }
         }
 
+        fun mult(result: MrVector4f, m: MrMatrix4f, v: MrVector4f) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+            val w = v.w
+            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
+            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
+            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
+            result[3] = m[3 + 4 * 0] * x + m[3 + 4 * 1] * y + m[3 + 4 * 2] * z + m[3 + 4 * 3] * w
+        }
+
+        fun mult(result: MrVector3f, m: MrMatrix4f, v: MrVector3f) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+            val w = 1.0f
+            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
+            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
+            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
+        }
+
         fun transpose(result: MrMatrix4f, m: MrMatrix4f) {
             for (i in 0..3) {
                 val k = i * 4
@@ -176,11 +209,11 @@ class MrMatrix4f {
             }
         }
 
-        fun translateIp(result: MrMatrix4f, translation: MrVector3f) {
+        fun translate(result: MrMatrix4f, translation: MrVector3f) {
             innerTranslate(result, translation.x, translation.y, translation.z)
         }
 
-        fun translateIp(result: MrMatrix4f, x: Float, y: Float, z: Float) {
+        fun translate(result: MrMatrix4f, x: Float, y: Float, z: Float) {
             innerTranslate(result, x, y, z)
         }
 
@@ -188,6 +221,25 @@ class MrMatrix4f {
             for (i in 0..3) {
                 result.values[12 + i] = result.values[i] * x + result.values[4 + i] * y + result.values[8 + i] * z + result.values[12 + i]
             }
+        }
+
+        fun rotate(result: MrMatrix4f, q: MrQuaternion) {
+            val rotQuat = MrMatrix4f()
+            fromQuaternion(rotQuat, q)
+            mult(result, result, rotQuat)
+        }
+
+        fun scale(result: MrMatrix4f, m: MrMatrix4f, s: MrVector3f) {
+            for (i in 0..3) {
+                result[i] = m[i] * s.x
+                result[4 + i] = m[4 + i] * s.y
+                result[8 + i] = m[8 + i] * s.z
+                result[12 + i] = m[12 + i]
+            }
+        }
+
+        fun scale(result: MrMatrix4f, s: MrVector3f) {
+            scale(result, result, s)
         }
 
         fun invert(result: MrMatrix4f, m: MrMatrix4f): Boolean {
@@ -330,7 +382,33 @@ class MrMatrix4f {
 
             val negEye = MrVector3f()
             MrVector3f.multScalar(negEye,-1.0f, eye)
-            MrMatrix4f.translateIp(result, negEye)
+            MrMatrix4f.translate(result, negEye)
+        }
+
+        fun fromQuaternion(result: MrMatrix4f, q: MrQuaternion) {
+            identity(result)
+            val x: Float = q.x
+            val y: Float = q.y
+            val z: Float = q.z
+            val w: Float = q.w
+            val xx = x * x
+            val xy = x * y
+            val xz = x * z
+            val xw = x * w
+            val yy = y * y
+            val yz = y * z
+            val yw = y * w
+            val zz = z * z
+            val zw = z * w
+            result[0, 0] = 1 - 2 * (yy + zz)
+            result[0, 1] = 2 * (xy - zw)
+            result[0, 2] = 2 * (xz + yw)
+            result[1, 0] = 2 * (xy + zw)
+            result[1, 1] = 1 - 2 * (xx + zz)
+            result[1, 2] = 2 * (yz - xw)
+            result[2, 0] = 2 * (xz - yw)
+            result[2, 1] = 2 * (yz + xw)
+            result[2, 2] = 1 - 2 * (xx + yy)
         }
 
     }

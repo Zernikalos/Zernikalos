@@ -19,6 +19,15 @@ class MrVector3f(var x: Float, var y: Float, var z: Float) {
     val norm2: Float
         get() = sqrt(Companion.dot(this, this))
 
+    operator fun set(i: Int, value: Float) {
+        when(i) {
+            0 -> x = value
+            1 -> y = value
+            2 -> z = value
+            else -> throw Error("Out of bounds array access")
+        }
+    }
+
     fun setValues(x: Float, y: Float, z: Float) {
         this.x = x
         this.y = y
@@ -106,6 +115,14 @@ class MrVector3f(var x: Float, var y: Float, var z: Float) {
             return op1.x * op2.x + op1.y * op2.y + op1.z * op2.z
         }
 
+        fun norm2(v: MrVector3f): Float {
+            return sqrt(dot(v, v))
+        }
+
+        fun norm2(x: Float, y: Float, z: Float): Float {
+            return x * x + y * y + z * z
+        }
+
         fun multScalar(result: MrVector3f, scalar: Float, v: MrVector3f) {
             result.x = scalar * v.x
             result.y = scalar * v.y
@@ -135,6 +152,24 @@ class MrVector3f(var x: Float, var y: Float, var z: Float) {
             result.x = (1 - t) * op1.x + t * op2.x
             result.y = (1 - t) * op1.y + t * op2.y
             result.z = (1 - t) * op1.z + t * op2.z
+        }
+
+        fun rotateVector(result: MrVector3f, q: MrQuaternion, v: MrVector3f) {
+            val q1 = MrQuaternion()
+            val q2 = MrQuaternion()
+
+            //Qv = Q(0,vx,vy,vz)
+            MrQuaternion.fromVec3(q1, v)
+            //q=q/||q||
+            MrQuaternion.normalize(q2, q)
+
+            //q*Qv
+            MrQuaternion.mult(q1, q2, q1)
+            //q^
+            MrQuaternion.conjugate(q2, q2)
+            //q*Qv*q^
+            MrQuaternion.mult(q1, q1, q2)
+            result.setValues(q1.x, q1.y, q1.z)
         }
 
     }
