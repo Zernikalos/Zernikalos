@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mrrobotto.iml" filepath="$PROJECT_DIR$/.idea/modules/mrrobotto.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mrrobotto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/mrrobotto.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mrrobotto.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mrrobotto.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/androidMain/androidMain.iml" filepath="$PROJECT_DIR$/src/androidMain/androidMain.iml" />
     </modules>
   </component>
 </project>

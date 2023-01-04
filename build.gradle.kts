@@ -1,12 +1,18 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    val kotlinVersion = "1.7.20"
+
+    kotlin("multiplatform") version kotlinVersion
     id("com.android.library") version "7.3.1" apply true
-    id("org.jetbrains.kotlin.android") version "1.7.20" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20" apply true
+    id("org.jetbrains.kotlin.android") version kotlinVersion apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion apply true
 }
 
 group = "mr.robotto"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
+
+ext {
+    version = "1.8.0"
+}
 
 repositories {
     gradlePluginPortal()
@@ -19,8 +25,10 @@ android {
     compileSdk=33
 
     defaultConfig {
-        minSdk=28
+        minSdk=24
         targetSdk=33
+
+        version="0.0.1"
 
         testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
         // consumerProguardFiles="consumer-rules.pro"
@@ -55,7 +63,7 @@ kotlin {
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
                 output?.library = "mrrobotto"
-                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
+                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
             }
         }
     }
@@ -70,24 +78,31 @@ kotlin {
 
     
     sourceSets {
+        all {
+            languageSettings.optIn("mr.robotto.OptInAnnotation")
+            languageSettings.optIn("kotlin.js.ExperimentalJsExport")
+        }
+
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
-
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
+        //val commonTest by getting {
+        //    dependencies {
+        //        implementation(kotlin("test"))
+        //    }
+        //}
         // val jvmMain by getting
         // val jvmTest by getting
-        val androidMain by getting
-        val androidTest by getting
+        val androidMain by getting {
+
+        }
+        // val androidTest by getting
         val jsMain by getting
-        val jsTest by getting
+        // val jsTest by getting
         // val nativeMain by getting
         // val nativeTest by getting
     }

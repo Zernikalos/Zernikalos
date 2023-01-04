@@ -1,6 +1,7 @@
 package mr.robotto
 
 import android.opengl.GLES30
+import java.nio.ByteBuffer
 
 actual class MrRenderingContext {
 
@@ -58,14 +59,85 @@ actual class MrRenderingContext {
         return GLES30.glGetShaderInfoLog(shader.id as Int)
     }
 
+    actual fun bindAttribLocation(program: GLWrap, index: Int, attrName: String) {
+        GLES30.glBindAttribLocation(program.id as Int, index, attrName)
+    }
+
+    actual fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap {
+        val id = GLES30.glGetUniformLocation(program.id as Int, uniformName)
+        return GLWrap(id)
+    }
+
+    actual fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray) {
+        GLES30.glUniformMatrix4fv(uniform.id as Int, count, transpose, values, 0)
+    }
+
+    actual fun createBuffer(): GLWrap {
+        val buff: IntArray = IntArray(1)
+        GLES30.glGenBuffers(1, buff, 0)
+        val id = buff[0]
+        return GLWrap(id)
+    }
+
+    actual fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap) {
+        GLES30.glBindBuffer(targetType.value, buffer.id as Int)
+    }
+
+    actual fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType) {
+        val buff = ByteBuffer.wrap(dataArray)
+        GLES30.glBufferData(targetType.value, dataArray.size, buff, usageType.value)
+    }
+
+    actual fun enableVertexAttrib(index: Int) {
+        GLES30.glEnableVertexAttribArray(index)
+    }
+
+    actual fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) {
+        GLES30.glVertexAttribPointer(index, size, type, normalized, stride, offset)
+    }
+
+    actual fun createVertexArray(): GLWrap {
+        val buff: IntArray = IntArray(1)
+        GLES30.glGenVertexArrays(1, buff, 0)
+        val id = buff[0]
+        return GLWrap(id)
+    }
+
+    actual fun bindVertexArray(vao: GLWrap) {
+        GLES30.glBindVertexArray(vao.id as Int)
+    }
+
+    actual fun drawArrays(mode: Int, first: Int, count: Int) {
+        GLES30.glDrawArrays(mode, first, count)
+    }
+
+
 }
 
-actual object BufferBit {
+actual object ExpectTypes {
+    actual val FLOAT: Int = GLES30.GL_FLOAT
+}
+
+actual object ExpectBufferTargetType {
+    actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
+    actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER
+}
+
+actual object ExpectBufferUsageType {
+    actual val STATIC_DRAW: Int = GLES30.GL_STATIC_DRAW
+}
+
+actual object ExpectBufferBit {
     actual val COLOR_BUFFER: Int = GLES30.GL_COLOR_BUFFER_BIT
     actual val DEPTH_BUFFER: Int = GLES30.GL_DEPTH_BUFFER_BIT
 }
 
-actual object ShaderType {
+actual object ExpectShaderType {
     actual val VERTEX_SHADER: Int = GLES30.GL_VERTEX_SHADER
     actual val FRAGMENT_SHADER: Int = GLES30.GL_FRAGMENT_SHADER
+}
+
+actual object ExpectDrawModes {
+    actual val TRIANGLES: Int = GLES30.GL_TRIANGLES
+    actual val LINES: Int = GLES30.GL_LINES
 }

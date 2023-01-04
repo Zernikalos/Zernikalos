@@ -1,49 +1,35 @@
 package mr.robotto.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.GLWrap
 import mr.robotto.ShaderType
-import mr.robotto.components.MrComponent
-import mr.robotto.components.MrComponentData
-import mr.robotto.components.MrComponentRender
-import mr.robotto.components.MrComponentSerializer
-
-@Serializable(with = MrShaderSerializer::class)
-class MrShader: MrComponent<MrShaderData, MrShaderRender>() {
-
-    override lateinit var data: MrShaderData
-    override var renderer: MrShaderRender = MrShaderRender()
-
-    val shader: GLWrap
-        get() = data.shader
-}
+import mr.robotto.components.*
 
 @Serializable
-class MrShaderData(val type: String, val source: String, @Transient var shader: GLWrap = GLWrap()): MrComponentData()
+class MrShader(private val type: String, private val source: String): MrComponent() {
 
-class MrShaderRender: MrComponentRender<MrShaderData>() {
+    @Transient var shader: GLWrap = GLWrap()
 
-    override fun internalInitialize() {
-        val type = if (data.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
-        val shader = createShader(type)
+    override fun renderInitialize() {
+        val type = if (type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
+        val shad = createShader(type)
+        // TODO
         // if (shaderId <= 0) {
         //     throw Error("Error creating shader")
         // }
 
-        compileShader(shader, data.source)
-        checkShader(shader)
+        compileShader(shad, source)
+        checkShader(shad)
 
-        data.shader = shader
+        shader = shad
     }
 
     override fun render() {
     }
 
-    private fun createShader(shaderType: Int): GLWrap {
-        return context.createShader(shaderType)
+    private fun createShader(shaderType: ShaderType): GLWrap {
+        return context.createShader(shaderType.value)
     }
 
     private fun compileShader(shader: GLWrap, source: String) {
@@ -56,17 +42,8 @@ class MrShaderRender: MrComponentRender<MrShaderData>() {
         val compilerError = context.getError()
         if (compilerStatus != "" || compilerError > 0) {
             context.deleteShader(shader)
-            throw Error("Error compiling shader")
+            throw Error("Error compiling shader $compilerStatus")
         }
-    }
-
-}
-
-class MrShaderSerializer: MrComponentSerializer<MrShader, MrShaderData>() {
-    override val deserializationStrategy: DeserializationStrategy<MrShaderData> = MrShaderData.serializer()
-
-    override fun createDeserializationInstance(): MrShader {
-        return MrShader()
     }
 
 }

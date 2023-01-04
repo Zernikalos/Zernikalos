@@ -1,37 +1,34 @@
 package mr.robotto.components.mesh
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import mr.robotto.MrRenderingContext
-import mr.robotto.components.MrComponent
-import mr.robotto.components.MrComponentData
-import mr.robotto.components.MrComponentRender
-import mr.robotto.components.MrComponentSerializer
-
-@Serializable(with = MrMeshSerializer::class)
-class MrMesh : MrComponent<MrMeshData, MrMeshRender>() {
-    override lateinit var data: MrMeshData
-    override var renderer: MrMeshRender = MrMeshRender()
-}
+import kotlinx.serialization.Transient
+import mr.robotto.DrawModes
+import mr.robotto.components.*
+import mr.robotto.components.buffer.MrBuffer
+import mr.robotto.components.buffer.MrVertexArray
 
 @Serializable
-class MrMeshData(val indices: Array<Int>, val attributes: Map<String, MrAttribute>): MrComponentData()
+class MrMesh: MrComponent() {
+    private lateinit var attributeKeys: Map<String, MrAttributeKey>
+    private lateinit var indices: MrBuffer
+    private lateinit var vertices: Map<String, MrBuffer>
 
-class MrMeshRender: MrComponentRender<MrMeshData>() {
-    override fun internalInitialize() {
+    @Transient
+    val vao: MrVertexArray = MrVertexArray()
+
+    override fun renderInitialize() {
+        vao.initialize(context)
+
+        attributeKeys.forEach { (name, attr) ->
+            val buffer = vertices[name]
+            buffer?.initialize(context)
+            attr.initialize(context)
+        }
     }
 
     override fun render() {
-    }
-
-}
-
-class MrMeshSerializer: MrComponentSerializer<MrMesh, MrMeshData>() {
-
-    override val deserializationStrategy: DeserializationStrategy<MrMeshData> = MrMeshData.serializer()
-
-    override fun createDeserializationInstance(): MrMesh {
-        return MrMesh()
+        vao.render()
+        context.drawArrays(DrawModes.TRIANGLES.value, 0, 36)
     }
 
 }

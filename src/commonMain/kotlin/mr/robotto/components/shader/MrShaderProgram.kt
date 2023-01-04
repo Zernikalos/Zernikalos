@@ -1,22 +1,13 @@
 package mr.robotto.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import mr.robotto.components.MrComponent
-import mr.robotto.components.MrComponentData
-import mr.robotto.components.MrComponentRender
-import mr.robotto.components.MrComponentSerializer
-
-@Serializable(with = MrShaderProgramSerializer::class)
-class MrShaderProgram: MrComponent<MrShaderProgramData, MrShaderProgramRender>() {
-    override var data: MrShaderProgramData = MrShaderProgramData()
-    override var renderer: MrShaderProgramRender = MrShaderProgramRender()
-}
+import mr.robotto.components.*
+import mr.robotto.math.MrMatrix4f
 
 @Serializable
-class MrShaderProgramData: MrComponentData() {
+class MrShaderProgram(): MrComponent() {
     @Transient
     val program: MrProgram = MrProgram()
 
@@ -25,43 +16,56 @@ class MrShaderProgramData: MrComponentData() {
     @SerialName("fragmentShader")
     lateinit var fragmentShader: MrShader
 
-    var attributes: Map<String, MrShaderAttribute> = HashMap()
-    @Transient
-    var uniforms: List<MrShaderUniform> = ArrayList()
-}
+    private val attributes: HashMap<String, MrAttribute> = HashMap()
 
-class MrShaderProgramRender: MrComponentRender<MrShaderProgramData>() {
-    override fun internalInitialize() {
-        data.program.initialize(context)
+    private var uniforms: HashMap<String, MrUniform> = HashMap()
 
-        data.vertexShader.initialize(context)
-        attachShader(data.program, data.vertexShader)
+    constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IMrShaderAttribute>, uniforms: Map<String, IMrShaderUniform>) : this() {
+        vertexShader = MrShader("vertex", vertexShaderSource)
+        fragmentShader = MrShader("fragment", fragmentShaderSource)
 
-        data.fragmentShader.initialize(context)
-        attachShader(data.program, data.fragmentShader)
+        attributes.forEach { (key, attrInput) ->
+            this.attributes[key] = MrAttribute(attrInput.index, attrInput.attributeName)
+        }
 
-        data.attributes.forEach { (_, value) -> value.initialize(context) }
+        uniforms.forEach { (key, uniformInput) ->
+            this.uniforms[key] = MrUniform(key, uniformInput.count, uniformInput.type)
+        }
+    }
 
-        data.program.link()
-        data.uniforms.forEach { it.initialize(context) }
+    override fun renderInitialize() {
+        program.initialize(context)
+
+        vertexShader.initialize(context)
+        attachShader(program, vertexShader)
+
+        fragmentShader.initialize(context)
+        attachShader(program, fragmentShader)
+
+        attributes.values.forEach { attr ->
+            attr.initialize(context)
+            attr.bindLocation(program)
+        }
+
+        program.link()
+        uniforms.values.forEach { uniform ->
+            uniform.initialize(context)
+            uniform.bindLocation(program)
+        }
     }
 
     override fun render() {
-        data.program.render()
-        data.uniforms.forEach { it.render() }
+        program.render()
+        uniforms.values.forEach {
+            val m = MrMatrix4f.Identity
+            // m.translate(0f, 0f, -6f)
+            m[2, 3] = -6f
+            it.bindValue(m.values)
+        }
     }
 
     private fun attachShader(program: MrProgram, shader: MrShader) {
-        context.attachShader(program.program, shader.shader)
-    }
-
-}
-
-class MrShaderProgramSerializer: MrComponentSerializer<MrShaderProgram, MrShaderProgramData>() {
-    override val deserializationStrategy: DeserializationStrategy<MrShaderProgramData> = MrShaderProgramData.serializer()
-
-    override fun createDeserializationInstance(): MrShaderProgram {
-        return MrShaderProgram()
+        context.attachShader(program.programId, shader.shader)
     }
 
 }
