@@ -1,4 +1,6 @@
 
+rootProject.name = "mrrobotto"
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -6,5 +8,3 @@ pluginManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "mrrobotto"

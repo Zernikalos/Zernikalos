@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
     val kotlinVersion = "1.7.20"
 
@@ -11,10 +9,6 @@ plugins {
 
 group = "mr.robotto"
 version = "0.0.1"
-
-ext {
-    version = "1.8.0"
-}
 
 repositories {
     gradlePluginPortal()
@@ -41,7 +35,6 @@ android {
 
 }
 
-
 val lwjglVersion = "3.3.1"
 
 val lwjglNatives = Pair(
@@ -60,13 +53,14 @@ val lwjglNatives = Pair(
 }
 
 kotlin {
+
     android {
 
     }
 
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "18"
+            kotlinOptions.jvmTarget = "1.8"
         }
         // withJava()
         testRuns["test"].executionTask.configure {
@@ -87,14 +81,14 @@ kotlin {
             }
         }
     }
-    // val hostOs = System.getProperty("os.name")
-    // val isMingwX64 = hostOs.startsWith("Windows")
-    /* val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        isMingwX64 -> mingwX64("native")
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    } */
+//    val hostOs = System.getProperty("os.name")
+//    val isMingwX64 = hostOs.startsWith("Windows")
+//    val nativeTarget = when {
+//        hostOs == "Mac OS X" -> macosX64("native")
+//        hostOs == "Linux" -> linuxX64("native")
+//        isMingwX64 -> mingwX64("native")
+//        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
+//    }
 
     
     sourceSets {
@@ -110,13 +104,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
-        //val commonTest by getting {
-        //    dependencies {
-        //        implementation(kotlin("test"))
-        //    }
-        //}
-
         val jvmMain by getting {
+            kotlin.srcDir("src/jvmMain/kotlin")
+
             dependencies {
                 // implementation("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
@@ -126,22 +116,19 @@ kotlin {
                 implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
                 implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
                 implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-//                runtimeOnly("org.lwjgl.lwjgl", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl.lwjgl-assimp", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl.lwjgl-glfw", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl.lwjgl-openal", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl.lwjgl-opengl", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl.lwjgl-stb", classifier = lwjglNatives)
+                runtimeOnly("org.lwjgl.lwjgl:$lwjglVersion:$lwjglNatives")
+                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
+                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
+                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
+                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
+                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
             }
         }
         // val jvmTest by getting
         val androidMain by getting {
-
+            kotlin.srcDir("src/androidMain/kotlin")
         }
         // val androidTest by getting
         val jsMain by getting
-        // val jsTest by getting
-        // val nativeMain by getting
-        // val nativeTest by getting
     }
 }
