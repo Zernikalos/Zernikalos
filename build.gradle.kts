@@ -1,19 +1,18 @@
 plugins {
-    val kotlinVersion = "1.7.20"
-
-    kotlin("multiplatform") version kotlinVersion
-    id("com.android.library") version "7.3.1" apply true
-    id("org.jetbrains.kotlin.android") version kotlinVersion apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion apply true
+    kotlin("multiplatform") apply true
+    id("com.android.library") apply true
+    id("org.jetbrains.kotlin.android") apply false
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 group = "mr.robotto"
 version = "0.0.1"
 
 repositories {
+    mavenLocal()
+    mavenCentral()
     gradlePluginPortal()
     google()
-    mavenCentral()
 }
 
 android {
@@ -53,7 +52,6 @@ val lwjglNatives = Pair(
 }
 
 kotlin {
-
     android {
 
     }
@@ -116,12 +114,19 @@ kotlin {
                 implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
                 implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
                 implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-                runtimeOnly("org.lwjgl.lwjgl:$lwjglVersion:$lwjglNatives")
-                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
-                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
-                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
-                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
-                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
+//
+//                runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl", "lwjgl-assimp", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
+//                runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = lwjglNatives)
+
+//                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
+//                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
+//                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
+//                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
+//                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
             }
         }
         // val jvmTest by getting
