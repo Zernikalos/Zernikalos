@@ -1,5 +1,6 @@
 package mr.robotto.ui
 
+import mr.robotto.MrRenderingContext
 import org.lwjgl.glfw.*
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.system.MemoryStack.*
@@ -79,4 +80,17 @@ actual class MrSurfaceView {
         // Make the window visible
         glfwShowWindow(window)
     }
+
+    actual val width: Int
+        get() = TODO("Not yet implemented")
+    actual val height: Int
+        get() = TODO("Not yet implemented")
+
+    actual fun onReady() {
+    }
+
+    actual val stateHandlerBridge: MrSurfaceStateHandlerBridge
+        get() = TODO("Not yet implemented")
+    actual val renderingContext: MrRenderingContext
+        get() = TODO("Not yet implemented")
 }
