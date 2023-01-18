@@ -29,8 +29,6 @@ class MrBuffer: MrComponent() {
 
         context.bindBuffer(targetBuffer, buffer)
         context.bufferData(targetBuffer, dataArray, usage)
-        //context.enableVertexAttrib(0)
-        //context.vertexAttribPointer(0, 3, Types.FLOAT.value, false, 0, 0)
     }
 
     override fun render() {

@@ -3,6 +3,7 @@ plugins {
     id("com.android.library") apply true
     id("org.jetbrains.kotlin.android") apply false
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 group = "mr.robotto"
