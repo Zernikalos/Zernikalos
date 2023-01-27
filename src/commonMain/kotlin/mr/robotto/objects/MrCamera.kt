@@ -20,11 +20,10 @@ class MrCamera: MrObject {
         this.up.copy(up)
     }
 
-    override fun internalInitialize(ctx: MrRenderingContext) {
+    override fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
     }
 
     override fun internalRender() {
     }
-
 
 }

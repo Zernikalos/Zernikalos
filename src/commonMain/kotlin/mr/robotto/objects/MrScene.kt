@@ -8,7 +8,7 @@ import kotlin.js.JsExport
 class MrScene: MrObject() {
     var viewport: MrViewport = MrViewport()
 
-    override fun internalInitialize(ctx: MrRenderingContext) {
+    override fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
         viewport.initialize(ctx)
     }
 

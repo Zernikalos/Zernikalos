@@ -7,7 +7,7 @@ import mr.robotto.MrRenderingContext
 @Serializable
 @SerialName("Group")
 class MrGroup: MrObject() {
-    override fun internalInitialize(ctx: MrRenderingContext) {
+    override fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
     }
 
     override fun internalRender() {

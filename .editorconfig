@@ -1,0 +1,4 @@
+[*.kt]
+ktlint_code_style = official
+indent_size = 4 # possible values: number (e.g. 2), "unset" (makes ktlint ignore indentation completely)
+indent_style = space # or "tab"

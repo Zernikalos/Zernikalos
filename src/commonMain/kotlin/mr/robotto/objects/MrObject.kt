@@ -17,9 +17,9 @@ abstract class MrObject {
     @JsName("children")
     var children: Array<@Polymorphic MrObject> = emptyArray()
 
-    fun initialize(ctx: MrRenderingContext) {
-        internalInitialize(ctx)
-        children.forEach { child -> child.initialize(ctx) }
+    fun initialize(sceneContext: MrSceneContext, renderingContext: MrRenderingContext) {
+        internalInitialize(sceneContext, renderingContext)
+        children.forEach { child -> child.initialize(sceneContext, renderingContext) }
     }
 
     fun render() {
@@ -31,7 +31,7 @@ abstract class MrObject {
         children += child
     }
 
-    protected abstract fun internalInitialize(ctx: MrRenderingContext)
+    protected abstract fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext)
 
     protected abstract fun internalRender()
 
