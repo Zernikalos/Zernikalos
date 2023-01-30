@@ -3,6 +3,7 @@ package mr.robotto.components.shader
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.GLWrap
+import mr.robotto.MrRenderingContext
 import mr.robotto.MrTypes
 import mr.robotto.components.MrComponent
 
@@ -16,21 +17,21 @@ class MrUniform(private val uniformName: String, private val count: Int, val typ
     @Transient
     lateinit var uniformId: GLWrap
 
-    override fun renderInitialize() {
+    override fun initialize(ctx: MrRenderingContext) {
     }
 
-    fun bindLocation(program: MrProgram) {
-        uniformId = context.getUniformLocation(program.programId, uniformName)
+    fun bindLocation(ctx: MrRenderingContext, program: MrProgram) {
+        uniformId = ctx.getUniformLocation(program.programId, uniformName)
     }
 
-    fun bindValue(values: FloatArray) {
+    fun bindValue(ctx: MrRenderingContext, values: FloatArray) {
         when (type) {
-            MrTypes.MAT4 -> context.uniformMatrix4fv(uniformId, count, false, values)
+            MrTypes.MAT4 -> ctx.uniformMatrix4fv(uniformId, count, false, values)
             else -> return
         }
     }
 
-    override fun render() {
+    override fun render(ctx: MrRenderingContext) {
     }
 
 }

@@ -3,6 +3,7 @@ package mr.robotto.components.shader
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import mr.robotto.MrRenderingContext
 import mr.robotto.components.*
 import mr.robotto.math.MrMatrix4f
 
@@ -33,39 +34,39 @@ class MrShaderProgram(): MrComponent() {
         }
     }
 
-    override fun renderInitialize() {
-        program.initialize(context)
+    override fun initialize(ctx: MrRenderingContext) {
+        program.initialize(ctx)
 
-        vertexShader.initialize(context)
-        attachShader(program, vertexShader)
+        vertexShader.initialize(ctx)
+        attachShader(ctx, program, vertexShader)
 
-        fragmentShader.initialize(context)
-        attachShader(program, fragmentShader)
+        fragmentShader.initialize(ctx)
+        attachShader(ctx, program, fragmentShader)
 
         attributes.values.forEach { attr ->
-            attr.initialize(context)
-            attr.bindLocation(program)
+            attr.initialize(ctx)
+            attr.bindLocation(ctx, program)
         }
 
-        program.link()
+        program.link(ctx)
         uniforms.values.forEach { uniform ->
-            uniform.initialize(context)
-            uniform.bindLocation(program)
+            uniform.initialize(ctx)
+            uniform.bindLocation(ctx, program)
         }
     }
 
-    override fun render() {
-        program.render()
+    override fun render(ctx: MrRenderingContext) {
+        program.render(ctx)
         uniforms.values.forEach {
             val m = MrMatrix4f.Identity
             // m.translate(0f, 0f, -6f)
             m[2, 3] = -6f
-            it.bindValue(m.values)
+            it.bindValue(ctx, m.values)
         }
     }
 
-    private fun attachShader(program: MrProgram, shader: MrShader) {
-        context.attachShader(program.programId, shader.shader)
+    private fun attachShader(ctx: MrRenderingContext, program: MrProgram, shader: MrShader) {
+        ctx.attachShader(program.programId, shader.shader)
     }
 
 }

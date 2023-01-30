@@ -10,7 +10,7 @@ class MrGroup: MrObject() {
     override fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
     }
 
-    override fun internalRender() {
+    override fun internalRender(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
 
     }
 }

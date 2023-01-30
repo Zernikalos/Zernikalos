@@ -12,7 +12,7 @@ class MrScene: MrObject() {
         viewport.initialize(ctx)
     }
 
-    override fun internalRender() {
-        viewport.render()
+    override fun internalRender(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
+        viewport.render(ctx)
     }
 }

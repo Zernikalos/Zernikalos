@@ -19,8 +19,8 @@ class MrModel: MrObject() {
         mesh.initialize(ctx)
     }
 
-    override fun internalRender() {
-        shaderProgram.render()
-        mesh.render()
+    override fun internalRender(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
+        shaderProgram.render(ctx)
+        mesh.render(ctx)
     }
 }

@@ -1,6 +1,7 @@
 package mr.robotto.components.shader
 
 import kotlinx.serialization.Serializable
+import mr.robotto.MrRenderingContext
 import mr.robotto.components.*
 
 interface IMrShaderAttribute {
@@ -11,14 +12,14 @@ interface IMrShaderAttribute {
 @Serializable
 class MrAttribute(private val index: Int, private val attributeName: String): MrComponent() {
 
-    override fun renderInitialize() {
+    override fun initialize(ctx: MrRenderingContext) {
     }
 
-    fun bindLocation(program: MrProgram) {
-        context.bindAttribLocation(program.programId, index, attributeName)
+    fun bindLocation(ctx: MrRenderingContext, program: MrProgram) {
+        ctx.bindAttribLocation(program.programId, index, attributeName)
     }
 
-    override fun render() {
+    override fun render(ctx: MrRenderingContext) {
     }
 
 }

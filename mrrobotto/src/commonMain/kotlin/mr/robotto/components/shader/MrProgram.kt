@@ -1,14 +1,15 @@
 package mr.robotto.components.shader
 
 import mr.robotto.GLWrap
+import mr.robotto.MrRenderingContext
 import mr.robotto.components.MrComponent
 
 class MrProgram: MrComponent() {
 
     lateinit var programId: GLWrap
 
-    override fun renderInitialize() {
-        val p = createProgram()
+    override fun initialize(ctx: MrRenderingContext) {
+        val p = ctx.createProgram()
         // TODO
         /* if (program <= 0) {
             val err = context.getError()
@@ -17,16 +18,12 @@ class MrProgram: MrComponent() {
         programId = p
     }
 
-    override fun render() {
-        context.useProgram(programId)
+    override fun render(ctx: MrRenderingContext) {
+        ctx.useProgram(programId)
     }
 
-    fun link() {
-        context.linkProgram(programId)
-    }
-
-    private fun createProgram(): GLWrap {
-        return context.createProgram()
+    fun link(ctx: MrRenderingContext) {
+        ctx.linkProgram(programId)
     }
 
 }

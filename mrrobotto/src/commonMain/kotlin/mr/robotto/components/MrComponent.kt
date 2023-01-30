@@ -4,14 +4,8 @@ import mr.robotto.MrRenderingContext
 
 abstract class MrComponent {
 
-    protected lateinit var context: MrRenderingContext
+    abstract fun initialize(ctx: MrRenderingContext)
 
-    fun initialize(ctx: MrRenderingContext) {
-        context = ctx
-        renderInitialize()
-    }
+    abstract fun render(ctx: MrRenderingContext)
 
-    protected abstract fun renderInitialize()
-
-    abstract fun render()
 }

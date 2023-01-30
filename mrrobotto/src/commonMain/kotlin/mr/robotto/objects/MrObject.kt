@@ -22,9 +22,9 @@ abstract class MrObject {
         children.forEach { child -> child.initialize(sceneContext, renderingContext) }
     }
 
-    fun render() {
-        internalRender()
-        children.forEach { child -> child.render() }
+    fun render(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
+        internalRender(sceneContext, ctx)
+        children.forEach { child -> child.render(sceneContext, ctx) }
     }
 
     fun addChild(child: MrObject) {
@@ -33,6 +33,6 @@ abstract class MrObject {
 
     protected abstract fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext)
 
-    protected abstract fun internalRender()
+    protected abstract fun internalRender(sceneContext: MrSceneContext, ctx: MrRenderingContext)
 
 }

@@ -3,6 +3,7 @@ package mr.robotto.components.mesh
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.DrawModes
+import mr.robotto.MrRenderingContext
 import mr.robotto.components.*
 import mr.robotto.components.buffer.MrBuffer
 import mr.robotto.components.buffer.MrVertexArray
@@ -16,19 +17,19 @@ class MrMesh: MrComponent() {
     @Transient
     val vao: MrVertexArray = MrVertexArray()
 
-    override fun renderInitialize() {
-        vao.initialize(context)
+    override fun initialize(ctx: MrRenderingContext) {
+        vao.initialize(ctx)
 
         attributeKeys.forEach { (name, attr) ->
             val buffer = vertices[name]
-            buffer?.initialize(context)
-            attr.initialize(context)
+            buffer?.initialize(ctx)
+            attr.initialize(ctx)
         }
     }
 
-    override fun render() {
-        vao.render()
-        context.drawArrays(DrawModes.TRIANGLES.value, 0, 36)
+    override fun render(ctx: MrRenderingContext) {
+        vao.render(ctx)
+        ctx.drawArrays(DrawModes.TRIANGLES.value, 0, 36)
     }
 
 }

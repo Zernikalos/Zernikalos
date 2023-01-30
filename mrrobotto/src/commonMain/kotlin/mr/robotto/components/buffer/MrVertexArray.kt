@@ -1,19 +1,20 @@
 package mr.robotto.components.buffer
 
 import mr.robotto.GLWrap
+import mr.robotto.MrRenderingContext
 import mr.robotto.components.MrComponent
 
 class MrVertexArray: MrComponent() {
     private lateinit var vao: GLWrap
 
-    override fun renderInitialize() {
-        val auxVao = context.createVertexArray()
+    override fun initialize(ctx: MrRenderingContext) {
+        val auxVao = ctx.createVertexArray()
         // TODO Check existence
         vao = auxVao
-        context.bindVertexArray(vao)
+        ctx.bindVertexArray(vao)
     }
 
-    override fun render() {
-        context.bindVertexArray(vao)
+    override fun render(ctx: MrRenderingContext) {
+        ctx.bindVertexArray(vao)
     }
 }
