@@ -1,12 +1,21 @@
+import org.gradle.api.initialization.resolve.RepositoriesMode
+
 pluginManagement {
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
     }
+
+    plugins {
+        id("multiplatform") version "1.8.0"
+        id("com.android.library") version "7.3.1"
+        id("org.jetbrains.kotlin.android") version "1.8.0"
+        id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral()
@@ -14,3 +23,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MrRobottoSample"
 include ':app'
+
+include ':mrrobotto'
+project(':mrrobotto').projectDir = new File('../../mrrobotto')

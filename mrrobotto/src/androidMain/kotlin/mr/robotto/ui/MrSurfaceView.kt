@@ -3,10 +3,8 @@ package mr.robotto.ui
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import mr.robotto.MrRenderingContext
-import mr.robotto.components.MrViewport
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-
 
 actual class MrSurfaceView {
 
@@ -44,7 +42,6 @@ actual class MrSurfaceView {
 class AndroidNativeRenderer(private val stateHandlerBridge: MrSurfaceStateHandlerBridge) : GLSurfaceView.Renderer {
 
     val renderingContext: MrRenderingContext = MrRenderingContext()
-    private val scene: MrViewport = MrViewport()
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
 //        scene.initialize(renderingContext)
@@ -61,6 +58,6 @@ class AndroidNativeRenderer(private val stateHandlerBridge: MrSurfaceStateHandle
     }
 
     override fun onDrawFrame(p0: GL10?) {
-        scene.render()
+        stateHandlerBridge.onRender()
     }
 }
