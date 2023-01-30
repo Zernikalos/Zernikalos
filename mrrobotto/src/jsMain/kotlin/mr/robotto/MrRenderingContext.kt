@@ -11,7 +11,6 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
     fun bindVertexArray(vao: WebGLVertexArrayObject)
 }
 
-@OptIn(ExperimentalJsExport::class)
 @JsExport
 actual class MrRenderingContext {
 

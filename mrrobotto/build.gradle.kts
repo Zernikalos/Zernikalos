@@ -94,6 +94,7 @@ kotlin {
         all {
             languageSettings.optIn("mr.robotto.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
 
         val commonMain by getting {

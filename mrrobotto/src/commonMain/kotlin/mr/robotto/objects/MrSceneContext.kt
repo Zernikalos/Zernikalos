@@ -3,7 +3,6 @@ package mr.robotto.objects
 import mr.robotto.uniformgenerator.MrUniformGenerator
 import kotlin.js.JsExport
 
-@JsExport
 class MrSceneContext(val scene: MrScene) {
 
     private var _activeCamera: MrCamera? = null
