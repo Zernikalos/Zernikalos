@@ -4,13 +4,14 @@ import kotlin.js.JsName
 
 interface MrSceneStateHandler {
 
-    val sceneContext: MrSceneContext
+    @JsName("createSceneContext")
+    fun createSceneContext(): MrSceneContext
 
     @JsName("onReady")
-    fun onReady(renderingContext: MrRenderingContext)
+    fun onReady(sceneContext: MrSceneContext, renderingContext: MrRenderingContext)
 
     fun onResize(width: Int, height: Int)
 
     @JsName("onRender")
-    fun onRender(renderingContext: MrRenderingContext)
+    fun onRender(sceneContext: MrSceneContext, renderingContext: MrRenderingContext)
 }
