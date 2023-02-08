@@ -1,5 +1,7 @@
-package mr.robotto.objects
+package mr.robotto
 
+import mr.robotto.objects.MrCamera
+import mr.robotto.objects.MrScene
 import mr.robotto.uniformgenerator.MrUniformGenerator
 import kotlin.js.JsExport
 

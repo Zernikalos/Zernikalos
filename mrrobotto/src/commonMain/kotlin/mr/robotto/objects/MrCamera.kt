@@ -1,6 +1,7 @@
 package mr.robotto.objects
 
 import mr.robotto.MrRenderingContext
+import mr.robotto.MrSceneContext
 import mr.robotto.components.camera.MrLens
 import mr.robotto.math.MrVector3f
 

@@ -3,6 +3,7 @@ package mr.robotto.objects
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mr.robotto.MrRenderingContext
+import mr.robotto.MrSceneContext
 
 @Serializable
 @SerialName("Group")

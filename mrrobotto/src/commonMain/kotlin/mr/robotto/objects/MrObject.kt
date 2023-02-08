@@ -3,6 +3,7 @@ package mr.robotto.objects
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import mr.robotto.MrRenderingContext
+import mr.robotto.MrSceneContext
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.JsName

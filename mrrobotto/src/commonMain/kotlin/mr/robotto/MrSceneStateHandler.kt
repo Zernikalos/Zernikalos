@@ -1,6 +1,5 @@
 package mr.robotto
 
-import mr.robotto.objects.MrSceneContext
 import kotlin.js.JsName
 
 interface MrSceneStateHandler {
