@@ -1,16 +1,21 @@
 package mr.robotto.math
 
+import kotlinx.serialization.Transient
+
 class MrTransform {
 
-    val _matrix: MrMatrix4f = MrMatrix4f.Identity
+    @Transient
+    private val _matrix: MrMatrix4f = MrMatrix4f.Identity
 
-    val _location: MrVector3f   = MrVector3f.Zero
-    val _rotation: MrQuaternion = MrQuaternion.Identity
-    val _scale:    MrVector3f   = MrVector3f.Ones
+    private val _location: MrVector3f   = MrVector3f.Zero
+    private val _rotation: MrQuaternion = MrQuaternion.Identity
+    private val _scale:    MrVector3f   = MrVector3f.Ones
 
-    val _forward: MrVector3f = MrVector3f(1f, 0f, 0f)
-    val _right:   MrVector3f = MrVector3f(0f, 1f, 0f)
-    val _up:      MrVector3f = MrVector3f(0f, 0f, 1f)
+    private val _forward: MrVector3f = MrVector3f(1f, 0f, 0f)
+    private val _right:   MrVector3f = MrVector3f(0f, 1f, 0f)
+    private val _up:      MrVector3f = MrVector3f(0f, 0f, 1f)
+
+    constructor()
 
     constructor(location: MrVector3f, rotation: MrQuaternion, scale: MrVector3f) {
         _location.copy(location)

@@ -2,8 +2,10 @@ package mr.robotto.objects
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import mr.robotto.MrRenderingContext
 import mr.robotto.MrSceneContext
+import mr.robotto.math.MrTransform
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -17,6 +19,9 @@ abstract class MrObject {
 
     @JsName("children")
     var children: Array<@Polymorphic MrObject> = emptyArray()
+
+    @Transient
+    val transform: MrTransform = MrTransform()
 
     fun initialize(sceneContext: MrSceneContext, renderingContext: MrRenderingContext) {
         internalInitialize(sceneContext, renderingContext)

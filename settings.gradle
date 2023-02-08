@@ -1,0 +1,7 @@
+rootProject.name = "mrrobottoengine"
+
+include(":mrrobotto")
+include(":samples:mrrobottosample")
+
+project(":mrrobotto").name = "mrrobotto"
+project("samples:mrrobottosample").name = "mrrobottosample"

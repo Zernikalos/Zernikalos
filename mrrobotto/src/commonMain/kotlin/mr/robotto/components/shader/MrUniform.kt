@@ -4,16 +4,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import mr.robotto.GLWrap
 import mr.robotto.MrRenderingContext
-import mr.robotto.MrTypes
+import mr.robotto.MrUniformType
 import mr.robotto.components.MrComponent
 
 interface IMrShaderUniform {
     val count: Int
-    val type: MrTypes
+    val type: MrUniformType
 }
 
 @Serializable
-class MrUniform(private val uniformName: String, private val count: Int, val type: MrTypes): MrComponent() {
+class MrUniform(private val uniformName: String, private val count: Int, val type: MrUniformType): MrComponent() {
     @Transient
     lateinit var uniformId: GLWrap
 
@@ -26,7 +26,7 @@ class MrUniform(private val uniformName: String, private val count: Int, val typ
 
     fun bindValue(ctx: MrRenderingContext, values: FloatArray) {
         when (type) {
-            MrTypes.MAT4 -> ctx.uniformMatrix4fv(uniformId, count, false, values)
+            MrUniformType.MAT4 -> ctx.uniformMatrix4fv(uniformId, count, false, values)
             else -> return
         }
     }
