@@ -1,5 +1,6 @@
 package mr.robotto.ui
 
+import kotlinx.browser.window
 import mr.robotto.MrRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
@@ -23,10 +24,17 @@ actual class MrSurfaceView {
         onReady()
     }
 
-    actual fun onReady() {
+    private fun onReady() {
         renderingContext.setContext(canvas)
 
         stateHandlerBridge.onReady(renderingContext)
+
+        renderLoop()
+    }
+
+    private fun renderLoop() {
+        stateHandlerBridge.onRender(renderingContext)
+        window.setTimeout({renderLoop()}, 1000/60)
     }
 
 }

@@ -86,9 +86,6 @@ actual class MrSurfaceView {
     actual val height: Int
         get() = TODO("Not yet implemented")
 
-    actual fun onReady() {
-    }
-
     actual val stateHandlerBridge: MrSurfaceStateHandlerBridge
         get() = TODO("Not yet implemented")
     actual val renderingContext: MrRenderingContext

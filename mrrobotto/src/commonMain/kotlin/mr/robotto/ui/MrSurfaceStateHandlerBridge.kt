@@ -27,8 +27,8 @@ class MrSurfaceStateHandlerBridge {
         stateHandler?.onReady(renderingContext)
     }
 
-    fun onRender() {
-        stateHandler?.onRender()
+    fun onRender(renderingContext: MrRenderingContext) {
+        stateHandler?.onRender(renderingContext)
     }
 
 }

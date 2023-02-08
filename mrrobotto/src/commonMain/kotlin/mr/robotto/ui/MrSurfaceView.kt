@@ -9,6 +9,4 @@ expect class MrSurfaceView {
 
     val stateHandlerBridge: MrSurfaceStateHandlerBridge
     val renderingContext: MrRenderingContext
-
-    fun onReady()
 }
