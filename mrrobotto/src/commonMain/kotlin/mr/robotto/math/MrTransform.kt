@@ -1,7 +1,12 @@
 package mr.robotto.math
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
+@JsExport
+@Serializable
 class MrTransform {
 
     @Transient
@@ -15,8 +20,10 @@ class MrTransform {
     private val _right:   MrVector3f = MrVector3f(0f, 1f, 0f)
     private val _up:      MrVector3f = MrVector3f(0f, 0f, 1f)
 
+    @JsName("defaultCtor")
     constructor()
 
+    @JsName("argsCtor")
     constructor(location: MrVector3f, rotation: MrQuaternion, scale: MrVector3f) {
         _location.copy(location)
         _rotation.copy(rotation)
@@ -58,10 +65,12 @@ class MrTransform {
         MrQuaternion.fromAngleAxis(_rotation, angle, x, y, z)
     }
 
+    @JsName("rotateByVector")
     fun setRotation(angle: Float, axis: MrVector3f) {
         MrQuaternion.fromAngleAxis(_rotation, angle, axis)
     }
 
+    @JsName("setLookAtUp")
     fun setLookAt(look: MrVector3f, up: MrVector3f) {
         val m = MrMatrix4f()
         MrMatrix4f.lookAt(m, _location, look, up)
@@ -78,22 +87,27 @@ class MrTransform {
         _location.z += z
     }
 
+    @JsName("translateByVector")
     fun translate(v: MrVector3f) {
         translate(v.x, v.y, v.z)
     }
 
+    @JsName("scaleByValues")
     fun scale(sx: Float, sy: Float, sz: Float) {
         _scale.setValues(sx, sy, sz)
     }
 
+    @JsName("scaleByFactor")
     fun scale(s: Float) {
         _scale.setValues(s, s, s)
     }
 
+    @JsName("scaleByVector")
     fun scale(v: MrVector3f) {
         _scale.setValues(v.x, v.y, v.z)
     }
 
+    @JsName("rotateByQuat")
     fun rotate(q: MrQuaternion) {
         MrQuaternion.mult(_rotation, _rotation, q)
     }
@@ -104,10 +118,12 @@ class MrTransform {
         rotate(q)
     }
 
+    @JsName("rotateByAngleAxisVector")
     fun rotate(angle: Float, axis: MrVector3f) {
         rotate(angle, axis.x, axis.y, axis.z)
     }
 
+    @JsName("rotateAroundPointAxesThrough")
     fun rotateAround(angle: Float, point: MrVector3f, axis: MrVector3f, through: MrVector3f) {
         val q = MrQuaternion()
         MrQuaternion.fromAngleAxis(q, angle, axis)

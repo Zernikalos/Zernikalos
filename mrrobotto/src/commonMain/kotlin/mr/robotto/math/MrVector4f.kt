@@ -1,21 +1,32 @@
 package mr.robotto.math
 
+import kotlinx.serialization.Serializable
+import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-class MrVector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
+@JsExport
+@Serializable
+class MrVector4f(var x: Float, var y: Float, var z: Float, var w: Float): MrAlgebraObject {
 
+    @JsName("zeroCtor")
     constructor() : this(0f, 0f, 0f, 0f)
 
+    @JsName("repeatCtor")
     constructor(v: Float): this(v, v, v, v)
 
+    @JsName("copyCtor")
     constructor(v: MrVector3f) : this(v.x, v.y, v.z, 1.0f)
 
-    val values: FloatArray
+    override val values: FloatArray
         get() = floatArrayOf(x, y, z, w)
 
     val norm2: Float
         get() = sqrt(MrVector4f.dot(this, this))
+
+    override val size: Int
+        get() = 4
 
     fun setValues(x: Float, y: Float, z: Float, w: Float) {
         this.x = x
@@ -50,6 +61,7 @@ class MrVector4f(var x: Float, var y: Float, var z: Float, var w: Float) {
         return MrVector4f.dot(this, v)
     }
 
+    @JsName("timesScalar")
     operator fun times(scalar: Float): MrVector4f {
         val result = MrVector4f()
         MrVector4f.multScalar(result, scalar, this)

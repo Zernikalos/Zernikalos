@@ -1,20 +1,32 @@
 package mr.robotto.math
 
+import kotlinx.serialization.Serializable
+import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.math.abs
 
-class MrMatrix4f {
-    val values: FloatArray
+@JsExport
+@Serializable
+class MrMatrix4f: MrAlgebraObject {
 
+    override val values: FloatArray
+
+    override val size: Int
+        get() = values.size
+
+    @JsName("zeroCtor")
     constructor() {
         values = FloatArray(16)
         identity()
     }
 
+    @JsName("copyArrayCtor")
     constructor(values: Array<Float>) {
         checkDimension(values)
         this.values = values.toFloatArray()
     }
 
+    @JsName("copyCtor")
     constructor(values: FloatArray) {
         checkDimension(values)
         this.values = values.copyOf()
@@ -24,11 +36,13 @@ class MrMatrix4f {
         return values[i]
     }
 
+    @JsName("getIJ")
     operator fun get(i: Int, j: Int): Float {
         val k = 4 * j + i
         return values[k]
     }
 
+    @JsName("setIJ")
     operator fun set(i: Int, j: Int, v: Float) {
         val k = 4 * j + i
         values[k] = v
@@ -64,6 +78,7 @@ class MrMatrix4f {
         transposeIp(this)
     }
 
+    @JsName("translateByVector")
     fun translate(translation: MrVector3f) {
         translate(this, translation)
     }
@@ -154,6 +169,7 @@ class MrMatrix4f {
             }
         }
 
+        @JsName("multVec4")
         fun mult(result: MrVector4f, m: MrMatrix4f, v: MrVector4f) {
             val x = v.x
             val y = v.y
@@ -165,6 +181,7 @@ class MrMatrix4f {
             result[3] = m[3 + 4 * 0] * x + m[3 + 4 * 1] * y + m[3 + 4 * 2] * z + m[3 + 4 * 3] * w
         }
 
+        @JsName("multVec3")
         fun mult(result: MrVector3f, m: MrMatrix4f, v: MrVector3f) {
             val x = v.x
             val y = v.y
@@ -200,6 +217,7 @@ class MrMatrix4f {
             }
         }
 
+        @JsName("translateByVectorCopy")
         fun translate(result: MrMatrix4f, m: MrMatrix4f, translation: MrVector3f) {
             for (i in 0..11) {
                 result.values[i] = m.values[i]
@@ -209,6 +227,7 @@ class MrMatrix4f {
             }
         }
 
+        @JsName("translateByVector")
         fun translate(result: MrMatrix4f, translation: MrVector3f) {
             innerTranslate(result, translation.x, translation.y, translation.z)
         }
@@ -229,6 +248,7 @@ class MrMatrix4f {
             mult(result, result, rotQuat)
         }
 
+        @JsName("scaleByVectorCopy")
         fun scale(result: MrMatrix4f, m: MrMatrix4f, s: MrVector3f) {
             for (i in 0..3) {
                 result[i] = m[i] * s.x

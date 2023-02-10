@@ -1,19 +1,28 @@
 package mr.robotto.math
 
+import kotlinx.serialization.Serializable
+import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
+@JsExport
+@Serializable
+class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): MrAlgebraObject {
 
-    constructor() : this(1f, 0f, 0f, 0f)
-
-    val values: FloatArray
+    override val values: FloatArray
         get() = floatArrayOf(x, y, z, w)
+
+    override val size: Int
+        get() = 4
 
     val norm2: Float
         get() = sqrt(MrQuaternion.dot(this, this))
+
+    @JsName("identityCtor")
+    constructor() : this(1f, 0f, 0f, 0f)
 
     fun setValues(w: Float, x: Float, y: Float, z: Float) {
         this.x = x
@@ -40,6 +49,7 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
         return result
     }
 
+    @JsName("timesScalar")
     operator fun times(scalar: Float): MrQuaternion {
         val result = MrQuaternion()
         MrQuaternion.multScalar(result, scalar, this)
@@ -176,6 +186,7 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float) {
             fromAngleAxis(result, angle, axis.x, axis.y, axis.z)
         }
 
+        @JsName("fromAngleAxisPerValue")
         fun fromAngleAxis(result: MrQuaternion, angle: Float, x: Float, y: Float, z: Float) {
             //Axis normalization
             var norm: Float = MrVector3f.norm2(x, y, z)
