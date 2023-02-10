@@ -3,12 +3,13 @@ rootProject.name = "mrrobotto"
 
 pluginManagement {
     plugins {
-        val kotlinVersion = "1.8.0"
+        val kotlinPlugVersion = "1.8.10"
+        val androidPluginVer = "7.3.1"
 
-        kotlin("multiplatform") version kotlinVersion
-        id("com.android.library") version "7.3.1"
-        id("org.jetbrains.kotlin.android") version kotlinVersion
-        id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
+        kotlin("multiplatform") version kotlinPlugVersion
+        id("com.android.library") version androidPluginVer
+        id("org.jetbrains.kotlin.android") version kotlinPlugVersion
+        id("org.jetbrains.kotlin.plugin.serialization") version kotlinPlugVersion
         id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     }
 
