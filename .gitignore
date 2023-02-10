@@ -1,6 +1,6 @@
 build
 .gradle
-gradle
+*.jar
 local.properties
 kotlin-js-store
 output
