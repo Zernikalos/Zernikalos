@@ -11,7 +11,6 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@ExperimentalJsExport
 @Serializable
 @Polymorphic
 abstract class MrObject {
@@ -22,6 +21,25 @@ abstract class MrObject {
 
     @Transient
     val transform: MrTransform = MrTransform()
+
+    @Transient
+    private var _parent: MrObject? = null
+
+    val parent: MrObject?
+        get() = _parent
+
+    val hasParent: Boolean
+        get() = _parent != null
+
+    val isRoot: Boolean
+        get() = !hasParent
+
+    // TODO: Ugly hack for assigning parent after load from exporter
+    init {
+        for (child in children) {
+            assignThisParent(child)
+        }
+    }
 
     fun initialize(sceneContext: MrSceneContext, renderingContext: MrRenderingContext) {
         internalInitialize(sceneContext, renderingContext)
@@ -35,6 +53,11 @@ abstract class MrObject {
 
     fun addChild(child: MrObject) {
         children += child
+        assignThisParent(child)
+    }
+
+    private fun assignThisParent(obj: MrObject) {
+        obj._parent = this
     }
 
     protected abstract fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext)
