@@ -1,3 +1,5 @@
+package mr.robotto
+
 import mr.robotto.objects.MrObject
 
 fun upToRoot(obj: MrObject): Iterator<MrObject> {

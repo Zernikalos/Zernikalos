@@ -3,7 +3,7 @@ package mr.robotto.uniformgenerator
 import mr.robotto.MrSceneContext
 import mr.robotto.math.MrMatrix4f
 import mr.robotto.objects.MrObject
-import upToRoot
+import mr.robotto.upToRoot
 
 class MrModelViewProjectionGenerator: MrUniformGeneratorMat4f {
     override fun compute(sceneContext: MrSceneContext, obj: MrObject): MrMatrix4f {
