@@ -1,6 +1,10 @@
 package mr.robotto.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.abs

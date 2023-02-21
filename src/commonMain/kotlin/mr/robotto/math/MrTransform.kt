@@ -1,12 +1,16 @@
 package mr.robotto.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable
+@Serializable(with = MrTransformSerializer::class)
 class MrTransform {
 
     @Transient
@@ -148,4 +152,20 @@ class MrTransform {
         MrMatrix4f.mult(_right, _matrix, _right)
     }
 
+}
+
+@Serializable
+data class MrTransformSurrogate(val location: MrVector3f, val rotation: MrQuaternion, val scale: MrVector3f)
+
+class MrTransformSerializer : KSerializer<MrTransform> {
+    override val descriptor: SerialDescriptor = MrTransformSurrogate.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: MrTransform) {
+
+    }
+
+    override fun deserialize(decoder: Decoder): MrTransform {
+        val surrogate = decoder.decodeSerializableValue(MrTransformSurrogate.serializer())
+        return MrTransform(surrogate.location, surrogate.rotation, surrogate.scale)
+    }
 }

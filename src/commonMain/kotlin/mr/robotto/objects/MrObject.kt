@@ -19,7 +19,6 @@ abstract class MrObject {
     @JsName("children")
     var children: Array<@Polymorphic MrObject> = emptyArray()
 
-    @Transient
     val transform: MrTransform = MrTransform()
 
     @Transient
