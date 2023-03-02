@@ -19,7 +19,7 @@ val mrObjectModule = SerializersModule {
                 "Model" -> return@defaultDeserializer MrModel.serializer()
                 "Group" -> return@defaultDeserializer MrGroup.serializer()
 
-                else -> {return@defaultDeserializer MrModel.serializer()}
+                else -> {return@defaultDeserializer MrGroup.serializer()}
             }
         }
     }
