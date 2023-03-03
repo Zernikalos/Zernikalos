@@ -13,9 +13,9 @@ class MrShader(private val type: String, private val source: String): MrComponen
     @Transient var shader: GLWrap = GLWrap()
 
     override fun initialize(ctx: MrRenderingContext) {
-        val type = if (type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
+        val type = if (this.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
         val shad = createShader(ctx, type)
-        // TODO
+        // TODO: Take care with the cast since this breaks js
         // if (shaderId <= 0) {
         //     throw Error("Error creating shader")
         // }
@@ -43,7 +43,7 @@ class MrShader(private val type: String, private val source: String): MrComponen
         val compilerError = ctx.getError()
         if (compilerStatus != "" || compilerError > 0) {
             ctx.deleteShader(shader)
-            throw Error("Error compiling shader $compilerStatus")
+            throw Error("Error compiling shader $compilerError : $compilerStatus")
         }
     }
 
