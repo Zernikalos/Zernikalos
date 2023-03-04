@@ -54,6 +54,8 @@ expect class MrRenderingContext {
 
     fun enableVertexAttrib(index: Int)
 
+    fun enableVertexAttribArray(index: Int)
+
     fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
 
     /** VAO **/
@@ -66,6 +68,8 @@ expect class MrRenderingContext {
 
     fun drawArrays(mode: Int, first: Int, count: Int)
 
+    fun drawElements(mode: Int, count: Int, type: Int, offset: Int)
+
 }
 
 @OptIn(ExperimentalJsExport::class)
@@ -73,6 +77,7 @@ expect class MrRenderingContext {
 data class GLWrap(val id: Any? = null)
 
 enum class Types(val value: Int) {
+    UNSIGNED(ExpectTypes.UNSIGNED),
     FLOAT(ExpectTypes.FLOAT)
 }
 
@@ -106,6 +111,7 @@ enum class DrawModes(val value: Int) {
 }
 
 expect object ExpectTypes {
+    val UNSIGNED: Int
     val FLOAT: Int
 }
 

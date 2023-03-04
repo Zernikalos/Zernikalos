@@ -128,9 +128,14 @@ actual class MrRenderingContext {
         GL11.glDrawArrays(mode, first, count)
     }
 
+    actual fun drawElements(mode: Int, count: Int, type: Int, offset: Int) {
+        GL30.glDrawElements(mode, count, type, offset.toLong())
+    }
+
 }
 
 actual object ExpectTypes {
+    actual val UNSIGNED: Int = GL11.GL_UNSIGNED_INT
     actual val FLOAT: Int = GL11.GL_FLOAT
 }
 

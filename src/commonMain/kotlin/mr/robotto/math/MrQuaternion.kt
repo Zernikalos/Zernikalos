@@ -18,7 +18,7 @@ import kotlin.math.sqrt
 class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): MrAlgebraObject {
 
     override val values: FloatArray
-        get() = floatArrayOf(x, y, z, w)
+        get() = floatArrayOf(w, x, y, z)
 
     override val size: Int
         get() = 4

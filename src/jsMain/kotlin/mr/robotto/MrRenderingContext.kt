@@ -106,6 +106,10 @@ actual class MrRenderingContext {
         gl.enableVertexAttribArray(index)
     }
 
+    actual fun enableVertexAttribArray(index: Int) {
+        gl.enableVertexAttribArray(index)
+    }
+
     actual fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) {
         gl.vertexAttribPointer(index, size, type, normalized, stride, offset)
     }
@@ -123,9 +127,14 @@ actual class MrRenderingContext {
         gl.drawArrays(mode, first, count)
     }
 
+    actual fun drawElements(mode: Int, count: Int, type: Int, offset: Int) {
+        gl.drawElements(mode, count, type, offset)
+    }
+
 }
 
 actual object ExpectTypes {
+    actual val UNSIGNED: Int = WebGLRenderingContext.UNSIGNED_INT
     actual val FLOAT: Int = WebGLRenderingContext.FLOAT
 }
 

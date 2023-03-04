@@ -2,6 +2,8 @@ package mr.robotto.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import mr.robotto.MrRenderingContext
 import mr.robotto.MrSceneContext
 import mr.robotto.components.mesh.MrMesh
@@ -13,8 +15,10 @@ import kotlin.js.JsExport
 @Serializable
 @SerialName("Model")
 class MrModel: MrObject() {
-    private lateinit var mesh: MrMesh
+    @ProtoNumber(4)
     private lateinit var shaderProgram: MrShaderProgram
+    @ProtoNumber(5)
+    private lateinit var mesh: MrMesh
 
     override fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext) {
         shaderProgram.initialize(ctx)

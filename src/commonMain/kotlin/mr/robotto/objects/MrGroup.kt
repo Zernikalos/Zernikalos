@@ -4,7 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mr.robotto.MrRenderingContext
 import mr.robotto.MrSceneContext
+import kotlin.js.JsExport
 
+@JsExport
 @Serializable
 @SerialName("Group")
 class MrGroup: MrObject() {

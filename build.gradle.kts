@@ -59,15 +59,15 @@ kotlin {
         }
     }
 
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
-        // withJava()
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
+//    jvm {
+//        compilations.all {
+//            kotlinOptions.jvmTarget = "1.8"
+//        }
+//        // withJava()
+//        testRuns["test"].executionTask.configure {
+//            useJUnitPlatform()
+//        }
+//    }
 
     js(IR) {
         browser {
@@ -102,37 +102,38 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0-RC")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
             }
         }
-        val jvmMain by getting {
-            kotlin.srcDir("src/jvmMain/kotlin")
-
-            dependencies {
-                // implementation("org.lwjgl:lwjgl-bom:$lwjglVersion")
-
-                implementation("org.lwjgl:lwjgl:$lwjglVersion")
-                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
-                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
-                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
+//        val jvmMain by getting {
+//            kotlin.srcDir("src/jvmMain/kotlin")
 //
-//                runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl", "lwjgl-assimp", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
-//                runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = lwjglNatives)
-
-//                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
-//                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
-//                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
-//                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
-//                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
-            }
-        }
+//            dependencies {
+//                // implementation("org.lwjgl:lwjgl-bom:$lwjglVersion")
+//
+//                implementation("org.lwjgl:lwjgl:$lwjglVersion")
+//                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
+//                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+//                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
+//                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+//                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
+////
+////                runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
+////                runtimeOnly("org.lwjgl", "lwjgl-assimp", classifier = lwjglNatives)
+////                runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)
+////                runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = lwjglNatives)
+////                runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
+////                runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = lwjglNatives)
+//
+////                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
+////                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
+////                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
+////                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
+////                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
+//            }
+//        }
         // val jvmTest by getting
         val androidMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")

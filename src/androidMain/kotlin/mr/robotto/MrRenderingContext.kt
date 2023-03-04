@@ -92,6 +92,10 @@ actual class MrRenderingContext {
         GLES30.glEnableVertexAttribArray(index)
     }
 
+    actual fun enableVertexAttribArray(index: Int) {
+        GLES30.glEnableVertexAttribArray(index)
+    }
+
     actual fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) {
         GLES30.glVertexAttribPointer(index, size, type, normalized, stride, offset)
     }
@@ -111,10 +115,14 @@ actual class MrRenderingContext {
         GLES30.glDrawArrays(mode, first, count)
     }
 
+    actual fun drawElements(mode: Int, count: Int, type: Int, offset: Int) {
+        GLES30.glDrawElements(mode, count, type, offset)
+    }
 
 }
 
 actual object ExpectTypes {
+    actual val UNSIGNED: Int = GLES30.GL_UNSIGNED_INT
     actual val FLOAT: Int = GLES30.GL_FLOAT
 }
 

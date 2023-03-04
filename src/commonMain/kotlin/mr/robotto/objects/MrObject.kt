@@ -1,8 +1,13 @@
 package mr.robotto.objects
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import mr.robotto.MrRenderingContext
 import mr.robotto.MrSceneContext
 import mr.robotto.math.MrTransform
@@ -17,8 +22,10 @@ abstract class MrObject {
     lateinit var name: String
 
     @JsName("children")
+    @Transient
     var children: Array<@Polymorphic MrObject> = emptyArray()
 
+    @ProtoNumber(3)
     val transform: MrTransform = MrTransform()
 
     @Transient
@@ -62,5 +69,28 @@ abstract class MrObject {
     protected abstract fun internalInitialize(sceneContext: MrSceneContext, ctx: MrRenderingContext)
 
     protected abstract fun internalRender(sceneContext: MrSceneContext, ctx: MrRenderingContext)
+
+}
+
+@Serializable
+data class Surrogate(val type: String, val name: String)
+
+@Serializable
+data class Surrogate2(val type: String)
+
+class ObjSerializer: KSerializer<MrObject> {
+    override val descriptor: SerialDescriptor = Surrogate2.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): MrObject {
+        val type = decoder.decodeString()
+
+        // val aux = decoder.decodeSerializableValue(Surrogate.serializer())
+        println("hasta aqui llegamos")
+        return MrGroup()
+    }
+
+    override fun serialize(encoder: Encoder, value: MrObject) {
+        TODO("Not yet implemented")
+    }
 
 }
