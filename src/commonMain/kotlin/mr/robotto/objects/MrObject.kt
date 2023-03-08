@@ -19,14 +19,18 @@ import kotlin.js.JsName
 @Serializable
 @Polymorphic
 abstract class MrObject {
+    @ProtoNumber(1)
+    lateinit var id: String
+
+    @ProtoNumber(2)
     lateinit var name: String
+
+    @ProtoNumber(3)
+    val transform: MrTransform = MrTransform()
 
     @JsName("children")
     @Transient
     var children: Array<@Polymorphic MrObject> = emptyArray()
-
-    @ProtoNumber(3)
-    val transform: MrTransform = MrTransform()
 
     @Transient
     private var _parent: MrObject? = null
