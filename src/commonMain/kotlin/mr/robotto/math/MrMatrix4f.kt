@@ -245,7 +245,8 @@ class MrMatrix4f: MrAlgebraObject {
         fun rotate(result: MrMatrix4f, q: MrQuaternion) {
             val rotQuat = MrMatrix4f()
             fromQuaternion(rotQuat, q)
-            mult(result, result, rotQuat)
+            val aux = MrMatrix4f(result.values)
+            mult(result, aux, rotQuat)
         }
 
         @JsName("scaleByVectorCopy")
@@ -411,21 +412,27 @@ class MrMatrix4f: MrAlgebraObject {
             val y: Float = q.y
             val z: Float = q.z
             val w: Float = q.w
+
             val xx = x * x
             val xy = x * y
             val xz = x * z
             val xw = x * w
+
             val yy = y * y
             val yz = y * z
             val yw = y * w
+
             val zz = z * z
             val zw = z * w
+
             result[0, 0] = 1 - 2 * (yy + zz)
             result[0, 1] = 2 * (xy - zw)
             result[0, 2] = 2 * (xz + yw)
+
             result[1, 0] = 2 * (xy + zw)
             result[1, 1] = 1 - 2 * (xx + zz)
             result[1, 2] = 2 * (yz - xw)
+
             result[2, 0] = 2 * (xz - yw)
             result[2, 1] = 2 * (yz + xw)
             result[2, 2] = 1 - 2 * (xx + yy)

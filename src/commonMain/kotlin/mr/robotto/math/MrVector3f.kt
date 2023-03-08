@@ -137,7 +137,7 @@ class MrVector3f(var x: Float, var y: Float, var z: Float): MrAlgebraObject {
 
         @JsName("norm2PerValue")
         fun norm2(x: Float, y: Float, z: Float): Float {
-            return x * x + y * y + z * z
+            return sqrt(x * x + y * y + z * z)
         }
 
         fun multScalar(result: MrVector3f, scalar: Float, v: MrVector3f) {

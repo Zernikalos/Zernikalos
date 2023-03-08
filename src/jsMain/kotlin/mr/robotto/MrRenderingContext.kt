@@ -21,6 +21,10 @@ actual class MrRenderingContext {
         gl = context as WebGL2RenderingContext
     }
 
+    actual fun enable(feat: Int) {
+        gl.enable(feat)
+    }
+
     actual fun clearColor(r: Float, g: Float, b: Float, a: Float) {
         gl.clearColor(r, g, b, a)
     }
@@ -31,6 +35,10 @@ actual class MrRenderingContext {
 
     actual fun clear(buffer: Int) {
         gl.clear(buffer)
+    }
+
+    actual fun cullFace(mode: Int) {
+        gl.cullFace(mode)
     }
 
     actual fun createProgram(): GLWrap {
@@ -133,8 +141,17 @@ actual class MrRenderingContext {
 
 }
 
+actual object ExpectEnabler {
+    actual val DEPTH_TEST: Int = WebGLRenderingContext.DEPTH_TEST
+}
+
 actual object ExpectTypes {
-    actual val UNSIGNED: Int = WebGLRenderingContext.UNSIGNED_INT
+    actual val UNSIGNED_BYTE: Int = WebGLRenderingContext.UNSIGNED_BYTE
+    actual val BYTE: Int = WebGLRenderingContext.BYTE
+    actual val INT: Int = WebGLRenderingContext.INT
+    actual val UNSIGNED_INT: Int = WebGLRenderingContext.UNSIGNED_INT
+    actual val SHORT: Int = WebGLRenderingContext.SHORT
+    actual val UNSIGNED_SHORT: Int = WebGLRenderingContext.UNSIGNED_SHORT
     actual val FLOAT: Int = WebGLRenderingContext.FLOAT
 }
 
@@ -160,4 +177,10 @@ actual object ExpectShaderType {
 actual object ExpectDrawModes {
     actual val TRIANGLES: Int = WebGLRenderingContext.TRIANGLES
     actual val LINES: Int = WebGLRenderingContext.LINES
+}
+
+actual object ExpectCullModeType {
+    actual val FRONT: Int = WebGLRenderingContext.FRONT
+    actual val BACK: Int = WebGLRenderingContext.BACK
+    actual val FRONT_AND_BACK: Int = WebGLRenderingContext.FRONT_AND_BACK
 }

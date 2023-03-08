@@ -1,6 +1,8 @@
 package mr.robotto.components
 
 import mr.robotto.BufferBit
+import mr.robotto.CullModeType
+import mr.robotto.Enabler
 import mr.robotto.MrRenderingContext
 import mr.robotto.math.MrVector4f
 
@@ -12,6 +14,8 @@ class MrViewport: MrComponent() {
     override fun initialize(ctx: MrRenderingContext) {
         val vp = viewport
         ctx.viewport(0, 0, 700, 700)
+        ctx.enable(Enabler.DEPTH_TEST.value)
+        ctx.cullFace(CullModeType.FRONT.value)
     }
 
     override fun render(ctx: MrRenderingContext) {

@@ -6,6 +6,10 @@ import kotlin.js.JsExport
 
 expect class MrRenderingContext {
 
+    /** Commons **/
+
+    fun enable(feat: Int)
+
     /** Viewport **/
 
     fun clearColor(r: Float, g: Float, b: Float, a: Float)
@@ -13,6 +17,8 @@ expect class MrRenderingContext {
     fun viewport(top: Int, left: Int, width: Int, height: Int)
 
     fun clear(buffer: Int)
+
+    fun cullFace(mode: Int)
 
     /** ShaderProgram **/
 
@@ -76,8 +82,17 @@ expect class MrRenderingContext {
 @JsExport
 data class GLWrap(val id: Any? = null)
 
+enum class Enabler(val value: Int) {
+    DEPTH_TEST(ExpectEnabler.DEPTH_TEST)
+}
+
 enum class Types(val value: Int) {
-    UNSIGNED(ExpectTypes.UNSIGNED),
+    BYTE(ExpectTypes.BYTE),
+    UNSIGNED_BYTE(ExpectTypes.UNSIGNED_BYTE),
+    INT(ExpectTypes.INT),
+    UNSIGNED_INT(ExpectTypes.UNSIGNED_INT),
+    SHORT(ExpectTypes.SHORT),
+    UNSIGNED_SHORT(ExpectTypes.UNSIGNED_SHORT),
     FLOAT(ExpectTypes.FLOAT)
 }
 
@@ -105,13 +120,28 @@ enum class ShaderType(val value: Int) {
     FRAGMENT_SHADER(ExpectShaderType.FRAGMENT_SHADER)
 }
 
+enum class CullModeType(val value: Int) {
+    FRONT(ExpectCullModeType.FRONT),
+    BACK(ExpectCullModeType.BACK),
+    FRONT_AND_BACK(ExpectCullModeType.FRONT_AND_BACK)
+}
+
 enum class DrawModes(val value: Int) {
     TRIANGLES(ExpectDrawModes.TRIANGLES),
     LINES(ExpectDrawModes.LINES)
 }
 
+expect object ExpectEnabler {
+    val DEPTH_TEST: Int
+}
+
 expect object ExpectTypes {
-    val UNSIGNED: Int
+    val BYTE: Int
+    val UNSIGNED_BYTE: Int
+    val INT: Int
+    val UNSIGNED_INT: Int
+    val SHORT: Int
+    val UNSIGNED_SHORT: Int
     val FLOAT: Int
 }
 
@@ -137,4 +167,10 @@ expect object ExpectBufferUsageType {
 expect object ExpectDrawModes {
     val TRIANGLES: Int
     val LINES: Int
+}
+
+expect object ExpectCullModeType {
+    val FRONT: Int
+    val BACK: Int
+    val FRONT_AND_BACK: Int
 }

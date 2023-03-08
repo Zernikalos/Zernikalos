@@ -4,6 +4,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.cbor.ByteString
+import kotlinx.serialization.protobuf.ProtoNumber
 import mr.robotto.BufferTargetType
 import mr.robotto.BufferUsageType
 import mr.robotto.GLWrap
@@ -16,13 +17,17 @@ class MrBuffer: MrComponent() {
     @Transient
     lateinit var buffer: GLWrap
 
+    @ProtoNumber(1)
     private var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
+    @ProtoNumber(2)
     private var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
+    @ProtoNumber(3)
     var itemSize: Int = 0
+    @ProtoNumber(4)
     var count: Int = 0
-    @ExperimentalSerializationApi
+    @ProtoNumber(5)
     @ByteString
-    private var dataArray: ByteArray = byteArrayOf()
+    private lateinit var dataArray: ByteArray
 
     val hasData: Boolean
         get() = !dataArray.isEmpty()

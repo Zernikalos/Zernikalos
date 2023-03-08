@@ -5,12 +5,20 @@ import java.nio.ByteBuffer
 
 actual class MrRenderingContext {
 
+    actual fun enable(feat: Int) {
+        GLES30.glEnable(feat)
+    }
+
     actual fun clearColor(r: Float, g: Float, b: Float, a: Float) {
         GLES30.glClearColor(r,g, b, a)
     }
 
     actual fun viewport(top: Int, left: Int, width: Int, height: Int) {
         GLES30.glViewport(top, left, width, height)
+    }
+
+    actual fun cullFace(mode: Int) {
+        GLES30.glCullFace(mode)
     }
 
     actual fun clear(buffer: Int) {
@@ -121,8 +129,17 @@ actual class MrRenderingContext {
 
 }
 
+actual object ExpectEnabler {
+    actual val DEPTH_TEST: Int = GLES30.GL_DEPTH_TEST
+}
+
 actual object ExpectTypes {
-    actual val UNSIGNED: Int = GLES30.GL_UNSIGNED_INT
+    actual val BYTE: Int = GLES30.GL_BYTE
+    actual val UNSIGNED_BYTE: Int = GLES30.GL_UNSIGNED_BYTE
+    actual val INT: Int = GLES30.GL_INT
+    actual val UNSIGNED_INT: Int = GLES30.GL_UNSIGNED_INT
+    actual val SHORT: Int = GLES30.GL_SHORT
+    actual val UNSIGNED_SHORT: Int = GLES30.GL_UNSIGNED_SHORT
     actual val FLOAT: Int = GLES30.GL_FLOAT
 }
 
@@ -148,4 +165,10 @@ actual object ExpectShaderType {
 actual object ExpectDrawModes {
     actual val TRIANGLES: Int = GLES30.GL_TRIANGLES
     actual val LINES: Int = GLES30.GL_LINES
+}
+
+actual object ExpectCullModeType {
+    actual val FRONT: Int = GLES30.GL_FRONT
+    actual val BACK: Int = GLES30.GL_BACK
+    actual val FRONT_AND_BACK: Int = GLES30.GL_FRONT_AND_BACK
 }

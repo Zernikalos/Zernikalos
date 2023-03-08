@@ -211,7 +211,7 @@ class MrQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): MrAl
             result.x = s * xn
             result.y = s * yn
             result.z = s * zn
-            MrQuaternion.normalize(result, result)
+            normalize(result, result)
         }
 
         //TODO: Optimize this method

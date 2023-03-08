@@ -42,7 +42,7 @@ class MrMesh: MrComponent() {
     override fun render(ctx: MrRenderingContext) {
         vao.render(ctx)
         if (useIndexBuffer) {
-            ctx.drawElements(DrawModes.TRIANGLES.value, 1000, Types.UNSIGNED.value, 0)
+            ctx.drawElements(DrawModes.TRIANGLES.value, indices.count, Types.UNSIGNED_SHORT.value, 0)
         } else {
             // TODO: Fix this
             ctx.drawArrays(DrawModes.TRIANGLES.value, 0, vertices["position"]?.count!!)
