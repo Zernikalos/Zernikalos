@@ -1,5 +1,5 @@
 
-rootProject.name = "mrrobotto"
+rootProject.name = "zernikalos"
 
 pluginManagement {
     plugins {

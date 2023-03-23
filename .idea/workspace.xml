@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9c554bc5-2375-4cca-86ca-784a29e0db5c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/zernikalos_js_0_0_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/Zernikalos.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkUniformGenerator.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webpack.config.d/webpack-config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/mrrobotto_jslegacy_0_0_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/mrrobotto_jvm_0_0_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/mr/robotto/MrRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ZkRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/mr/robotto/MrRobotto.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/mr/robotto/ui/MrSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrRobottoBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZernikalosBase.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrSceneContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkSceneContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrSceneStateHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkSceneStateHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrTraverse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkTraverse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/MrUniformType.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkUniformType.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/MrComponent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZkComponent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/MrViewport.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZkViewport.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/buffer/MrBuffer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkBuffer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/buffer/MrVertexArray.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkVertexArray.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/camera/MrLens.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/camera/ZkLens.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/mesh/MrAttributeKey.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZkAttributeKey.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/mesh/MrMesh.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZkMesh.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/shader/MrAttribute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkAttribute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/shader/MrProgram.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkProgram.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/shader/MrShader.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkShader.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/shader/MrShaderProgram.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkShaderProgram.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/components/shader/MrUniform.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkUniform.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/loader/MrLoader.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkLoader.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/loader/MrProtoDeserializer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkProtoDeserializer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrAlgebraObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkAlgebraObject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrMatrix4f.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkMatrix4F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrQuaternion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkQuaternion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrTransform.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkTransform.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrVector3f.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkVector3F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/math/MrVector4f.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkVector4F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/objects/MrCamera.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkCamera.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/objects/MrGroup.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkGroup.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/objects/MrModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/objects/MrObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkObject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/objects/MrScene.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkScene.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/ui/MrSurfaceStateHandlerBridge.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZkSurfaceStateHandlerBridge.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/ui/MrSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/uniformgenerator/MrModelMatrixGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkModelMatrixGenerator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/uniformgenerator/MrModelViewProjectionGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkModelViewProjectionGenerator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/mr/robotto/uniformgenerator/MrUniformGenerator.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/MrRobotto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/Zernikalos.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/mr/robotto/MrRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ZkRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/mr/robotto/ui/MrSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jvmMain/kotlin/mr/robotto/MrRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jvmMain/kotlin/zernikalos/MrRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jvmMain/kotlin/mr/robotto/ui/MrSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jvmMain/kotlin/zernikalos/ui/MrSurfaceView.kt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Mv1WVp70XvQbVXF5xRm4HOOiWv" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "last_opened_file_path": "/home/aaron/Documents/ZernikalosProject/Zernikalos"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos" />
+      <recent name="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos" />
+      <recent name="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos" />
+      <recent name="$PROJECT_DIR$/src/jvmMain/kotlin/zernikalos/ui" />
+      <recent name="$PROJECT_DIR$/src/jvmMain/kotlin/zernikalos" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="zernikalos" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.Zernikalos [build]">
+    <configuration name="Zernikalos [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Zernikalos [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.Zernikalos [build]" />
+        <item itemvalue="Gradle.Zernikalos [clean]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9c554bc5-2375-4cca-86ca-784a29e0db5c" name="Changes" comment="" />
+      <created>1678633273272</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1678633273272</updated>
+    </task>
+    <servers />
+  </component>
+</project>

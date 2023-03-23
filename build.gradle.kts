@@ -6,7 +6,7 @@ plugins {
     // id("org.jlleitschuh.gradle.ktlint")
 }
 
-group = "mr.robotto"
+group = "zernikalos"
 version = "0.0.1"
 
 repositories {
@@ -17,7 +17,7 @@ repositories {
 }
 
 android {
-    namespace="mr.robotto"
+    namespace="com.zernikalos"
     compileSdk=33
 
     defaultConfig {
@@ -77,7 +77,7 @@ kotlin {
             }
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
-                output?.library = "mrrobotto"
+                output?.library = "zernikalos"
                 mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
             }
         }
@@ -94,7 +94,7 @@ kotlin {
     
     sourceSets {
         all {
-            languageSettings.optIn("mr.robotto.OptInAnnotation")
+            languageSettings.optIn("zernikalos.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
