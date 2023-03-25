@@ -2,7 +2,6 @@ package zernikalos.components.buffer
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.BufferTargetType
 import zernikalos.BufferUsageType
@@ -25,7 +24,6 @@ class ZkBuffer: ZkComponent() {
     @ProtoNumber(4)
     var count: Int = 0
     @ProtoNumber(5)
-    @ByteString
     private lateinit var dataArray: ByteArray
 
     val hasData: Boolean

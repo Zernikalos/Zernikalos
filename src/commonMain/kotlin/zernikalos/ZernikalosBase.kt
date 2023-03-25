@@ -1,6 +1,6 @@
 package zernikalos
 
-import zernikalos.loader.loadFromCborString
+import zernikalos.loader.loadFromProtoString
 import zernikalos.objects.ZkObject
 import zernikalos.ui.ZkSurfaceView
 import kotlin.js.JsExport
@@ -23,6 +23,6 @@ open class ZernikalosBase {
     }
 
     fun load(hexString: String): ZkObject {
-        return loadFromCborString(hexString)
+        return loadFromProtoString(hexString)
     }
 }

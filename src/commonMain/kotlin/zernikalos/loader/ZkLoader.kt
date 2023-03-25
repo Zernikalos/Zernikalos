@@ -1,7 +1,6 @@
 package zernikalos.loader
 
 import kotlinx.serialization.*
-import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -34,12 +33,6 @@ val zkObjectModule = SerializersModule {
 
 }
 
-@OptIn(ExperimentalSerializationApi::class)
-val cborFormat = Cbor {
-    serializersModule = zkObjectModule
-    ignoreUnknownKeys = true
-}
-
 val protoFormat = ProtoBuf {
     serializersModule = zkObjectModule
     encodeDefaults = true
@@ -49,12 +42,6 @@ val jsonFormat = Json {
     serializersModule = zkObjectModule
     ignoreUnknownKeys = true
     encodeDefaults = true
-}
-
-@JsExport
-@OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
-fun loadFromCborString(hexString: String): ZkObject {
-    return cborFormat.decodeFromHexString(hexString)
 }
 
 @JsExport
