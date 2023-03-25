@@ -1,28 +1,28 @@
 package zernikalos
 
 import zernikalos.loader.loadFromProtoString
-import zernikalos.objects.ZkObject
-import zernikalos.ui.ZkSurfaceView
+import zernikalos.objects.ZObject
+import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport
 
 @JsExport
 open class ZernikalosBase {
 
-    lateinit var surfaceView: ZkSurfaceView
+    lateinit var surfaceView: ZSurfaceView
 
     init {
         println("Starting engine")
     }
 
-    fun attachSurfaceView(surfaceView: ZkSurfaceView) {
+    fun attachSurfaceView(surfaceView: ZSurfaceView) {
         this.surfaceView = surfaceView
     }
 
-    fun attachStateHandler(stateHandler: ZkSceneStateHandler) {
+    fun attachStateHandler(stateHandler: ZSceneStateHandler) {
         surfaceView.stateHandlerBridge.stateHandler = stateHandler
     }
 
-    fun load(hexString: String): ZkObject {
+    fun load(hexString: String): ZObject {
         return loadFromProtoString(hexString)
     }
 }

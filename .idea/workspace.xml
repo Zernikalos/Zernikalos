@@ -5,13 +5,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9c554bc5-2375-4cca-86ca-784a29e0db5c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZSceneContext.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZUniformGenerator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/Zernikalos.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/Zernikalos.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ZkRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ZRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos/ui/ZSurfaceView.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZernikalosBase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZernikalosBase.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkBuffer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkBuffer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkSceneContext.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkSceneStateHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZSceneStateHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkTraverse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZTraverse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ZkUniformType.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZkComponent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZComponent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZkViewport.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/ZViewport.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkBuffer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZBuffer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZkVertexArray.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/buffer/ZVertexArray.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/camera/ZkLens.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/camera/ZLens.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZkAttributeKey.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZAttributeKey.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZkMesh.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/mesh/ZMesh.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkAttribute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZAttribute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkProgram.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZProgram.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkShader.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZShader.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkShaderProgram.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZShaderProgram.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZkUniform.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/components/shader/ZUniform.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkLoader.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkLoader.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkProtoDeserializer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/loader/ZkProtoDeserializer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkAlgebraObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZAlgebraObject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkMatrix4F.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZMatrix4F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkQuaternion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZQuaternion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkTransform.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZTransform.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkVector3F.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZVector3F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZkVector4F.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/math/ZVector4F.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkCamera.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZCamera.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkGroup.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZGroup.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkObject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZObject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZkScene.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/objects/ZScene.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZkSurfaceStateHandlerBridge.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZSurfaceStateHandlerBridge.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/ui/ZSurfaceView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkModelMatrixGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZModelMatrixGenerator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkModelViewProjectionGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZModelViewProjectionGenerator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commonMain/kotlin/zernikalos/uniformgenerator/ZkUniformGenerator.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/Zernikalos.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/Zernikalos.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ZkRenderingContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ZRenderingContext.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ui/ZkSurfaceView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/jsMain/kotlin/zernikalos/ui/ZSurfaceView.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +70,23 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand />
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="zernikalos" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
             <select />
           </tree_state>
         </projects_view>
@@ -49,16 +104,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;zernikalos&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/aaron/Documents/ZernikalosProject/Zernikalos&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "zernikalos",
+    "last_opened_file_path": "/home/aaron/Documents/ZernikalosProject/Zernikalos",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/androidMain/kotlin/zernikalos" />
@@ -68,6 +123,7 @@
       <recent name="$PROJECT_DIR$/src/jvmMain/kotlin/zernikalos" />
     </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="zernikalos.components.shader" />
       <recent name="zernikalos" />
     </key>
   </component>
@@ -115,6 +171,19 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <ForceTestExec>false</ForceTestExec>
       <method v="2" />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="zernikalos" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="zernikalos" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <recent_temporary>
       <list>

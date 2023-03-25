@@ -6,18 +6,18 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
-import zernikalos.objects.ZkGroup
-import zernikalos.objects.ZkModel
-import zernikalos.objects.ZkObject
+import zernikalos.objects.ZGroup
+import zernikalos.objects.ZModel
+import zernikalos.objects.ZObject
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
-val zkObjectModule = SerializersModule {
-    polymorphic(ZkObject::class) {
-        subclass(ZkModel::class)
-        subclass(ZkGroup::class)
-        defaultDeserializer { ZkGroup.serializer() }
+val zObjectModule = SerializersModule {
+    polymorphic(ZObject::class) {
+        subclass(ZModel::class)
+        subclass(ZGroup::class)
+        defaultDeserializer { ZGroup.serializer() }
     }
 //    polymorphic(MrObject::class) {
 //        defaultDeserializer { className: String? ->
@@ -34,18 +34,18 @@ val zkObjectModule = SerializersModule {
 }
 
 val protoFormat = ProtoBuf {
-    serializersModule = zkObjectModule
+    serializersModule = zObjectModule
     encodeDefaults = true
 }
 
 val jsonFormat = Json {
-    serializersModule = zkObjectModule
+    serializersModule = zObjectModule
     ignoreUnknownKeys = true
     encodeDefaults = true
 }
 
 @JsExport
-fun loadFromProtoString(hexString: String): ZkObject {
+fun loadFromProtoString(hexString: String): ZObject {
     return protoFormat.decodeFromHexString(ZkProtoDeserializer, hexString)
 }
 
@@ -63,6 +63,6 @@ fun loadFromProtoString(hexString: String): ZkObject {
 
 @JsExport
 @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
-fun loadFromJsonString(jsonString: String): ZkObject {
+fun loadFromJsonString(jsonString: String): ZObject {
     return jsonFormat.decodeFromString(jsonString)
 }
