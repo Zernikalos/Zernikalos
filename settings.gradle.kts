@@ -11,6 +11,7 @@ pluginManagement {
         id("org.jetbrains.kotlin.android") version kotlinPlugVersion
         id("org.jetbrains.kotlin.plugin.serialization") version kotlinPlugVersion
         id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+        // id("org.lwjgl.plugin") version "0.0.30"
     }
 
     repositories {

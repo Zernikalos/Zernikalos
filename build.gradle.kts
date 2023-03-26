@@ -1,8 +1,10 @@
+
 plugins {
     kotlin("multiplatform") apply true
     id("com.android.library") apply true
     id("org.jetbrains.kotlin.android") apply false
     id("org.jetbrains.kotlin.plugin.serialization")
+    // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
 
@@ -36,21 +38,7 @@ android {
 }
 
 val lwjglVersion = "3.3.1"
-
-val lwjglNatives = Pair(
-    System.getProperty("os.name")!!,
-    System.getProperty("os.arch")!!
-).let { (name, arch) ->
-    when {
-        arrayOf("Linux", "FreeBSD", "SunOS", "Unit").any { name.startsWith(it) } ->
-            "natives-linux"
-        arrayOf("Mac OS X", "Darwin").any { name.startsWith(it) }                ->
-            "natives-macos-arm64"
-        arrayOf("Windows").any { name.startsWith(it) }                           ->
-            "natives-windows"
-        else -> throw Error("Unrecognized or unsupported platform. Please set \"lwjglNatives\" manually")
-    }
-}
+val lwjglNatives = "natives-linux"
 
 kotlin {
     android {
@@ -59,15 +47,15 @@ kotlin {
         }
     }
 
-//    jvm {
+    jvm {
 //        compilations.all {
 //            kotlinOptions.jvmTarget = "1.8"
 //        }
-//        // withJava()
+        // withJava()
 //        testRuns["test"].executionTask.configure {
 //            useJUnitPlatform()
 //        }
-//    }
+    }
 
     js(IR) {
         browser {
@@ -106,33 +94,33 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
             }
         }
-//        val jvmMain by getting {
-//            kotlin.srcDir("src/jvmMain/kotlin")
-//
-//            dependencies {
-//                // implementation("org.lwjgl:lwjgl-bom:$lwjglVersion")
-//
-//                implementation("org.lwjgl:lwjgl:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-////
-////                runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
-////                runtimeOnly("org.lwjgl", "lwjgl-assimp", classifier = lwjglNatives)
-////                runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)
-////                runtimeOnly("org.lwjgl", "lwjgl-openal", classifier = lwjglNatives)
-////                runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
-////                runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = lwjglNatives)
-//
-////                runtimeOnly("org.lwjgl.lwjgl-assimp:$lwjglVersion:$lwjglNatives")
-////                runtimeOnly("org.lwjgl.lwjgl-glfw:$lwjglVersion:$lwjglNatives")
-////                runtimeOnly("org.lwjgl.lwjgl-openal:$lwjglVersion:$lwjglNatives")
-////                runtimeOnly("org.lwjgl.lwjgl-opengl:$lwjglVersion:$lwjglNatives")
-////                runtimeOnly("org.lwjgl.lwjgl-stb:$lwjglVersion:$lwjglNatives")
-//            }
-//        }
+
+
+        val jvmMain by getting {
+            kotlin.srcDir("src/jvmMain/kotlin")
+
+            dependencies {
+//                lwjgl {
+//                    // implementation(Lwjgl.Preset.minimalOpenGL.)
+//                    version= "3.3.1"
+//                }
+                // implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
+
+                implementation("org.lwjgl:lwjgl:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
+
+                runtimeOnly("org.lwjgl:lwjgl:$lwjglVersion")
+                runtimeOnly("org.lwjgl:lwjgl-assimp:$lwjglVersion")
+                runtimeOnly("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+                runtimeOnly("org.lwjgl:lwjgl-openal:$lwjglVersion")
+                runtimeOnly("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+                runtimeOnly("org.lwjgl:lwjgl-stb:$lwjglVersion")
+            }
+        }
         // val jvmTest by getting
         val androidMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")

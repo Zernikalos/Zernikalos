@@ -1,12 +1,12 @@
-package mr.robotto.ui
+package zernikalos.ui
 
-import mr.robotto.MrRenderingContext
 import org.lwjgl.glfw.*
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.system.MemoryStack.*
+import zernikalos.ZRenderingContext
 import java.nio.IntBuffer
 
-actual class MrSurfaceView {
+actual class ZSurfaceView {
 
     var window: Long = -1
 
@@ -86,8 +86,9 @@ actual class MrSurfaceView {
     actual val height: Int
         get() = TODO("Not yet implemented")
 
-    actual val stateHandlerBridge: MrSurfaceStateHandlerBridge
+    actual val stateHandlerBridge: ZSurfaceStateHandlerBridge
         get() = TODO("Not yet implemented")
-    actual val renderingContext: MrRenderingContext
+    actual val renderingContext: ZRenderingContext
         get() = TODO("Not yet implemented")
+
 }

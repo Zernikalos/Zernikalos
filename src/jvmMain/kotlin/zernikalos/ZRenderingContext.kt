@@ -1,9 +1,14 @@
-package mr.robotto
+package zernikalos
 
 import org.lwjgl.opengl.*
 import java.nio.ByteBuffer
 
-actual class MrRenderingContext {
+actual class ZRenderingContext {
+
+    actual fun enable(feat: Int) {
+        GL11.glEnable(feat)
+    }
+
     /** Viewport **/
     actual fun clearColor(r: Float, g: Float, b: Float, a: Float) {
         GL11.glClearColor(r, g, b, a)
@@ -15,6 +20,10 @@ actual class MrRenderingContext {
 
     actual fun clear(buffer: Int) {
         GL11.glClear(buffer)
+    }
+
+    actual fun cullFace(mode: Int) {
+        GL11.glCullFace(mode)
     }
 
     /** ShaderProgram **/
@@ -132,10 +141,22 @@ actual class MrRenderingContext {
         GL30.glDrawElements(mode, count, type, offset.toLong())
     }
 
+    actual fun enableVertexAttribArray(index: Int) {
+        GL30.glEnableVertexAttribArray(index)
+    }
+}
+
+actual object ExpectEnabler {
+    actual val DEPTH_TEST: Int = GL11.GL_DEPTH_TEST
 }
 
 actual object ExpectTypes {
-    actual val UNSIGNED: Int = GL11.GL_UNSIGNED_INT
+    actual val BYTE: Int = GL11.GL_BYTE
+    actual val UNSIGNED_BYTE: Int = GL11.GL_UNSIGNED_BYTE
+    actual val INT: Int =GL11.GL_INT
+    actual val UNSIGNED_INT: Int = GL11.GL_UNSIGNED_INT
+    actual val SHORT: Int = GL11.GL_SHORT
+    actual val UNSIGNED_SHORT: Int = GL11.GL_UNSIGNED_SHORT
     actual val FLOAT: Int = GL11.GL_FLOAT
 }
 
@@ -161,4 +182,10 @@ actual object ExpectBufferUsageType {
 actual object ExpectDrawModes {
     actual val TRIANGLES: Int = GL11.GL_TRIANGLES
     actual val LINES: Int = GL11.GL_LINES
+}
+
+actual object ExpectCullModeType {
+    actual val FRONT: Int = GL11.GL_FRONT
+    actual val BACK: Int = GL11.GL_BACK
+    actual val FRONT_AND_BACK: Int = GL11.GL_FRONT_AND_BACK
 }

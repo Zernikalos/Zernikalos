@@ -30,7 +30,7 @@ class ZModel: ZObject() {
         shaderProgram.uniforms.forEach {
             val uniformGenerator = sceneContext.getUniform(it.key)
             if (uniformGenerator != null) {
-                val uniformValue: ZMatrix4F = uniformGenerator.compute(sceneContext, this) as ZMatrix4F
+                val uniformValue: ZMatrix4F = uniformGenerator.compute(sceneContext, this)
                 it.value.bindValue(ctx, uniformValue.values)
             }
         }
