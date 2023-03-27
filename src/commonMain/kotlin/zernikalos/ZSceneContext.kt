@@ -3,7 +3,8 @@ package zernikalos
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
 import zernikalos.uniformgenerator.ZModelMatrixGenerator
-import zernikalos.uniformgenerator.ZModelViewProjectionGenerator
+import zernikalos.uniformgenerator.ZModelViewGenerator
+import zernikalos.uniformgenerator.ZProjectionMatrixGenerator
 import zernikalos.uniformgenerator.ZUniformGeneratorMat4F
 import kotlin.js.JsExport
 
@@ -11,8 +12,11 @@ open class ZSceneContext(val scene: ZScene) {
 
     private var _activeCamera: ZCamera? = null
 
-    val activeCamera: ZCamera?
+    var activeCamera: ZCamera?
         get() = _activeCamera
+        set(value) {
+            _activeCamera = value
+        }
 
     private val uniformsGeneratorMap = HashMap<String, ZUniformGeneratorMat4F>()
 
@@ -31,8 +35,8 @@ open class ZSceneContext(val scene: ZScene) {
 
 class ZSceneContextDefault(scene: ZScene): ZSceneContext(scene) {
     init {
-        addUniformGenerator("modelMatrix", ZModelMatrixGenerator())
-        addUniformGenerator("ModelViewProjection", ZModelViewProjectionGenerator())
+        addUniformGenerator("ProjectionMatrix", ZProjectionMatrixGenerator())
+        addUniformGenerator("ViewModelMatrix", ZModelViewGenerator())
     }
 }
 
