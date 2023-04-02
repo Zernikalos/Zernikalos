@@ -1,5 +1,8 @@
 package zernikalos.objects
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.camera.ZLens
@@ -10,11 +13,15 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
+@Serializable
 class ZCamera: ZObject {
 
+    @Transient
     val lookAt: ZVector3F = ZVector3F()
+    @Transient
     val up: ZVector3F = ZVector3F()
-    var lens: ZLens
+    @ProtoNumber(4)
+    var lens: ZPerspectiveLens
 
     val projectionMatrix: ZMatrix4F
         get() = lens.projectionMatrix
@@ -25,16 +32,16 @@ class ZCamera: ZObject {
     val viewProjectionMatrix: ZMatrix4F
         get() = projectionMatrix * viewMatrix
 
-    @JsName("lensCtor")
-    constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZLens) {
-        this.lookAt.copy(lookAt)
-        this.up.copy(up)
-        this.lens = lens
-    }
+//    @JsName("lensCtor")
+//    constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZPerspectiveLens) {
+//        this.lookAt.copy(lookAt)
+//        this.up.copy(up)
+//        this.lens = lens
+//    }
 
     @JsName("defaultCtor")
-    constructor(lookAt: ZVector3F, up: ZVector3F): this(lookAt, up, ZPerspectiveLens.Default) {
-
+    constructor(lookAt: ZVector3F, up: ZVector3F) {
+        this.lens = ZPerspectiveLens.Default
     }
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {

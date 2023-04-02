@@ -1,9 +1,13 @@
 package zernikalos.components.camera
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.math.ZMatrix4F
 
+@Serializable
 open class ZPerspectiveLens: ZLens {
 
+    @ProtoNumber(4)
     var fov: Float
 
     constructor(near: Float, far: Float, fov: Float) : super(near, far) {

@@ -1,15 +1,24 @@
 package zernikalos.components.camera
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.math.ZMatrix4F
 
-abstract class ZLens(var near: Float, var far: Float) {
+@Serializable
+abstract class ZLens(@ProtoNumber(1) var near: Float,@ProtoNumber(2)  var far: Float) {
 
+    @Transient
     var width: Float? = null
+    @Transient
     var height: Float? = null
 
+    @ProtoNumber(3)
     protected var _aspectRatio: Float? = null
+    @Transient
     var useComputedAspectRatio: Boolean = false
 
+    @Transient
     protected val matrix = ZMatrix4F.Identity
 
     var aspectRatio: Float

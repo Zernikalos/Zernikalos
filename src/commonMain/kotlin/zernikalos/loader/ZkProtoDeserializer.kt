@@ -6,10 +6,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.objects.ZGroup
-import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
-import zernikalos.objects.ZScene
+import zernikalos.objects.*
 
 @Serializable
 data class ProtoZkObject(
@@ -17,6 +14,7 @@ data class ProtoZkObject(
     @ProtoNumber(2) val scene: ZScene?,
     @ProtoNumber(3) val group: ZGroup?,
     @ProtoNumber(4) val model: ZModel?,
+    @ProtoNumber(5) val camera: ZCamera?,
     @ProtoNumber(100) val children: Array<ProtoZkObject>? = emptyArray()
 )
 
@@ -46,6 +44,7 @@ object ZkProtoDeserializer: KSerializer<ZObject> {
             "Scene" -> return decodedProtoObj.scene!!
             "Group" -> return decodedProtoObj.group!!
             "Model" -> return decodedProtoObj.model!!
+            "Camera" -> return decodedProtoObj.camera!!
         }
         throw Error("Type has not been found on object")
     }
