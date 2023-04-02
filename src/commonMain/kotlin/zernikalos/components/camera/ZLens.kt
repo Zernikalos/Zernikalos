@@ -2,18 +2,11 @@ package zernikalos.components.camera
 
 import zernikalos.math.ZMatrix4F
 
-abstract class ZLens {
-
-    enum class Types {
-        ORTHOGONAL,
-        PROJECTIVE
-    }
+abstract class ZLens(var near: Float, var far: Float) {
 
     var width: Float? = null
     var height: Float? = null
 
-    var near: Float
-    var far: Float
     protected var _aspectRatio: Float? = null
     var useComputedAspectRatio: Boolean = false
 
@@ -32,11 +25,6 @@ abstract class ZLens {
         }
 
     abstract val projectionMatrix: ZMatrix4F
-
-    constructor(near: Float, far: Float) {
-        this.near = near
-        this.far = far
-    }
 
     private fun computeAspectRatio(): Float {
         if (width == null || height == null) {

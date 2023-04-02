@@ -20,4 +20,9 @@ open class ZPerspectiveLens: ZLens {
             return matrix
         }
 
+    companion object {
+        val Default: ZPerspectiveLens
+            get() = ZPerspectiveLens(1f, 100f, 45f)
+
+    }
 }
