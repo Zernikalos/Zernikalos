@@ -6,9 +6,9 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
-import zernikalos.objects.ZGroup
-import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
+import zernikalos.components.camera.ZLens
+import zernikalos.components.camera.ZPerspectiveLens
+import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
@@ -17,7 +17,13 @@ val zObjectModule = SerializersModule {
     polymorphic(ZObject::class) {
         subclass(ZModel::class)
         subclass(ZGroup::class)
+        subclass(ZScene::class)
+        subclass(ZCamera::class)
         defaultDeserializer { ZGroup.serializer() }
+    }
+
+    polymorphic(ZLens::class) {
+        subclass(ZPerspectiveLens::class)
     }
 //    polymorphic(MrObject::class) {
 //        defaultDeserializer { className: String? ->
@@ -48,18 +54,6 @@ val jsonFormat = Json {
 fun loadFromProtoString(hexString: String): ZObject {
     return protoFormat.decodeFromHexString(ZkProtoDeserializer, hexString)
 }
-
-//@Serializable
-//data class Grupito(val type: String, val name: String, val data: ByteArray)
-//
-//@Serializable
-//data class ProtoObject(val type: String, val group: Grupito?, val children: Array<ProtoObject>? = emptyArray())
-//
-//
-//@JsExport
-//fun sample(st: String): ProtoObject {
-//    return protoFormat.decodeFromHexString<ProtoObject>(st)
-//}
 
 @JsExport
 @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
