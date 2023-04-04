@@ -4,21 +4,20 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.math.ZMatrix4F
+import kotlin.js.JsExport
 
 @Serializable
-abstract class ZLens(@ProtoNumber(1) var near: Float,@ProtoNumber(2)  var far: Float) {
+@JsExport
+abstract class ZLens(@ProtoNumber(1) var near: Float, @ProtoNumber(2) var far: Float) {
 
-    @Transient
     var width: Float? = null
-    @Transient
     var height: Float? = null
 
     @ProtoNumber(3)
     protected var _aspectRatio: Float? = null
-    @Transient
+
     var useComputedAspectRatio: Boolean = false
 
-    @Transient
     protected val matrix = ZMatrix4F.Identity
 
     var aspectRatio: Float

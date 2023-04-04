@@ -16,10 +16,6 @@ import kotlin.js.JsName
 @Serializable
 class ZCamera: ZObject {
 
-    @Transient
-    val lookAt: ZVector3F = ZVector3F()
-    @Transient
-    val up: ZVector3F = ZVector3F()
     @ProtoNumber(4)
     var lens: ZPerspectiveLens
 
@@ -32,15 +28,15 @@ class ZCamera: ZObject {
     val viewProjectionMatrix: ZMatrix4F
         get() = projectionMatrix * viewMatrix
 
-//    @JsName("lensCtor")
-//    constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZPerspectiveLens) {
-//        this.lookAt.copy(lookAt)
-//        this.up.copy(up)
-//        this.lens = lens
-//    }
+    @JsName("initWithLens")
+    constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZPerspectiveLens) {
+        this.transform.setLookAt(lookAt, up)
+        this.lens = lens
+    }
 
-    @JsName("defaultCtor")
+    @JsName("init")
     constructor(lookAt: ZVector3F, up: ZVector3F) {
+        this.transform.setLookAt(lookAt, up)
         this.lens = ZPerspectiveLens.Default
     }
 
@@ -51,7 +47,7 @@ class ZCamera: ZObject {
     }
 
     companion object {
-        val DefaultPerspective: ZCamera
+        val DefaultPerspectiveCamera: ZCamera
             get() = ZCamera(ZVector3F.Zero, ZVector3F.Up)
     }
 
