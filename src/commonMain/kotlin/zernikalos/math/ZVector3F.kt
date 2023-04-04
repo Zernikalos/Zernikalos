@@ -97,6 +97,15 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         val Ones: ZVector3F
             get() = ZVector3F(1.0f)
 
+        val Forward: ZVector3F
+            get() = ZVector3F(1f, 0f, 0f)
+
+        val Right: ZVector3F
+            get() = ZVector3F(0f, 1f, 0f)
+
+        val Up: ZVector3F
+            get() = ZVector3F(0f, 0f, 1f)
+
         fun copy(result: ZVector3F, v: ZVector3F) {
             result.x = v.x
             result.y = v.y

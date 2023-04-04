@@ -3,7 +3,9 @@ package zernikalos.math
 import kotlinx.serialization.Serializable
 import kotlin.js.JsExport
 import kotlin.js.JsName
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.tan
 
 @JsExport
 @Serializable
@@ -263,7 +265,14 @@ class ZMatrix4F: ZAlgebraObject {
             scale(result, result, s)
         }
 
+        /**
+         * Computes the invert matrix from the given one
+         *
+         * @param result Matrix where the result of the operation will be stored
+         * @param m The given matrix
+         */
         fun invert(result: ZMatrix4F, m: ZMatrix4F): Boolean {
+            // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
             val src0  = m.values[0]
             val src4  = m.values[1]
             val src8  = m.values[2]
@@ -436,6 +445,41 @@ class ZMatrix4F: ZAlgebraObject {
             result[2, 0] = 2 * (xz - yw)
             result[2, 1] = 2 * (yz + xw)
             result[2, 2] = 1 - 2 * (xx + yy)
+        }
+
+        /**
+         * Computes the perspective projection matrix
+         *
+         * @param result Matrix where the result of the operation will be stored
+         * @param fov Angle in degrees providing the Field Of View
+         * @param aspect Desired aspect ratio
+         * @param near Near clip plane
+         * @param far Far clip plane
+         */
+        fun perspective(result: ZMatrix4F, fov: Float, aspect: Float, near: Float, far: Float) {
+            // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
+            val f: Float = 1f / tan(fov * (PI / 360f)).toFloat()
+            val rangeReciprocal = 1.0f / (near - far)
+
+            result.values[0] = f / aspect
+            result.values[1] = 0f
+            result.values[2] = 0f
+            result.values[3] = 0f
+
+            result.values[4] = 0f
+            result.values[5] = f
+            result.values[6] = 0f
+            result.values[7] = 0f
+
+            result.values[8] = 0f
+            result.values[9] = 0f
+            result.values[10] = (far + near) * rangeReciprocal
+            result.values[11] = -1f
+
+            result.values[12] = 0f
+            result.values[13] = 0f
+            result.values[14] = 2 * far * near * rangeReciprocal
+            result.values[15] = 0f
         }
 
     }

@@ -20,9 +20,9 @@ class ZTransform {
     private val _rotation: ZQuaternion = ZQuaternion.Identity
     private val _scale: ZVector3F = ZVector3F.Ones
 
-    private val _forward: ZVector3F = ZVector3F(1f, 0f, 0f)
-    private val _right: ZVector3F = ZVector3F(0f, 1f, 0f)
-    private val _up: ZVector3F = ZVector3F(0f, 0f, 1f)
+    private val _forward: ZVector3F = ZVector3F.Forward
+    private val _right: ZVector3F = ZVector3F.Right
+    private val _up: ZVector3F = ZVector3F.Up
 
     @JsName("defaultCtor")
     constructor()
