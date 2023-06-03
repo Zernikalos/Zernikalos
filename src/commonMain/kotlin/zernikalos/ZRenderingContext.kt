@@ -89,11 +89,12 @@ enum class Enabler(val value: Int) {
 enum class Types(val value: Int) {
     BYTE(ExpectTypes.BYTE),
     UNSIGNED_BYTE(ExpectTypes.UNSIGNED_BYTE),
-    INT(ExpectTypes.INT),
-    UNSIGNED_INT(ExpectTypes.UNSIGNED_INT),
     SHORT(ExpectTypes.SHORT),
     UNSIGNED_SHORT(ExpectTypes.UNSIGNED_SHORT),
-    FLOAT(ExpectTypes.FLOAT)
+    INT(ExpectTypes.INT),
+    UNSIGNED_INT(ExpectTypes.UNSIGNED_INT),
+    FLOAT(ExpectTypes.FLOAT),
+    DOUBLE(ExpectTypes.DOUBLE)
 }
 
 enum class BufferTargetType(val value: Int) {
@@ -143,6 +144,7 @@ expect object ExpectTypes {
     val SHORT: Int
     val UNSIGNED_SHORT: Int
     val FLOAT: Int
+    val DOUBLE: Int
 }
 
 expect object ExpectBufferBit {

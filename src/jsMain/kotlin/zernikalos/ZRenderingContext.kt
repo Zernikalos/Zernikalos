@@ -153,6 +153,7 @@ actual object ExpectTypes {
     actual val SHORT: Int = WebGLRenderingContext.SHORT
     actual val UNSIGNED_SHORT: Int = WebGLRenderingContext.UNSIGNED_SHORT
     actual val FLOAT: Int = WebGLRenderingContext.FLOAT
+    actual val DOUBLE: Int = WebGLRenderingContext.FLOAT
 }
 
 actual object ExpectBufferTargetType {

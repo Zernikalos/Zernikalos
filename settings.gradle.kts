@@ -3,7 +3,7 @@ rootProject.name = "zernikalos"
 
 pluginManagement {
     plugins {
-        val kotlinPlugVersion = "1.8.10"
+        val kotlinPlugVersion = "1.8.21"
         val androidPluginVer = "7.4.0"
 
         kotlin("multiplatform") version kotlinPlugVersion

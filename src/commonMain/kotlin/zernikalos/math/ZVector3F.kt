@@ -154,6 +154,9 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         fun normalize(result: ZVector3F, v: ZVector3F) {
             copy(result, v)
             val norm2 = v.norm2
+            if (abs(norm2) < 0.00000000001) {
+                return
+            }
             val invNorm = 1.0f / norm2
             result.multScalar(invNorm)
         }
