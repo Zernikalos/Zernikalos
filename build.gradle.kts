@@ -24,7 +24,6 @@ android {
 
     defaultConfig {
         minSdk=24
-        targetSdk=33
 
         version="0.0.1"
 
@@ -83,6 +82,9 @@ kotlin {
     
     sourceSets {
         all {
+//            languageSettings {
+//                languageVersion = "2.0"
+//            }
             languageSettings.optIn("zernikalos.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
@@ -92,7 +94,6 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
             }
         }
 

@@ -89,6 +89,10 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         copy(this, v)
     }
 
+    override fun toString(): String {
+        return "[$x, $y, $z]"
+    }
+
     companion object {
 
         val Zero: ZVector3F

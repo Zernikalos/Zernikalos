@@ -75,14 +75,14 @@ class ZTransform {
     }
 
     @JsName("setLookAtUp")
-    fun setLookAt(look: ZVector3F, up: ZVector3F) {
+    fun lookAt(look: ZVector3F, up: ZVector3F) {
         val m = ZMatrix4F()
         ZMatrix4F.lookAt(m, _location, look, up)
         ZQuaternion.fromMatrix4(_rotation, m)
     }
 
-    fun setLookAt(look: ZVector3F) {
-        setLookAt(look, _up)
+    fun lookAt(look: ZVector3F) {
+        lookAt(look, _up)
     }
 
     fun translate(x: Float, y: Float, z: Float) {

@@ -1,11 +1,9 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
-import zernikalos.components.camera.ZLens
 import zernikalos.components.camera.ZPerspectiveLens
 import zernikalos.math.ZMatrix4F
 import zernikalos.math.ZVector3F
@@ -30,13 +28,13 @@ class ZCamera: ZObject {
 
     @JsName("initWithLens")
     constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZPerspectiveLens) {
-        this.transform.setLookAt(lookAt, up)
+        this.transform.lookAt(lookAt, up)
         this.lens = lens
     }
 
     @JsName("init")
     constructor(lookAt: ZVector3F, up: ZVector3F) {
-        this.transform.setLookAt(lookAt, up)
+        this.transform.lookAt(lookAt, up)
         this.lens = ZPerspectiveLens.Default
     }
 
