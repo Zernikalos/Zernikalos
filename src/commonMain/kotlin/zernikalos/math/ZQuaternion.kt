@@ -78,11 +78,11 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
     }
 
     // TODO: Check!
-    fun rotate(angle: Float, axis: ZVector3F) {
+    fun rotate(angle: Float, axis: ZVector3) {
         rotate(this, this, angle, axis)
     }
 
-    fun fromMatrix4(m: ZMatrix4F) {
+    fun fromMatrix4(m: ZMatrix4) {
         fromMatrix4(this, m)
     }
 
@@ -174,27 +174,27 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
             multScalar(result, n2, result)
         }
 
-        fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3F) {
+        fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3) {
             val opRot = ZQuaternion(q.w, q.x, q.y, q.z)
             fromAngleAxis(opRot, angle, axis)
             mult(result, result, opRot)
         }
 
-        fun fromVec3(result: ZQuaternion, v: ZVector3F) {
+        fun fromVec3(result: ZQuaternion, v: ZVector3) {
             result.w = 0f
             result.x = v.x
             result.y = v.y
             result.z = v.z
         }
 
-        fun fromAngleAxis(result: ZQuaternion, angle: Float, axis: ZVector3F) {
+        fun fromAngleAxis(result: ZQuaternion, angle: Float, axis: ZVector3) {
             fromAngleAxis(result, angle, axis.x, axis.y, axis.z)
         }
 
         @JsName("fromAngleAxisPerValue")
         fun fromAngleAxis(result: ZQuaternion, angle: Float, x: Float, y: Float, z: Float) {
             //Axis normalization
-            var norm: Float = ZVector3F.norm2(x, y, z)
+            var norm: Float = ZVector3.norm2(x, y, z)
             norm = 1.0f / norm
             val xn = x * norm
             val yn = y * norm
@@ -215,7 +215,7 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
         }
 
         //TODO: Optimize this method
-        fun fromMatrix4(result: ZQuaternion, m: ZMatrix4F) {
+        fun fromMatrix4(result: ZQuaternion, m: ZMatrix4) {
             val v = m.values
             val m00 = v[0]
             val m01 = v[4]

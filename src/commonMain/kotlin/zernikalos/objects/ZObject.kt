@@ -7,7 +7,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
 import zernikalos.math.ZTransform
-import zernikalos.math.ZVector3F
+import zernikalos.math.ZVector3
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -66,12 +66,12 @@ abstract class ZObject {
         obj._parent = this
     }
 
-    fun lookAt(look: ZVector3F) {
-        lookAt(look, ZVector3F.Up)
+    fun lookAt(look: ZVector3) {
+        lookAt(look, ZVector3.Up)
     }
 
     @JsName("lookAtWithUp")
-    fun lookAt(look: ZVector3F, up: ZVector3F) {
+    fun lookAt(look: ZVector3, up: ZVector3) {
         transform.lookAt(look, up)
     }
 

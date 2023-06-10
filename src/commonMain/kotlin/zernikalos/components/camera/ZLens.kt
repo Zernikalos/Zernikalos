@@ -1,9 +1,8 @@
 package zernikalos.components.camera
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.math.ZMatrix4F
+import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 
 @Serializable
@@ -18,7 +17,7 @@ abstract class ZLens(@ProtoNumber(1) var near: Float, @ProtoNumber(2) var far: F
 
     var useComputedAspectRatio: Boolean = false
 
-    protected val matrix = ZMatrix4F.Identity
+    protected val matrix = ZMatrix4.Identity
 
     var aspectRatio: Float
         get() {
@@ -32,7 +31,7 @@ abstract class ZLens(@ProtoNumber(1) var near: Float, @ProtoNumber(2) var far: F
             useComputedAspectRatio = false
         }
 
-    abstract val projectionMatrix: ZMatrix4F
+    abstract val projectionMatrix: ZMatrix4
 
     private fun computeAspectRatio(): Float {
         if (width == null || height == null) {

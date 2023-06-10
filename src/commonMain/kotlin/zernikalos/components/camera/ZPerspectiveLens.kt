@@ -2,7 +2,7 @@ package zernikalos.components.camera
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.math.ZMatrix4F
+import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -23,9 +23,9 @@ open class ZPerspectiveLens: ZLens {
         _aspectRatio = aspectRatio
     }
 
-    override val projectionMatrix: ZMatrix4F
+    override val projectionMatrix: ZMatrix4
         get() {
-            ZMatrix4F.perspective(matrix, fov, aspectRatio, near, far)
+            ZMatrix4.perspective(matrix, fov, aspectRatio, near, far)
             return matrix
         }
 
