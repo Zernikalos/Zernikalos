@@ -7,11 +7,10 @@ import kotlin.js.JsExport
 @JsExport
 class Zernikalos: ZernikalosBase() {
 
-    fun attachCanvas(canvas: HTMLCanvasElement) {
-        val surfaceView = ZSurfaceView()
-        surfaceView.attachCanvas(canvas)
-
-        attachSurfaceView(surfaceView)
+    @JsName("initializeWithCanvas")
+    fun initialize(canvas: HTMLCanvasElement, stateHandler: ZSceneStateHandler) {
+        val surfaceView = ZSurfaceView(canvas)
+        initialize(surfaceView, stateHandler)
     }
 
 }

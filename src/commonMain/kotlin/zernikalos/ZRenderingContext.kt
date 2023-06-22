@@ -1,10 +1,11 @@
 package zernikalos
 
 import kotlinx.serialization.SerialName
+import zernikalos.ui.ZSurfaceView
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
-expect class ZRenderingContext {
+expect class ZRenderingContext(surfaceView: ZSurfaceView) {
 
     /** Commons **/
 

@@ -3,23 +3,45 @@ package zernikalos
 import zernikalos.loader.loadFromProtoString
 import zernikalos.objects.ZObject
 import zernikalos.ui.ZSurfaceView
+import zernikalos.ui.ZSurfaceViewEventHandler
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @JsExport
 open class ZernikalosBase {
 
     lateinit var surfaceView: ZSurfaceView
+    lateinit var renderingContext: ZRenderingContext
+    lateinit var stateHandler: ZSceneStateHandler
+    lateinit var sceneContext: ZSceneContext
 
     init {
         println("Starting engine")
     }
 
-    fun attachSurfaceView(surfaceView: ZSurfaceView) {
-        this.surfaceView = surfaceView
+    fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
+        this.stateHandler = stateHandler
+        this.surfaceView = view
+
+        sceneContext = contextCreator.createSceneContext(surfaceView)
+        renderingContext = contextCreator.createRenderingContext(surfaceView)
+
+        surfaceView.eventHandler = object : ZSurfaceViewEventHandler {
+            override fun onReady() {
+                stateHandler.onReady(sceneContext, renderingContext)
+            }
+
+            override fun onRender() {
+                stateHandler.onRender(sceneContext, renderingContext)
+            }
+        }
     }
 
-    fun attachStateHandler(stateHandler: ZSceneStateHandler) {
-        surfaceView.stateHandlerBridge.stateHandler = stateHandler
+    @JsName("initializeWithDefaults")
+    fun initialize(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
+        val contextCreator = createDefaultContextCreator()
+
+        initialize(view, contextCreator, stateHandler)
     }
 
     fun load(hexString: String): ZObject {
