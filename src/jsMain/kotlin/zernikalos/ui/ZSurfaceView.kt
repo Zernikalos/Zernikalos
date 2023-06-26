@@ -6,34 +6,26 @@ import org.w3c.dom.HTMLCanvasElement
 
 @JsExport
 @ExperimentalJsExport
-actual class ZSurfaceView {
+actual class ZSurfaceView(val canvas: HTMLCanvasElement) {
 
-    lateinit var canvas: HTMLCanvasElement
+    actual var eventHandler: ZSurfaceViewEventHandler? = null
 
     actual val width: Int
         get() = canvas.width
     actual val height: Int
         get() = canvas.height
 
-    actual val stateHandlerBridge: ZSurfaceStateHandlerBridge = ZSurfaceStateHandlerBridge()
-    actual val renderingContext: ZRenderingContext = ZRenderingContext()
-
-    fun attachCanvas(canvas: HTMLCanvasElement) {
-        this.canvas = canvas
-
+    init {
         onReady()
     }
 
     private fun onReady() {
-        renderingContext.setContext(canvas)
-
-        stateHandlerBridge.onReady(renderingContext)
-
+        eventHandler?.onReady()
         renderLoop()
     }
 
     private fun renderLoop() {
-        stateHandlerBridge.onRender(renderingContext)
+        eventHandler?.onRender()
         window.setTimeout({renderLoop()}, 1000/60)
     }
 

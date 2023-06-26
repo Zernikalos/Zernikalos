@@ -78,17 +78,22 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
     }
 
     // TODO: Check!
-    fun rotate(angle: Float, axis: ZVector3F) {
+    fun rotate(angle: Float, axis: ZVector3) {
         rotate(this, this, angle, axis)
     }
 
-    fun fromMatrix4(m: ZMatrix4F) {
+    fun fromMatrix4(m: ZMatrix4) {
         fromMatrix4(this, m)
     }
 
     fun copy(q: ZQuaternion) {
         copy(this, q)
     }
+
+    override fun toString(): String {
+        return "[$w : $x, $y, $z]"
+    }
+
 
     companion object {
 
@@ -169,27 +174,27 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
             multScalar(result, n2, result)
         }
 
-        fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3F) {
+        fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3) {
             val opRot = ZQuaternion(q.w, q.x, q.y, q.z)
             fromAngleAxis(opRot, angle, axis)
             mult(result, result, opRot)
         }
 
-        fun fromVec3(result: ZQuaternion, v: ZVector3F) {
+        fun fromVec3(result: ZQuaternion, v: ZVector3) {
             result.w = 0f
             result.x = v.x
             result.y = v.y
             result.z = v.z
         }
 
-        fun fromAngleAxis(result: ZQuaternion, angle: Float, axis: ZVector3F) {
+        fun fromAngleAxis(result: ZQuaternion, angle: Float, axis: ZVector3) {
             fromAngleAxis(result, angle, axis.x, axis.y, axis.z)
         }
 
         @JsName("fromAngleAxisPerValue")
         fun fromAngleAxis(result: ZQuaternion, angle: Float, x: Float, y: Float, z: Float) {
             //Axis normalization
-            var norm: Float = ZVector3F.norm2(x, y, z)
+            var norm: Float = ZVector3.norm2(x, y, z)
             norm = 1.0f / norm
             val xn = x * norm
             val yn = y * norm
@@ -210,7 +215,7 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
         }
 
         //TODO: Optimize this method
-        fun fromMatrix4(result: ZQuaternion, m: ZMatrix4F) {
+        fun fromMatrix4(result: ZQuaternion, m: ZMatrix4) {
             val v = m.values
             val m00 = v[0]
             val m01 = v[4]
@@ -221,37 +226,37 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
             val m20 = v[2]
             val m21 = v[6]
             val m22 = v[10]
-            var S: Float
-            var qw: Float
-            var qx: Float
-            var qy: Float
-            var qz: Float
+            val s: Float
+            val qw: Float
+            val qx: Float
+            val qy: Float
+            val qz: Float
             val trace = m00 + m11 + m22 // I removed + 1.0f
             if (trace > 0) {// I changed M_EPSILON to 0
-                S = 0.5f / sqrt(trace + 1.0f)
-                qw = 0.25f / S
-                qx = (m21 - m12) * S
-                qy = (m02 - m20) * S
-                qz = (m10 - m01) * S
+                s = 0.5f / sqrt(trace + 1.0f)
+                qw = 0.25f / s
+                qx = (m21 - m12) * s
+                qy = (m02 - m20) * s
+                qz = (m10 - m01) * s
             } else {
                 if (m00 > m11 && m00 > m22) {
-                    S = 2.0f * sqrt(1.0f + m00 - m11 - m22)
-                    qw = (m21 - m12) / S
-                    qx = 0.25f * S
-                    qy = (m01 + m10) / S
-                    qz = (m02 + m20) / S
+                    s = 2.0f * sqrt(1.0f + m00 - m11 - m22)
+                    qw = (m21 - m12) / s
+                    qx = 0.25f * s
+                    qy = (m01 + m10) / s
+                    qz = (m02 + m20) / s
                 } else if (m11 > m22) {
-                    S = 2.0f * sqrt(1.0f + m11 - m00 - m22)
-                    qw = (m02 - m20) / S
-                    qx = (m01 + m10) / S
-                    qy = 0.25f * S
-                    qz = (m12 + m21) / S
+                    s = 2.0f * sqrt(1.0f + m11 - m00 - m22)
+                    qw = (m02 - m20) / s
+                    qx = (m01 + m10) / s
+                    qy = 0.25f * s
+                    qz = (m12 + m21) / s
                 } else {
-                    S = 2.0f * sqrt(1.0f + m22 - m00 - m11)
-                    qw = (m10 - m01) / S
-                    qx = (m02 + m20) / S
-                    qy = (m12 + m21) / S
-                    qz = 0.25f * S
+                    s = 2.0f * sqrt(1.0f + m22 - m00 - m11)
+                    qw = (m10 - m01) / s
+                    qx = (m02 + m20) / s
+                    qy = (m12 + m21) / s
+                    qz = 0.25f * s
                 }
             }
 

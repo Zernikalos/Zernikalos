@@ -1,14 +1,12 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
-import zernikalos.components.camera.ZLens
 import zernikalos.components.camera.ZPerspectiveLens
-import zernikalos.math.ZMatrix4F
-import zernikalos.math.ZVector3F
+import zernikalos.math.ZMatrix4
+import zernikalos.math.ZVector3
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -19,24 +17,24 @@ class ZCamera: ZObject {
     @ProtoNumber(4)
     var lens: ZPerspectiveLens
 
-    val projectionMatrix: ZMatrix4F
+    val projectionMatrix: ZMatrix4
         get() = lens.projectionMatrix
 
-    val viewMatrix: ZMatrix4F
+    val viewMatrix: ZMatrix4
         get() = transform.matrix
 
-    val viewProjectionMatrix: ZMatrix4F
+    val viewProjectionMatrix: ZMatrix4
         get() = projectionMatrix * viewMatrix
 
     @JsName("initWithLens")
-    constructor(lookAt: ZVector3F, up: ZVector3F, lens: ZPerspectiveLens) {
-        this.transform.setLookAt(lookAt, up)
+    constructor(lookAt: ZVector3, up: ZVector3, lens: ZPerspectiveLens) {
+        this.transform.lookAt(lookAt, up)
         this.lens = lens
     }
 
     @JsName("init")
-    constructor(lookAt: ZVector3F, up: ZVector3F) {
-        this.transform.setLookAt(lookAt, up)
+    constructor(lookAt: ZVector3, up: ZVector3) {
+        this.transform.lookAt(lookAt, up)
         this.lens = ZPerspectiveLens.Default
     }
 
@@ -48,7 +46,7 @@ class ZCamera: ZObject {
 
     companion object {
         val DefaultPerspectiveCamera: ZCamera
-            get() = ZCamera(ZVector3F.Zero, ZVector3F.Up)
+            get() = ZCamera(ZVector3.Zero, ZVector3.Up)
     }
 
 }

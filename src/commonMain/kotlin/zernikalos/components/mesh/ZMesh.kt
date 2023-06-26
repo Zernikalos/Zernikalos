@@ -8,44 +8,47 @@ import zernikalos.Types
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponent
 import zernikalos.components.buffer.ZBuffer
+import zernikalos.components.buffer.ZIndicesBuffer
 import zernikalos.components.buffer.ZVertexArray
 
 @Serializable
 class ZMesh: ZComponent() {
     @ProtoNumber(1)
-    private lateinit var attributeKeys: Map<String, ZAttributeKey>
+    private lateinit var bufferKeys: Map<String, ZBufferKey>
     @ProtoNumber(2)
-    private lateinit var indices: ZBuffer
+    private var indices: ZIndicesBuffer? = null
     @ProtoNumber(3)
-    private lateinit var vertices: Map<String, ZBuffer>
+    private lateinit var buffers: Map<String, ZBuffer>
 
     @Transient
     val vao: ZVertexArray = ZVertexArray()
 
     val useIndexBuffer: Boolean
-        get() = indices.hasData
+        get() = indices != null
 
     override fun initialize(ctx: ZRenderingContext) {
         vao.initialize(ctx)
 
-        attributeKeys.forEach { (name, attr) ->
-            val buffer = vertices[name]
+        bufferKeys.forEach { (name, attr) ->
+            val buffer = buffers[name]
             buffer?.initialize(ctx)
             attr.initialize(ctx)
         }
 
         if (useIndexBuffer) {
-            indices.initialize(ctx)
+            indices?.initialize(ctx)
         }
     }
 
     override fun render(ctx: ZRenderingContext) {
         vao.render(ctx)
         if (useIndexBuffer) {
-            ctx.drawElements(DrawModes.TRIANGLES.value, indices.count, Types.UNSIGNED_SHORT.value, 0)
+            val count = indices?.count!!
+            ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
         } else {
             // TODO: Fix this
-            ctx.drawArrays(DrawModes.TRIANGLES.value, 0, vertices["position"]?.count!!)
+            val count = bufferKeys["position"]?.count!!
+            ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
         }
     }
 

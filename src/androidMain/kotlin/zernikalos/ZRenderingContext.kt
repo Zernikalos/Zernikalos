@@ -1,9 +1,10 @@
 package zernikalos
 
 import android.opengl.GLES30
+import zernikalos.ui.ZSurfaceView
 import java.nio.ByteBuffer
 
-actual class ZRenderingContext {
+actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView) {
 
     actual fun enable(feat: Int) {
         GLES30.glEnable(feat)
@@ -141,6 +142,7 @@ actual object ExpectTypes {
     actual val SHORT: Int = GLES30.GL_SHORT
     actual val UNSIGNED_SHORT: Int = GLES30.GL_UNSIGNED_SHORT
     actual val FLOAT: Int = GLES30.GL_FLOAT
+    actual val DOUBLE: Int = GLES30.GL_FLOAT
 }
 
 actual object ExpectBufferTargetType {

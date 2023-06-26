@@ -5,11 +5,9 @@ import zernikalos.ui.ZSurfaceView
 
 class Zernikalos: ZernikalosBase() {
 
-    fun attachView(view: GLSurfaceView) {
-        val surfaceView = ZSurfaceView()
-        surfaceView.attachView(view)
-
-        attachSurfaceView(surfaceView)
+    fun initialize(view: GLSurfaceView, stateHandler: ZSceneStateHandler) {
+        val surfaceView = ZSurfaceView(view)
+        initialize(surfaceView, stateHandler)
     }
 
 }

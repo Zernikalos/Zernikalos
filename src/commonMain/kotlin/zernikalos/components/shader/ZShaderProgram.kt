@@ -25,7 +25,7 @@ class ZShaderProgram(): ZComponent() {
         fragmentShader = ZShader("fragment", fragmentShaderSource)
 
         attributes.forEach { (key, attrInput) ->
-            this.attributes[key] = ZAttribute(attrInput.index, attrInput.attributeName)
+            this.attributes[key] = ZAttribute(attrInput.id, attrInput.attributeName)
         }
 
         uniforms.forEach { (key, uniformInput) ->

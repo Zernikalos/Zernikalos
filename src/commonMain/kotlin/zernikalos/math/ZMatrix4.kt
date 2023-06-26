@@ -9,7 +9,7 @@ import kotlin.math.tan
 
 @JsExport
 @Serializable
-class ZMatrix4F: ZAlgebraObject {
+class ZMatrix4: ZAlgebraObject {
 
     override val values: FloatArray
 
@@ -54,20 +54,20 @@ class ZMatrix4F: ZAlgebraObject {
         values[i] = v
     }
 
-    operator fun plus(m: ZMatrix4F): ZMatrix4F {
-        val result = ZMatrix4F()
+    operator fun plus(m: ZMatrix4): ZMatrix4 {
+        val result = ZMatrix4()
         add(result, this, m)
         return result
     }
 
-    operator fun minus(m: ZMatrix4F): ZMatrix4F {
-        val result = ZMatrix4F()
+    operator fun minus(m: ZMatrix4): ZMatrix4 {
+        val result = ZMatrix4()
         subtract(result, this, m)
         return result
     }
 
-    operator fun times(m: ZMatrix4F): ZMatrix4F {
-        val result = ZMatrix4F()
+    operator fun times(m: ZMatrix4): ZMatrix4 {
+        val result = ZMatrix4()
         mult(result, this, m)
         return result
     }
@@ -81,7 +81,7 @@ class ZMatrix4F: ZAlgebraObject {
     }
 
     @JsName("translateByVector")
-    fun translate(translation: ZVector3F) {
+    fun translate(translation: ZVector3) {
         translate(this, translation)
     }
 
@@ -93,7 +93,7 @@ class ZMatrix4F: ZAlgebraObject {
         invert(this, this)
     }
 
-    fun scale(s: ZVector3F) {
+    fun scale(s: ZVector3) {
         scale(this, s)
     }
 
@@ -111,10 +111,10 @@ class ZMatrix4F: ZAlgebraObject {
 
     companion object {
 
-        val Identity: ZMatrix4F
-            get() = ZMatrix4F()
+        val Identity: ZMatrix4
+            get() = ZMatrix4()
 
-        fun identity(result: ZMatrix4F) {
+        fun identity(result: ZMatrix4) {
             result.values[0]  = 1.0f
             result.values[1]  = 0.0f
             result.values[2]  = 0.0f
@@ -136,19 +136,19 @@ class ZMatrix4F: ZAlgebraObject {
             result.values[15] = 1.0f
         }
 
-        fun add(result: ZMatrix4F, m1: ZMatrix4F, m2: ZMatrix4F) {
+        fun add(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
                 result.values[i] = m1.values[i] + m2.values[i]
             }
         }
 
-        fun subtract(result: ZMatrix4F, m1: ZMatrix4F, m2: ZMatrix4F) {
+        fun subtract(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
                 result.values[i] = m1.values[i] - m2.values[i]
             }
         }
 
-        fun mult(result: ZMatrix4F, lm: ZMatrix4F, rm: ZMatrix4F) {
+        fun mult(result: ZMatrix4, lm: ZMatrix4, rm: ZMatrix4) {
             for (i in 0 .. 3) {
                 val rm_i0 = rm.values[4 * i]
                 var ri0 = lm.values[0] * rm_i0
@@ -172,7 +172,7 @@ class ZMatrix4F: ZAlgebraObject {
         }
 
         @JsName("multVec4")
-        fun mult(result: ZVector4F, m: ZMatrix4F, v: ZVector4F) {
+        fun mult(result: ZVector4, m: ZMatrix4, v: ZVector4) {
             val x = v.x
             val y = v.y
             val z = v.z
@@ -184,7 +184,7 @@ class ZMatrix4F: ZAlgebraObject {
         }
 
         @JsName("multVec3")
-        fun mult(result: ZVector3F, m: ZMatrix4F, v: ZVector3F) {
+        fun mult(result: ZVector3, m: ZMatrix4, v: ZVector3) {
             val x = v.x
             val y = v.y
             val z = v.z
@@ -194,7 +194,7 @@ class ZMatrix4F: ZAlgebraObject {
             result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
         }
 
-        fun transpose(result: ZMatrix4F, m: ZMatrix4F) {
+        fun transpose(result: ZMatrix4, m: ZMatrix4) {
             for (i in 0..3) {
                 val k = i * 4
                 result.values[i] = m.values[k]
@@ -204,7 +204,7 @@ class ZMatrix4F: ZAlgebraObject {
             }
         }
 
-        fun transposeIp(result: ZMatrix4F) {
+        fun transposeIp(result: ZMatrix4) {
             // https://en.wikipedia.org/wiki/In-place_matrix_transposition
             for (i in 0.. 3) {
                 for (j in i+1..3) {
@@ -220,7 +220,7 @@ class ZMatrix4F: ZAlgebraObject {
         }
 
         @JsName("translateByVectorCopy")
-        fun translate(result: ZMatrix4F, m: ZMatrix4F, translation: ZVector3F) {
+        fun translate(result: ZMatrix4, m: ZMatrix4, translation: ZVector3) {
             for (i in 0..11) {
                 result.values[i] = m.values[i]
             }
@@ -230,29 +230,29 @@ class ZMatrix4F: ZAlgebraObject {
         }
 
         @JsName("translateByVector")
-        fun translate(result: ZMatrix4F, translation: ZVector3F) {
+        fun translate(result: ZMatrix4, translation: ZVector3) {
             innerTranslate(result, translation.x, translation.y, translation.z)
         }
 
-        fun translate(result: ZMatrix4F, x: Float, y: Float, z: Float) {
+        fun translate(result: ZMatrix4, x: Float, y: Float, z: Float) {
             innerTranslate(result, x, y, z)
         }
 
-        private fun innerTranslate(result: ZMatrix4F, x: Float, y: Float, z: Float) {
+        private fun innerTranslate(result: ZMatrix4, x: Float, y: Float, z: Float) {
             for (i in 0..3) {
                 result.values[12 + i] = result.values[i] * x + result.values[4 + i] * y + result.values[8 + i] * z + result.values[12 + i]
             }
         }
 
-        fun rotate(result: ZMatrix4F, q: ZQuaternion) {
-            val rotQuat = ZMatrix4F()
+        fun rotate(result: ZMatrix4, q: ZQuaternion) {
+            val rotQuat = ZMatrix4()
             fromQuaternion(rotQuat, q)
-            val aux = ZMatrix4F(result.values)
+            val aux = ZMatrix4(result.values)
             mult(result, aux, rotQuat)
         }
 
         @JsName("scaleByVectorCopy")
-        fun scale(result: ZMatrix4F, m: ZMatrix4F, s: ZVector3F) {
+        fun scale(result: ZMatrix4, m: ZMatrix4, s: ZVector3) {
             for (i in 0..3) {
                 result[i] = m[i] * s.x
                 result[4 + i] = m[4 + i] * s.y
@@ -261,7 +261,7 @@ class ZMatrix4F: ZAlgebraObject {
             }
         }
 
-        fun scale(result: ZMatrix4F, s: ZVector3F) {
+        fun scale(result: ZMatrix4, s: ZVector3) {
             scale(result, result, s)
         }
 
@@ -271,7 +271,7 @@ class ZMatrix4F: ZAlgebraObject {
          * @param result Matrix where the result of the operation will be stored
          * @param m The given matrix
          */
-        fun invert(result: ZMatrix4F, m: ZMatrix4F): Boolean {
+        fun invert(result: ZMatrix4, m: ZMatrix4): Boolean {
             // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
             val src0  = m.values[0]
             val src4  = m.values[1]
@@ -369,26 +369,26 @@ class ZMatrix4F: ZAlgebraObject {
             return true
         }
 
-        fun lookAt(result: ZMatrix4F, eye: ZVector3F, center: ZVector3F, up: ZVector3F) {
-            val f = ZVector3F()
+        fun lookAt(result: ZMatrix4, eye: ZVector3, center: ZVector3, up: ZVector3) {
+            val f = ZVector3()
 
             // See the OpenGL GLUT documentation for gluLookAt for a description
             // of the algorithm. We implement it in a straightforward way:
-            ZVector3F.subtract(f, center, eye)
+            ZVector3.subtract(f, center, eye)
 
             // Normalize f
             f.normalize()
 
             // compute s = f x up (x means "cross product")
-            val s = ZVector3F()
-            ZVector3F.cross(s, f, up)
+            val s = ZVector3()
+            ZVector3.cross(s, f, up)
 
             // and normalize s
             s.normalize()
 
             // compute u = s x f
-            val u = ZVector3F()
-            ZVector3F.cross(u, s, f)
+            val u = ZVector3()
+            ZVector3.cross(u, s, f)
 
             result.values[0] = s.x
             result.values[1] = u.x
@@ -410,12 +410,12 @@ class ZMatrix4F: ZAlgebraObject {
             result.values[14] = 0.0f
             result.values[15] = 1.0f
 
-            val negEye = ZVector3F()
-            ZVector3F.multScalar(negEye, -1.0f, eye)
+            val negEye = ZVector3()
+            ZVector3.multScalar(negEye, -1.0f, eye)
             translate(result, negEye)
         }
 
-        fun fromQuaternion(result: ZMatrix4F, q: ZQuaternion) {
+        fun fromQuaternion(result: ZMatrix4, q: ZQuaternion) {
             identity(result)
             val x: Float = q.x
             val y: Float = q.y
@@ -456,7 +456,7 @@ class ZMatrix4F: ZAlgebraObject {
          * @param near Near clip plane
          * @param far Far clip plane
          */
-        fun perspective(result: ZMatrix4F, fov: Float, aspect: Float, near: Float, far: Float) {
+        fun perspective(result: ZMatrix4, fov: Float, aspect: Float, near: Float, far: Float) {
             // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
             val f: Float = 1f / tan(fov * (PI / 360f)).toFloat()
             val rangeReciprocal = 1.0f / (near - far)

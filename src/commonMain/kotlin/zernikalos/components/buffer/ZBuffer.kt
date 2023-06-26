@@ -10,27 +10,22 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponent
 
 @Serializable
-class ZBuffer: ZComponent() {
+open class ZBuffer: ZComponent() {
 
     @Transient
     lateinit var buffer: GLWrap
 
     @ProtoNumber(1)
-    private var targetBuffer: BufferTargetType = BufferTargetType.ARRAY_BUFFER
-    @ProtoNumber(2)
-    private var usage: BufferUsageType = BufferUsageType.STATIC_DRAW
-    @ProtoNumber(3)
-    var itemSize: Int = 0
-    @ProtoNumber(4)
-    var count: Int = 0
+    var isIndexBuffer: Boolean = false
+
     @ProtoNumber(5)
     private lateinit var dataArray: ByteArray
 
     val hasData: Boolean
         get() = !dataArray.isEmpty()
 
-    val isIndexBuffer: Boolean
-        get() = targetBuffer == BufferTargetType.ELEMENT_ARRAY_BUFFER
+    private val targetBuffer: BufferTargetType
+        get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
 
     override fun initialize(ctx: ZRenderingContext) {
         if (!hasData) {
@@ -44,7 +39,7 @@ class ZBuffer: ZComponent() {
         //        }
 
         ctx.bindBuffer(targetBuffer, buffer)
-        ctx.bufferData(targetBuffer, dataArray, usage)
+        ctx.bufferData(targetBuffer, dataArray, BufferUsageType.STATIC_DRAW)
     }
 
     fun bind(ctx: ZRenderingContext) {

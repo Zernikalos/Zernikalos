@@ -7,7 +7,7 @@ import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.ZShaderProgram
-import zernikalos.math.ZMatrix4F
+import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 
 @JsExport
@@ -30,7 +30,7 @@ class ZModel: ZObject() {
         shaderProgram.uniforms.forEach {
             val uniformGenerator = sceneContext.getUniform(it.key)
             if (uniformGenerator != null) {
-                val uniformValue: ZMatrix4F = uniformGenerator.compute(sceneContext, this)
+                val uniformValue: ZMatrix4 = uniformGenerator.compute(sceneContext, this)
                 it.value.bindValue(ctx, uniformValue.values)
             }
         }

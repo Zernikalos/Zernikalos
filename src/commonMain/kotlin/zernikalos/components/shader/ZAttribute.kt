@@ -5,18 +5,18 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponent
 
 interface IZShaderAttribute {
-    val index: Int
+    val id: Int
     val attributeName: String
 }
 
 @Serializable
-class ZAttribute(private val index: Int, private val attributeName: String): ZComponent() {
+class ZAttribute(private val id: Int, private val attributeName: String): ZComponent() {
 
     override fun initialize(ctx: ZRenderingContext) {
     }
 
     fun bindLocation(ctx: ZRenderingContext, program: ZProgram) {
-        ctx.bindAttribLocation(program.programId, index, attributeName)
+        ctx.bindAttribLocation(program.programId, id, attributeName)
     }
 
     override fun render(ctx: ZRenderingContext) {

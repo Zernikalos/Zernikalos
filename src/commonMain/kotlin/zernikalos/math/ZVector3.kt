@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
+class ZVector3(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
 
     @JsName("zeroCtor")
     constructor() : this(0f, 0f, 0f)
@@ -17,7 +17,7 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
     constructor(v: Float) : this(v, v, v)
 
     @JsName("copyCtor")
-    constructor(v4: ZVector4F) : this() {
+    constructor(v4: ZVector4) : this() {
         fromVec4(this, v4)
     }
 
@@ -45,25 +45,25 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         this.z = z
     }
 
-    operator fun plus(v: ZVector3F): ZVector3F {
-        val result = ZVector3F()
+    operator fun plus(v: ZVector3): ZVector3 {
+        val result = ZVector3()
         add(result, this, v)
         return result
     }
 
-    operator fun minus(v: ZVector3F): ZVector3F {
-        val result = ZVector3F()
+    operator fun minus(v: ZVector3): ZVector3 {
+        val result = ZVector3()
         subtract(result, this, v)
         return result
     }
 
-    operator fun times(v: ZVector3F): Float {
+    operator fun times(v: ZVector3): Float {
         return dot(this, v)
     }
 
     @JsName("timesScalar")
-    operator fun times(scalar: Float): ZVector3F {
-        val result = ZVector3F()
+    operator fun times(scalar: Float): ZVector3 {
+        val result = ZVector3()
         multScalar(result, scalar, this)
         return result
     }
@@ -80,39 +80,43 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         normalize(this, this)
     }
 
-    fun cross(v: ZVector3F) {
+    fun cross(v: ZVector3) {
         // TODO: This should not be working
         cross(this, this, v)
     }
 
-    fun copy(v: ZVector3F) {
+    fun copy(v: ZVector3) {
         copy(this, v)
+    }
+
+    override fun toString(): String {
+        return "[$x, $y, $z]"
     }
 
     companion object {
 
-        val Zero: ZVector3F
-            get() = ZVector3F()
+        val Zero: ZVector3
+            get() = ZVector3()
 
-        val Ones: ZVector3F
-            get() = ZVector3F(1.0f)
+        val Ones: ZVector3
+            get() = ZVector3(1.0f)
 
-        val Forward: ZVector3F
-            get() = ZVector3F(1f, 0f, 0f)
+        val Forward: ZVector3
+            get() = ZVector3(1f, 0f, 0f)
 
-        val Right: ZVector3F
-            get() = ZVector3F(0f, 1f, 0f)
+        val Right: ZVector3
+            get() = ZVector3(0f, 1f, 0f)
 
-        val Up: ZVector3F
-            get() = ZVector3F(0f, 0f, 1f)
+        val Up: ZVector3
+            get() = ZVector3(0f, 0f, 1f)
 
-        fun copy(result: ZVector3F, v: ZVector3F) {
+        fun copy(result: ZVector3, v: ZVector3) {
             result.x = v.x
             result.y = v.y
             result.z = v.z
         }
 
-        fun fromVec4(result: ZVector3F, v: ZVector4F) {
+        fun fromVec4(result: ZVector3, v: ZVector4) {
             if (abs(v.w) > 0) {
                 result.setValues(v.x / v.w, v.y / v.w, v.z / v.w)
             } else {
@@ -120,23 +124,23 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
             }
         }
 
-        fun zero(result: ZVector3F) {
+        fun zero(result: ZVector3) {
             result.x = 0.0f
             result.y = 0.0f
             result.z = 0.0f
         }
 
-        fun add(result: ZVector3F, op1: ZVector3F, op2: ZVector3F) {
+        fun add(result: ZVector3, op1: ZVector3, op2: ZVector3) {
             result.x = op1.x + op2.y
             result.y = op1.y + op2.y
             result.z = op1.z + op2.z
         }
 
-        fun dot(op1: ZVector3F, op2: ZVector3F): Float {
+        fun dot(op1: ZVector3, op2: ZVector3): Float {
             return op1.x * op2.x + op1.y * op2.y + op1.z * op2.z
         }
 
-        fun norm2(v: ZVector3F): Float {
+        fun norm2(v: ZVector3): Float {
             return sqrt(dot(v, v))
         }
 
@@ -145,38 +149,41 @@ class ZVector3F(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
             return sqrt(x * x + y * y + z * z)
         }
 
-        fun multScalar(result: ZVector3F, scalar: Float, v: ZVector3F) {
+        fun multScalar(result: ZVector3, scalar: Float, v: ZVector3) {
             result.x = scalar * v.x
             result.y = scalar * v.y
             result.z = scalar * v.z
         }
 
-        fun normalize(result: ZVector3F, v: ZVector3F) {
+        fun normalize(result: ZVector3, v: ZVector3) {
             copy(result, v)
             val norm2 = v.norm2
+            if (abs(norm2) < 0.00000000001) {
+                return
+            }
             val invNorm = 1.0f / norm2
             result.multScalar(invNorm)
         }
 
-        fun subtract(result: ZVector3F, op1: ZVector3F, op2: ZVector3F) {
+        fun subtract(result: ZVector3, op1: ZVector3, op2: ZVector3) {
             result.x = op1.x - op2.x
             result.y = op1.y - op2.y
             result.z = op1.z - op2.z
         }
 
-        fun cross(result: ZVector3F, op1: ZVector3F, op2: ZVector3F) {
+        fun cross(result: ZVector3, op1: ZVector3, op2: ZVector3) {
             result.x = op1.y * op2.z - op1.z * op2.y
             result.y = op1.z * op2.x - op1.x * op2.z
             result.z = op1.x * op2.y - op1.y * op2.x
         }
 
-        fun lerp(result: ZVector3F, t: Float, op1: ZVector3F, op2: ZVector3F) {
+        fun lerp(result: ZVector3, t: Float, op1: ZVector3, op2: ZVector3) {
             result.x = (1 - t) * op1.x + t * op2.x
             result.y = (1 - t) * op1.y + t * op2.y
             result.z = (1 - t) * op1.z + t * op2.z
         }
 
-        fun rotateVector(result: ZVector3F, q: ZQuaternion, v: ZVector3F) {
+        fun rotateVector(result: ZVector3, q: ZQuaternion, v: ZVector3) {
             val q1 = ZQuaternion()
             val q2 = ZQuaternion()
 

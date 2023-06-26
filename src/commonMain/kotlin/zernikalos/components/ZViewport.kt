@@ -4,11 +4,11 @@ import zernikalos.BufferBit
 import zernikalos.CullModeType
 import zernikalos.Enabler
 import zernikalos.ZRenderingContext
-import zernikalos.math.ZVector4F
+import zernikalos.math.ZVector4
 
 class ZViewport: ZComponent() {
     //private val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
-    private val clearColor: ZVector4F = ZVector4F(.2f, .2f, .2f, 1.0f)
+    private val clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f)
     private val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 
     override fun initialize(ctx: ZRenderingContext) {

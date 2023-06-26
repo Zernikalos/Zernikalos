@@ -2,23 +2,27 @@ package zernikalos.ui
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import zernikalos.ZRenderingContext
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-actual class ZSurfaceView {
-
-    actual val stateHandlerBridge: ZSurfaceStateHandlerBridge = ZSurfaceStateHandlerBridge()
-    actual val renderingContext: ZRenderingContext
-        get() = nativeRenderer.renderingContext
+actual class ZSurfaceView(view: GLSurfaceView) {
 
     lateinit var nativeSurfaceView: GLSurfaceView
-    private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer(stateHandlerBridge)
+    private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
 
     actual val width: Int
         get() = nativeSurfaceView.width
     actual val height: Int
         get() = nativeSurfaceView.height
+    actual var eventHandler: ZSurfaceViewEventHandler?
+        get() = nativeRenderer.eventHandler
+        set(value) {
+            nativeRenderer.eventHandler = value
+        }
+
+    init {
+        attachView(view)
+    }
 
     fun attachView(nativeSurfaceView: GLSurfaceView) {
         this.nativeSurfaceView = nativeSurfaceView
@@ -35,12 +39,12 @@ actual class ZSurfaceView {
     }
 }
 
-class AndroidNativeRenderer(private val stateHandlerBridge: ZSurfaceStateHandlerBridge) : GLSurfaceView.Renderer {
+class AndroidNativeRenderer: GLSurfaceView.Renderer {
 
-    val renderingContext: ZRenderingContext = ZRenderingContext()
+    var eventHandler: ZSurfaceViewEventHandler? = null
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
-        stateHandlerBridge.onReady(renderingContext)
+        eventHandler?.onReady()
     }
 
     override fun onSurfaceChanged(p0: GL10?, width: Int, height: Int) {
@@ -48,6 +52,6 @@ class AndroidNativeRenderer(private val stateHandlerBridge: ZSurfaceStateHandler
     }
 
     override fun onDrawFrame(p0: GL10?) {
-        stateHandlerBridge.onRender(renderingContext)
+        eventHandler?.onRender()
     }
 }

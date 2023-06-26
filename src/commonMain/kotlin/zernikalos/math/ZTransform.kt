@@ -14,27 +14,27 @@ import kotlin.js.JsName
 class ZTransform {
 
     @Transient
-    private val _matrix: ZMatrix4F = ZMatrix4F.Identity
+    private val _matrix: ZMatrix4 = ZMatrix4.Identity
 
-    private val _location: ZVector3F = ZVector3F.Zero
+    private val _location: ZVector3 = ZVector3.Zero
     private val _rotation: ZQuaternion = ZQuaternion.Identity
-    private val _scale: ZVector3F = ZVector3F.Ones
+    private val _scale: ZVector3 = ZVector3.Ones
 
-    private val _forward: ZVector3F = ZVector3F.Forward
-    private val _right: ZVector3F = ZVector3F.Right
-    private val _up: ZVector3F = ZVector3F.Up
+    private val _forward: ZVector3 = ZVector3.Forward
+    private val _right: ZVector3 = ZVector3.Right
+    private val _up: ZVector3 = ZVector3.Up
 
     @JsName("defaultCtor")
     constructor()
 
     @JsName("argsCtor")
-    constructor(location: ZVector3F, rotation: ZQuaternion, scale: ZVector3F) {
+    constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3) {
         _location.copy(location)
         _rotation.copy(rotation)
         _scale.copy(scale)
     }
 
-    var location: ZVector3F
+    var location: ZVector3
         get() = _location
         set(value) {
             _location.copy(value)
@@ -46,18 +46,18 @@ class ZTransform {
             _rotation.copy(value)
         }
 
-    var scale: ZVector3F
+    var scale: ZVector3
         get() = _scale
         set(value) {
             _scale.copy(value)
         }
 
-    val matrix: ZMatrix4F
+    val matrix: ZMatrix4
         get() {
-            ZMatrix4F.identity(_matrix)
-            ZMatrix4F.translate(_matrix, _location)
-            ZMatrix4F.rotate(_matrix, _rotation)
-            ZMatrix4F.scale(_matrix, _scale)
+            ZMatrix4.identity(_matrix)
+            ZMatrix4.translate(_matrix, _location)
+            ZMatrix4.rotate(_matrix, _rotation)
+            ZMatrix4.scale(_matrix, _scale)
             return _matrix
         }
 
@@ -70,19 +70,19 @@ class ZTransform {
     }
 
     @JsName("rotateByVector")
-    fun setRotation(angle: Float, axis: ZVector3F) {
+    fun setRotation(angle: Float, axis: ZVector3) {
         ZQuaternion.fromAngleAxis(_rotation, angle, axis)
     }
 
     @JsName("setLookAtUp")
-    fun setLookAt(look: ZVector3F, up: ZVector3F) {
-        val m = ZMatrix4F()
-        ZMatrix4F.lookAt(m, _location, look, up)
+    fun lookAt(look: ZVector3, up: ZVector3) {
+        val m = ZMatrix4()
+        ZMatrix4.lookAt(m, _location, look, up)
         ZQuaternion.fromMatrix4(_rotation, m)
     }
 
-    fun setLookAt(look: ZVector3F) {
-        setLookAt(look, _up)
+    fun lookAt(look: ZVector3) {
+        lookAt(look, _up)
     }
 
     fun translate(x: Float, y: Float, z: Float) {
@@ -92,7 +92,7 @@ class ZTransform {
     }
 
     @JsName("translateByVector")
-    fun translate(v: ZVector3F) {
+    fun translate(v: ZVector3) {
         translate(v.x, v.y, v.z)
     }
 
@@ -107,7 +107,7 @@ class ZTransform {
     }
 
     @JsName("scaleByVector")
-    fun scale(v: ZVector3F) {
+    fun scale(v: ZVector3) {
         _scale.setValues(v.x, v.y, v.z)
     }
 
@@ -123,39 +123,39 @@ class ZTransform {
     }
 
     @JsName("rotateByAngleAxisVector")
-    fun rotate(angle: Float, axis: ZVector3F) {
+    fun rotate(angle: Float, axis: ZVector3) {
         rotate(angle, axis.x, axis.y, axis.z)
     }
 
     @JsName("rotateAroundPointAxesThrough")
-    fun rotateAround(angle: Float, point: ZVector3F, axis: ZVector3F, through: ZVector3F) {
+    fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3, through: ZVector3) {
         val q = ZQuaternion()
         ZQuaternion.fromAngleAxis(q, angle, axis)
         ZQuaternion.mult(_rotation, _rotation, q)
 
-        val v = ZVector3F()
+        val v = ZVector3()
         //V-P
-        ZVector3F.subtract(v, through, point)
+        ZVector3.subtract(v, through, point)
         //R(V-P)
-        ZVector3F.rotateVector(v, _rotation, v)
+        ZVector3.rotateVector(v, _rotation, v)
         //Loc = P + R(V-P)
-        ZVector3F.add(_location, point, v)
+        ZVector3.add(_location, point, v)
     }
 
-    fun rotateAround(angle: Float, point: ZVector3F, axis: ZVector3F) {
+    fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3) {
         rotateAround(angle, point, axis, _location)
     }
 
     private fun transformLocalAxis() {
-        ZMatrix4F.mult(_forward, _matrix, _forward)
-        ZMatrix4F.mult(_up, _matrix, _up)
-        ZMatrix4F.mult(_right, _matrix, _right)
+        ZMatrix4.mult(_forward, _matrix, _forward)
+        ZMatrix4.mult(_up, _matrix, _up)
+        ZMatrix4.mult(_right, _matrix, _right)
     }
 
 }
 
 @Serializable
-data class ZkTransformSurrogate(val location: ZVector3F, val rotation: ZQuaternion, val scale: ZVector3F)
+data class ZkTransformSurrogate(val location: ZVector3, val rotation: ZQuaternion, val scale: ZVector3)
 
 class ZkTransformSerializer : KSerializer<ZTransform> {
     override val descriptor: SerialDescriptor = ZkTransformSurrogate.serializer().descriptor

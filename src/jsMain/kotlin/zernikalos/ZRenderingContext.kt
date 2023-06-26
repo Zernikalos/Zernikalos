@@ -2,6 +2,7 @@ package zernikalos
 
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.ui.ZSurfaceView
 
 abstract external class WebGLVertexArrayObject: WebGLObject
 
@@ -12,9 +13,13 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
 }
 
 @JsExport
-actual class ZRenderingContext {
+actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView) {
 
     private lateinit var gl: WebGL2RenderingContext
+
+    init {
+        setContext(surfaceView.canvas)
+    }
 
     fun setContext(canvas: HTMLCanvasElement) {
         val context = canvas.getContext("webgl2") ?: throw Error("Unable to get context")
@@ -153,6 +158,7 @@ actual object ExpectTypes {
     actual val SHORT: Int = WebGLRenderingContext.SHORT
     actual val UNSIGNED_SHORT: Int = WebGLRenderingContext.UNSIGNED_SHORT
     actual val FLOAT: Int = WebGLRenderingContext.FLOAT
+    actual val DOUBLE: Int = WebGLRenderingContext.FLOAT
 }
 
 actual object ExpectBufferTargetType {
