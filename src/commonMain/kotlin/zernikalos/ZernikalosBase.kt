@@ -15,6 +15,8 @@ open class ZernikalosBase {
     lateinit var stateHandler: ZSceneStateHandler
     lateinit var sceneContext: ZSceneContext
 
+    var initialized = false
+
     init {
         println("Starting engine")
     }
@@ -29,9 +31,14 @@ open class ZernikalosBase {
         surfaceView.eventHandler = object : ZSurfaceViewEventHandler {
             override fun onReady() {
                 stateHandler.onReady(sceneContext, renderingContext)
+                initialized = true
             }
 
             override fun onRender() {
+                if (!initialized) {
+                    initialized = true
+                    stateHandler.onReady(sceneContext, renderingContext)
+                }
                 stateHandler.onRender(sceneContext, renderingContext)
             }
         }
