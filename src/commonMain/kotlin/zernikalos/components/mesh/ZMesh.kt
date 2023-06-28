@@ -7,12 +7,13 @@ import zernikalos.DrawModes
 import zernikalos.Types
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponent
+import zernikalos.components.ZRenderizable
 import zernikalos.components.buffer.ZBuffer
 import zernikalos.components.buffer.ZIndicesBuffer
 import zernikalos.components.buffer.ZVertexArray
 
 @Serializable
-class ZMesh: ZComponent() {
+class ZMesh: ZRenderizable() {
     @ProtoNumber(1)
     private lateinit var bufferKeys: Map<String, ZBufferKey>
     @ProtoNumber(2)
@@ -41,7 +42,7 @@ class ZMesh: ZComponent() {
     }
 
     override fun render(ctx: ZRenderingContext) {
-        vao.render(ctx)
+        vao.bind(ctx)
         if (useIndexBuffer) {
             val count = indices?.count!!
             ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
@@ -50,6 +51,7 @@ class ZMesh: ZComponent() {
             val count = bufferKeys["position"]?.count!!
             ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
         }
+        vao.unbind(ctx)
     }
 
 }

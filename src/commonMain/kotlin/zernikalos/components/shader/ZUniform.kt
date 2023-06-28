@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
 interface IZShaderUniform {
@@ -29,9 +30,6 @@ class ZUniform(private val uniformName: String, private val count: Int, val type
             ZUniformType.MAT4 -> ctx.uniformMatrix4fv(uniformId, count, false, values)
             else -> return
         }
-    }
-
-    override fun render(ctx: ZRenderingContext) {
     }
 
 }

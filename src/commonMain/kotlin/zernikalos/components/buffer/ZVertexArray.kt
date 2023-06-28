@@ -2,9 +2,9 @@ package zernikalos.components.buffer
 
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.ZBindeable
 
-class ZVertexArray: ZComponent() {
+class ZVertexArray: ZBindeable() {
     private lateinit var vao: GLWrap
 
     override fun initialize(ctx: ZRenderingContext) {
@@ -14,7 +14,11 @@ class ZVertexArray: ZComponent() {
         ctx.bindVertexArray(vao)
     }
 
-    override fun render(ctx: ZRenderingContext) {
+    override fun bind(ctx: ZRenderingContext) {
         ctx.bindVertexArray(vao)
     }
+
+    override fun unbind(ctx: ZRenderingContext) {
+    }
+
 }

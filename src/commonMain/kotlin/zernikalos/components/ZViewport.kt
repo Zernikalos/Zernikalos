@@ -6,7 +6,7 @@ import zernikalos.Enabler
 import zernikalos.ZRenderingContext
 import zernikalos.math.ZVector4
 
-class ZViewport: ZComponent() {
+class ZViewport: ZRenderizable() {
     //private val viewport: Array<Int> = arrayOf(0, 0, 700, 700)
     private val clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f)
     private val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
@@ -22,4 +22,5 @@ class ZViewport: ZComponent() {
         ctx.clearColor(v.x, v.y, v.z, v.w)
         ctx.clear(clearMask)
     }
+
 }

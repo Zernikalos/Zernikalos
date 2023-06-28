@@ -13,7 +13,4 @@ class ZBufferKey(private val id: Int, private val dataType: Types, private val s
         ctx.vertexAttribPointer(id, size, dataType.value, normalized, stride, offset)
     }
 
-    override fun render(ctx: ZRenderingContext) {
-    }
-
 }

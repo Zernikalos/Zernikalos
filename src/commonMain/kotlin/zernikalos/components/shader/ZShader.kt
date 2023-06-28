@@ -5,6 +5,7 @@ import kotlinx.serialization.Transient
 import zernikalos.GLWrap
 import zernikalos.ShaderType
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
 @Serializable
@@ -24,9 +25,6 @@ class ZShader(private val type: String, private val source: String): ZComponent(
         checkShader(ctx, shad)
 
         shader = shad
-    }
-
-    override fun render(ctx: ZRenderingContext) {
     }
 
     private fun createShader(ctx: ZRenderingContext, shaderType: ShaderType): GLWrap {

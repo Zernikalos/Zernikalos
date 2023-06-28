@@ -4,10 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
 @Serializable
-class ZShaderProgram(): ZComponent() {
+class ZShaderProgram(): ZBindeable() {
     @Transient
     val program: ZProgram = ZProgram()
 
@@ -54,8 +55,12 @@ class ZShaderProgram(): ZComponent() {
         }
     }
 
-    override fun render(ctx: ZRenderingContext) {
-        program.render(ctx)
+    override fun bind(ctx: ZRenderingContext) {
+        program.bind(ctx)
+    }
+
+    override fun unbind(ctx: ZRenderingContext) {
+        program.unbind(ctx)
     }
 
     private fun attachShader(ctx: ZRenderingContext, program: ZProgram, shader: ZShader) {

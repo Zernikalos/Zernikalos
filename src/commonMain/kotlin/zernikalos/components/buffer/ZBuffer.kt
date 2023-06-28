@@ -7,10 +7,11 @@ import zernikalos.BufferTargetType
 import zernikalos.BufferUsageType
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
 @Serializable
-open class ZBuffer: ZComponent() {
+open class ZBuffer: ZBindeable() {
 
     @Transient
     lateinit var buffer: GLWrap
@@ -42,10 +43,11 @@ open class ZBuffer: ZComponent() {
         ctx.bufferData(targetBuffer, dataArray, BufferUsageType.STATIC_DRAW)
     }
 
-    fun bind(ctx: ZRenderingContext) {
+    override fun bind(ctx: ZRenderingContext) {
         ctx.bindBuffer(targetBuffer, buffer)
     }
 
-    override fun render(ctx: ZRenderingContext) {
+    override fun unbind(ctx: ZRenderingContext) {
     }
+
 }

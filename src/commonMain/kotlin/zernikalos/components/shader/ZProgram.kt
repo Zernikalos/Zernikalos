@@ -2,9 +2,10 @@ package zernikalos.components.shader
 
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
-class ZProgram: ZComponent() {
+class ZProgram: ZBindeable() {
 
     lateinit var programId: GLWrap
 
@@ -18,8 +19,11 @@ class ZProgram: ZComponent() {
         programId = p
     }
 
-    override fun render(ctx: ZRenderingContext) {
+    override fun bind(ctx: ZRenderingContext) {
         ctx.useProgram(programId)
+    }
+
+    override fun unbind(ctx: ZRenderingContext) {
     }
 
     fun link(ctx: ZRenderingContext) {

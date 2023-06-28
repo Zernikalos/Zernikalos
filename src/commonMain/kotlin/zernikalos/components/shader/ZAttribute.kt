@@ -2,6 +2,7 @@ package zernikalos.components.shader
 
 import kotlinx.serialization.Serializable
 import zernikalos.ZRenderingContext
+import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 
 interface IZShaderAttribute {
@@ -19,7 +20,5 @@ class ZAttribute(private val id: Int, private val attributeName: String): ZCompo
         ctx.bindAttribLocation(program.programId, id, attributeName)
     }
 
-    override fun render(ctx: ZRenderingContext) {
-    }
 
 }

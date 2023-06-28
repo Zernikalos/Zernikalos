@@ -25,7 +25,7 @@ class ZModel: ZObject() {
     }
 
     override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
-        shaderProgram.render(ctx)
+        shaderProgram.bind(ctx)
 
         shaderProgram.uniforms.forEach {
             val uniformGenerator = sceneContext.getUniform(it.key)
@@ -36,5 +36,7 @@ class ZModel: ZObject() {
         }
 
         mesh.render(ctx)
+
+        shaderProgram.unbind(ctx)
     }
 }
