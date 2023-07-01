@@ -1,5 +1,6 @@
 package zernikalos.components.buffer
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -7,29 +8,51 @@ import zernikalos.BufferTargetType
 import zernikalos.BufferUsageType
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponent
+import zernikalos.components.*
+
+@Serializable(with = ZBufferSerializer::class)
+open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
+
+    override fun initialize(ctx: ZRenderingContext) {
+        renderer.initialize(ctx, data)
+    }
+
+    override fun bind(ctx: ZRenderingContext) {
+        renderer.bind(ctx, data)
+    }
+
+    override fun unbind(ctx: ZRenderingContext) {
+        renderer.unbind(ctx, data)
+    }
+
+}
 
 @Serializable
-open class ZBuffer: ZBindeable() {
+open class ZBufferData(
+    @ProtoNumber(1)
+    var isIndexBuffer: Boolean = false,
+    @ProtoNumber(3)
+    var size: Int = 0,
+    @ProtoNumber(4)
+    var count: Int = 0,
+    @ProtoNumber(5)
+    var dataArray: ByteArray
+): ZComponentData() {
+    val hasData: Boolean
+        get() = !dataArray.isEmpty()
+
+    val targetBuffer: BufferTargetType
+        get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
+
+}
+
+class ZBufferRenderer: ZComponentRender<ZBufferData> {
 
     @Transient
     lateinit var buffer: GLWrap
 
-    @ProtoNumber(1)
-    var isIndexBuffer: Boolean = false
-
-    @ProtoNumber(5)
-    private lateinit var dataArray: ByteArray
-
-    val hasData: Boolean
-        get() = !dataArray.isEmpty()
-
-    private val targetBuffer: BufferTargetType
-        get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
-
-    override fun initialize(ctx: ZRenderingContext) {
-        if (!hasData) {
+    override fun initialize(ctx: ZRenderingContext, data: ZBufferData) {
+        if (!data.hasData) {
             return
         }
 
@@ -39,15 +62,30 @@ open class ZBuffer: ZBindeable() {
         //            throw Error("Unable to create buffer")
         //        }
 
-        ctx.bindBuffer(targetBuffer, buffer)
-        ctx.bufferData(targetBuffer, dataArray, BufferUsageType.STATIC_DRAW)
+        ctx.bindBuffer(data.targetBuffer, buffer)
+        ctx.bufferData(data.targetBuffer, data.dataArray, BufferUsageType.STATIC_DRAW)
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        ctx.bindBuffer(targetBuffer, buffer)
+    override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
+        ctx.bindBuffer(data.targetBuffer, buffer)
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
+    override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {
+        super.unbind(ctx, data)
     }
 
 }
+
+class ZBufferSerializer: ZComponentSerializer<ZBuffer, ZBufferData, ZBufferRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZBufferData>
+        get() = ZBufferData.serializer()
+
+    override fun createRendererComponent(): ZBufferRenderer {
+        return ZBufferRenderer()
+    }
+
+    override fun createComponentInstance(data: ZBufferData, renderer: ZBufferRenderer): ZBuffer {
+        return ZBuffer()
+    }
+}
+

@@ -1,27 +1,40 @@
 package zernikalos.components.shader
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import zernikalos.GLWrap
 import zernikalos.ShaderType
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 
-@Serializable
-class ZShader(private val type: String, private val source: String): ZComponent() {
-
-    @Transient var shader: GLWrap = GLWrap()
+@Serializable(with = ZShaderSerializer::class)
+class ZShader(): ZComponent<ZShaderData, ZShaderRenderer>() {
 
     override fun initialize(ctx: ZRenderingContext) {
-        val type = if (this.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
+        renderer.initialize(ctx, data)
+    }
+
+}
+
+@Serializable
+data class ZShaderData(
+    val type: String,
+    val source: String
+): ZComponentData()
+
+class ZShaderRenderer: ZComponentRender<ZShaderData> {
+
+    var shader: GLWrap = GLWrap()
+
+    override fun initialize(ctx: ZRenderingContext, data: ZShaderData) {
+        val type = if (data.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
         val shad = createShader(ctx, type)
         // TODO: Take care with the cast since this breaks js
         // if (shaderId <= 0) {
         //     throw Error("Error creating shader")
         // }
 
-        compileShader(ctx, shad, source)
+        compileShader(ctx, shad, data.source)
         checkShader(ctx, shad)
 
         shader = shad
@@ -43,6 +56,20 @@ class ZShader(private val type: String, private val source: String): ZComponent(
             ctx.deleteShader(shader)
             throw Error("Error compiling shader $compilerError : $compilerStatus")
         }
+    }
+
+}
+
+class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData, ZShaderRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZShaderData>
+        get() = ZShaderData.serializer()
+
+    override fun createRendererComponent(): ZShaderRenderer {
+        return ZShaderRenderer()
+    }
+
+    override fun createComponentInstance(data: ZShaderData, renderer: ZShaderRenderer): ZShader {
+        return ZShader()
     }
 
 }

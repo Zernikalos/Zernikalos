@@ -1,16 +1,56 @@
 package zernikalos.components.mesh
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import zernikalos.Types
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 
-@Serializable
-class ZBufferKey(private val id: Int, private val dataType: Types, private val size: Int, val count: Int, private val normalized: Boolean, private val offset: Int, private val stride: Int): ZComponent() {
+@Serializable(with = ZBufferKeySerializer::class)
+class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
 
     override fun initialize(ctx: ZRenderingContext) {
-        ctx.enableVertexAttrib(id)
-        ctx.vertexAttribPointer(id, size, dataType.value, normalized, stride, offset)
+        renderer.initialize(ctx, data)
+    }
+
+}
+
+@Serializable
+data class ZBufferKeyData(
+    val id: Int,
+    val dataType: Types,
+    val size: Int,
+    val count: Int,
+    val normalized: Boolean,
+    val offset: Int,
+    val stride: Int
+): ZComponentData()
+
+class ZBufferKeyRenderer: ZComponentRender<ZBufferKeyData> {
+    override fun initialize(ctx: ZRenderingContext, data: ZBufferKeyData) {
+        ctx.enableVertexAttrib(data.id)
+        ctx.vertexAttribPointer(
+            data.id,
+            data.size,
+            data.dataType.value,
+            data.normalized,
+            data.stride,
+            data.offset
+        )
+    }
+
+}
+
+class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData, ZBufferKeyRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZBufferKeyData>
+        get() = ZBufferKeyData.serializer()
+
+    override fun createRendererComponent(): ZBufferKeyRenderer {
+        return ZBufferKeyRenderer()
+    }
+
+    override fun createComponentInstance(data: ZBufferKeyData, renderer: ZBufferKeyRenderer): ZBufferKey {
+        return ZBufferKey()
     }
 
 }
