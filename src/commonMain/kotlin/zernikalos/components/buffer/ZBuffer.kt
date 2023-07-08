@@ -13,6 +13,18 @@ import zernikalos.components.*
 @Serializable(with = ZBufferSerializer::class)
 open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
+    val isIndexBuffer: Boolean
+        get() = data.isIndexBuffer
+
+    val size: Int
+        get() = data.size
+
+    val count: Int
+        get() = data.count
+
+    val dataArray: ByteArray
+        get() = data.dataArray
+
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
     }
@@ -41,6 +53,7 @@ open class ZBufferData(
     val hasData: Boolean
         get() = !dataArray.isEmpty()
 
+    // TODO: Change this in order to make it ogl independent
     val targetBuffer: BufferTargetType
         get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
 

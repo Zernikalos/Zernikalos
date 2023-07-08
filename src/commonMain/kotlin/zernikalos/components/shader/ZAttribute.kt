@@ -2,11 +2,18 @@ package zernikalos.components.shader
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 
 @Serializable(with = ZAttributeSerializer::class)
 class ZAttribute: ZComponent<ZAttributeData, ZAttributeRenderer>() {
+
+    val id: Int
+        get() = data.id
+
+    val attributeName: String
+        get() = data.attributeName
 
     override fun initialize(ctx: ZRenderingContext) {
     }
@@ -18,7 +25,9 @@ class ZAttribute: ZComponent<ZAttributeData, ZAttributeRenderer>() {
 
 @Serializable
 data class ZAttributeData(
+    @ProtoNumber(1)
     val id: Int,
+    @ProtoNumber(2)
     val attributeName: String
 ): ZComponentData()
 

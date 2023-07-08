@@ -14,6 +14,15 @@ import zernikalos.components.buffer.ZVertexArray
 @Serializable(with = ZMeshSerializer::class)
 class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 
+    val bufferKeys: Map<String, ZBufferKey>
+        get() = data.bufferKeys
+
+    val indices: ZBuffer?
+        get() = data.indices
+
+    val buffers: Map<String, ZBuffer>
+        get() = data.buffers
+
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
     }
@@ -57,11 +66,11 @@ class ZMeshRenderer: ZComponentRender<ZMeshData> {
     override fun render(ctx: ZRenderingContext, data: ZMeshData) {
         vao.bind(ctx)
         if (useIndexBuffer(data)) {
-            val count = data.indices?.data?.count!!
+            val count = data.indices?.count!!
             ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
         } else {
             // TODO: Fix this
-            val count = data.bufferKeys["position"]?.data!!.count
+            val count = data.bufferKeys["position"]?.count!!
             ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
         }
         vao.unbind(ctx)

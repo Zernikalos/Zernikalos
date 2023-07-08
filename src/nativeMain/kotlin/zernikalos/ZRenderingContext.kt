@@ -138,28 +138,28 @@ actual object ExpectEnabler {
 
 actual object ExpectTypes {
     actual val BYTE: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val UNSIGNED_BYTE: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val INT: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val UNSIGNED_INT: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val SHORT: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val UNSIGNED_SHORT: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val FLOAT: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val DOUBLE: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
 }
 
 actual object ExpectBufferBit {
     actual val COLOR_BUFFER: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
     actual val DEPTH_BUFFER: Int
-        get() = TODO("Not yet implemented")
+        get() = 1
 }
 
 actual object ExpectShaderType {

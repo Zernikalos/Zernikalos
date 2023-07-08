@@ -3,6 +3,7 @@ package zernikalos.components.shader
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
@@ -30,6 +31,15 @@ enum class ZUniformType {
 @Serializable(with = ZUniformSerializer::class)
 class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
 
+    val uniformName: String
+        get() = data.uniformName
+
+    val count: Int
+        get() = data.count
+
+    val type: ZUniformType
+        get() = data.type
+
     override fun initialize(ctx: ZRenderingContext) {
     }
 
@@ -45,8 +55,11 @@ class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
 
 @Serializable
 data class ZUniformData(
+    @ProtoNumber(1)
     val uniformName: String,
+    @ProtoNumber(2)
     val count: Int,
+    @ProtoNumber(3)
     val type: ZUniformType
 ): ZComponentData()
 

@@ -15,9 +15,9 @@ import kotlin.js.JsExport
 @SerialName("Model")
 class ZModel: ZObject() {
     @ProtoNumber(4)
-    private lateinit var shaderProgram: ZShaderProgram
+    lateinit var shaderProgram: ZShaderProgram
     @ProtoNumber(5)
-    private lateinit var mesh: ZMesh
+    lateinit var mesh: ZMesh
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
