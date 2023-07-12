@@ -63,23 +63,13 @@ data class ZUniformData(
     val type: ZUniformType
 ): ZComponentData()
 
-class ZUniformRenderer: ZComponentRender<ZUniformData> {
+expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {
 
-    lateinit var uniformId: GLWrap
+    override fun initialize(ctx: ZRenderingContext, data: ZUniformData)
 
-    override fun initialize(ctx: ZRenderingContext, data: ZUniformData) {
-    }
+    fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram)
 
-    fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram) {
-        uniformId = ctx.getUniformLocation(program.renderer.programId, data.uniformName)
-    }
-
-    fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray) {
-        when (data.type) {
-            ZUniformType.MAT4 -> ctx.uniformMatrix4fv(uniformId, data.count, false, values)
-            else -> return
-        }
-    }
+    fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray)
 }
 
 class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData, ZUniformRenderer>() {

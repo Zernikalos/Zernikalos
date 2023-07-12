@@ -56,18 +56,8 @@ data class ZBufferKeyData(
     val stride: Int
 ): ZComponentData()
 
-class ZBufferKeyRenderer: ZComponentRender<ZBufferKeyData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZBufferKeyData) {
-        ctx.enableVertexAttrib(data.id)
-        ctx.vertexAttribPointer(
-            data.id,
-            data.size,
-            data.dataType.value,
-            data.normalized,
-            data.stride,
-            data.offset
-        )
-    }
+expect class ZBufferKeyRenderer(): ZComponentRender<ZBufferKeyData> {
+    override fun initialize(ctx: ZRenderingContext, data: ZBufferKeyData)
 
 }
 

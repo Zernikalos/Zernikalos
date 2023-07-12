@@ -10,7 +10,9 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import zernikalos.components.buffer.ZBuffer
 import zernikalos.components.buffer.ZVertexArray
+import kotlin.js.JsExport
 
+@JsExport
 @Serializable(with = ZMeshSerializer::class)
 class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 
@@ -43,38 +45,12 @@ data class ZMeshData(
     var buffers: Map<String, ZBuffer>
 ): ZComponentData()
 
-class ZMeshRenderer: ZComponentRender<ZMeshData> {
+expect class ZMeshRenderer(): ZComponentRender<ZMeshData> {
 
-    @Transient
-    val vao: ZVertexArray = ZVertexArray()
+    fun useIndexBuffer(data: ZMeshData): Boolean
+    override fun initialize(ctx: ZRenderingContext, data: ZMeshData)
 
-    fun useIndexBuffer(data: ZMeshData): Boolean = data.indices != null
-    override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
-        vao.initialize(ctx)
-
-        data.bufferKeys.forEach { (name, attr) ->
-            val buffer = data.buffers[name]
-            buffer?.initialize(ctx)
-            attr.initialize(ctx)
-        }
-
-        if (useIndexBuffer(data)) {
-            data.indices?.initialize(ctx)
-        }
-    }
-
-    override fun render(ctx: ZRenderingContext, data: ZMeshData) {
-        vao.bind(ctx)
-        if (useIndexBuffer(data)) {
-            val count = data.indices?.count!!
-            ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
-        } else {
-            // TODO: Fix this
-            val count = data.bufferKeys["position"]?.count!!
-            ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
-        }
-        vao.unbind(ctx)
-    }
+    override fun render(ctx: ZRenderingContext, data: ZMeshData)
 
 }
 

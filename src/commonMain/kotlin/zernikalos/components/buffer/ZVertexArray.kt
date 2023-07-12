@@ -27,22 +27,12 @@ class ZVertexArray: ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(), ZBinde
 
 class ZVertexArrayData: ZComponentData()
 
-class ZVertexArrayRenderer: ZComponentRender<ZVertexArrayData> {
+expect class ZVertexArrayRenderer(): ZComponentRender<ZVertexArrayData> {
 
-    private lateinit var vao: GLWrap
+    override fun initialize(ctx: ZRenderingContext, data: ZVertexArrayData)
 
-    override fun initialize(ctx: ZRenderingContext, data: ZVertexArrayData) {
-        val auxVao = ctx.createVertexArray()
-        // TODO Check existence
-        vao = auxVao
-        ctx.bindVertexArray(vao)
-    }
+    override fun bind(ctx: ZRenderingContext, data: ZVertexArrayData)
 
-    override fun bind(ctx: ZRenderingContext, data: ZVertexArrayData) {
-        ctx.bindVertexArray(vao)
-    }
-
-    override fun unbind(ctx: ZRenderingContext, data: ZVertexArrayData) {
-    }
+    override fun unbind(ctx: ZRenderingContext, data: ZVertexArrayData)
 
 }

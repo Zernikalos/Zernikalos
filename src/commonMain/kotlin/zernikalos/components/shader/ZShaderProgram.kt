@@ -51,42 +51,12 @@ data class ZShaderProgramData(
     var uniforms: HashMap<String, ZUniform> = HashMap()
 ): ZComponentData()
 
-class ZShaderProgramRenderer: ZComponentRender<ZShaderProgramData> {
+expect class ZShaderProgramRenderer(): ZComponentRender<ZShaderProgramData> {
 
-    val program: ZProgram = ZProgram()
-
-    override fun initialize(ctx: ZRenderingContext, data: ZShaderProgramData) {
-        program.initialize(ctx)
-
-        data.vertexShader.initialize(ctx)
-        attachShader(ctx, program, data.vertexShader)
-
-        data.fragmentShader.initialize(ctx)
-        attachShader(ctx, program, data.fragmentShader)
-
-        data.attributes.values.forEach { attr ->
-            attr.initialize(ctx)
-            attr.bindLocation(ctx, program)
-        }
-
-        program.link(ctx)
-        data.uniforms.values.forEach { uniform ->
-            uniform.initialize(ctx)
-            uniform.bindLocation(ctx, program)
-        }
-    }
-
-    override fun bind(ctx: ZRenderingContext, data: ZShaderProgramData) {
-        program.bind(ctx)
-    }
-
-    override fun unbind(ctx: ZRenderingContext, data: ZShaderProgramData) {
-        program.unbind(ctx)
-    }
-
-    private fun attachShader(ctx: ZRenderingContext, program: ZProgram, shader: ZShader) {
-        ctx.attachShader(program.renderer.programId, shader.renderer.shader)
-    }
+    val program: ZProgram
+    override fun initialize(ctx: ZRenderingContext, data: ZShaderProgramData)
+    override fun bind(ctx: ZRenderingContext, data: ZShaderProgramData)
+    override fun unbind(ctx: ZRenderingContext, data: ZShaderProgramData)
 
 }
 

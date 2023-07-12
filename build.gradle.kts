@@ -37,7 +37,7 @@ android {
 }
 
 kotlin {
-    android {
+    androidTarget {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
@@ -66,13 +66,13 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
-    macosArm64("native") {
-        binaries.framework {
-            isStatic = true
-            baseName="Zernikalos"
-            binaryOption("bundleId", "com.zernikalos")
-        }
-    }
+//    macosArm64("native") {
+//        binaries.framework {
+//            isStatic = true
+//            baseName="Zernikalos"
+//            binaryOption("bundleId", "com.zernikalos")
+//        }
+//    }
 
     
     sourceSets {
@@ -92,17 +92,24 @@ kotlin {
             }
         }
 
+        val oglMain by creating {
+            kotlin.srcDir("src/oglMain/kotlin")
+            dependsOn(commonMain)
+        }
+
         val androidMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+            dependsOn(oglMain)
         }
 
         val jsMain by getting {
             languageSettings.optIn("zernikalos.OptInAnnotation")
+            dependsOn(oglMain)
         }
 
-        val nativeMain by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
-        }
+//        val nativeMain by getting {
+//            languageSettings.optIn("zernikalos.OptInAnnotation")
+//        }
 
     }
 }

@@ -31,13 +31,10 @@ data class ZAttributeData(
     val attributeName: String
 ): ZComponentData()
 
-class ZAttributeRenderer: ZComponentRender<ZAttributeData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZAttributeData) {
-    }
+expect class ZAttributeRenderer(): ZComponentRender<ZAttributeData> {
+    override fun initialize(ctx: ZRenderingContext, data: ZAttributeData)
 
-    fun bindLocation(ctx: ZRenderingContext,data: ZAttributeData, program: ZProgram) {
-        ctx.bindAttribLocation(program.renderer.programId, data.id, data.attributeName)
-    }
+    fun bindLocation(ctx: ZRenderingContext,data: ZAttributeData, program: ZProgram)
 
 }
 

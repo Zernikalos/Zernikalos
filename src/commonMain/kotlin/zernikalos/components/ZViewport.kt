@@ -32,18 +32,10 @@ data class ZViewportData(
     val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 ): ZComponentData()
 
-class ZViewportRenderer: ZComponentRender<ZViewportData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZViewportData) {
-        ctx.viewport(0, 0, 700, 700)
-        ctx.enable(Enabler.DEPTH_TEST.value)
-        ctx.cullFace(CullModeType.FRONT.value)
-    }
+expect class ZViewportRenderer(): ZComponentRender<ZViewportData> {
+    override fun initialize(ctx: ZRenderingContext, data: ZViewportData)
 
-    override fun render(ctx: ZRenderingContext, data: ZViewportData) {
-        val v = data.clearColor
-        ctx.clearColor(v.x, v.y, v.z, v.w)
-        ctx.clear(data.clearMask)
-    }
+    override fun render(ctx: ZRenderingContext, data: ZViewportData)
 
 }
 

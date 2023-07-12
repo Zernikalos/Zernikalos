@@ -32,41 +32,9 @@ data class ZShaderData(
     val source: String
 ): ZComponentData()
 
-class ZShaderRenderer: ZComponentRender<ZShaderData> {
+expect class ZShaderRenderer(): ZComponentRender<ZShaderData> {
 
-    var shader: GLWrap = GLWrap()
-
-    override fun initialize(ctx: ZRenderingContext, data: ZShaderData) {
-        val type = if (data.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
-        val shad = createShader(ctx, type)
-        // TODO: Take care with the cast since this breaks js
-        // if (shaderId <= 0) {
-        //     throw Error("Error creating shader")
-        // }
-
-        compileShader(ctx, shad, data.source)
-        checkShader(ctx, shad)
-
-        shader = shad
-    }
-
-    private fun createShader(ctx: ZRenderingContext, shaderType: ShaderType): GLWrap {
-        return ctx.createShader(shaderType.value)
-    }
-
-    private fun compileShader(ctx: ZRenderingContext, shader: GLWrap, source: String) {
-        ctx.shaderSource(shader, source)
-        ctx.compileShader(shader)
-    }
-
-    private fun checkShader(ctx: ZRenderingContext, shader: GLWrap) {
-        val compilerStatus = ctx.getShaderInfoLog(shader)
-        val compilerError = ctx.getError()
-        if (compilerStatus != "" || compilerError > 0) {
-            ctx.deleteShader(shader)
-            throw Error("Error compiling shader $compilerError : $compilerStatus")
-        }
-    }
+    override fun initialize(ctx: ZRenderingContext, data: ZShaderData)
 
 }
 

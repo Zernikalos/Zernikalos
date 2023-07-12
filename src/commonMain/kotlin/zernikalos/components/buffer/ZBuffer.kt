@@ -2,14 +2,15 @@ package zernikalos.components.buffer
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.BufferTargetType
 import zernikalos.BufferUsageType
 import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsExport
 
+@JsExport
 @Serializable(with = ZBufferSerializer::class)
 open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
@@ -59,7 +60,17 @@ open class ZBufferData(
 
 }
 
-class ZBufferRenderer: ZComponentRender<ZBufferData> {
+expect class ZBufferRenderer(): ZComponentRender<ZBufferData> {
+
+    override fun initialize(ctx: ZRenderingContext, data: ZBufferData)
+
+    override fun bind(ctx: ZRenderingContext, data: ZBufferData)
+
+    override fun unbind(ctx: ZRenderingContext, data: ZBufferData)
+
+}
+
+/* class ZBufferRenderer: ZComponentRender<ZBufferData> {
 
     @Transient
     lateinit var buffer: GLWrap
@@ -87,7 +98,7 @@ class ZBufferRenderer: ZComponentRender<ZBufferData> {
         super.unbind(ctx, data)
     }
 
-}
+} */
 
 class ZBufferSerializer: ZComponentSerializer<ZBuffer, ZBufferData, ZBufferRenderer>() {
     override val deserializationStrategy: DeserializationStrategy<ZBufferData>

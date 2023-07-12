@@ -30,26 +30,12 @@ class ZProgram: ZComponent<ZProgramData, ZProgramRenderer>(), ZBindeable {
 
 class ZProgramData(): ZComponentData()
 
-class ZProgramRenderer: ZComponentRender<ZProgramData> {
+expect class ZProgramRenderer(): ZComponentRender<ZProgramData> {
 
-    lateinit var programId: GLWrap
+    override fun initialize(ctx: ZRenderingContext, data: ZProgramData)
 
-    override fun initialize(ctx: ZRenderingContext, data: ZProgramData) {
-        val p = ctx.createProgram()
-        // TODO
-        /* if (program <= 0) {
-            val err = context.getError()
-            throw Error("Unable to create program ${err}")
-        } */
-        programId = p
-    }
+    override fun bind(ctx: ZRenderingContext, data: ZProgramData)
 
-    override fun bind(ctx: ZRenderingContext, data: ZProgramData) {
-        ctx.useProgram(programId)
-    }
-
-    fun link(ctx: ZRenderingContext) {
-        ctx.linkProgram(programId)
-    }
+    fun link(ctx: ZRenderingContext)
 
 }
