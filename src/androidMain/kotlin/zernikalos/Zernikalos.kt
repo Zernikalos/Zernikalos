@@ -10,4 +10,10 @@ class Zernikalos: ZernikalosBase() {
         initialize(surfaceView, stateHandler)
     }
 
+    fun initialize(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
+        val contextCreator = createDefaultContextCreator()
+
+        initialize(view, contextCreator, stateHandler)
+    }
+
 }

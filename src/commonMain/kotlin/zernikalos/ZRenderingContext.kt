@@ -5,83 +5,11 @@ import zernikalos.ui.ZSurfaceView
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
-expect class ZRenderingContext(surfaceView: ZSurfaceView) {
+interface ZRenderingContext {
 
-    /** Commons **/
-
-    fun enable(feat: Int)
-
-    /** Viewport **/
-
-    fun clearColor(r: Float, g: Float, b: Float, a: Float)
-
-    fun viewport(top: Int, left: Int, width: Int, height: Int)
-
-    fun clear(buffer: Int)
-
-    fun cullFace(mode: Int)
-
-    /** ShaderProgram **/
-
-    fun createProgram(): GLWrap
-
-    fun useProgram(program: GLWrap)
-
-    fun linkProgram(program: GLWrap)
-
-    fun createShader(shaderType: Int): GLWrap
-
-    fun deleteShader(shader: GLWrap)
-
-    fun shaderSource(shader: GLWrap, source: String)
-
-    fun compileShader(shader: GLWrap)
-
-    fun attachShader(program: GLWrap, shader: GLWrap)
-
-    fun getError(): Int
-
-    fun getShaderInfoLog(shader: GLWrap): String
-
-    fun bindAttribLocation(program: GLWrap, index: Int, attrName: String)
-
-    /** UNIFORMS **/
-
-    fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap
-
-    fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray)
-
-    /** VBO **/
-
-    fun createBuffer(): GLWrap
-
-    fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap)
-
-    fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType)
-
-    fun enableVertexAttrib(index: Int)
-
-    fun enableVertexAttribArray(index: Int)
-
-    fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
-
-    /** VAO **/
-
-    fun createVertexArray(): GLWrap
-
-    fun bindVertexArray(vao: GLWrap)
-
-    /** Draw **/
-
-    fun drawArrays(mode: Int, first: Int, count: Int)
-
-    fun drawElements(mode: Int, count: Int, type: Int, offset: Int)
+    fun initWithSurfaceView(surfaceView: ZSurfaceView)
 
 }
-
-@OptIn(ExperimentalJsExport::class)
-@JsExport
-data class GLWrap(val id: Any? = null)
 
 enum class Enabler(val value: Int) {
     DEPTH_TEST(ExpectEnabler.DEPTH_TEST)

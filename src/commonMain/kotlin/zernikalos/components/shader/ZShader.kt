@@ -3,8 +3,6 @@ package zernikalos.components.shader
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.GLWrap
-import zernikalos.ShaderType
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 

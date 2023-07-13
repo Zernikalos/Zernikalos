@@ -2,6 +2,7 @@ package zernikalos.components.shader
 
 import zernikalos.GLWrap
 import zernikalos.ShaderType
+import zernikalos.ZGLRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
@@ -24,15 +25,21 @@ actual class ZShaderRenderer: ZComponentRender<ZShaderData> {
     }
 
     private fun createShader(ctx: ZRenderingContext, shaderType: ShaderType): GLWrap {
+        ctx as ZGLRenderingContext
+
         return ctx.createShader(shaderType.value)
     }
 
     private fun compileShader(ctx: ZRenderingContext, shader: GLWrap, source: String) {
+        ctx as ZGLRenderingContext
+
         ctx.shaderSource(shader, source)
         ctx.compileShader(shader)
     }
 
     private fun checkShader(ctx: ZRenderingContext, shader: GLWrap) {
+        ctx as ZGLRenderingContext
+
         val compilerStatus = ctx.getShaderInfoLog(shader)
         val compilerError = ctx.getError()
         if (compilerStatus != "" || compilerError > 0) {

@@ -1,5 +1,6 @@
 package zernikalos.components.shader
 
+import zernikalos.ZGLRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
@@ -8,6 +9,8 @@ actual class ZAttributeRenderer: ZComponentRender<ZAttributeData> {
     }
 
     actual fun bindLocation(ctx: ZRenderingContext, data: ZAttributeData, program: ZProgram) {
+        ctx as ZGLRenderingContext
+
         ctx.bindAttribLocation(program.renderer.programId, data.id, data.attributeName)
     }
 

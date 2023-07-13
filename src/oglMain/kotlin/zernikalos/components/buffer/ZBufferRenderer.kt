@@ -2,6 +2,7 @@ package zernikalos.components.buffer
 
 import zernikalos.BufferUsageType
 import zernikalos.GLWrap
+import zernikalos.ZGLRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender
 import kotlin.jvm.Transient
@@ -14,7 +15,8 @@ actual class ZBufferRenderer : ZComponentRender<ZBufferData> {
         if (!data.hasData) {
             return
         }
-        
+        ctx as ZGLRenderingContext
+
         buffer = ctx.createBuffer()
         // TODO Check errors
         //        if (!data.buffer) {
@@ -26,6 +28,8 @@ actual class ZBufferRenderer : ZComponentRender<ZBufferData> {
     }
 
     actual override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
+        ctx as ZGLRenderingContext
+
         ctx.bindBuffer(data.targetBuffer, buffer)
     }
 

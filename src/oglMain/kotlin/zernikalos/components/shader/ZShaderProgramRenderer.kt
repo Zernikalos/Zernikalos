@@ -1,5 +1,6 @@
 package zernikalos.components.shader
 
+import zernikalos.ZGLRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
@@ -37,6 +38,8 @@ actual class ZShaderProgramRenderer: ZComponentRender<ZShaderProgramData> {
     }
 
     private fun attachShader(ctx: ZRenderingContext, program: ZProgram, shader: ZShader) {
+        ctx as ZGLRenderingContext
+
         ctx.attachShader(program.renderer.programId, shader.renderer.shader)
     }
 

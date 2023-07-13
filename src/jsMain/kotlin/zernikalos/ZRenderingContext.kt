@@ -13,12 +13,17 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
 }
 
 @JsExport
-actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView) {
+actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 
     private lateinit var gl: WebGL2RenderingContext
 
-    init {
+
+    override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
         setContext(surfaceView.canvas)
+    }
+
+    init {
+        initWithSurfaceView(surfaceView)
     }
 
     fun setContext(canvas: HTMLCanvasElement) {

@@ -4,7 +4,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 

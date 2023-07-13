@@ -3,6 +3,7 @@ package zernikalos.components.mesh
 import kotlinx.serialization.Transient
 import zernikalos.DrawModes
 import zernikalos.Types
+import zernikalos.ZGLRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender
 import zernikalos.components.buffer.ZVertexArray
@@ -28,6 +29,8 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
     }
 
     actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {
+        ctx as ZGLRenderingContext
+
         vao.bind(ctx)
         if (useIndexBuffer(data)) {
             val count = data.indices?.count!!

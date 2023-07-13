@@ -44,13 +44,6 @@ open class ZernikalosBase {
         }
     }
 
-    @JsName("initializeWithDefaults")
-    fun initialize(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
-        val contextCreator = createDefaultContextCreator()
-
-        initialize(view, contextCreator, stateHandler)
-    }
-
     fun load(hexString: String): ZObject {
         return loadFromProtoString(hexString)
     }

@@ -4,8 +4,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.BufferTargetType
-import zernikalos.BufferUsageType
-import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport

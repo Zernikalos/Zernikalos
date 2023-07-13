@@ -4,7 +4,10 @@ import android.opengl.GLES30
 import zernikalos.ui.ZSurfaceView
 import java.nio.ByteBuffer
 
-actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView) {
+actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
+
+    override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
+    }
 
     actual fun enable(feat: Int) {
         GLES30.glEnable(feat)

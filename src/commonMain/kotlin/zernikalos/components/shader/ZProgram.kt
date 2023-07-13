@@ -1,6 +1,5 @@
 package zernikalos.components.shader
 
-import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 
