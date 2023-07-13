@@ -66,13 +66,13 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
-//    macosArm64("native") {
-//        binaries.framework {
-//            isStatic = true
-//            baseName="Zernikalos"
-//            binaryOption("bundleId", "com.zernikalos")
-//        }
-//    }
+    macosArm64("native") {
+        binaries.framework {
+            isStatic = true
+            baseName="Zernikalos"
+            binaryOption("bundleId", "com.zernikalos")
+        }
+    }
 
     
     sourceSets {
@@ -107,9 +107,9 @@ kotlin {
             dependsOn(oglMain)
         }
 
-//        val nativeMain by getting {
-//            languageSettings.optIn("zernikalos.OptInAnnotation")
-//        }
+        val nativeMain by getting {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+        }
 
     }
 }
