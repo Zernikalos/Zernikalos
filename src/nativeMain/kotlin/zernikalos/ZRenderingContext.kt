@@ -1,7 +1,6 @@
 package zernikalos
 
-import platform.Metal.MTLCommandQueueProtocol
-import platform.Metal.MTLDeviceProtocol
+import platform.Metal.*
 import platform.MetalKit.MTKView
 import zernikalos.ui.ZSurfaceView
 
@@ -9,6 +8,9 @@ class ZMtlRenderingContext constructor(val surfaceView: ZSurfaceView): ZRenderin
 
     val device: MTLDeviceProtocol
     val commandQueue: MTLCommandQueueProtocol
+
+    var commandBuffer: MTLCommandBufferProtocol? = null
+    var renderEncoder: MTLRenderCommandEncoderProtocol? = null
 
     init {
         device = surfaceView.nativeView.device!!
@@ -18,6 +20,13 @@ class ZMtlRenderingContext constructor(val surfaceView: ZSurfaceView): ZRenderin
 
     }
 
+    fun makeCommandBuffer() {
+        commandBuffer = commandQueue.commandBuffer()
+    }
+
+    fun makeRenderCommandEncoder(renderPassDescriptor: MTLRenderPassDescriptor) {
+        renderEncoder = commandBuffer?.renderCommandEncoderWithDescriptor(renderPassDescriptor)
+    }
 
 }
 

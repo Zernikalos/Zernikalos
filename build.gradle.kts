@@ -44,6 +44,7 @@ kotlin {
     }
 
     js(IR) {
+        moduleName = "@zernikalos/zernikalos"
         browser {
             binaries.executable()
             distribution {
