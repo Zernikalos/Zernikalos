@@ -137,17 +137,6 @@ actual object ExpectEnabler {
     actual val DEPTH_TEST: Int = GLES30.GL_DEPTH_TEST
 }
 
-actual object ExpectTypes {
-    actual val BYTE: Int = GLES30.GL_BYTE
-    actual val UNSIGNED_BYTE: Int = GLES30.GL_UNSIGNED_BYTE
-    actual val INT: Int = GLES30.GL_INT
-    actual val UNSIGNED_INT: Int = GLES30.GL_UNSIGNED_INT
-    actual val SHORT: Int = GLES30.GL_SHORT
-    actual val UNSIGNED_SHORT: Int = GLES30.GL_UNSIGNED_SHORT
-    actual val FLOAT: Int = GLES30.GL_FLOAT
-    actual val DOUBLE: Int = GLES30.GL_FLOAT
-}
-
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER

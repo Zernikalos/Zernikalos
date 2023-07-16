@@ -155,17 +155,6 @@ actual object ExpectEnabler {
     actual val DEPTH_TEST: Int = WebGLRenderingContext.DEPTH_TEST
 }
 
-actual object ExpectTypes {
-    actual val UNSIGNED_BYTE: Int = WebGLRenderingContext.UNSIGNED_BYTE
-    actual val BYTE: Int = WebGLRenderingContext.BYTE
-    actual val INT: Int = WebGLRenderingContext.INT
-    actual val UNSIGNED_INT: Int = WebGLRenderingContext.UNSIGNED_INT
-    actual val SHORT: Int = WebGLRenderingContext.SHORT
-    actual val UNSIGNED_SHORT: Int = WebGLRenderingContext.UNSIGNED_SHORT
-    actual val FLOAT: Int = WebGLRenderingContext.FLOAT
-    actual val DOUBLE: Int = WebGLRenderingContext.FLOAT
-}
-
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = WebGLRenderingContext.ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER

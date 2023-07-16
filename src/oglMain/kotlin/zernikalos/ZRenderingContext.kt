@@ -1,5 +1,6 @@
 package zernikalos
 
+import kotlinx.serialization.SerialName
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -81,3 +82,15 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 data class GLWrap(val id: Any? = null)
+
+enum class BufferTargetType(val value: Int) {
+    @SerialName("array")
+    ARRAY_BUFFER(ExpectBufferTargetType.ARRAY_BUFFER),
+    @SerialName("element")
+    ELEMENT_ARRAY_BUFFER(ExpectBufferTargetType.ELEMENT_ARRAY_BUFFER)
+}
+
+expect object ExpectBufferTargetType {
+    val ARRAY_BUFFER: Int
+    val ELEMENT_ARRAY_BUFFER: Int
+}

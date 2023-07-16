@@ -3,7 +3,7 @@ package zernikalos.components.mesh
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.Types
+import zernikalos.ZDataType
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 
@@ -13,10 +13,9 @@ class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
     val id: Int
         get() = data.id
 
-    val dataType: Types
+    val dataType: ZDataType
         get() = data.dataType
 
-    // TODO: Review duplicated
     val size: Int
         get() = data.size
 
@@ -43,7 +42,7 @@ data class ZBufferKeyData(
     @ProtoNumber(1)
     val id: Int,
     @ProtoNumber(2)
-    val dataType: Types,
+    val dataType: ZDataType,
     @ProtoNumber(3)
     val size: Int,
     @ProtoNumber(4)

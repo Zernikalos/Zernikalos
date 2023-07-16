@@ -1,10 +1,7 @@
 package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
-import zernikalos.DrawModes
-import zernikalos.Types
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.*
 import zernikalos.components.ZComponentRender
 import zernikalos.components.buffer.ZVertexArray
 
@@ -34,7 +31,7 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
         vao.bind(ctx)
         if (useIndexBuffer(data)) {
             val count = data.indices?.count!!
-            ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
+            ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglType(ZDataType.UNSIGNED_SHORT), 0)
         } else {
             // TODO: Fix this
             val count = data.bufferKeys["position"]?.count!!

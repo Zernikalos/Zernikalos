@@ -3,7 +3,6 @@ package zernikalos.components.buffer
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.BufferTargetType
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
@@ -51,11 +50,6 @@ open class ZBufferData(
 ): ZComponentData() {
     val hasData: Boolean
         get() = !dataArray.isEmpty()
-
-    // TODO: Change this in order to make it ogl independent
-    val targetBuffer: BufferTargetType
-        get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
-
 }
 
 expect class ZBufferRenderer(): ZComponentRender<ZBufferData> {
@@ -67,36 +61,6 @@ expect class ZBufferRenderer(): ZComponentRender<ZBufferData> {
     override fun unbind(ctx: ZRenderingContext, data: ZBufferData)
 
 }
-
-/* class ZBufferRenderer: ZComponentRender<ZBufferData> {
-
-    @Transient
-    lateinit var buffer: GLWrap
-
-    override fun initialize(ctx: ZRenderingContext, data: ZBufferData) {
-        if (!data.hasData) {
-            return
-        }
-
-        buffer = ctx.createBuffer()
-        // TODO Check errors
-        //        if (!data.buffer) {
-        //            throw Error("Unable to create buffer")
-        //        }
-
-        ctx.bindBuffer(data.targetBuffer, buffer)
-        ctx.bufferData(data.targetBuffer, data.dataArray, BufferUsageType.STATIC_DRAW)
-    }
-
-    override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
-        ctx.bindBuffer(data.targetBuffer, buffer)
-    }
-
-    override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {
-        super.unbind(ctx, data)
-    }
-
-} */
 
 class ZBufferSerializer: ZComponentSerializer<ZBuffer, ZBufferData, ZBufferRenderer>() {
     override val deserializationStrategy: DeserializationStrategy<ZBufferData>

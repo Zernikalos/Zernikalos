@@ -4,28 +4,10 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZDataType
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 
-@Serializable
-enum class ZUniformType {
-    @SerialName("scalar")
-    SCALAR,
-
-    @SerialName("vec2")
-    VEC2,
-    @SerialName("vec3")
-    VEC3,
-    @SerialName("vec4")
-    VEC4,
-
-    @SerialName("mat2")
-    MAT2,
-    @SerialName("mat3")
-    MAT3,
-    @SerialName("mat4")
-    MAT4
-}
 
 @Serializable(with = ZUniformSerializer::class)
 class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
@@ -36,7 +18,7 @@ class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
     val count: Int
         get() = data.count
 
-    val type: ZUniformType
+    val type: ZDataType
         get() = data.type
 
     override fun initialize(ctx: ZRenderingContext) {
@@ -59,7 +41,7 @@ data class ZUniformData(
     @ProtoNumber(2)
     val count: Int,
     @ProtoNumber(3)
-    val type: ZUniformType
+    val type: ZDataType
 ): ZComponentData()
 
 expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {

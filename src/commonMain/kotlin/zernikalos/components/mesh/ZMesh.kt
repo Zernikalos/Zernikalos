@@ -2,14 +2,10 @@ package zernikalos.components.mesh
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.DrawModes
-import zernikalos.Types
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import zernikalos.components.buffer.ZBuffer
-import zernikalos.components.buffer.ZVertexArray
 import kotlin.js.JsExport
 
 @JsExport
