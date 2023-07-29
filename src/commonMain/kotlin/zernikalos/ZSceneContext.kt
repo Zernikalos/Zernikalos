@@ -6,9 +6,11 @@ import zernikalos.ui.ZSurfaceView
 import zernikalos.uniformgenerator.*
 import kotlin.js.JsExport
 
+@JsExport
 open class ZSceneContext {
 
     var scene: ZScene? = null
+
     var activeCamera: ZCamera? = null
 
     private val uniformsGeneratorMap = HashMap<String, ZUniformGeneratorMat4F>()

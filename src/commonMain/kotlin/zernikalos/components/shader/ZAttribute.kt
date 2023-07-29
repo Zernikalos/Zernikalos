@@ -1,25 +1,53 @@
 package zernikalos.components.shader
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 
-interface IZShaderAttribute {
+@Serializable(with = ZAttributeSerializer::class)
+class ZAttribute: ZComponent<ZAttributeData, ZAttributeRenderer>() {
+
     val id: Int
-    val attributeName: String
-}
+        get() = data.id
 
-@Serializable
-class ZAttribute(private val id: Int, private val attributeName: String): ZComponent() {
+    val attributeName: String
+        get() = data.attributeName
 
     override fun initialize(ctx: ZRenderingContext) {
     }
 
     fun bindLocation(ctx: ZRenderingContext, program: ZProgram) {
-        ctx.bindAttribLocation(program.programId, id, attributeName)
+        renderer.bindLocation(ctx, data, program)
+    }
+}
+
+@Serializable
+data class ZAttributeData(
+    @ProtoNumber(1)
+    val id: Int,
+    @ProtoNumber(2)
+    val attributeName: String
+): ZComponentData()
+
+expect class ZAttributeRenderer(): ZComponentRender<ZAttributeData> {
+    override fun initialize(ctx: ZRenderingContext, data: ZAttributeData)
+
+    fun bindLocation(ctx: ZRenderingContext,data: ZAttributeData, program: ZProgram)
+
+}
+
+class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData, ZAttributeRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZAttributeData>
+        get() = ZAttributeData.serializer()
+
+    override fun createRendererComponent(): ZAttributeRenderer {
+        return ZAttributeRenderer()
     }
 
-    override fun render(ctx: ZRenderingContext) {
+    override fun createComponentInstance(data: ZAttributeData, renderer: ZAttributeRenderer): ZAttribute {
+        return ZAttribute()
     }
 
 }

@@ -8,16 +8,18 @@ import org.w3c.dom.HTMLCanvasElement
 @ExperimentalJsExport
 actual class ZSurfaceView(val canvas: HTMLCanvasElement) {
 
-    actual var eventHandler: ZSurfaceViewEventHandler? = null
+    var _eventHandler: ZSurfaceViewEventHandler? = null
+    actual var eventHandler: ZSurfaceViewEventHandler?
+        get() = _eventHandler
+        set(value) {
+            _eventHandler = value
+            onReady()
+        }
 
     actual val width: Int
         get() = canvas.width
     actual val height: Int
         get() = canvas.height
-
-    init {
-        onReady()
-    }
 
     private fun onReady() {
         eventHandler?.onReady()

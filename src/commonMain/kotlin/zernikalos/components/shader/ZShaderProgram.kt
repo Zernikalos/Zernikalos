@@ -1,65 +1,77 @@
 package zernikalos.components.shader
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
+import kotlin.js.JsExport
 
-@Serializable
-class ZShaderProgram(): ZComponent() {
-    @Transient
-    val program: ZProgram = ZProgram()
+@JsExport
+@Serializable(with = ZShaderProgramSerializer::class)
+class ZShaderProgram(): ZComponent<ZShaderProgramData, ZShaderProgramRenderer>(), ZBindeable {
 
-    @SerialName("vertexShader")
-    lateinit var vertexShader: ZShader
-    @SerialName("fragmentShader")
-    lateinit var fragmentShader: ZShader
+    // TODO: Check if these should be a val or var better in order to set up values
+    val vertexShader: ZShader
+        get() = data.vertexShader
 
-    private val attributes: HashMap<String, ZAttribute> = HashMap()
+    val fragmentShader: ZShader
+        get() = data.fragmentShader
 
-    var uniforms: HashMap<String, ZUniform> = HashMap()
+    val attributes: HashMap<String, ZAttribute>
+        get() = data.attributes
 
-    constructor(vertexShaderSource: String, fragmentShaderSource: String, attributes: Map<String, IZShaderAttribute>, uniforms: Map<String, IZShaderUniform>) : this() {
-        vertexShader = ZShader("vertex", vertexShaderSource)
-        fragmentShader = ZShader("fragment", fragmentShaderSource)
-
-        attributes.forEach { (key, attrInput) ->
-            this.attributes[key] = ZAttribute(attrInput.id, attrInput.attributeName)
-        }
-
-        uniforms.forEach { (key, uniformInput) ->
-            this.uniforms[key] = ZUniform(key, uniformInput.count, uniformInput.type)
-        }
-    }
+    val uniforms: Map<String, ZUniform>
+        get() = data.uniforms
 
     override fun initialize(ctx: ZRenderingContext) {
-        program.initialize(ctx)
-
-        vertexShader.initialize(ctx)
-        attachShader(ctx, program, vertexShader)
-
-        fragmentShader.initialize(ctx)
-        attachShader(ctx, program, fragmentShader)
-
-        attributes.values.forEach { attr ->
-            attr.initialize(ctx)
-            attr.bindLocation(ctx, program)
-        }
-
-        program.link(ctx)
-        uniforms.values.forEach { uniform ->
-            uniform.initialize(ctx)
-            uniform.bindLocation(ctx, program)
-        }
+        renderer.initialize(ctx, data)
     }
 
-    override fun render(ctx: ZRenderingContext) {
-        program.render(ctx)
+    override fun bind(ctx: ZRenderingContext) {
+        renderer.bind(ctx, data)
     }
 
-    private fun attachShader(ctx: ZRenderingContext, program: ZProgram, shader: ZShader) {
-        ctx.attachShader(program.programId, shader.shader)
+    override fun unbind(ctx: ZRenderingContext) {
+        renderer.unbind(ctx, data)
+    }
+
+}
+
+@Serializable
+data class ZShaderProgramData(
+    @SerialName("vertexShader")
+    @ProtoNumber(1)
+    var vertexShader: ZShader,
+    @SerialName("fragmentShader")
+    @ProtoNumber(2)
+    var fragmentShader: ZShader,
+    @ProtoNumber(3)
+    val attributes: HashMap<String, ZAttribute> = HashMap(),
+    @ProtoNumber(4)
+    var uniforms: HashMap<String, ZUniform> = HashMap()
+): ZComponentData()
+
+expect class ZShaderProgramRenderer(): ZComponentRender<ZShaderProgramData> {
+
+    val program: ZProgram
+    override fun initialize(ctx: ZRenderingContext, data: ZShaderProgramData)
+    override fun bind(ctx: ZRenderingContext, data: ZShaderProgramData)
+    override fun unbind(ctx: ZRenderingContext, data: ZShaderProgramData)
+
+}
+
+class ZShaderProgramSerializer: ZComponentSerializer<ZShaderProgram, ZShaderProgramData, ZShaderProgramRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZShaderProgramData>
+        get() = ZShaderProgramData.serializer()
+
+    override fun createRendererComponent(): ZShaderProgramRenderer {
+        return ZShaderProgramRenderer()
+    }
+
+    override fun createComponentInstance(data: ZShaderProgramData, renderer: ZShaderProgramRenderer): ZShaderProgram {
+        return ZShaderProgram()
     }
 
 }

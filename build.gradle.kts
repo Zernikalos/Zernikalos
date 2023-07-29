@@ -36,27 +36,15 @@ android {
 
 }
 
-val lwjglVersion = "3.3.1"
-val lwjglNatives = "natives-linux"
-
 kotlin {
-    android {
+    androidTarget {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
     }
 
-//    jvm {
-//        compilations.all {
-//            kotlinOptions.jvmTarget = "1.8"
-//        }
-        // withJava()
-//        testRuns["test"].executionTask.configure {
-//            useJUnitPlatform()
-//        }
-//    }
-
     js(IR) {
+        moduleName = "@zernikalos/zernikalos"
         browser {
             binaries.executable()
             distribution {
@@ -79,6 +67,14 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
+    macosArm64("native") {
+        binaries.framework {
+            isStatic = true
+            baseName="Zernikalos"
+            binaryOption("bundleId", "com.zernikalos")
+        }
+    }
+
     
     sourceSets {
         all {
@@ -97,37 +93,24 @@ kotlin {
             }
         }
 
+        val oglMain by creating {
+            kotlin.srcDir("src/oglMain/kotlin")
+            dependsOn(commonMain)
+        }
 
-//        val jvmMain by getting {
-//            kotlin.srcDir("src/jvmMain/kotlin")
-//
-//            dependencies {
-////                lwjgl {
-////                    // implementation(Lwjgl.Preset.minimalOpenGL.)
-////                    version= "3.3.1"
-////                }
-//                // implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
-//
-//                implementation("org.lwjgl:lwjgl:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-//                implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-//
-//                runtimeOnly("org.lwjgl:lwjgl:$lwjglVersion")
-//                runtimeOnly("org.lwjgl:lwjgl-assimp:$lwjglVersion")
-//                runtimeOnly("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-//                runtimeOnly("org.lwjgl:lwjgl-openal:$lwjglVersion")
-//                runtimeOnly("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-//                runtimeOnly("org.lwjgl:lwjgl-stb:$lwjglVersion")
-//            }
-//        }
-        // val jvmTest by getting
         val androidMain by getting {
             kotlin.srcDir("src/androidMain/kotlin")
+            dependsOn(oglMain)
         }
-        // val androidTest by getting
-        val jsMain by getting
+
+        val jsMain by getting {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+            dependsOn(oglMain)
+        }
+
+        val nativeMain by getting {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+        }
+
     }
 }

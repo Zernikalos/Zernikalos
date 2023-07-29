@@ -1,57 +1,68 @@
 package zernikalos.components.shader
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import zernikalos.GLWrap
+import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZDataType
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 
-interface IZShaderUniform {
+
+@Serializable(with = ZUniformSerializer::class)
+class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
+
+    val uniformName: String
+        get() = data.uniformName
+
     val count: Int
-    val type: ZUniformType
-}
+        get() = data.count
 
-@Serializable
-class ZUniform(private val uniformName: String, private val count: Int, val type: ZUniformType): ZComponent() {
-    @Transient
-    lateinit var uniformId: GLWrap
+    val type: ZDataType
+        get() = data.type
 
     override fun initialize(ctx: ZRenderingContext) {
     }
 
     fun bindLocation(ctx: ZRenderingContext, program: ZProgram) {
-        uniformId = ctx.getUniformLocation(program.programId, uniformName)
+        renderer.bindLocation(ctx, data, program)
     }
 
     fun bindValue(ctx: ZRenderingContext, values: FloatArray) {
-        when (type) {
-            ZUniformType.MAT4 -> ctx.uniformMatrix4fv(uniformId, count, false, values)
-            else -> return
-        }
-    }
-
-    override fun render(ctx: ZRenderingContext) {
+        renderer.bindValue(ctx, data, values)
     }
 
 }
 
 @Serializable
-enum class ZUniformType {
-    @SerialName("scalar")
-    SCALAR,
+data class ZUniformData(
+    @ProtoNumber(1)
+    val uniformName: String,
+    @ProtoNumber(2)
+    val count: Int,
+    @ProtoNumber(3)
+    val type: ZDataType
+): ZComponentData()
 
-    @SerialName("vec2")
-    VEC2,
-    @SerialName("vec3")
-    VEC3,
-    @SerialName("vec4")
-    VEC4,
+expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {
 
-    @SerialName("mat2")
-    MAT2,
-    @SerialName("mat3")
-    MAT3,
-    @SerialName("mat4")
-    MAT4
+    override fun initialize(ctx: ZRenderingContext, data: ZUniformData)
+
+    fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram)
+
+    fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray)
+}
+
+class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData, ZUniformRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZUniformData>
+        get() = ZUniformData.serializer()
+
+    override fun createRendererComponent(): ZUniformRenderer {
+        return ZUniformRenderer()
+    }
+
+    override fun createComponentInstance(data: ZUniformData, renderer: ZUniformRenderer): ZUniform {
+        return ZUniform()
+    }
+
 }

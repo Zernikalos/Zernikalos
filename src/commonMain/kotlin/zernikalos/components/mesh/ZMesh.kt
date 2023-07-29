@@ -1,55 +1,65 @@
 package zernikalos.components.mesh
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.DrawModes
-import zernikalos.Types
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 import zernikalos.components.buffer.ZBuffer
-import zernikalos.components.buffer.ZIndicesBuffer
-import zernikalos.components.buffer.ZVertexArray
+import kotlin.js.JsExport
 
-@Serializable
-class ZMesh: ZComponent() {
-    @ProtoNumber(1)
-    private lateinit var bufferKeys: Map<String, ZBufferKey>
-    @ProtoNumber(2)
-    private var indices: ZIndicesBuffer? = null
-    @ProtoNumber(3)
-    private lateinit var buffers: Map<String, ZBuffer>
+@JsExport
+@Serializable(with = ZMeshSerializer::class)
+class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 
-    @Transient
-    val vao: ZVertexArray = ZVertexArray()
+    val bufferKeys: Map<String, ZBufferKey>
+        get() = data.bufferKeys
 
-    val useIndexBuffer: Boolean
-        get() = indices != null
+    val indices: ZBuffer?
+        get() = data.indices
+
+    val buffers: Map<String, ZBuffer>
+        get() = data.buffers
 
     override fun initialize(ctx: ZRenderingContext) {
-        vao.initialize(ctx)
-
-        bufferKeys.forEach { (name, attr) ->
-            val buffer = buffers[name]
-            buffer?.initialize(ctx)
-            attr.initialize(ctx)
-        }
-
-        if (useIndexBuffer) {
-            indices?.initialize(ctx)
-        }
+        renderer.initialize(ctx, data)
     }
 
     override fun render(ctx: ZRenderingContext) {
-        vao.render(ctx)
-        if (useIndexBuffer) {
-            val count = indices?.count!!
-            ctx.drawElements(DrawModes.TRIANGLES.value, count, Types.UNSIGNED_SHORT.value, 0)
-        } else {
-            // TODO: Fix this
-            val count = bufferKeys["position"]?.count!!
-            ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
-        }
+        renderer.render(ctx, data)
+    }
+
+}
+
+@Serializable
+data class ZMeshData(
+    @ProtoNumber(1)
+    var bufferKeys: Map<String, ZBufferKey>,
+    @ProtoNumber(2)
+    val indices: ZBuffer? = null,
+    @ProtoNumber(3)
+    var buffers: Map<String, ZBuffer>
+): ZComponentData()
+
+expect class ZMeshRenderer(): ZComponentRender<ZMeshData> {
+
+    fun useIndexBuffer(data: ZMeshData): Boolean
+    override fun initialize(ctx: ZRenderingContext, data: ZMeshData)
+
+    override fun render(ctx: ZRenderingContext, data: ZMeshData)
+
+}
+
+class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData, ZMeshRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZMeshData>
+        get() = ZMeshData.serializer()
+
+    override fun createRendererComponent(): ZMeshRenderer {
+        return ZMeshRenderer()
+    }
+
+    override fun createComponentInstance(data: ZMeshData, renderer: ZMeshRenderer): ZMesh {
+        return ZMesh()
     }
 
 }

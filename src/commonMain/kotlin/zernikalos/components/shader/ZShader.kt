@@ -1,50 +1,53 @@
 package zernikalos.components.shader
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import zernikalos.GLWrap
-import zernikalos.ShaderType
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
+import kotlin.js.JsExport
 
-@Serializable
-class ZShader(private val type: String, private val source: String): ZComponent() {
+@JsExport
+@Serializable(with = ZShaderSerializer::class)
+class ZShader(): ZComponent<ZShaderData, ZShaderRenderer>() {
 
-    @Transient var shader: GLWrap = GLWrap()
+    // TODO: Improve typing
+    val type: String
+        get() = data.type
+
+    val source: String
+        get() = data.source
 
     override fun initialize(ctx: ZRenderingContext) {
-        val type = if (this.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
-        val shad = createShader(ctx, type)
-        // TODO: Take care with the cast since this breaks js
-        // if (shaderId <= 0) {
-        //     throw Error("Error creating shader")
-        // }
-
-        compileShader(ctx, shad, source)
-        checkShader(ctx, shad)
-
-        shader = shad
+        renderer.initialize(ctx, data)
     }
 
-    override fun render(ctx: ZRenderingContext) {
+}
+
+@Serializable
+data class ZShaderData(
+    @ProtoNumber(1)
+    val type: String,
+    @ProtoNumber(2)
+    val source: String
+): ZComponentData()
+
+expect class ZShaderRenderer(): ZComponentRender<ZShaderData> {
+
+    override fun initialize(ctx: ZRenderingContext, data: ZShaderData)
+
+}
+
+class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData, ZShaderRenderer>() {
+    override val deserializationStrategy: DeserializationStrategy<ZShaderData>
+        get() = ZShaderData.serializer()
+
+    override fun createRendererComponent(): ZShaderRenderer {
+        return ZShaderRenderer()
     }
 
-    private fun createShader(ctx: ZRenderingContext, shaderType: ShaderType): GLWrap {
-        return ctx.createShader(shaderType.value)
-    }
-
-    private fun compileShader(ctx: ZRenderingContext, shader: GLWrap, source: String) {
-        ctx.shaderSource(shader, source)
-        ctx.compileShader(shader)
-    }
-
-    private fun checkShader(ctx: ZRenderingContext, shader: GLWrap) {
-        val compilerStatus = ctx.getShaderInfoLog(shader)
-        val compilerError = ctx.getError()
-        if (compilerStatus != "" || compilerError > 0) {
-            ctx.deleteShader(shader)
-            throw Error("Error compiling shader $compilerError : $compilerStatus")
-        }
+    override fun createComponentInstance(data: ZShaderData, renderer: ZShaderRenderer): ZShader {
+        return ZShader()
     }
 
 }

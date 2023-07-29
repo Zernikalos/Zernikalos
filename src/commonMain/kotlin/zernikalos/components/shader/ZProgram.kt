@@ -1,29 +1,40 @@
 package zernikalos.components.shader
 
-import zernikalos.GLWrap
 import zernikalos.ZRenderingContext
-import zernikalos.components.ZComponent
+import zernikalos.components.*
 
-class ZProgram: ZComponent() {
+class ZProgram: ZComponent<ZProgramData, ZProgramRenderer>(), ZBindeable {
 
-    lateinit var programId: GLWrap
-
-    override fun initialize(ctx: ZRenderingContext) {
-        val p = ctx.createProgram()
-        // TODO
-        /* if (program <= 0) {
-            val err = context.getError()
-            throw Error("Unable to create program ${err}")
-        } */
-        programId = p
+    init {
+        data = ZProgramData()
+        renderer = ZProgramRenderer()
     }
 
-    override fun render(ctx: ZRenderingContext) {
-        ctx.useProgram(programId)
+    override fun initialize(ctx: ZRenderingContext) {
+        renderer.initialize(ctx, data)
+    }
+
+    override fun bind(ctx: ZRenderingContext) {
+        renderer.bind(ctx, data)
+    }
+
+    override fun unbind(ctx: ZRenderingContext) {
     }
 
     fun link(ctx: ZRenderingContext) {
-        ctx.linkProgram(programId)
+        renderer.link(ctx)
     }
+
+}
+
+class ZProgramData(): ZComponentData()
+
+expect class ZProgramRenderer(): ZComponentRender<ZProgramData> {
+
+    override fun initialize(ctx: ZRenderingContext, data: ZProgramData)
+
+    override fun bind(ctx: ZRenderingContext, data: ZProgramData)
+
+    fun link(ctx: ZRenderingContext)
 
 }

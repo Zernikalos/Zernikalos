@@ -13,12 +13,17 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
 }
 
 @JsExport
-actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView) {
+actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 
     private lateinit var gl: WebGL2RenderingContext
 
-    init {
+
+    override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
         setContext(surfaceView.canvas)
+    }
+
+    init {
+        initWithSurfaceView(surfaceView)
     }
 
     fun setContext(canvas: HTMLCanvasElement) {
@@ -148,17 +153,6 @@ actual class ZRenderingContext actual constructor(val surfaceView: ZSurfaceView)
 
 actual object ExpectEnabler {
     actual val DEPTH_TEST: Int = WebGLRenderingContext.DEPTH_TEST
-}
-
-actual object ExpectTypes {
-    actual val UNSIGNED_BYTE: Int = WebGLRenderingContext.UNSIGNED_BYTE
-    actual val BYTE: Int = WebGLRenderingContext.BYTE
-    actual val INT: Int = WebGLRenderingContext.INT
-    actual val UNSIGNED_INT: Int = WebGLRenderingContext.UNSIGNED_INT
-    actual val SHORT: Int = WebGLRenderingContext.SHORT
-    actual val UNSIGNED_SHORT: Int = WebGLRenderingContext.UNSIGNED_SHORT
-    actual val FLOAT: Int = WebGLRenderingContext.FLOAT
-    actual val DOUBLE: Int = WebGLRenderingContext.FLOAT
 }
 
 actual object ExpectBufferTargetType {
