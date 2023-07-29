@@ -5,10 +5,9 @@ import zernikalos.ui.ZSurfaceView
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
+@JsExport
 interface ZRenderingContext {
-
     fun initWithSurfaceView(surfaceView: ZSurfaceView)
-
 }
 
 enum class Enabler(val value: Int) {

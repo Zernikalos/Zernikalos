@@ -6,7 +6,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsExport
 
+@JsExport
 @Serializable(with = ZShaderProgramSerializer::class)
 class ZShaderProgram(): ZComponent<ZShaderProgramData, ZShaderProgramRenderer>(), ZBindeable {
 
