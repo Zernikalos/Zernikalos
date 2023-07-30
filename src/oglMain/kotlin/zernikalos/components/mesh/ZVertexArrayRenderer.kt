@@ -1,4 +1,4 @@
-package zernikalos.components.buffer
+package zernikalos.components.mesh
 
 import zernikalos.GLWrap
 import zernikalos.ZGLRenderingContext

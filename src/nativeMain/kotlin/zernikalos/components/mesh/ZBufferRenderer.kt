@@ -1,9 +1,9 @@
-package zernikalos.components.buffer
+package zernikalos.components.mesh
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import platform.Metal.MTLBufferProtocol
-import platform.Metal.MTLRenderCommandEncoderProtocol
-import platform.Metal.MTLResourceOptions
 import zernikalos.ZMtlRenderingContext
 import zernikalos.ZRenderingContext
 import zernikalos.components.ZComponentRender

@@ -3,7 +3,6 @@ package zernikalos.components.mesh
 import kotlinx.serialization.Transient
 import zernikalos.*
 import zernikalos.components.ZComponentRender
-import zernikalos.components.buffer.ZVertexArray
 
 actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
 

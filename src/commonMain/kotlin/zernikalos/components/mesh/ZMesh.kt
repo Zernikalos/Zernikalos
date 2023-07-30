@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
-import zernikalos.components.buffer.ZBuffer
 import kotlin.js.JsExport
 
 @JsExport
