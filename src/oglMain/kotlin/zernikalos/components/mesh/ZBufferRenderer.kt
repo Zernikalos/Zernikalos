@@ -7,10 +7,10 @@ import kotlin.jvm.Transient
 actual class ZBufferRenderer : ZComponentRender<ZBufferData> {
     @Transient
     lateinit var buffer: GLWrap
+    private var isIndexBuffer = false
 
-    private fun getBufferTargetType(data: ZBufferData): BufferTargetType {
-        return if (data.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
-    }
+    private val bufferTargetType: BufferTargetType
+        get() = if (isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
 
     actual override fun initialize(ctx: ZRenderingContext, data: ZBufferData) {
         if (!data.hasData) {
@@ -24,16 +24,25 @@ actual class ZBufferRenderer : ZComponentRender<ZBufferData> {
         //            throw Error("Unable to create buffer")
         //        }
 
-        val targetBufferType = getBufferTargetType(data)
-        ctx.bindBuffer(targetBufferType, buffer)
-        ctx.bufferData(targetBufferType, data.dataArray, BufferUsageType.STATIC_DRAW)
+        ctx.bindBuffer(bufferTargetType, buffer)
+        ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
+    }
+
+
+    actual fun initializeIndexBuffer(ctx: ZRenderingContext, data: ZBufferData) {
+        isIndexBuffer = true
+        initialize(ctx, data)
+    }
+
+    actual fun initializeVertexBuffer(ctx: ZRenderingContext, data: ZBufferData) {
+        isIndexBuffer = false
+        initialize(ctx, data)
     }
 
     actual override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
         ctx as ZGLRenderingContext
 
-        val targetBufferType = getBufferTargetType(data)
-        ctx.bindBuffer(targetBufferType, buffer)
+        ctx.bindBuffer(bufferTargetType, buffer)
     }
 
     actual override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {

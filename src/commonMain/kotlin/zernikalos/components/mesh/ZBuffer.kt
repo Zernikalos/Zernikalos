@@ -11,20 +11,22 @@ import kotlin.js.JsExport
 @Serializable(with = ZBufferSerializer::class)
 open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
-    val isIndexBuffer: Boolean
-        get() = data.isIndexBuffer
-
-    val size: Int
-        get() = data.size
-
-    val count: Int
-        get() = data.count
+    val id: Int
+        get() = data.id
 
     val dataArray: ByteArray
         get() = data.dataArray
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
+    }
+
+    fun initializeIndexBuffer(ctx: ZRenderingContext) {
+        renderer.initializeIndexBuffer(ctx, data)
+    }
+
+    fun initializeVertexBuffer(ctx: ZRenderingContext) {
+        renderer.initializeVertexBuffer(ctx, data)
     }
 
     override fun bind(ctx: ZRenderingContext) {
@@ -40,12 +42,8 @@ open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 @Serializable
 open class ZBufferData(
     @ProtoNumber(1)
-    var isIndexBuffer: Boolean = false,
-    @ProtoNumber(3)
-    var size: Int = 0,
-    @ProtoNumber(4)
-    var count: Int = 0,
-    @ProtoNumber(5)
+    var id: Int,
+    @ProtoNumber(2)
     var dataArray: ByteArray
 ): ZComponentData() {
     val hasData: Boolean
@@ -55,6 +53,10 @@ open class ZBufferData(
 expect class ZBufferRenderer(): ZComponentRender<ZBufferData> {
 
     override fun initialize(ctx: ZRenderingContext, data: ZBufferData)
+
+    fun initializeIndexBuffer(ctx: ZRenderingContext, data: ZBufferData)
+
+    fun initializeVertexBuffer(ctx: ZRenderingContext, data: ZBufferData)
 
     override fun bind(ctx: ZRenderingContext, data: ZBufferData)
 

@@ -49,4 +49,10 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
     actual override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {
     }
 
+    actual fun initializeIndexBuffer(ctx: ZRenderingContext, data: ZBufferData) {
+    }
+
+    actual fun initializeVertexBuffer(ctx: ZRenderingContext, data: ZBufferData) {
+    }
+
 }

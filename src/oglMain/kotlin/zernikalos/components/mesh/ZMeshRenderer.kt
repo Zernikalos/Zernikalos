@@ -9,18 +9,17 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
     @Transient
     val vao: ZVertexArray = ZVertexArray()
 
-    actual fun useIndexBuffer(data: ZMeshData): Boolean = data.indices != null
     actual override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
         vao.initialize(ctx)
 
-        data.bufferKeys.forEach { (name, attr) ->
-            val buffer = data.buffers[name]
-            buffer?.initialize(ctx)
-            attr.initialize(ctx)
-        }
-
-        if (useIndexBuffer(data)) {
-            data.indices?.initialize(ctx)
+        data.bufferKeys.forEach { (name, key) ->
+            val buffer = data.findBufferByKey(key)
+            if (key.isIndexBuffer) {
+                buffer?.initializeIndexBuffer(ctx)
+            } else {
+                buffer?.initializeVertexBuffer(ctx)
+            }
+            key.initialize(ctx)
         }
     }
 
@@ -28,8 +27,8 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
         ctx as ZGLRenderingContext
 
         vao.bind(ctx)
-        if (useIndexBuffer(data)) {
-            val count = data.indices?.count!!
+        if (data.hasIndexBuffer) {
+            val count = data.indexBufferKey?.count!!
             ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglType(ZDataType.UNSIGNED_SHORT), 0)
         } else {
             // TODO: Fix this

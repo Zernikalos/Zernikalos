@@ -14,11 +14,17 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
     val bufferKeys: Map<String, ZBufferKey>
         get() = data.bufferKeys
 
-    val indices: ZBuffer?
-        get() = data.indices
-
     val buffers: Map<String, ZBuffer>
         get() = data.buffers
+
+    val indexBufferKey: ZBufferKey?
+        get() = data.indexBufferKey
+
+    val indexBuffer: ZBuffer?
+        get() = data.indexBuffer
+
+    val hasIndexBuffer: Boolean
+        get() = data.hasIndexBuffer
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
@@ -35,14 +41,27 @@ data class ZMeshData(
     @ProtoNumber(1)
     var bufferKeys: Map<String, ZBufferKey>,
     @ProtoNumber(2)
-    val indices: ZBuffer? = null,
-    @ProtoNumber(3)
     var buffers: Map<String, ZBuffer>
-): ZComponentData()
+): ZComponentData() {
+    val indexBufferKey: ZBufferKey?
+        get() = bufferKeys.values.find { it -> it.isIndexBuffer }
+
+    val hasIndexBuffer: Boolean
+        get() = indexBufferKey != null
+
+    val indexBuffer: ZBuffer?
+        get() {
+            val key = indexBufferKey ?: return null
+            return findBufferByKey(key)
+        }
+
+    fun findBufferByKey(key: ZBufferKey): ZBuffer? {
+        return buffers.values.find { it -> it.id == key.bufferId }
+    }
+}
 
 expect class ZMeshRenderer(): ZComponentRender<ZMeshData> {
 
-    fun useIndexBuffer(data: ZMeshData): Boolean
     override fun initialize(ctx: ZRenderingContext, data: ZMeshData)
 
     override fun render(ctx: ZRenderingContext, data: ZMeshData)

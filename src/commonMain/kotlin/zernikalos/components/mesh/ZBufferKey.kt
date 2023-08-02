@@ -31,6 +31,12 @@ class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
     val stride: Int
         get() = data.stride
 
+    val isIndexBuffer: Boolean
+        get() = data.isIndexBuffer
+
+    val bufferId: Int
+        get() = data.bufferId
+
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
     }
@@ -52,7 +58,11 @@ data class ZBufferKeyData(
     @ProtoNumber(6)
     val offset: Int,
     @ProtoNumber(7)
-    val stride: Int
+    val stride: Int,
+    @ProtoNumber(8)
+    val isIndexBuffer: Boolean,
+    @ProtoNumber(9)
+    val bufferId: Int
 ): ZComponentData()
 
 expect class ZBufferKeyRenderer(): ZComponentRender<ZBufferKeyData> {
