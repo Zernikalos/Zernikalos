@@ -13,38 +13,25 @@ actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {
 
         vertexDescriptor = MTLVertexDescriptor()
 
-        data.bufferKeys.forEach { (name, key) ->
-            if (key.isIndexBuffer) {
-                data.indexBuffer?.initialize(ctx)
-            } else {
-                // Hack for only position and color
-                if(key.id <= 1) {
-                    key.renderer.initialize(ctx, key.data)
-                    vertexDescriptor.attributes.setObject(key.renderer.attributeDescriptor, key.id.toULong())
-                    vertexDescriptor.layouts.setObject(key.renderer.layoutDescriptor, key.id.toULong())
-
-                    val buffer = data.buffers[name]
-                    buffer?.initialize(ctx)
-                }
+        data.buffers.forEach { (name, buffer) ->
+            if (buffer.id <= 1) {
+                buffer.initialize(ctx)
+                vertexDescriptor.attributes.setObject(buffer.renderer.attributeDescriptor, buffer.id.toULong())
+                vertexDescriptor.layouts.setObject(buffer.renderer.layoutDescriptor, buffer.id.toULong())
             }
-
+            if (buffer.isIndexBuffer) {
+                buffer.initialize(ctx)
+            }
         }
 
-        //data.indices?.initialize(ctx)
     }
 
     override fun bind(ctx: ZRenderingContext, data: ZMeshData) {
-//        var index = 0
-//        data.buffers.forEach { (name, buffer) ->
-//            buffer.renderer.bind2(ctx, buffer.data, index)
-//            index++
-//        }
-
-        val buffer = data.buffers["position"]
-        buffer?.renderer?.bind2(ctx, buffer.data, 0)
+        val posBuffer = data.buffers["position"]
+        posBuffer?.bind(ctx)
 
         val colBuffer = data.buffers["color"]
-        colBuffer?.renderer?.bind2(ctx, colBuffer.data, 1)
+        colBuffer?.bind(ctx)
     }
 
     actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {

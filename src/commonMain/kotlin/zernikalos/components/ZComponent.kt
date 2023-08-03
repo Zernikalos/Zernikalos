@@ -7,9 +7,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.ZRenderingContext
 
-abstract class ZComponent<T: ZComponentData, R: ZComponentRender<T>> {
-
+abstract class ZBaseComponent<T: ZComponentData> {
     lateinit var data: T
+}
+
+abstract class ZComponent<T: ZComponentData, R: ZComponentRender<T>>: ZBaseComponent<T>() {
+
     lateinit var renderer: R
 
     abstract fun initialize(ctx: ZRenderingContext)
@@ -29,6 +32,29 @@ interface ZComponentRender<T: ZComponentData> {
     fun unbind(ctx: ZRenderingContext, data: T) {}
 
     fun render(ctx: ZRenderingContext, data: T) {}
+}
+
+abstract class ZBaseComponentSerializer<
+    T: ZBaseComponent<D>,
+    D: ZComponentData>
+    : KSerializer<T> {
+
+    abstract val deserializationStrategy: DeserializationStrategy<D>
+
+    override val descriptor: SerialDescriptor
+        get() = deserializationStrategy.descriptor
+
+    protected abstract fun createComponentInstance(data: D): T
+
+    override fun deserialize(decoder: Decoder): T {
+        val data = decoder.decodeSerializableValue(deserializationStrategy)
+        val component: T = createComponentInstance(data)
+        component.data = data
+        return component
+    }
+
+    override fun serialize(encoder: Encoder, value: T) {}
+
 }
 
 abstract class ZComponentSerializer<

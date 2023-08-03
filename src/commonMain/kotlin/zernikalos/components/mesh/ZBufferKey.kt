@@ -8,7 +8,7 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.*
 
 @Serializable(with = ZBufferKeySerializer::class)
-class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
+class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
 
     val id: Int
         get() = data.id
@@ -37,10 +37,6 @@ class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
     val bufferId: Int
         get() = data.bufferId
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
-    }
-
 }
 
 @Serializable
@@ -65,20 +61,11 @@ data class ZBufferKeyData(
     val bufferId: Int
 ): ZComponentData()
 
-expect class ZBufferKeyRenderer(): ZComponentRender<ZBufferKeyData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZBufferKeyData)
-
-}
-
-class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData, ZBufferKeyRenderer>() {
+class ZBufferKeySerializer: ZBaseComponentSerializer<ZBufferKey, ZBufferKeyData>() {
     override val deserializationStrategy: DeserializationStrategy<ZBufferKeyData>
         get() = ZBufferKeyData.serializer()
 
-    override fun createRendererComponent(): ZBufferKeyRenderer {
-        return ZBufferKeyRenderer()
-    }
-
-    override fun createComponentInstance(data: ZBufferKeyData, renderer: ZBufferKeyRenderer): ZBufferKey {
+    override fun createComponentInstance(data: ZBufferKeyData): ZBufferKey {
         return ZBufferKey()
     }
 

@@ -2,6 +2,7 @@ package zernikalos.components.mesh
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
@@ -23,6 +24,7 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
     val indexBuffer: ZBuffer?
         get() = data.indexBuffer
 
+
     val hasIndexBuffer: Boolean
         get() = data.hasIndexBuffer
 
@@ -37,26 +39,38 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 }
 
 @Serializable
-data class ZMeshData(
+class ZMeshData(
     @ProtoNumber(1)
     var bufferKeys: Map<String, ZBufferKey>,
     @ProtoNumber(2)
-    var buffers: Map<String, ZBuffer>
+    var rawBuffers: Map<String, ZRawBuffer>
 ): ZComponentData() {
+
+    @Transient
+    val buffers: HashMap<String, ZBuffer> = HashMap()
+
+    init {
+        bufferKeys.entries.forEach { (name, key) ->
+            val buffer = findBufferByKey(key)
+            if (buffer != null) {
+                val compBuffer = ZBuffer(key, buffer)
+                buffers[name] = compBuffer
+            }
+        }
+    }
+
+    val indexBuffer: ZBuffer?
+        get() = buffers.values.find { it -> it.isIndexBuffer }
+
     val indexBufferKey: ZBufferKey?
         get() = bufferKeys.values.find { it -> it.isIndexBuffer }
 
     val hasIndexBuffer: Boolean
         get() = indexBufferKey != null
 
-    val indexBuffer: ZBuffer?
-        get() {
-            val key = indexBufferKey ?: return null
-            return findBufferByKey(key)
-        }
 
-    fun findBufferByKey(key: ZBufferKey): ZBuffer? {
-        return buffers.values.find { it -> it.id == key.bufferId }
+    fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
+        return rawBuffers.values.find { it -> it.id == key.bufferId }
     }
 }
 

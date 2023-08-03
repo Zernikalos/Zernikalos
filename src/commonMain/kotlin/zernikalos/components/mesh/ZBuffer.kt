@@ -1,32 +1,27 @@
 package zernikalos.components.mesh
 
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
-import zernikalos.components.*
-import kotlin.js.JsExport
+import zernikalos.components.ZBindeable
+import zernikalos.components.ZComponent
+import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRender
 
-@JsExport
-@Serializable(with = ZBufferSerializer::class)
-open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
+class ZBuffer(key: ZBufferKey, buffer: ZRawBuffer):
+    ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
     val id: Int
         get() = data.id
 
-    val dataArray: ByteArray
-        get() = data.dataArray
+    val isIndexBuffer: Boolean
+        get() = data.isIndexBuffer
+
+    init {
+        data = ZBufferData(key, buffer)
+        renderer = ZBufferRenderer()
+    }
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
-    }
-
-    fun initializeIndexBuffer(ctx: ZRenderingContext) {
-        renderer.initializeIndexBuffer(ctx, data)
-    }
-
-    fun initializeVertexBuffer(ctx: ZRenderingContext) {
-        renderer.initializeVertexBuffer(ctx, data)
     }
 
     override fun bind(ctx: ZRenderingContext) {
@@ -39,41 +34,21 @@ open class ZBuffer: ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
 }
 
-@Serializable
-open class ZBufferData(
-    @ProtoNumber(1)
-    var id: Int,
-    @ProtoNumber(2)
-    var dataArray: ByteArray
+data class ZBufferData(
+    val key: ZBufferKey,
+    val buffer: ZRawBuffer
 ): ZComponentData() {
-    val hasData: Boolean
-        get() = !dataArray.isEmpty()
+
+    val id: Int
+        get() = key.id
+    val isIndexBuffer: Boolean
+        get() = key.isIndexBuffer
 }
 
 expect class ZBufferRenderer(): ZComponentRender<ZBufferData> {
-
     override fun initialize(ctx: ZRenderingContext, data: ZBufferData)
-
-    fun initializeIndexBuffer(ctx: ZRenderingContext, data: ZBufferData)
-
-    fun initializeVertexBuffer(ctx: ZRenderingContext, data: ZBufferData)
 
     override fun bind(ctx: ZRenderingContext, data: ZBufferData)
 
     override fun unbind(ctx: ZRenderingContext, data: ZBufferData)
-
 }
-
-class ZBufferSerializer: ZComponentSerializer<ZBuffer, ZBufferData, ZBufferRenderer>() {
-    override val deserializationStrategy: DeserializationStrategy<ZBufferData>
-        get() = ZBufferData.serializer()
-
-    override fun createRendererComponent(): ZBufferRenderer {
-        return ZBufferRenderer()
-    }
-
-    override fun createComponentInstance(data: ZBufferData, renderer: ZBufferRenderer): ZBuffer {
-        return ZBuffer()
-    }
-}
-

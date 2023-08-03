@@ -12,14 +12,8 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
     actual override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
         vao.initialize(ctx)
 
-        data.bufferKeys.forEach { (name, key) ->
-            val buffer = data.findBufferByKey(key)
-            if (key.isIndexBuffer) {
-                buffer?.initializeIndexBuffer(ctx)
-            } else {
-                buffer?.initializeVertexBuffer(ctx)
-            }
-            key.initialize(ctx)
+        data.buffers.forEach { (name, buff) ->
+            buff.initialize(ctx)
         }
     }
 
