@@ -6,8 +6,8 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import kotlin.js.JsExport
 
-@JsExport
 @Serializable(with = ZRawBufferSerializer::class)
+@JsExport
 open class ZRawBuffer: ZBaseComponent<ZRawBufferData>() {
 
     val id: Int
@@ -22,6 +22,7 @@ open class ZRawBuffer: ZBaseComponent<ZRawBufferData>() {
 }
 
 @Serializable
+@JsExport
 open class ZRawBufferData(
     @ProtoNumber(1)
     var id: Int,

@@ -3,11 +3,11 @@ package zernikalos.components
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import zernikalos.BufferBit
-import zernikalos.CullModeType
-import zernikalos.Enabler
 import zernikalos.ZRenderingContext
 import zernikalos.math.ZVector4
+import kotlin.js.JsExport
 
+@JsExport
 @Serializable(with = ZViewportSerializer::class)
 class ZViewport: ZComponent<ZViewportData, ZViewportRenderer>(), ZRenderizable {
 
@@ -26,6 +26,7 @@ class ZViewport: ZComponent<ZViewportData, ZViewportRenderer>(), ZRenderizable {
 
 }
 
+@JsExport
 @Serializable
 data class ZViewportData(
     val clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f),

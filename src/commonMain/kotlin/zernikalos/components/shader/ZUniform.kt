@@ -1,7 +1,6 @@
 package zernikalos.components.shader
 
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
@@ -18,8 +17,8 @@ class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
     val count: Int
         get() = data.count
 
-    val type: ZDataType
-        get() = data.type
+    val dataType: ZDataType
+        get() = data.dataType
 
     override fun initialize(ctx: ZRenderingContext) {
     }
@@ -41,7 +40,7 @@ data class ZUniformData(
     @ProtoNumber(2)
     val count: Int,
     @ProtoNumber(3)
-    val type: ZDataType
+    val dataType: ZDataType
 ): ZComponentData()
 
 expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {

@@ -8,8 +8,8 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 
-@JsExport
 @Serializable(with = ZMeshSerializer::class)
+@JsExport
 class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 
     val bufferKeys: Map<String, ZBufferKey>
@@ -39,6 +39,7 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 }
 
 @Serializable
+@JsExport
 class ZMeshData(
     @ProtoNumber(1)
     var bufferKeys: Map<String, ZBufferKey>,

@@ -5,7 +5,9 @@ import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
+import kotlin.js.JsExport
 
+@JsExport
 class ZBuffer(key: ZBufferKey, buffer: ZRawBuffer):
     ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {
 
@@ -34,6 +36,7 @@ class ZBuffer(key: ZBufferKey, buffer: ZRawBuffer):
 
 }
 
+@JsExport
 data class ZBufferData(
     val key: ZBufferKey,
     val buffer: ZRawBuffer

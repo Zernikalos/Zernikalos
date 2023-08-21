@@ -4,10 +4,11 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
-import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsExport
 
 @Serializable(with = ZBufferKeySerializer::class)
+@JsExport
 class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
 
     val id: Int
@@ -40,6 +41,7 @@ class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
 }
 
 @Serializable
+@JsExport
 data class ZBufferKeyData(
     @ProtoNumber(1)
     val id: Int,
