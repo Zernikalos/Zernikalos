@@ -3,25 +3,17 @@ package zernikalos.components.mesh
 import kotlinx.serialization.Transient
 import zernikalos.*
 import zernikalos.components.ZComponentRender
-import zernikalos.components.buffer.ZVertexArray
 
 actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
 
     @Transient
     val vao: ZVertexArray = ZVertexArray()
 
-    actual fun useIndexBuffer(data: ZMeshData): Boolean = data.indices != null
     actual override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
         vao.initialize(ctx)
 
-        data.bufferKeys.forEach { (name, attr) ->
-            val buffer = data.buffers[name]
-            buffer?.initialize(ctx)
-            attr.initialize(ctx)
-        }
-
-        if (useIndexBuffer(data)) {
-            data.indices?.initialize(ctx)
+        data.buffers.forEach { (name, buff) ->
+            buff.initialize(ctx)
         }
     }
 
@@ -29,8 +21,8 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
         ctx as ZGLRenderingContext
 
         vao.bind(ctx)
-        if (useIndexBuffer(data)) {
-            val count = data.indices?.count!!
+        if (data.hasIndexBuffer) {
+            val count = data.indexBufferKey?.count!!
             ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglType(ZDataType.UNSIGNED_SHORT), 0)
         } else {
             // TODO: Fix this

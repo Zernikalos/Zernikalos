@@ -4,11 +4,12 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
-import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsExport
 
 @Serializable(with = ZBufferKeySerializer::class)
-class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
+@JsExport
+class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
 
     val id: Int
         get() = data.id
@@ -31,13 +32,16 @@ class ZBufferKey: ZComponent<ZBufferKeyData, ZBufferKeyRenderer>() {
     val stride: Int
         get() = data.stride
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
-    }
+    val isIndexBuffer: Boolean
+        get() = data.isIndexBuffer
+
+    val bufferId: Int
+        get() = data.bufferId
 
 }
 
 @Serializable
+@JsExport
 data class ZBufferKeyData(
     @ProtoNumber(1)
     val id: Int,
@@ -52,23 +56,18 @@ data class ZBufferKeyData(
     @ProtoNumber(6)
     val offset: Int,
     @ProtoNumber(7)
-    val stride: Int
+    val stride: Int,
+    @ProtoNumber(8)
+    val isIndexBuffer: Boolean,
+    @ProtoNumber(9)
+    val bufferId: Int
 ): ZComponentData()
 
-expect class ZBufferKeyRenderer(): ZComponentRender<ZBufferKeyData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZBufferKeyData)
-
-}
-
-class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData, ZBufferKeyRenderer>() {
+class ZBufferKeySerializer: ZBaseComponentSerializer<ZBufferKey, ZBufferKeyData>() {
     override val deserializationStrategy: DeserializationStrategy<ZBufferKeyData>
         get() = ZBufferKeyData.serializer()
 
-    override fun createRendererComponent(): ZBufferKeyRenderer {
-        return ZBufferKeyRenderer()
-    }
-
-    override fun createComponentInstance(data: ZBufferKeyData, renderer: ZBufferKeyRenderer): ZBufferKey {
+    override fun createComponentInstance(data: ZBufferKeyData): ZBufferKey {
         return ZBufferKey()
     }
 

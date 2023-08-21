@@ -1,7 +1,9 @@
 package zernikalos
 
 import kotlinx.serialization.SerialName
+import kotlin.js.JsExport
 
+@JsExport
 enum class ZDataType {
     @SerialName("byte")
     BYTE,

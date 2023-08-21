@@ -45,6 +45,11 @@ kotlin {
 
     js(IR) {
         moduleName = "@zernikalos/zernikalos"
+        compilations["main"].packageJson {
+            customField("author", "Aarón Negrín")
+            customField("description","Zernikalos Game Engine for the browser")
+            customField("license", "MPL v2.0")
+        }
         browser {
             binaries.executable()
             distribution {
