@@ -16,6 +16,7 @@ fun toOglType(t: ZDataType): Int {
         ZDataType.MAT2F -> TODO()
         ZDataType.MAT3F -> TODO()
         ZDataType.MAT4F -> OglDataTypes.MAT4
+        ZDataType.TEXTURE -> OglDataTypes.TEXTURE
     }
     return value
 }
@@ -31,4 +32,5 @@ expect object OglDataTypes {
     val DOUBLE: Int
 
     val MAT4: Int
+    val TEXTURE: Int
 }

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZSceneContext
 import zernikalos.ZRenderingContext
+import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.ZShaderProgram
 import zernikalos.math.ZMatrix4
@@ -18,14 +19,18 @@ class ZModel: ZObject() {
     lateinit var shaderProgram: ZShaderProgram
     @ProtoNumber(5)
     lateinit var mesh: ZMesh
+    @ProtoNumber(6)
+    var material: ZMaterial? = null
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
         mesh.initialize(ctx)
+        material?.initialize(ctx)
     }
 
     override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.bind(ctx)
+        material?.bind(ctx)
 
         shaderProgram.uniforms.forEach {
             val uniformGenerator = sceneContext.getUniform(it.key)
@@ -37,6 +42,7 @@ class ZModel: ZObject() {
 
         mesh.render(ctx)
 
+        material?.unbind(ctx)
         shaderProgram.unbind(ctx)
     }
 }

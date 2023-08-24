@@ -1,8 +1,11 @@
 package zernikalos
 
 import android.opengl.GLES30
+import android.opengl.GLUtils
+import zernikalos.components.material.ZBitmap
 import zernikalos.ui.ZSurfaceView
 import java.nio.ByteBuffer
+import javax.microedition.khronos.opengles.GL
 
 actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 
@@ -129,6 +132,34 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
 
     actual fun drawElements(mode: Int, count: Int, type: Int, offset: Int) {
         GLES30.glDrawElements(mode, count, type, offset)
+    }
+
+    /** Textures **/
+    actual fun genTexture(): GLWrap {
+        val buff = IntArray(1)
+        GLES30.glGenTextures(1, buff, 0)
+        val id = buff[0]
+        return GLWrap(id)
+    }
+
+    actual fun activeTexture() {
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0)
+    }
+
+    actual fun bindTexture(texture: GLWrap) {
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texture.id as Int)
+    }
+
+    actual fun texParameterMin() {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST)
+    }
+
+    actual fun texParameterMag() {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST)
+    }
+
+    actual fun texImage2D(bitmap: ZBitmap) {
+        GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap.nativeBitmap, 0)
     }
 
 }

@@ -1,6 +1,7 @@
 package zernikalos
 
 import kotlinx.serialization.SerialName
+import zernikalos.components.material.ZBitmap
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -76,6 +77,20 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
     fun drawArrays(mode: Int, first: Int, count: Int)
 
     fun drawElements(mode: Int, count: Int, type: Int, offset: Int)
+
+    /** Textures **/
+
+    fun genTexture(): GLWrap
+
+    fun activeTexture()
+
+    fun bindTexture(texture: GLWrap)
+
+    fun texParameterMin()
+
+    fun texParameterMag()
+
+    fun texImage2D(bitmap: ZBitmap)
 
 }
 
