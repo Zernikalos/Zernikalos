@@ -2,6 +2,7 @@ package zernikalos
 
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.components.material.ZBitmap
 import zernikalos.ui.ZSurfaceView
 
 abstract external class WebGLVertexArrayObject: WebGLObject
@@ -147,6 +148,44 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
 
     actual fun drawElements(mode: Int, count: Int, type: Int, offset: Int) {
         gl.drawElements(mode, count, type, offset)
+    }
+
+    /** Textures **/
+    actual fun genTexture(): GLWrap {
+        val id = gl.createTexture()
+        return GLWrap(id)
+    }
+
+    actual fun activeTexture() {
+        // TODO
+        gl.activeTexture(WebGLRenderingContext.TEXTURE0)
+    }
+
+    actual fun bindTexture(texture: GLWrap) {
+        gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture.id as WebGLTexture)
+    }
+
+    actual fun texParameterMin() {
+        gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.NEAREST)
+    }
+
+    actual fun texParameterMag() {
+        gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.NEAREST)
+    }
+
+    actual fun texImage2D(bitmap: ZBitmap) {
+        // TODO review
+        gl.texImage2D(
+            WebGLRenderingContext.TEXTURE_2D,
+            0,
+            WebGLRenderingContext.RGB,
+            400,
+            400,
+            0,
+            WebGLRenderingContext.RGB,
+            WebGLRenderingContext.UNSIGNED_BYTE,
+            bitmap.nativeData
+        )
     }
 
 }

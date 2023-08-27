@@ -12,5 +12,12 @@ actual object OglDataTypes {
     actual val FLOAT: Int = WebGLRenderingContext.FLOAT
     actual val DOUBLE: Int = WebGLRenderingContext.FLOAT
 
+    actual val VEC2: Int = WebGLRenderingContext.FLOAT_VEC2
+    actual val VEC3: Int = WebGLRenderingContext.FLOAT_VEC3
+    actual val VEC4: Int = WebGLRenderingContext.FLOAT_VEC4
+    actual val MAT2: Int = WebGLRenderingContext.FLOAT_MAT2
+    actual val MAT3: Int = WebGLRenderingContext.FLOAT_MAT3
     actual val MAT4: Int = WebGLRenderingContext.FLOAT_MAT4
+
+    actual val TEXTURE: Int = WebGLRenderingContext.TEXTURE_2D
 }

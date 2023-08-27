@@ -10,11 +10,11 @@ fun toOglType(t: ZDataType): Int {
         ZDataType.UNSIGNED_INT -> OglDataTypes.UNSIGNED_INT
         ZDataType.FLOAT -> OglDataTypes.FLOAT
         ZDataType.DOUBLE -> OglDataTypes.DOUBLE
-        ZDataType.VEC2 -> TODO()
-        ZDataType.VEC3 -> TODO()
-        ZDataType.VEC4 -> TODO()
-        ZDataType.MAT2F -> TODO()
-        ZDataType.MAT3F -> TODO()
+        ZDataType.VEC2 -> OglDataTypes.VEC2
+        ZDataType.VEC3 -> OglDataTypes.VEC3
+        ZDataType.VEC4 -> OglDataTypes.VEC4
+        ZDataType.MAT2F -> OglDataTypes.MAT2
+        ZDataType.MAT3F -> OglDataTypes.MAT3
         ZDataType.MAT4F -> OglDataTypes.MAT4
         ZDataType.TEXTURE -> OglDataTypes.TEXTURE
     }
@@ -31,6 +31,12 @@ expect object OglDataTypes {
     val FLOAT: Int
     val DOUBLE: Int
 
+    val VEC2: Int
+    val VEC3: Int
+    val VEC4: Int
+    val MAT2: Int
+    val MAT3: Int
     val MAT4: Int
+
     val TEXTURE: Int
 }
