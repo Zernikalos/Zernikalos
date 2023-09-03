@@ -3,7 +3,6 @@ package zernikalos.ui
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.MetalKit.MTKView
-import zernikalos.ZRenderingContext
 
 actual class ZSurfaceView(view: MTKView) {
 
@@ -12,16 +11,16 @@ actual class ZSurfaceView(view: MTKView) {
     @OptIn(ExperimentalForeignApi::class)
     actual val width: Int
         get() {
-            nativeView.frame.useContents {
-                val widthValue = this.size.width
+            nativeView.drawableSize().useContents {
+                val widthValue = this.width
                 return widthValue.toInt()
             }
         }
     @OptIn(ExperimentalForeignApi::class)
     actual val height: Int
         get() {
-            nativeView.frame.useContents {
-                val heightValue = this.size.height
+            nativeView.drawableSize.useContents {
+                val heightValue = this.height
                 return heightValue.toInt()
             }
         }

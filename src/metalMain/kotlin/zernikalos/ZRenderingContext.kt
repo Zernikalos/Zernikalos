@@ -1,7 +1,6 @@
 package zernikalos
 
 import platform.Metal.*
-import platform.MetalKit.MTKView
 import zernikalos.ui.ZSurfaceView
 
 class ZMtlRenderingContext constructor(val surfaceView: ZSurfaceView): ZRenderingContext {

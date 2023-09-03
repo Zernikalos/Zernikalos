@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     kotlin("multiplatform") apply true
@@ -47,7 +48,7 @@ kotlin {
         moduleName = "@zernikalos/zernikalos"
         compilations["main"].packageJson {
             customField("author", "Aarón Negrín")
-            customField("description","Zernikalos Game Engine for the browser")
+            customField("description", "Zernikalos Game Engine for the browser")
             customField("license", "MPL v2.0")
         }
         browser {
@@ -72,11 +73,34 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
-    macosArm64("native") {
+    val appleFrameworkBaseName = "Zernikalos"
+
+    val xcf = XCFramework(appleFrameworkBaseName)
+
+    macosArm64() {
         binaries.framework {
             isStatic = true
-            baseName="Zernikalos"
-            binaryOption("bundleId", "com.zernikalos")
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
+        }
+    }
+
+    ios() {
+        binaries.framework {
+            isStatic = true
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
+        }
+    }
+
+    iosSimulatorArm64() {
+        binaries.framework {
+            isStatic = true
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
         }
     }
 
@@ -99,7 +123,14 @@ kotlin {
         }
 
         val oglMain by creating {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
             kotlin.srcDir("src/oglMain/kotlin")
+            dependsOn(commonMain)
+        }
+
+        val metalMain by creating {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+            kotlin.srcDir("src/metalMain/kotlin")
             dependsOn(commonMain)
         }
 
@@ -109,12 +140,24 @@ kotlin {
         }
 
         val jsMain by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             dependsOn(oglMain)
         }
 
-        val nativeMain by getting {
+        val macosArm64Main by getting {
             languageSettings.optIn("zernikalos.OptInAnnotation")
+            dependsOn(metalMain)
+            kotlin.srcDir("src/macosMain/kotlin")
+        }
+
+        val iosMain by getting {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+            dependsOn(metalMain)
+            kotlin.srcDir("src/iosMain/kotlin")
+        }
+
+        val iosSimulatorArm64Main by getting {
+            languageSettings.optIn("zernikalos.OptInAnnotation")
+            dependsOn(iosMain)
         }
 
     }
