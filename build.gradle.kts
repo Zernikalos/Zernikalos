@@ -20,7 +20,7 @@ repositories {
 }
 
 android {
-    namespace="com.zernikalos"
+    namespace="io.zernikalos"
     compileSdk=33
 
     defaultConfig {
@@ -118,18 +118,16 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.0")
             }
         }
 
         val oglMain by creating {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             kotlin.srcDir("src/oglMain/kotlin")
             dependsOn(commonMain)
         }
 
         val metalMain by creating {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             kotlin.srcDir("src/metalMain/kotlin")
             dependsOn(commonMain)
         }
@@ -144,19 +142,16 @@ kotlin {
         }
 
         val macosArm64Main by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             dependsOn(metalMain)
             kotlin.srcDir("src/macosMain/kotlin")
         }
 
         val iosMain by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             dependsOn(metalMain)
             kotlin.srcDir("src/iosMain/kotlin")
         }
 
         val iosSimulatorArm64Main by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             dependsOn(iosMain)
         }
 

@@ -2,21 +2,37 @@ package zernikalos
 
 fun toOglType(t: ZDataType): Int {
     val value = when (t) {
-        ZDataType.BYTE -> OglDataTypes.BYTE
-        ZDataType.UNSIGNED_BYTE -> OglDataTypes.UNSIGNED_BYTE
-        ZDataType.SHORT -> OglDataTypes.SHORT
-        ZDataType.UNSIGNED_SHORT -> OglDataTypes.UNSIGNED_SHORT
-        ZDataType.INT -> OglDataTypes.INT
-        ZDataType.UNSIGNED_INT -> OglDataTypes.UNSIGNED_INT
-        ZDataType.FLOAT -> OglDataTypes.FLOAT
-        ZDataType.DOUBLE -> OglDataTypes.DOUBLE
-        ZDataType.VEC2 -> OglDataTypes.VEC2
-        ZDataType.VEC3 -> OglDataTypes.VEC3
-        ZDataType.VEC4 -> OglDataTypes.VEC4
-        ZDataType.MAT2F -> OglDataTypes.MAT2
-        ZDataType.MAT3F -> OglDataTypes.MAT3
-        ZDataType.MAT4F -> OglDataTypes.MAT4
-        ZDataType.TEXTURE -> OglDataTypes.TEXTURE
+        ZTypes.BYTE -> OglDataTypes.BYTE
+        ZTypes.UBYTE -> OglDataTypes.UNSIGNED_BYTE
+        ZTypes.SHORT -> OglDataTypes.SHORT
+        ZTypes.USHORT -> OglDataTypes.UNSIGNED_SHORT
+        ZTypes.INT -> OglDataTypes.INT
+        ZTypes.UINT -> OglDataTypes.UNSIGNED_INT
+        ZTypes.FLOAT -> OglDataTypes.FLOAT
+        ZTypes.DOUBLE -> OglDataTypes.DOUBLE
+        ZTypes.VEC2F -> OglDataTypes.VEC2
+        ZTypes.VEC3F -> OglDataTypes.VEC3
+        ZTypes.VEC4F -> OglDataTypes.VEC4
+        ZTypes.MAT2F -> OglDataTypes.MAT2
+        ZTypes.MAT3F -> OglDataTypes.MAT3
+        ZTypes.MAT4F -> OglDataTypes.MAT4
+        ZTypes.TEXTURE -> OglDataTypes.TEXTURE
+        else -> 0
+    }
+    return value
+}
+
+fun toOglBaseType(t: ZDataType): Int {
+    val value = when (t.type) {
+        ZBaseType.BYTE -> OglDataTypes.BYTE
+        ZBaseType.UNSIGNED_BYTE -> OglDataTypes.UNSIGNED_BYTE
+        ZBaseType.SHORT -> OglDataTypes.SHORT
+        ZBaseType.UNSIGNED_SHORT -> OglDataTypes.UNSIGNED_SHORT
+        ZBaseType.INT -> OglDataTypes.INT
+        ZBaseType.UNSIGNED_INT -> OglDataTypes.UNSIGNED_INT
+        ZBaseType.FLOAT -> OglDataTypes.FLOAT
+        ZBaseType.DOUBLE -> OglDataTypes.DOUBLE
+        ZBaseType.TEXTURE -> OglDataTypes.TEXTURE
     }
     return value
 }

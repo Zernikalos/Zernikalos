@@ -97,6 +97,10 @@ class ZMatrix4: ZAlgebraObject {
         scale(this, s)
     }
 
+    override fun toString(): String {
+        return this.values.contentToString()
+    }
+
     private fun checkDimension(values: Array<Float>) {
         if (values.size != 16) {
             throw Error("Invalid Matrix 4x4 dimension")

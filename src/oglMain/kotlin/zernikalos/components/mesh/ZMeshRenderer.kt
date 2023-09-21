@@ -22,8 +22,11 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
 
         vao.bind(ctx)
         if (data.hasIndexBuffer) {
-            val count = data.indexBufferKey?.count!!
-            ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglType(ZDataType.UNSIGNED_SHORT), 0)
+            // If we have the index buffer for sure this will not be null
+            val indexBufferKey = data.indexBufferKey!!
+            val count = indexBufferKey.count
+            // TODO: you don't need to draw triangles all the time
+            ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglBaseType(indexBufferKey.dataType), 0)
         } else {
             // TODO: Fix this
             val count = data.bufferKeys["position"]?.count!!

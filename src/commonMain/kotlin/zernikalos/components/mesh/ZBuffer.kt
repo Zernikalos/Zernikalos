@@ -7,6 +7,10 @@ import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import kotlin.js.JsExport
 
+/**
+ * Utility class for representing the mix of a ZBufferKey + ZRawBuffer in a simpler way
+ * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
+ */
 @JsExport
 class ZBuffer(key: ZBufferKey, buffer: ZRawBuffer):
     ZComponent<ZBufferData, ZBufferRenderer>(), ZBindeable {

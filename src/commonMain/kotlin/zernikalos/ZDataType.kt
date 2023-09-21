@@ -1,60 +1,118 @@
 package zernikalos
 
-import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import kotlin.js.JsExport
 
 @JsExport
-enum class ZDataType {
-    @SerialName("byte")
+enum class ZBaseType {
+
     @ProtoNumber(0)
     BYTE,
-    @SerialName("ubyte")
     @ProtoNumber(1)
     UNSIGNED_BYTE,
 
-    @SerialName("short")
     @ProtoNumber(2)
     SHORT,
-    @SerialName("ushort")
     @ProtoNumber(3)
     UNSIGNED_SHORT,
 
-    @SerialName("int")
     @ProtoNumber(4)
     INT,
-    @SerialName("uint")
     @ProtoNumber(5)
     UNSIGNED_INT,
 
-    @SerialName("float")
     @ProtoNumber(6)
     FLOAT,
-    @SerialName("double")
     @ProtoNumber(7)
     DOUBLE,
 
-    @SerialName("vec2")
     @ProtoNumber(8)
+    TEXTURE;
+
+    val byteSize: Int
+        get() {
+            return when(this) {
+                BYTE -> Byte.SIZE_BYTES
+                UNSIGNED_BYTE -> UByte.SIZE_BYTES
+                SHORT -> Short.SIZE_BYTES
+                UNSIGNED_SHORT -> UShort.SIZE_BYTES
+                INT -> Int.SIZE_BYTES
+                UNSIGNED_INT -> UInt.SIZE_BYTES
+                FLOAT -> Float.SIZE_BYTES
+                DOUBLE -> Double.SIZE_BYTES
+                TEXTURE -> 0
+            }
+        }
+}
+
+
+@JsExport
+enum class ZFormatType {
+    @ProtoNumber(0)
+    SCALAR,
+
+    @ProtoNumber(1)
     VEC2,
-    @SerialName("vec3")
-    @ProtoNumber(9)
+    @ProtoNumber(2)
     VEC3,
-    @SerialName("vec4")
-    @ProtoNumber(10)
+    @ProtoNumber(3)
     VEC4,
 
-    @SerialName("mat2")
-    @ProtoNumber(11)
-    MAT2F,
-    @SerialName("mat3")
-    @ProtoNumber(12)
-    MAT3F,
-    @SerialName("mat4")
-    @ProtoNumber(13)
-    MAT4F,
+    @ProtoNumber(4)
+    MAT2,
+    @ProtoNumber(5)
+    MAT3,
+    @ProtoNumber(6)
+    MAT4,
 
-    @SerialName("texture")
-    @ProtoNumber(14)
+    @ProtoNumber(7)
     TEXTURE
+}
+
+@JsExport
+@Serializable
+data class ZDataType(
+    @ProtoNumber(1)
+    val type: ZBaseType,
+    @ProtoNumber(2)
+    val format: ZFormatType
+) {
+    val size: Int
+        get() {
+            return when (format) {
+                ZFormatType.SCALAR -> 1
+                ZFormatType.VEC2 -> 2
+                ZFormatType.VEC3 -> 3
+                ZFormatType.VEC4 -> 4
+                ZFormatType.MAT2 -> 4
+                ZFormatType.MAT3 -> 9
+                ZFormatType.MAT4 -> 16
+                ZFormatType.TEXTURE -> 0
+            }
+        }
+
+    val byteSize: Int
+        get() = size * type.byteSize
+}
+
+object ZTypes {
+    val BYTE = ZDataType(ZBaseType.BYTE, ZFormatType.SCALAR)
+    val UBYTE = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.SCALAR)
+    val INT = ZDataType(ZBaseType.INT, ZFormatType.SCALAR)
+    val UINT = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.SCALAR)
+    val SHORT = ZDataType(ZBaseType.SHORT, ZFormatType.SCALAR)
+    val USHORT = ZDataType(ZBaseType.UNSIGNED_SHORT, ZFormatType.SCALAR)
+    val FLOAT = ZDataType(ZBaseType.FLOAT, ZFormatType.SCALAR)
+    val DOUBLE = ZDataType(ZBaseType.DOUBLE, ZFormatType.SCALAR)
+
+    val VEC2F = ZDataType(ZBaseType.FLOAT, ZFormatType.VEC2)
+    val VEC3F = ZDataType(ZBaseType.FLOAT, ZFormatType.VEC3)
+    val VEC4F = ZDataType(ZBaseType.FLOAT, ZFormatType.VEC4)
+
+    val MAT2F = ZDataType(ZBaseType.FLOAT, ZFormatType.MAT2)
+    val MAT3F = ZDataType(ZBaseType.FLOAT, ZFormatType.MAT3)
+    val MAT4F = ZDataType(ZBaseType.FLOAT, ZFormatType.MAT4)
+
+    val TEXTURE = ZDataType(ZBaseType.TEXTURE, ZFormatType.TEXTURE)
 }

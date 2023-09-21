@@ -6,6 +6,9 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import kotlin.js.JsExport
 
+/**
+ * Raw buffer representing the data array with vertex information stored
+ */
 @Serializable(with = ZRawBufferSerializer::class)
 @JsExport
 open class ZRawBuffer: ZBaseComponent<ZRawBufferData>() {

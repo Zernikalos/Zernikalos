@@ -32,7 +32,7 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
     private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferKey) {
         ctx as ZGLRenderingContext
 
-        val glDataType = toOglType(data.dataType)
+        val glDataType = toOglBaseType(data.dataType)
 
         ctx.enableVertexAttrib(data.id)
         ctx.vertexAttribPointer(

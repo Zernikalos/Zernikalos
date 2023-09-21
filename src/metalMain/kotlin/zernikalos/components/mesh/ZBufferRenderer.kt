@@ -4,8 +4,10 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Metal.*
+import zernikalos.ZDataType
 import zernikalos.ZMtlRenderingContext
 import zernikalos.ZRenderingContext
+import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
 
 actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData> {
@@ -50,7 +52,11 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
         //            buffer = ctx.device.newBufferWithBytes(bufferPtr, data.size.toULong(), 0u)
         //        }
 
+        // The use of pinned is to get access to a constant memory location
         data.buffer.dataArray.usePinned { pinned ->
+            // Requires to set the initial position and how many bytes to copy
+            // Notice that all buffers store only bytes
+            // TODO: Check the options to this function
             buffer = ctx.device.newBufferWithBytes(pinned.addressOf(0), data.buffer.dataArray.size.toULong(), 1u)
         }
     }
@@ -59,12 +65,34 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
         attributeDescriptor = MTLVertexAttributeDescriptor()
         attributeDescriptor.offset = data.key.offset.toULong()
         attributeDescriptor.bufferIndex = data.key.id.toULong()
-        attributeDescriptor.format = MTLVertexFormatFloat3
+        // In OGL we specify the base type and the size independently, not the same scenario in Metal
+        attributeDescriptor.format = toMtlFormat(data.key.dataType)
 
         layoutDescriptor = MTLVertexBufferLayoutDescriptor()
-        layoutDescriptor.stride = 12u
+        // This stride is different than OGL, in Metal all the vertex data is added into the same buffer
+        // on OGL we could have different buffers at this time
+        layoutDescriptor.stride = (data.key.dataType.byteSize).toULong()
+        // TODO: Check these 2 steps
         layoutDescriptor.stepRate = 1u
         layoutDescriptor.stepFunction = MTLStepFunctionPerVertex
     }
 
+}
+
+fun toMtlFormat(dataType: ZDataType): MTLVertexFormat {
+    return when (dataType) {
+        ZTypes.INT -> MTLVertexFormatInt
+        ZTypes.UINT -> MTLVertexFormatUInt
+
+        ZTypes.USHORT -> MTLVertexFormatUShort
+        ZTypes.SHORT -> MTLVertexFormatShort
+
+        ZTypes.FLOAT -> MTLVertexFormatFloat
+
+        ZTypes.VEC3F -> MTLVertexFormatFloat3
+        ZTypes.VEC2F -> MTLVertexFormatFloat2
+        ZTypes.VEC4F -> MTLVertexFormatFloat4
+
+        else -> 0u
+    }
 }

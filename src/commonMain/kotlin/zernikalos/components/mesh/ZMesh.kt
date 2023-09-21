@@ -8,13 +8,23 @@ import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 
+/**
+ * Mesh will provide:
+ * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
+ */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
 class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
 
+    /**
+     * Will provide the BufferKeys stored by this mesh
+     */
     val bufferKeys: Map<String, ZBufferKey>
         get() = data.bufferKeys
 
+    /**
+     * The buffers expressed in a more cohesive way providing key + buffer data in one place
+     */
     val buffers: Map<String, ZBuffer>
         get() = data.buffers
 
@@ -69,8 +79,7 @@ class ZMeshData(
     val hasIndexBuffer: Boolean
         get() = indexBufferKey != null
 
-
-    fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
+    private fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
         return rawBuffers.values.find { it -> it.id == key.bufferId }
     }
 }
