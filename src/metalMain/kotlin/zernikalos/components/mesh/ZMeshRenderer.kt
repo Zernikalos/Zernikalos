@@ -36,12 +36,11 @@ actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {
     actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {
         ctx as ZMtlRenderingContext
 
-        val key = data.indexBufferKey!!
         val indices = data.indexBuffer!!
 
         ctx.renderEncoder?.drawIndexedPrimitives(
             MTLPrimitiveTypeTriangle,
-            key.count.toULong(),
+            indices.count.toULong(),
             MTLIndexTypeUInt16,
             indices.renderer.buffer!!,
             0u

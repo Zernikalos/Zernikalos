@@ -2,13 +2,12 @@ package zernikalos.components.shader
 
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsName
 
-class ZProgram: ZComponent<ZProgramData, ZProgramRenderer>(), ZBindeable {
+class ZProgram internal constructor(data: ZProgramData, renderer: ZProgramRenderer): ZComponent<ZProgramData, ZProgramRenderer>(data, renderer), ZBindeable {
 
-    init {
-        data = ZProgramData()
-        renderer = ZProgramRenderer()
-    }
+    @JsName("init")
+    constructor(): this(ZProgramData(), ZProgramRenderer())
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)

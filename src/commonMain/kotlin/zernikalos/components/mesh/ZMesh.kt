@@ -7,6 +7,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 /**
  * Mesh will provide:
@@ -14,13 +15,10 @@ import kotlin.js.JsExport
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData, renderer: ZMeshRenderer): ZComponent<ZMeshData, ZMeshRenderer>(data, renderer), ZRenderizable {
 
-    /**
-     * Will provide the BufferKeys stored by this mesh
-     */
-    val bufferKeys: Map<String, ZBufferKey>
-        get() = data.bufferKeys
+    @JsName("init")
+    constructor(): this(ZMeshData(), ZMeshRenderer())
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
@@ -28,17 +26,14 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
     val buffers: Map<String, ZBuffer>
         get() = data.buffers
 
-    val indexBufferKey: ZBufferKey?
-        get() = data.indexBufferKey
-
     val indexBuffer: ZBuffer?
         get() = data.indexBuffer
-
 
     val hasIndexBuffer: Boolean
         get() = data.hasIndexBuffer
 
     override fun initialize(ctx: ZRenderingContext) {
+        data.buildBuffers()
         renderer.initialize(ctx, data)
     }
 
@@ -46,41 +41,65 @@ class ZMesh: ZComponent<ZMeshData, ZMeshRenderer>(), ZRenderizable {
         renderer.render(ctx, data)
     }
 
+    fun addBufferKey(bufferKey: ZBufferKey) {
+        data.addBufferKey(bufferKey)
+    }
+
+    fun getBufferKey(name: String): ZBufferKey? {
+        return data.getBufferKey(name)
+    }
+
+    fun addRawBuffer(rawBuffer: ZRawBuffer) {
+        data.addRawBuffer(rawBuffer)
+    }
+
 }
 
 @Serializable
-@JsExport
 class ZMeshData(
     @ProtoNumber(1)
-    var bufferKeys: Map<String, ZBufferKey>,
+    var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(2)
-    var rawBuffers: Map<String, ZRawBuffer>
+    var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
 ): ZComponentData() {
 
     @Transient
     val buffers: HashMap<String, ZBuffer> = HashMap()
 
-    init {
-        bufferKeys.entries.forEach { (name, key) ->
-            val buffer = findBufferByKey(key)
+    val indexBuffer: ZBuffer?
+        get() = buffers.values.find { it.isIndexBuffer }
+
+    val hasIndexBuffer: Boolean
+        get() = indexBuffer != null
+
+    fun addBufferKey(bufferKey: ZBufferKey) {
+        bufferKeys.add(bufferKey)
+    }
+
+    fun getBufferKey(name: String): ZBufferKey? {
+        return bufferKeys.find { it.name == name }
+    }
+
+    fun addRawBuffer(rawBuffer: ZRawBuffer) {
+        rawBuffers.add(rawBuffer)
+    }
+
+    internal fun buildBuffers() {
+        bufferKeys.forEach { key ->
+            val buffer = buildBufferForKey(key)
             if (buffer != null) {
-                val compBuffer = ZBuffer(key, buffer)
-                buffers[name] = compBuffer
+                buffers[key.name] = buffer
             }
         }
     }
 
-    val indexBuffer: ZBuffer?
-        get() = buffers.values.find { it -> it.isIndexBuffer }
-
-    val indexBufferKey: ZBufferKey?
-        get() = bufferKeys.values.find { it -> it.isIndexBuffer }
-
-    val hasIndexBuffer: Boolean
-        get() = indexBufferKey != null
+    private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
+        val rawBuffer = findBufferByKey(key) ?: return null
+        return ZBuffer(key, rawBuffer)
+    }
 
     private fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
-        return rawBuffers.values.find { it -> it.id == key.bufferId }
+        return rawBuffers.find { it.id == key.bufferId }
     }
 }
 
@@ -101,7 +120,7 @@ class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData, ZMeshRenderer>() {
     }
 
     override fun createComponentInstance(data: ZMeshData, renderer: ZMeshRenderer): ZMesh {
-        return ZMesh()
+        return ZMesh(data, renderer)
     }
 
 }

@@ -8,15 +8,15 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZVector3(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
+class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebraObject {
 
-    @JsName("zeroCtor")
+    @JsName("init")
     constructor() : this(0f, 0f, 0f)
 
-    @JsName("repeatCtor")
+    @JsName("initWithValue")
     constructor(v: Float) : this(v, v, v)
 
-    @JsName("copyCtor")
+    @JsName("initWithVec4")
     constructor(v4: ZVector4) : this() {
         fromVec4(this, v4)
     }
@@ -93,7 +93,7 @@ class ZVector3(var x: Float, var y: Float, var z: Float): ZAlgebraObject {
         return "[$x, $y, $z]"
     }
 
-    companion object {
+    companion object Op {
 
         val Zero: ZVector3
             get() = ZVector3()

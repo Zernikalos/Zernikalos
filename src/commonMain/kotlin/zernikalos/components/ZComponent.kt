@@ -7,13 +7,21 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.ZRenderingContext
 
-abstract class ZBaseComponent<T: ZComponentData> {
-    lateinit var data: T
+abstract class ZBaseComponent<D: ZComponentData> internal constructor(data: D) {
+    var data: D
+
+    init {
+        this.data = data
+    }
 }
 
-abstract class ZComponent<T: ZComponentData, R: ZComponentRender<T>>: ZBaseComponent<T>() {
+abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(data: D, renderer: R): ZBaseComponent<D>(data) {
 
-    lateinit var renderer: R
+    var renderer: R
+
+    init {
+        this.renderer = renderer
+    }
 
     abstract fun initialize(ctx: ZRenderingContext)
 

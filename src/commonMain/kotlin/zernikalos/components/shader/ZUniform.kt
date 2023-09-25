@@ -5,20 +5,36 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZRenderingContext
+import zernikalos.ZTypes
 import zernikalos.components.*
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 
 @Serializable(with = ZUniformSerializer::class)
-class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
+@JsExport
+class ZUniform internal constructor(data: ZUniformData, renderer: ZUniformRenderer): ZComponent<ZUniformData, ZUniformRenderer>(data, renderer) {
 
-    val uniformName: String
+    @JsName("init")
+    constructor(): this(ZUniformData(), ZUniformRenderer())
+
+    var uniformName: String
         get() = data.uniformName
+        set(value) {
+            data.uniformName = value
+        }
 
-    val count: Int
+    var count: Int
         get() = data.count
+        set(value) {
+            data.count = value
+        }
 
-    val dataType: ZDataType
+    var dataType: ZDataType
         get() = data.dataType
+        set(value) {
+            data.dataType = value
+        }
 
     override fun initialize(ctx: ZRenderingContext) {
     }
@@ -31,16 +47,20 @@ class ZUniform: ZComponent<ZUniformData, ZUniformRenderer>() {
         renderer.bindValue(ctx, data, values)
     }
 
+    override fun toString(): String {
+        return data.toString()
+    }
+
 }
 
 @Serializable
 data class ZUniformData(
     @ProtoNumber(1)
-    val uniformName: String,
+    var uniformName: String = "",
     @ProtoNumber(2)
-    val count: Int,
+    var count: Int = -1,
     @ProtoNumber(3)
-    val dataType: ZDataType
+    var dataType: ZDataType = ZTypes.NONE
 ): ZComponentData()
 
 expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {

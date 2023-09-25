@@ -9,29 +9,28 @@ import kotlin.math.tan
 
 @JsExport
 @Serializable
-class ZMatrix4: ZAlgebraObject {
+class ZMatrix4(): ZAlgebraObject {
 
     override val values: FloatArray
 
     override val size: Int
         get() = values.size
 
-    @JsName("zeroCtor")
-    constructor() {
+    init {
         values = FloatArray(16)
         identity()
     }
 
-    @JsName("copyArrayCtor")
-    constructor(values: Array<Float>) {
+    @JsName("initWithValues")
+    constructor(values: Array<Float>): this() {
         checkDimension(values)
-        this.values = values.toFloatArray()
+        copyFromValues(values)
     }
 
-    @JsName("copyCtor")
-    constructor(values: FloatArray) {
+    @JsName("initWithFloatArray")
+    constructor(values: FloatArray): this() {
         checkDimension(values)
-        this.values = values.copyOf()
+        copyFromValues(values)
     }
 
     operator fun get(i: Int): Float {
@@ -113,7 +112,19 @@ class ZMatrix4: ZAlgebraObject {
         }
     }
 
-    companion object {
+    private fun copyFromValues(values: FloatArray) {
+        values.forEachIndexed { index, value ->
+            this.values[index] = value
+        }
+    }
+
+    private fun copyFromValues(values: Array<Float>) {
+        values.forEachIndexed { index, value ->
+            this.values[index] = value
+        }
+    }
+
+    companion object Op {
 
         val Identity: ZMatrix4
             get() = ZMatrix4()

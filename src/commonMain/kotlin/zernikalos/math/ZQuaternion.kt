@@ -10,7 +10,10 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlgebraObject {
+class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebraObject {
+
+    @JsName("init")
+    constructor() : this(1f, 0f, 0f, 0f)
 
     override val values: FloatArray
         get() = floatArrayOf(w, x, y, z)
@@ -20,9 +23,6 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
 
     val norm2: Float
         get() = sqrt(dot(this, this))
-
-    @JsName("identityCtor")
-    constructor() : this(1f, 0f, 0f, 0f)
 
     fun setValues(w: Float, x: Float, y: Float, z: Float) {
         this.x = x
@@ -95,7 +95,7 @@ class ZQuaternion(var w: Float, var x: Float, var y: Float, var z: Float): ZAlge
     }
 
 
-    companion object {
+    companion object Op {
 
         fun copy(result: ZQuaternion, q: ZQuaternion) {
             result.w = q.w

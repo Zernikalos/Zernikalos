@@ -24,6 +24,7 @@ fun toOglType(t: ZDataType): Int {
 
 fun toOglBaseType(t: ZDataType): Int {
     val value = when (t.type) {
+        ZBaseType.NONE -> 0
         ZBaseType.BYTE -> OglDataTypes.BYTE
         ZBaseType.UNSIGNED_BYTE -> OglDataTypes.UNSIGNED_BYTE
         ZBaseType.SHORT -> OglDataTypes.SHORT

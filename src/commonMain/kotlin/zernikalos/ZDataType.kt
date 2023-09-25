@@ -6,33 +6,36 @@ import kotlin.js.JsExport
 
 @JsExport
 enum class ZBaseType {
-
     @ProtoNumber(0)
-    BYTE,
+    NONE,
+
     @ProtoNumber(1)
+    BYTE,
+    @ProtoNumber(2)
     UNSIGNED_BYTE,
 
-    @ProtoNumber(2)
-    SHORT,
     @ProtoNumber(3)
+    SHORT,
+    @ProtoNumber(4)
     UNSIGNED_SHORT,
 
-    @ProtoNumber(4)
-    INT,
     @ProtoNumber(5)
+    INT,
+    @ProtoNumber(6)
     UNSIGNED_INT,
 
-    @ProtoNumber(6)
-    FLOAT,
     @ProtoNumber(7)
+    FLOAT,
+    @ProtoNumber(8)
     DOUBLE,
 
-    @ProtoNumber(8)
+    @ProtoNumber(9)
     TEXTURE;
 
     val byteSize: Int
         get() {
             return when(this) {
+                NONE -> 0
                 BYTE -> Byte.SIZE_BYTES
                 UNSIGNED_BYTE -> UByte.SIZE_BYTES
                 SHORT -> Short.SIZE_BYTES
@@ -46,27 +49,29 @@ enum class ZBaseType {
         }
 }
 
-
 @JsExport
 enum class ZFormatType {
     @ProtoNumber(0)
-    SCALAR,
+    NONE,
 
     @ProtoNumber(1)
-    VEC2,
+    SCALAR,
+
     @ProtoNumber(2)
-    VEC3,
+    VEC2,
     @ProtoNumber(3)
+    VEC3,
+    @ProtoNumber(4)
     VEC4,
 
-    @ProtoNumber(4)
-    MAT2,
     @ProtoNumber(5)
-    MAT3,
+    MAT2,
     @ProtoNumber(6)
+    MAT3,
+    @ProtoNumber(7)
     MAT4,
 
-    @ProtoNumber(7)
+    @ProtoNumber(8)
     TEXTURE
 }
 
@@ -81,6 +86,7 @@ data class ZDataType(
     val size: Int
         get() {
             return when (format) {
+                ZFormatType.NONE -> 0
                 ZFormatType.SCALAR -> 1
                 ZFormatType.VEC2 -> 2
                 ZFormatType.VEC3 -> 3
@@ -96,7 +102,10 @@ data class ZDataType(
         get() = size * type.byteSize
 }
 
+@JsExport
 object ZTypes {
+    val NONE = ZDataType(ZBaseType.NONE, ZFormatType.NONE)
+
     val BYTE = ZDataType(ZBaseType.BYTE, ZFormatType.SCALAR)
     val UBYTE = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.SCALAR)
     val INT = ZDataType(ZBaseType.INT, ZFormatType.SCALAR)

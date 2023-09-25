@@ -4,8 +4,10 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
+import zernikalos.ZTypes
 import zernikalos.components.*
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 /**
  * BufferKeys are the one in charge to provide specific data about how the information is being stored inside
@@ -13,57 +15,97 @@ import kotlin.js.JsExport
  */
 @Serializable(with = ZBufferKeySerializer::class)
 @JsExport
-class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
+class ZBufferKey internal constructor(data: ZBufferKeyData): ZBaseComponent<ZBufferKeyData>(data) {
+
+    @JsName("init")
+    constructor(): this(ZBufferKeyData())
+
+    @JsName("initWithArgs")
+    constructor(id: Int, dataType: ZDataType, name: String, size: Int, count: Int, normalized: Boolean, offset: Int, stride: Int, isIndexBuffer: Boolean, bufferId: Int):
+        this(ZBufferKeyData(id, dataType, name, size, count, normalized, offset, stride, isIndexBuffer, bufferId))
 
     /**
      * ID for this BufferKey.
      * Might differ from BufferId
      */
-    val id: Int
+    var id: Int
         get() = data.id
+        set(value) {
+            data.id = value
+        }
 
     /**
      * Type of data stored
      *
      */
-    val dataType: ZDataType
+    var dataType: ZDataType
         get() = data.dataType
+        set(value) {
+            data.dataType = value
+        }
+
+    var name: String
+        get() = data.name
+        set(value) {
+            data.name = value
+        }
 
     /**
      * How many elements are stored per data unit.
      * Example: a Vec3 will have size equals to 3 in the same way a Scalar will be 1
      */
-    val size: Int
+    var size: Int
         get() = data.size
+        set(value) {
+            data.size = value
+        }
 
     /**
      * How many elements of this type are stored.
      * Example: If we store 15 Vec3 elements in the data array the count will have a value of 15.
      */
-    val count: Int
+    var count: Int
         get() = data.count
+        set(value) {
+            data.count = value
+        }
 
-    val normalized: Boolean
+    var normalized: Boolean
         get() = data.normalized
+        set(value) {
+            data.normalized = value
+        }
 
-    val offset: Int
+    var offset: Int
         get() = data.offset
+        set(value) {
+            data.offset = value
+        }
 
     /**
      * If the data is tightly represented within the array how many elements it requires to be jumped to the next one
      * Example: We store a Vec3 postion and a Vec3 normal in the very same array, the stride will be 6
      */
-    val stride: Int
+    var stride: Int
         get() = data.stride
+        set(value) {
+            data.stride = value
+        }
 
-    val isIndexBuffer: Boolean
+    var isIndexBuffer: Boolean
         get() = data.isIndexBuffer
+        set(value) {
+            data.isIndexBuffer = value
+        }
 
     /**
      * Refers to the RawBuffer Id @see ZRawBuffer
      */
-    val bufferId: Int
+    var bufferId: Int
         get() = data.bufferId
+        set(value) {
+            data.bufferId = value
+        }
 
 }
 
@@ -71,23 +113,25 @@ class ZBufferKey: ZBaseComponent<ZBufferKeyData>() {
 @JsExport
 data class ZBufferKeyData(
     @ProtoNumber(1)
-    val id: Int,
+    var id: Int = -1,
     @ProtoNumber(2)
-    val dataType: ZDataType,
+    var dataType: ZDataType = ZTypes.NONE,
     @ProtoNumber(3)
-    val size: Int,
+    var name: String = "",
     @ProtoNumber(4)
-    val count: Int,
+    var size: Int = -1,
     @ProtoNumber(5)
-    val normalized: Boolean,
+    var count: Int = -1,
     @ProtoNumber(6)
-    val offset: Int,
+    var normalized: Boolean = false,
     @ProtoNumber(7)
-    val stride: Int,
+    var offset: Int = -1,
     @ProtoNumber(8)
-    val isIndexBuffer: Boolean,
+    var stride: Int = -1,
     @ProtoNumber(9)
-    val bufferId: Int
+    var isIndexBuffer: Boolean = false,
+    @ProtoNumber(10)
+    var bufferId: Int = -1
 ): ZComponentData()
 
 class ZBufferKeySerializer: ZBaseComponentSerializer<ZBufferKey, ZBufferKeyData>() {
@@ -95,7 +139,7 @@ class ZBufferKeySerializer: ZBaseComponentSerializer<ZBufferKey, ZBufferKeyData>
         get() = ZBufferKeyData.serializer()
 
     override fun createComponentInstance(data: ZBufferKeyData): ZBufferKey {
-        return ZBufferKey()
+        return ZBufferKey(data)
     }
 
 }

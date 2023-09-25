@@ -6,15 +6,18 @@ import zernikalos.BufferBit
 import zernikalos.ZRenderingContext
 import zernikalos.math.ZVector4
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZViewportSerializer::class)
-class ZViewport: ZComponent<ZViewportData, ZViewportRenderer>(), ZRenderizable {
+class ZViewport
+internal constructor(data: ZViewportData, renderer: ZViewportRenderer):
+    ZComponent<ZViewportData, ZViewportRenderer>(data, renderer),
+    ZRenderizable {
 
-    init {
-        data = ZViewportData()
-        renderer = ZViewportRenderer()
-    }
+    @JsName("init")
+    constructor(): this(ZViewportData(), ZViewportRenderer())
+
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
@@ -49,7 +52,7 @@ class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData, ZViewp
     }
 
     override fun createComponentInstance(data: ZViewportData, renderer: ZViewportRenderer): ZViewport {
-        return ZViewport()
+        return ZViewport(data, renderer)
     }
 
 }
