@@ -15,7 +15,7 @@ actual class ZUniformRenderer: ZComponentRender<ZUniformData> {
         uniformId = ctx.getUniformLocation(program.renderer.programId, data.uniformName)
     }
 
-    actual fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray) {
+    actual fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, data: ZUniformData, values: FloatArray) {
         ctx as ZGLRenderingContext
         when (data.dataType) {
             ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, values)

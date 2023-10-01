@@ -37,6 +37,10 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData, renderer: ZS
         data.uniforms[name] = uniform
     }
 
+    fun getUniform(name: String): ZUniform? {
+        return data.uniforms[name]
+    }
+
     fun addAttribute(name: String, attribute: ZAttribute) {
         data.attributes[name] = attribute
     }

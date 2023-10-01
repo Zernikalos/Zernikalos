@@ -36,6 +36,12 @@ class ZUniform internal constructor(data: ZUniformData, renderer: ZUniformRender
             data.dataType = value
         }
 
+    var idx: Int
+        get() = data.idx
+        set(value) {
+            data.idx = value
+        }
+
     override fun initialize(ctx: ZRenderingContext) {
     }
 
@@ -43,8 +49,8 @@ class ZUniform internal constructor(data: ZUniformData, renderer: ZUniformRender
         renderer.bindLocation(ctx, data, program)
     }
 
-    fun bindValue(ctx: ZRenderingContext, values: FloatArray) {
-        renderer.bindValue(ctx, data, values)
+    fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, values: FloatArray) {
+        renderer.bindValue(ctx, shaderProgram, data, values)
     }
 
     override fun toString(): String {
@@ -60,7 +66,9 @@ data class ZUniformData(
     @ProtoNumber(2)
     var count: Int = -1,
     @ProtoNumber(3)
-    var dataType: ZDataType = ZTypes.NONE
+    var dataType: ZDataType = ZTypes.NONE,
+    @ProtoNumber(4)
+    var idx: Int = -1
 ): ZComponentData()
 
 expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {
@@ -69,7 +77,7 @@ expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {
 
     fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram)
 
-    fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray)
+    fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, data: ZUniformData, values: FloatArray)
 }
 
 class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData, ZUniformRenderer>() {
