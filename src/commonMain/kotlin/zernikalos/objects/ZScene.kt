@@ -2,8 +2,8 @@ package zernikalos.objects
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import zernikalos.ZSceneContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZViewport
 import kotlin.js.JsExport
 

@@ -4,7 +4,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.*
 import kotlin.js.JsExport

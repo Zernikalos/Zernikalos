@@ -1,9 +1,9 @@
 package zernikalos.components
 
-import zernikalos.CullModeType
-import zernikalos.Enabler
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.CullModeType
+import zernikalos.context.Enabler
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZViewportRenderer: ZComponentRender<ZViewportData> {
     actual override fun initialize(ctx: ZRenderingContext, data: ZViewportData) {

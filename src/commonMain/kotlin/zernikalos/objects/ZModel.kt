@@ -3,8 +3,8 @@ package zernikalos.objects
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZSceneContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.ZShaderProgram

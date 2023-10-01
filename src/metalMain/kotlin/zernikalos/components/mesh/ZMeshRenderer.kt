@@ -1,8 +1,8 @@
 package zernikalos.components.mesh
 
 import platform.Metal.*
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
 actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {

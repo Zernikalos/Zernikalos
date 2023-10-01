@@ -2,8 +2,8 @@ package zernikalos.components.shader
 
 import platform.Metal.MTLBufferProtocol
 import platform.Metal.MTLResourceStorageModeShared
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
 actual class ZShaderProgramRenderer actual constructor() : ZComponentRender<ZShaderProgramData> {

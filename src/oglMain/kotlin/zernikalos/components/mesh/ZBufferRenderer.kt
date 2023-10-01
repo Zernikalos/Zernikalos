@@ -1,7 +1,8 @@
 package zernikalos.components.mesh
 
-import zernikalos.*
 import zernikalos.components.ZComponentRender
+import zernikalos.context.*
+import zernikalos.toOglBaseType
 import kotlin.jvm.Transient
 
 actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData> {

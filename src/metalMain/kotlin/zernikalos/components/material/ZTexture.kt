@@ -1,6 +1,6 @@
 package zernikalos.components.material
 
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
 actual class ZTextureRenderer actual constructor() : ZComponentRender<ZTextureData> {

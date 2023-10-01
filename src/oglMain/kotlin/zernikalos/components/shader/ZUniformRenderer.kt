@@ -1,7 +1,10 @@
 package zernikalos.components.shader
 
-import zernikalos.*
+import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
+import zernikalos.context.GLWrap
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZUniformRenderer: ZComponentRender<ZUniformData> {
 

@@ -1,6 +1,6 @@
 package zernikalos.components.shader
 
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsName
 

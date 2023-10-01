@@ -5,7 +5,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 
 abstract class ZBaseComponent<D: ZComponentData> internal constructor(data: D) {
     var data: D

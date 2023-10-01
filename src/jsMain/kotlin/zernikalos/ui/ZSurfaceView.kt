@@ -1,7 +1,6 @@
 package zernikalos.ui
 
 import kotlinx.browser.window
-import zernikalos.ZRenderingContext
 import org.w3c.dom.HTMLCanvasElement
 
 @JsExport

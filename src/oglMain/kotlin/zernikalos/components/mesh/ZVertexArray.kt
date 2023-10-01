@@ -1,8 +1,8 @@
 package zernikalos.components.mesh
 
-import zernikalos.GLWrap
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.GLWrap
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData

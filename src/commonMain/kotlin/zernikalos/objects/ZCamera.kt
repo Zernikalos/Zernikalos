@@ -2,8 +2,8 @@ package zernikalos.objects
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZSceneContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.camera.ZPerspectiveLens
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZVector3

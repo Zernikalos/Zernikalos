@@ -1,8 +1,11 @@
 package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
-import zernikalos.*
 import zernikalos.components.ZComponentRender
+import zernikalos.context.DrawModes
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
+import zernikalos.toOglBaseType
 
 actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
 

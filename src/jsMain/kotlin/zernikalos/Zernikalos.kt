@@ -2,6 +2,7 @@ package zernikalos
 
 import zernikalos.ui.ZSurfaceView
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.context.createDefaultContextCreator
 import kotlin.js.JsExport
 
 @JsExport

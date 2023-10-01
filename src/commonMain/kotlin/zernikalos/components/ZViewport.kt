@@ -2,8 +2,8 @@ package zernikalos.components
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import zernikalos.BufferBit
-import zernikalos.ZRenderingContext
+import zernikalos.context.BufferBit
+import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZVector4
 import kotlin.js.JsExport
 import kotlin.js.JsName

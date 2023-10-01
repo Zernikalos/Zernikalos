@@ -3,7 +3,7 @@ package zernikalos.uniformgenerator
 import zernikalos.ZDataType
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
-import zernikalos.ZSceneContext
+import zernikalos.context.ZSceneContext
 import zernikalos.ZTypes
 
 interface ZUniformGenerator<T> {

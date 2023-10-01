@@ -5,8 +5,8 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Metal.*
 import zernikalos.ZDataType
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
 

@@ -3,7 +3,7 @@ package zernikalos.components.shader
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -49,7 +49,7 @@ data class ZAttributeData(
 expect class ZAttributeRenderer(): ZComponentRender<ZAttributeData> {
     override fun initialize(ctx: ZRenderingContext, data: ZAttributeData)
 
-    fun bindLocation(ctx: ZRenderingContext,data: ZAttributeData, program: ZProgram)
+    fun bindLocation(ctx: ZRenderingContext, data: ZAttributeData, program: ZProgram)
 
 }
 

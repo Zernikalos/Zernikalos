@@ -1,8 +1,10 @@
-package zernikalos
+package zernikalos.context
 
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.components.material.ZBitmap
+import zernikalos.context.BufferUsageType
+import zernikalos.context.ZRenderingContext
 import zernikalos.ui.ZSurfaceView
 
 abstract external class WebGLVertexArrayObject: WebGLObject

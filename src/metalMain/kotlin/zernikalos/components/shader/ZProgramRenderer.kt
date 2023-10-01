@@ -1,6 +1,6 @@
 package zernikalos.components.shader
 
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
 actual class ZProgramRenderer actual constructor() : ZComponentRender<ZProgramData> {

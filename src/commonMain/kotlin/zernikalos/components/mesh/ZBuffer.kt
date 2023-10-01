@@ -1,7 +1,7 @@
 package zernikalos.components.mesh
 
 import zernikalos.ZDataType
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData

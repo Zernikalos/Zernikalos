@@ -1,9 +1,8 @@
 package zernikalos.components.material
 
-import zernikalos.GLWrap
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
-import zernikalos.components.ZBindeable
+import zernikalos.context.GLWrap
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
 actual class ZTextureRenderer actual constructor() : ZComponentRender<ZTextureData> {

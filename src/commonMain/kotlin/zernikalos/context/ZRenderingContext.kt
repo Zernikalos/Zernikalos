@@ -1,8 +1,7 @@
-package zernikalos
+package zernikalos.context
 
 import kotlinx.serialization.SerialName
 import zernikalos.ui.ZSurfaceView
-import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
 @JsExport

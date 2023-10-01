@@ -3,7 +3,7 @@ package zernikalos.components.material
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName

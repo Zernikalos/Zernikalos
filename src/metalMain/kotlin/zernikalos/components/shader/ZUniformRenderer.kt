@@ -2,10 +2,9 @@ package zernikalos.components.shader
 
 import kotlinx.cinterop.*
 import platform.posix.memcpy
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
-import kotlin.native.concurrent.freeze
 
 actual class ZUniformRenderer actual constructor() : ZComponentRender<ZUniformData> {
     actual override fun initialize(ctx: ZRenderingContext, data: ZUniformData) {
