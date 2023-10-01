@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     kotlin("multiplatform") apply true
@@ -19,7 +20,7 @@ repositories {
 }
 
 android {
-    namespace="com.zernikalos"
+    namespace="io.zernikalos"
     compileSdk=33
 
     defaultConfig {
@@ -47,7 +48,7 @@ kotlin {
         moduleName = "@zernikalos/zernikalos"
         compilations["main"].packageJson {
             customField("author", "Aarón Negrín")
-            customField("description","Zernikalos Game Engine for the browser")
+            customField("description", "Zernikalos Game Engine for the browser")
             customField("license", "MPL v2.0")
         }
         browser {
@@ -72,11 +73,34 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
-    macosArm64("native") {
+    val appleFrameworkBaseName = "Zernikalos"
+
+    val xcf = XCFramework(appleFrameworkBaseName)
+
+    macosArm64() {
         binaries.framework {
             isStatic = true
-            baseName="Zernikalos"
-            binaryOption("bundleId", "com.zernikalos")
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
+        }
+    }
+
+    ios() {
+        binaries.framework {
+            isStatic = true
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
+        }
+    }
+
+    iosSimulatorArm64() {
+        binaries.framework {
+            isStatic = true
+            baseName = appleFrameworkBaseName
+            binaryOption("bundleId", "io.zernikalos")
+            xcf.add(this)
         }
     }
 
@@ -94,12 +118,17 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.0")
             }
         }
 
         val oglMain by creating {
             kotlin.srcDir("src/oglMain/kotlin")
+            dependsOn(commonMain)
+        }
+
+        val metalMain by creating {
+            kotlin.srcDir("src/metalMain/kotlin")
             dependsOn(commonMain)
         }
 
@@ -109,12 +138,21 @@ kotlin {
         }
 
         val jsMain by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
             dependsOn(oglMain)
         }
 
-        val nativeMain by getting {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
+        val macosArm64Main by getting {
+            dependsOn(metalMain)
+            kotlin.srcDir("src/macosMain/kotlin")
+        }
+
+        val iosMain by getting {
+            dependsOn(metalMain)
+            kotlin.srcDir("src/iosMain/kotlin")
+        }
+
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
         }
 
     }

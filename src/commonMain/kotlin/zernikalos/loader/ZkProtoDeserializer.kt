@@ -31,15 +31,15 @@ object ZkProtoDeserializer: KSerializer<ZObject> {
     }
 
     private fun transformTree(decodedProtoObj: ProtoZkObject): ZObject {
-        val mrObject = getMrObject(decodedProtoObj)
+        val zObject = getZObject(decodedProtoObj)
         decodedProtoObj.children?.forEach { child ->
             val childObj = transformTree(child)
-            mrObject.addChild(childObj)
+            zObject.addChild(childObj)
         }
-        return mrObject
+        return zObject
     }
 
-    private fun getMrObject(decodedProtoObj: ProtoZkObject): ZObject {
+    private fun getZObject(decodedProtoObj: ProtoZkObject): ZObject {
         when (decodedProtoObj.type) {
             "Scene" -> return decodedProtoObj.scene!!
             "Group" -> return decodedProtoObj.group!!

@@ -4,6 +4,7 @@ import zernikalos.ZDataType
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 import zernikalos.ZSceneContext
+import zernikalos.ZTypes
 
 interface ZUniformGenerator<T> {
 
@@ -15,5 +16,5 @@ interface ZUniformGenerator<T> {
 
 interface ZUniformGeneratorMat4F: ZUniformGenerator<ZMatrix4> {
     override val type: ZDataType
-        get() = ZDataType.MAT4F
+        get() = ZTypes.MAT4F
 }

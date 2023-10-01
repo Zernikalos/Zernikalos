@@ -1,9 +1,6 @@
 package zernikalos.components.shader
 
-import zernikalos.GLWrap
-import zernikalos.ZDataType
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.*
 import zernikalos.components.ZComponentRender
 
 actual class ZUniformRenderer: ZComponentRender<ZUniformData> {
@@ -18,10 +15,10 @@ actual class ZUniformRenderer: ZComponentRender<ZUniformData> {
         uniformId = ctx.getUniformLocation(program.renderer.programId, data.uniformName)
     }
 
-    actual fun bindValue(ctx: ZRenderingContext, data: ZUniformData, values: FloatArray) {
+    actual fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, data: ZUniformData, values: FloatArray) {
         ctx as ZGLRenderingContext
         when (data.dataType) {
-            ZDataType.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, values)
+            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, values)
             else -> return
         }
     }

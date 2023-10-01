@@ -13,36 +13,34 @@ actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {
 
         vertexDescriptor = MTLVertexDescriptor()
 
-        data.buffers.forEach { (name, buffer) ->
-            if (buffer.id <= 1) {
-                buffer.initialize(ctx)
+        data.buffers.values.forEach { buffer ->
+            // Initialization is for all buffer types (indices and vertex data)
+            buffer.initialize(ctx)
+            if (!buffer.isIndexBuffer) {
+                // But only the vertex buffers will set the descriptors
                 vertexDescriptor.attributes.setObject(buffer.renderer.attributeDescriptor, buffer.id.toULong())
                 vertexDescriptor.layouts.setObject(buffer.renderer.layoutDescriptor, buffer.id.toULong())
-            }
-            if (buffer.isIndexBuffer) {
-                buffer.initialize(ctx)
             }
         }
 
     }
 
     override fun bind(ctx: ZRenderingContext, data: ZMeshData) {
-        val posBuffer = data.buffers["position"]
-        posBuffer?.bind(ctx)
-
-        val colBuffer = data.buffers["color"]
-        colBuffer?.bind(ctx)
+        data.buffers.values.forEach { buffer ->
+            if (!buffer.isIndexBuffer) {
+                buffer.bind(ctx)
+            }
+        }
     }
 
     actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {
         ctx as ZMtlRenderingContext
 
-        val key = data.indexBufferKey!!
         val indices = data.indexBuffer!!
 
         ctx.renderEncoder?.drawIndexedPrimitives(
             MTLPrimitiveTypeTriangle,
-            key.count.toULong(),
+            indices.count.toULong(),
             MTLIndexTypeUInt16,
             indices.renderer.buffer!!,
             0u

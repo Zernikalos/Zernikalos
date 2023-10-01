@@ -32,15 +32,17 @@ class ZModel: ZObject() {
         shaderProgram.bind(ctx)
         material?.bind(ctx)
 
-        shaderProgram.uniforms.forEach {
-            val uniformGenerator = sceneContext.getUniform(it.key)
+        shaderProgram.uniforms.forEach { (name, uniform) ->
+            val uniformGenerator = sceneContext.getUniform(name)
             if (uniformGenerator != null) {
                 val uniformValue: ZMatrix4 = uniformGenerator.compute(sceneContext, this)
-                it.value.bindValue(ctx, uniformValue.values)
+                uniform.bindValue(ctx, shaderProgram, uniformValue.values)
             }
         }
 
+        mesh.bind(ctx)
         mesh.render(ctx)
+        mesh.unbind(ctx)
 
         material?.unbind(ctx)
         shaderProgram.unbind(ctx)

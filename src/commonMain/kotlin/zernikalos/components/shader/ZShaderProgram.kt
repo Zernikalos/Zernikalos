@@ -1,29 +1,49 @@
 package zernikalos.components.shader
 
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZShaderProgramSerializer::class)
-class ZShaderProgram(): ZComponent<ZShaderProgramData, ZShaderProgramRenderer>(), ZBindeable {
+class ZShaderProgram internal constructor(data: ZShaderProgramData, renderer: ZShaderProgramRenderer): ZComponent<ZShaderProgramData, ZShaderProgramRenderer>(data, renderer), ZBindeable {
 
-    // TODO: Check if these should be a val or var better in order to set up values
-    val vertexShader: ZShader
+    @JsName("init")
+    constructor(): this(ZShaderProgramData(), ZShaderProgramRenderer())
+
+    var vertexShader: ZShader
         get() = data.vertexShader
+        set(value) {
+            data.vertexShader = value
+        }
 
-    val fragmentShader: ZShader
+    var fragmentShader: ZShader
         get() = data.fragmentShader
+        set(value) {
+            data.fragmentShader = value
+        }
 
-    val attributes: HashMap<String, ZAttribute>
+    val attributes: Map<String, ZAttribute>
         get() = data.attributes
 
     val uniforms: Map<String, ZUniform>
         get() = data.uniforms
+
+    fun addUniform(name: String, uniform: ZUniform) {
+        data.uniforms[name] = uniform
+    }
+
+    fun getUniform(name: String): ZUniform? {
+        return data.uniforms[name]
+    }
+
+    fun addAttribute(name: String, attribute: ZAttribute) {
+        data.attributes[name] = attribute
+    }
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
@@ -41,16 +61,14 @@ class ZShaderProgram(): ZComponent<ZShaderProgramData, ZShaderProgramRenderer>()
 
 @Serializable
 data class ZShaderProgramData(
-    @SerialName("vertexShader")
     @ProtoNumber(1)
-    var vertexShader: ZShader,
-    @SerialName("fragmentShader")
+    var vertexShader: ZShader = ZShader(),
     @ProtoNumber(2)
-    var fragmentShader: ZShader,
+    var fragmentShader: ZShader = ZShader(),
     @ProtoNumber(3)
-    val attributes: HashMap<String, ZAttribute> = HashMap(),
+    val attributes: LinkedHashMap<String, ZAttribute> = LinkedHashMap(),
     @ProtoNumber(4)
-    var uniforms: HashMap<String, ZUniform> = HashMap()
+    var uniforms: LinkedHashMap<String, ZUniform> = LinkedHashMap()
 ): ZComponentData()
 
 expect class ZShaderProgramRenderer(): ZComponentRender<ZShaderProgramData> {

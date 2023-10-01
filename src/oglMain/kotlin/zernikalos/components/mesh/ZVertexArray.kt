@@ -8,12 +8,9 @@ import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 
-class ZVertexArray: ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(), ZBindeable {
+class ZVertexArray internal constructor(data: ZVertexArrayData, renderer: ZVertexArrayRenderer): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data, renderer), ZBindeable {
 
-    init {
-        data = ZVertexArrayData()
-        renderer = ZVertexArrayRenderer()
-    }
+    constructor(): this(ZVertexArrayData(), ZVertexArrayRenderer())
 
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)

@@ -5,15 +5,30 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
+@JsExport
 @Serializable(with = ZAttributeSerializer::class)
-class ZAttribute: ZComponent<ZAttributeData, ZAttributeRenderer>() {
+class ZAttribute internal constructor(data: ZAttributeData, renderer: ZAttributeRenderer): ZComponent<ZAttributeData, ZAttributeRenderer>(data, renderer) {
 
-    val id: Int
+    @JsName("init")
+    constructor(): this(ZAttributeData(), ZAttributeRenderer())
+
+    @JsName("initWithArgs")
+    constructor(id: Int, attributeName: String): this(ZAttributeData(id, attributeName), ZAttributeRenderer())
+
+    var id: Int
         get() = data.id
+        set(value) {
+            data.id = value
+        }
 
-    val attributeName: String
+    var attributeName: String
         get() = data.attributeName
+        set(value) {
+            data.attributeName = value
+        }
 
     override fun initialize(ctx: ZRenderingContext) {
     }
@@ -26,9 +41,9 @@ class ZAttribute: ZComponent<ZAttributeData, ZAttributeRenderer>() {
 @Serializable
 data class ZAttributeData(
     @ProtoNumber(1)
-    val id: Int,
+    var id: Int = -1,
     @ProtoNumber(2)
-    val attributeName: String
+    var attributeName: String = ""
 ): ZComponentData()
 
 expect class ZAttributeRenderer(): ZComponentRender<ZAttributeData> {
@@ -47,7 +62,7 @@ class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData, ZAt
     }
 
     override fun createComponentInstance(data: ZAttributeData, renderer: ZAttributeRenderer): ZAttribute {
-        return ZAttribute()
+        return ZAttribute(data, renderer)
     }
 
 }

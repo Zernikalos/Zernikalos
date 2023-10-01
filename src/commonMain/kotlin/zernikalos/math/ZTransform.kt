@@ -11,7 +11,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZkTransformSerializer::class)
-class ZTransform {
+class ZTransform() {
 
     @Transient
     private val _matrix: ZMatrix4 = ZMatrix4.Identity
@@ -24,11 +24,9 @@ class ZTransform {
     private val _right: ZVector3 = ZVector3.Right
     private val _up: ZVector3 = ZVector3.Up
 
-    @JsName("defaultCtor")
-    constructor()
 
-    @JsName("argsCtor")
-    constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3) {
+    @JsName("initWithArgs")
+    constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
         _location.copy(location)
         _rotation.copy(rotation)
         _scale.copy(scale)

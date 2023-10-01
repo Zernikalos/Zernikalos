@@ -7,15 +7,15 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZVector4(var x: Float, var y: Float, var z: Float, var w: Float): ZAlgebraObject {
+class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: Float = 0f): ZAlgebraObject {
 
-    @JsName("zeroCtor")
+    @JsName("init")
     constructor() : this(0f, 0f, 0f, 0f)
 
-    @JsName("repeatCtor")
+    @JsName("initWithValue")
     constructor(v: Float): this(v, v, v, v)
 
-    @JsName("copyCtor")
+    @JsName("initWithVec3")
     constructor(v: ZVector3) : this(v.x, v.y, v.z, 1.0f)
 
     override val values: FloatArray
@@ -79,7 +79,7 @@ class ZVector4(var x: Float, var y: Float, var z: Float, var w: Float): ZAlgebra
         normalize(this, this)
     }
 
-    companion object {
+    companion object Op {
         fun add(result: ZVector4, op1: ZVector4, op2: ZVector4) {
             result.x = op1.x + op2.y
             result.y = op1.y + op2.y

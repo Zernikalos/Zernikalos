@@ -7,10 +7,30 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @Serializable(with = ZTextureSerializer::class)
 @JsExport
-class ZTexture: ZComponent<ZTextureData, ZTextureRenderer>(), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData, renderer: ZTextureRenderer): ZComponent<ZTextureData, ZTextureRenderer>(data, renderer), ZBindeable {
+
+    @JsName("init")
+    constructor(): this(ZTextureData(), ZTextureRenderer())
+
+    @JsName("initWithArgs")
+    constructor(id: String, dataArray: ByteArray): this(ZTextureData(id, dataArray), ZTextureRenderer())
+
+    var id: String
+        get() = data.id
+        set(value) {
+            data.id = value
+        }
+
+    var dataArray: ByteArray
+        get() = data.dataArray
+        set(value) {
+            data.dataArray = value
+        }
+
     override fun initialize(ctx: ZRenderingContext) {
         renderer.initialize(ctx, data)
     }
@@ -28,9 +48,9 @@ class ZTexture: ZComponent<ZTextureData, ZTextureRenderer>(), ZBindeable {
 @Serializable
 data class ZTextureData(
     @ProtoNumber(1)
-    val id: String,
+    var id: String = "",
     @ProtoNumber(2)
-    val dataArray: ByteArray,
+    var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData() {
 
     @Transient
@@ -51,7 +71,7 @@ class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData, ZTextureR
     }
 
     override fun createComponentInstance(data: ZTextureData, renderer: ZTextureRenderer): ZTexture {
-        return ZTexture()
+        return ZTexture(data, renderer)
     }
 
 }
