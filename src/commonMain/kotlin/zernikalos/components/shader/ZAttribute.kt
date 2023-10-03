@@ -10,31 +10,27 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZAttributeSerializer::class)
-class ZAttribute internal constructor(data: ZAttributeData, renderer: ZAttributeRenderer): ZComponent<ZAttributeData, ZAttributeRenderer>(data, renderer) {
+class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttributeData, ZAttributeRenderer>(data) {
 
     @JsName("init")
-    constructor(): this(ZAttributeData(), ZAttributeRenderer())
+    constructor(): this(ZAttributeData())
 
     @JsName("initWithArgs")
-    constructor(id: Int, attributeName: String): this(ZAttributeData(id, attributeName), ZAttributeRenderer())
+    constructor(id: Int, attributeName: String): this(ZAttributeData(id, attributeName))
 
-    var id: Int
-        get() = data.id
-        set(value) {
-            data.id = value
-        }
+    var id: Int by data::id
 
-    var attributeName: String
-        get() = data.attributeName
-        set(value) {
-            data.attributeName = value
-        }
+    var attributeName: String by data::attributeName
 
-    override fun initialize(ctx: ZRenderingContext) {
+    override fun internalInitialize(ctx: ZRenderingContext) {
     }
 
-    fun bindLocation(ctx: ZRenderingContext, program: ZProgram) {
-        renderer.bindLocation(ctx, data, program)
+    override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
+        return ZAttributeRenderer(ctx, data)
+    }
+
+    fun bindLocation(program: ZProgram) {
+        renderer.bindLocation(program)
     }
 }
 
@@ -46,10 +42,10 @@ data class ZAttributeData(
     var attributeName: String = ""
 ): ZComponentData()
 
-expect class ZAttributeRenderer(): ZComponentRender<ZAttributeData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZAttributeData)
+expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRender<ZAttributeData> {
+    override fun initialize()
 
-    fun bindLocation(ctx: ZRenderingContext, data: ZAttributeData, program: ZProgram)
+    fun bindLocation(program: ZProgram)
 
 }
 
@@ -57,12 +53,8 @@ class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData, ZAt
     override val deserializationStrategy: DeserializationStrategy<ZAttributeData>
         get() = ZAttributeData.serializer()
 
-    override fun createRendererComponent(): ZAttributeRenderer {
-        return ZAttributeRenderer()
-    }
-
-    override fun createComponentInstance(data: ZAttributeData, renderer: ZAttributeRenderer): ZAttribute {
-        return ZAttribute(data, renderer)
+    override fun createComponentInstance(data: ZAttributeData): ZAttribute {
+        return ZAttribute(data)
     }
 
 }

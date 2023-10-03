@@ -7,12 +7,12 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.toOglBaseType
 
-actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
+actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData>(ctx, data) {
 
     @Transient
     val vao: ZVertexArray = ZVertexArray()
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
+    actual override fun initialize() {
         vao.initialize(ctx)
 
         data.buffers.values.forEach { buff ->
@@ -20,10 +20,10 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
         }
     }
 
-    actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {
+    actual override fun render() {
         ctx as ZGLRenderingContext
 
-        vao.bind(ctx)
+        vao.bind()
         if (data.hasIndexBuffer) {
             // If we have the index buffer for sure this will not be null
             val indexBuffer = data.indexBuffer!!
@@ -35,7 +35,7 @@ actual class ZMeshRenderer: ZComponentRender<ZMeshData> {
             val count = data.buffers["position"]?.count!!
             ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
         }
-        vao.unbind(ctx)
+        vao.unbind()
     }
 
 }

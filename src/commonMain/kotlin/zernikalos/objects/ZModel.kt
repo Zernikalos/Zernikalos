@@ -29,22 +29,22 @@ class ZModel: ZObject() {
     }
 
     override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
-        shaderProgram.bind(ctx)
-        material?.bind(ctx)
+        shaderProgram.bind()
+        material?.bind()
 
         shaderProgram.uniforms.forEach { (name, uniform) ->
             val uniformGenerator = sceneContext.getUniform(name)
             if (uniformGenerator != null) {
                 val uniformValue: ZMatrix4 = uniformGenerator.compute(sceneContext, this)
-                uniform.bindValue(ctx, shaderProgram, uniformValue.values)
+                uniform.bindValue(shaderProgram, uniformValue.values)
             }
         }
 
-        mesh.bind(ctx)
-        mesh.render(ctx)
-        mesh.unbind(ctx)
+        mesh.bind()
+        mesh.render()
+        mesh.unbind()
 
-        material?.unbind(ctx)
-        shaderProgram.unbind(ctx)
+        material?.unbind()
+        shaderProgram.unbind()
     }
 }

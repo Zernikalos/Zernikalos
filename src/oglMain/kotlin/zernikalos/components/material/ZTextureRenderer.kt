@@ -5,11 +5,11 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZTextureRenderer actual constructor() : ZComponentRender<ZTextureData> {
+actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: ZTextureData) : ZComponentRender<ZTextureData>(ctx, data) {
 
     lateinit var textureHandler: GLWrap
 
-    override fun initialize(ctx: ZRenderingContext, data: ZTextureData) {
+    override fun initialize() {
         ctx as ZGLRenderingContext
 
         textureHandler = ctx.genTexture()
@@ -24,14 +24,14 @@ actual class ZTextureRenderer actual constructor() : ZComponentRender<ZTextureDa
         data.bitmap.dispose()
     }
 
-    override fun bind(ctx: ZRenderingContext, data: ZTextureData) {
+    override fun bind() {
         ctx as ZGLRenderingContext
 
         ctx.activeTexture()
         ctx.bindTexture(textureHandler)
     }
 
-    override fun unbind(ctx: ZRenderingContext, data: ZTextureData) {
+    override fun unbind() {
     }
 
 }

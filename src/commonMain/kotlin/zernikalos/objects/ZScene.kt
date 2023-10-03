@@ -18,6 +18,6 @@ class ZScene: ZObject() {
     }
 
     override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
-        viewport.render(ctx)
+        viewport.render()
     }
 }

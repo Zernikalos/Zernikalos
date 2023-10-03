@@ -11,28 +11,28 @@ import kotlin.js.JsName
 @Serializable(with = ZMaterialSerializer::class)
 @JsExport
 class ZMaterial
-internal constructor(data: ZMaterialData, renderer: ZMaterialRenderer):
-    ZComponent<ZMaterialData, ZMaterialRenderer>(data, renderer), ZBindeable {
+internal constructor(data: ZMaterialData):
+    ZComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
 
     @JsName("init")
-    constructor(): this(ZMaterialData(), ZMaterialRenderer())
+    constructor(): this(ZMaterialData())
 
-    var texture: ZTexture?
-        get() = data.texture
-        set(value) {
-            data.texture = value
-        }
+    var texture: ZTexture? by data::texture
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        renderer.bind(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
+        return ZMaterialRenderer(ctx, data)
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
-        renderer.unbind(ctx, data)
+    override fun bind() {
+        renderer.bind()
+    }
+
+    override fun unbind() {
+        renderer.unbind()
     }
 }
 
@@ -43,17 +43,17 @@ data class ZMaterialData(
     var texture: ZTexture? = null
 ): ZComponentData()
 
-class ZMaterialRenderer: ZComponentRender<ZMaterialData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZMaterialData) {
+class ZMaterialRenderer(ctx: ZRenderingContext, data: ZMaterialData): ZComponentRender<ZMaterialData>(ctx, data) {
+    override fun initialize() {
         data.texture?.initialize(ctx)
     }
 
-    override fun bind(ctx: ZRenderingContext, data: ZMaterialData) {
-        data.texture?.bind(ctx)
+    override fun bind() {
+        data.texture?.bind()
     }
 
-    override fun unbind(ctx: ZRenderingContext, data: ZMaterialData) {
-        data.texture?.unbind(ctx)
+    override fun unbind() {
+        data.texture?.unbind()
     }
 
 }
@@ -62,12 +62,8 @@ class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData, ZMater
     override val deserializationStrategy: DeserializationStrategy<ZMaterialData>
         get() = ZMaterialData.serializer()
 
-    override fun createRendererComponent(): ZMaterialRenderer {
-        return ZMaterialRenderer()
-    }
-
-    override fun createComponentInstance(data: ZMaterialData, renderer: ZMaterialRenderer): ZMaterial {
-        return ZMaterial(data, renderer)
+    override fun createComponentInstance(data: ZMaterialData): ZMaterial {
+        return ZMaterial(data)
     }
 
 }

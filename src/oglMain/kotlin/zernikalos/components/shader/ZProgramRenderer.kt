@@ -5,11 +5,11 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZProgramRenderer: ZComponentRender<ZProgramData> {
+actual class ZProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData>(ctx, data) {
 
     lateinit var programId: GLWrap
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZProgramData) {
+    actual override fun initialize() {
         ctx as ZGLRenderingContext
 
         val p = ctx.createProgram()
@@ -21,13 +21,13 @@ actual class ZProgramRenderer: ZComponentRender<ZProgramData> {
         programId = p
     }
 
-    actual override fun bind(ctx: ZRenderingContext, data: ZProgramData) {
+    actual override fun bind() {
         ctx as ZGLRenderingContext
 
         ctx.useProgram(programId)
     }
 
-    actual fun link(ctx: ZRenderingContext) {
+    actual fun link() {
         ctx as ZGLRenderingContext
 
         ctx.linkProgram(programId)

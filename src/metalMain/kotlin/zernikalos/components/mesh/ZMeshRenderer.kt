@@ -5,11 +5,11 @@ import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {
+actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData) : ZComponentRender<ZMeshData>(ctx, data) {
 
     lateinit var vertexDescriptor: MTLVertexDescriptor
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZMeshData) {
+    actual override fun initialize() {
 
         vertexDescriptor = MTLVertexDescriptor()
 
@@ -25,15 +25,15 @@ actual class ZMeshRenderer actual constructor() : ZComponentRender<ZMeshData> {
 
     }
 
-    override fun bind(ctx: ZRenderingContext, data: ZMeshData) {
+    override fun bind() {
         data.buffers.values.forEach { buffer ->
             if (!buffer.isIndexBuffer) {
-                buffer.bind(ctx)
+                buffer.bind()
             }
         }
     }
 
-    actual override fun render(ctx: ZRenderingContext, data: ZMeshData) {
+    actual override fun render() {
         ctx as ZMtlRenderingContext
 
         val indices = data.indexBuffer!!

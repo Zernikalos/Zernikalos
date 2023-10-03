@@ -28,84 +28,44 @@ class ZBufferKey internal constructor(data: ZBufferKeyData): ZBaseComponent<ZBuf
      * ID for this BufferKey.
      * Might differ from BufferId
      */
-    var id: Int
-        get() = data.id
-        set(value) {
-            data.id = value
-        }
+    var id: Int by data::id
 
     /**
      * Type of data stored
      *
      */
-    var dataType: ZDataType
-        get() = data.dataType
-        set(value) {
-            data.dataType = value
-        }
+    var dataType: ZDataType by data::dataType
 
-    var name: String
-        get() = data.name
-        set(value) {
-            data.name = value
-        }
+    var name: String by data::name
 
     /**
      * How many elements are stored per data unit.
      * Example: a Vec3 will have size equals to 3 in the same way a Scalar will be 1
      */
-    var size: Int
-        get() = data.size
-        set(value) {
-            data.size = value
-        }
+    var size: Int by data::size
 
     /**
      * How many elements of this type are stored.
      * Example: If we store 15 Vec3 elements in the data array the count will have a value of 15.
      */
-    var count: Int
-        get() = data.count
-        set(value) {
-            data.count = value
-        }
+    var count: Int by data::count
 
-    var normalized: Boolean
-        get() = data.normalized
-        set(value) {
-            data.normalized = value
-        }
+    var normalized: Boolean by data::normalized
 
-    var offset: Int
-        get() = data.offset
-        set(value) {
-            data.offset = value
-        }
+    var offset: Int by data::offset
 
     /**
      * If the data is tightly represented within the array how many elements it requires to be jumped to the next one
      * Example: We store a Vec3 postion and a Vec3 normal in the very same array, the stride will be 6
      */
-    var stride: Int
-        get() = data.stride
-        set(value) {
-            data.stride = value
-        }
+    var stride: Int by data::stride
 
-    var isIndexBuffer: Boolean
-        get() = data.isIndexBuffer
-        set(value) {
-            data.isIndexBuffer = value
-        }
+    var isIndexBuffer: Boolean by data::isIndexBuffer
 
     /**
      * Refers to the RawBuffer Id @see ZRawBuffer
      */
-    var bufferId: Int
-        get() = data.bufferId
-        set(value) {
-            data.bufferId = value
-        }
+    var bufferId: Int by data::bufferId
 
 }
 

@@ -6,11 +6,11 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZShaderRenderer: ZComponentRender<ZShaderData> {
+actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderData): ZComponentRender<ZShaderData>(ctx, data) {
 
     var shader: GLWrap = GLWrap()
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZShaderData) {
+    actual override fun initialize() {
         val type = if (data.type == "vertex") ShaderType.VERTEX_SHADER else ShaderType.FRAGMENT_SHADER
         val shad = createShader(ctx, type)
         // TODO: Take care with the cast since this breaks js
@@ -44,7 +44,7 @@ actual class ZShaderRenderer: ZComponentRender<ZShaderData> {
         val compilerError = ctx.getError()
         if (compilerStatus != "" || compilerError > 0) {
             ctx.deleteShader(shader)
-            throw Error("Error compiling shader $compilerError : $compilerStatus")
+            throw Error("Error compiling ${data.type} shader $compilerError : $compilerStatus")
         }
     }
 

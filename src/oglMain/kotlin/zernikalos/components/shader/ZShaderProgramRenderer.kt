@@ -4,40 +4,40 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZShaderProgramRenderer: ZComponentRender<ZShaderProgramData> {
+actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData>(ctx, data) {
 
     actual val program: ZProgram = ZProgram()
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZShaderProgramData) {
+    actual override fun initialize() {
         program.initialize(ctx)
 
         data.vertexShader.initialize(ctx)
-        attachShader(ctx, program, data.vertexShader)
+        attachShader(data.vertexShader)
 
         data.fragmentShader.initialize(ctx)
-        attachShader(ctx, program, data.fragmentShader)
+        attachShader(data.fragmentShader)
 
         data.attributes.values.forEach { attr ->
             attr.initialize(ctx)
-            attr.bindLocation(ctx, program)
+            attr.bindLocation(program)
         }
 
-        program.link(ctx)
+        program.link()
         data.uniforms.values.forEach { uniform ->
             uniform.initialize(ctx)
-            uniform.bindLocation(ctx, program)
+            uniform.bindLocation(program)
         }
     }
 
-    actual override fun bind(ctx: ZRenderingContext, data: ZShaderProgramData) {
-        program.bind(ctx)
+    actual override fun bind() {
+        program.bind()
     }
 
-    actual override fun unbind(ctx: ZRenderingContext, data: ZShaderProgramData) {
-        program.unbind(ctx)
+    actual override fun unbind() {
+        program.unbind()
     }
 
-    private fun attachShader(ctx: ZRenderingContext, program: ZProgram, shader: ZShader) {
+    private fun attachShader(shader: ZShader) {
         ctx as ZGLRenderingContext
 
         ctx.attachShader(program.renderer.programId, shader.renderer.shader)
