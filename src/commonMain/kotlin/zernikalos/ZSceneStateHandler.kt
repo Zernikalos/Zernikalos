@@ -1,5 +1,7 @@
 package zernikalos
 
+import zernikalos.context.ZRenderingContext
+import zernikalos.context.ZSceneContext
 import kotlin.js.JsExport
 
 @JsExport

@@ -1,4 +1,4 @@
-package zernikalos
+package zernikalos.context
 
 import platform.Metal.*
 import zernikalos.ui.ZSurfaceView

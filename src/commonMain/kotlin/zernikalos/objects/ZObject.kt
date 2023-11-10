@@ -4,8 +4,8 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZSceneContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
 import kotlin.js.JsExport

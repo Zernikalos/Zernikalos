@@ -1,10 +1,10 @@
 package zernikalos.components.shader
 
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 
-actual class ZShaderRenderer actual constructor() : ZComponentRender<ZShaderData> {
-    actual override fun initialize(ctx: ZRenderingContext, data: ZShaderData) {
+actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderData) : ZComponentRender<ZShaderData>(ctx, data) {
+    actual override fun initialize() {
     }
 
 }

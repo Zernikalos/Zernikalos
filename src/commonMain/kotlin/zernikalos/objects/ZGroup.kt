@@ -2,8 +2,8 @@ package zernikalos.objects
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import zernikalos.ZSceneContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 
 @JsExport

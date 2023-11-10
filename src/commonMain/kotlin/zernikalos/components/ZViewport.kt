@@ -2,8 +2,8 @@ package zernikalos.components
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import zernikalos.BufferBit
-import zernikalos.ZRenderingContext
+import zernikalos.context.BufferBit
+import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZVector4
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -11,20 +11,24 @@ import kotlin.js.JsName
 @JsExport
 @Serializable(with = ZViewportSerializer::class)
 class ZViewport
-internal constructor(data: ZViewportData, renderer: ZViewportRenderer):
-    ZComponent<ZViewportData, ZViewportRenderer>(data, renderer),
+internal constructor(data: ZViewportData):
+    ZComponent<ZViewportData, ZViewportRenderer>(data),
     ZRenderizable {
 
     @JsName("init")
-    constructor(): this(ZViewportData(), ZViewportRenderer())
+    constructor(): this(ZViewportData())
 
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
     }
 
-    override fun render(ctx: ZRenderingContext) {
-        renderer.render(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZViewportRenderer {
+        return ZViewportRenderer(ctx, data)
+    }
+
+    override fun render() {
+        renderer.render()
     }
 
 }
@@ -36,10 +40,10 @@ data class ZViewportData(
     val clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 ): ZComponentData()
 
-expect class ZViewportRenderer(): ZComponentRender<ZViewportData> {
-    override fun initialize(ctx: ZRenderingContext, data: ZViewportData)
+expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {
+    override fun initialize()
 
-    override fun render(ctx: ZRenderingContext, data: ZViewportData)
+    override fun render()
 
 }
 
@@ -47,12 +51,8 @@ class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData, ZViewp
     override val deserializationStrategy: DeserializationStrategy<ZViewportData>
         get() = ZViewportData.serializer()
 
-    override fun createRendererComponent(): ZViewportRenderer {
-        return ZViewportRenderer()
-    }
-
-    override fun createComponentInstance(data: ZViewportData, renderer: ZViewportRenderer): ZViewport {
-        return ZViewport(data, renderer)
+    override fun createComponentInstance(data: ZViewportData): ZViewport {
+        return ZViewport(data)
     }
 
 }

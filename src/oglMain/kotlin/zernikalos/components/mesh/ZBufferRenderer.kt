@@ -1,10 +1,11 @@
 package zernikalos.components.mesh
 
-import zernikalos.*
 import zernikalos.components.ZComponentRender
+import zernikalos.context.*
+import zernikalos.toOglBaseType
 import kotlin.jvm.Transient
 
-actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData> {
+actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
 
     @Transient
     lateinit var buffer: GLWrap
@@ -14,19 +15,19 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
     }
 
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun initialize() {
         initializeBuffer(ctx, data)
         initializeBufferKey(ctx, data.key)
     }
 
-    actual override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun bind() {
         ctx as ZGLRenderingContext
 
         val bufferTargetType = getBufferTargetType(data)
         ctx.bindBuffer(bufferTargetType, buffer)
     }
 
-    actual override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun unbind() {
     }
 
     private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferKey) {

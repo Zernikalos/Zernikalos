@@ -1,39 +1,43 @@
 package zernikalos.components.shader
 
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsName
 
-class ZProgram internal constructor(data: ZProgramData, renderer: ZProgramRenderer): ZComponent<ZProgramData, ZProgramRenderer>(data, renderer), ZBindeable {
+class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData, ZProgramRenderer>(data), ZBindeable {
 
     @JsName("init")
-    constructor(): this(ZProgramData(), ZProgramRenderer())
+    constructor(): this(ZProgramData())
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        renderer.bind(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
+        return ZProgramRenderer(ctx, data)
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
+    override fun bind() {
+        renderer.bind()
     }
 
-    fun link(ctx: ZRenderingContext) {
-        renderer.link(ctx)
+    override fun unbind() {
+    }
+
+    fun link() {
+        renderer.link()
     }
 
 }
 
 class ZProgramData(): ZComponentData()
 
-expect class ZProgramRenderer(): ZComponentRender<ZProgramData> {
+expect class ZProgramRenderer(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData> {
 
-    override fun initialize(ctx: ZRenderingContext, data: ZProgramData)
+    override fun initialize()
 
-    override fun bind(ctx: ZRenderingContext, data: ZProgramData)
+    override fun bind()
 
-    fun link(ctx: ZRenderingContext)
+    fun link()
 
 }

@@ -1,4 +1,4 @@
-package zernikalos
+package zernikalos.context
 
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport

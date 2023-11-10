@@ -4,43 +4,39 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @Serializable(with = ZTextureSerializer::class)
 @JsExport
-class ZTexture internal constructor(data: ZTextureData, renderer: ZTextureRenderer): ZComponent<ZTextureData, ZTextureRenderer>(data, renderer), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData): ZComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
-    constructor(): this(ZTextureData(), ZTextureRenderer())
+    constructor(): this(ZTextureData())
 
     @JsName("initWithArgs")
-    constructor(id: String, dataArray: ByteArray): this(ZTextureData(id, dataArray), ZTextureRenderer())
+    constructor(id: String, dataArray: ByteArray): this(ZTextureData(id, dataArray))
 
-    var id: String
-        get() = data.id
-        set(value) {
-            data.id = value
-        }
+    var id: String by data::id
 
-    var dataArray: ByteArray
-        get() = data.dataArray
-        set(value) {
-            data.dataArray = value
-        }
+    var dataArray: ByteArray by data::dataArray
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        renderer.bind(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
+        return ZTextureRenderer(ctx, data)
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
-        renderer.unbind(ctx, data)
+    override fun bind() {
+        renderer.bind()
+    }
+
+    override fun unbind() {
+        renderer.unbind()
     }
 }
 
@@ -58,7 +54,7 @@ data class ZTextureData(
 
 }
 
-expect class ZTextureRenderer(): ZComponentRender<ZTextureData> {
+expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
 
 }
 
@@ -66,12 +62,8 @@ class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData, ZTextureR
 
     override val deserializationStrategy: DeserializationStrategy<ZTextureData> = ZTextureData.serializer()
 
-    override fun createRendererComponent(): ZTextureRenderer {
-        return ZTextureRenderer()
-    }
-
-    override fun createComponentInstance(data: ZTextureData, renderer: ZTextureRenderer): ZTexture {
-        return ZTexture(data, renderer)
+    override fun createComponentInstance(data: ZTextureData): ZTexture {
+        return ZTexture(data)
     }
 
 }

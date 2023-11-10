@@ -3,7 +3,7 @@ package zernikalos.components.shader
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -11,29 +11,24 @@ import kotlin.js.JsName
 @JsExport
 @Serializable(with = ZShaderSerializer::class)
 class ZShader
-internal constructor (data: ZShaderData, renderer: ZShaderRenderer): ZComponent<ZShaderData, ZShaderRenderer>(data, renderer) {
+internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRenderer>(data) {
 
     @JsName("init")
-    constructor(): this(ZShaderData(), ZShaderRenderer())
+    constructor(): this(ZShaderData())
 
     @JsName("initWithArgs")
-    constructor(type: String, source: String): this(ZShaderData(type, source), ZShaderRenderer())
+    constructor(type: String, source: String): this(ZShaderData(type, source))
 
+    var type: String by data::type
 
-    var type: String
-        get() = data.type
-        set(value) {
-            data.type = value
-        }
+    var source: String by data::source
 
-    var source: String
-        get() = data.source
-        set(value) {
-            data.source = value
-        }
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
+    }
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZShaderRenderer {
+        return ZShaderRenderer(ctx, data)
     }
 
 }
@@ -46,9 +41,9 @@ data class ZShaderData(
     var source: String = ""
 ): ZComponentData()
 
-expect class ZShaderRenderer(): ZComponentRender<ZShaderData> {
+expect class ZShaderRenderer(ctx: ZRenderingContext, data: ZShaderData): ZComponentRender<ZShaderData> {
 
-    override fun initialize(ctx: ZRenderingContext, data: ZShaderData)
+    override fun initialize()
 
 }
 
@@ -56,12 +51,8 @@ class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData, ZShaderRende
     override val deserializationStrategy: DeserializationStrategy<ZShaderData>
         get() = ZShaderData.serializer()
 
-    override fun createRendererComponent(): ZShaderRenderer {
-        return ZShaderRenderer()
-    }
-
-    override fun createComponentInstance(data: ZShaderData, renderer: ZShaderRenderer): ZShader {
-        return ZShader(data, renderer)
+    override fun createComponentInstance(data: ZShaderData): ZShader {
+        return ZShader(data)
     }
 
 }

@@ -4,7 +4,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -15,38 +15,39 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData, renderer: ZMeshRenderer): ZComponent<ZMeshData, ZMeshRenderer>(data, renderer), ZBindeable, ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
 
     @JsName("init")
-    constructor(): this(ZMeshData(), ZMeshRenderer())
+    constructor(): this(ZMeshData())
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
      */
-    val buffers: Map<String, ZBuffer>
-        get() = data.buffers
+    val buffers: Map<String, ZBuffer> by data::buffers
 
-    val indexBuffer: ZBuffer?
-        get() = data.indexBuffer
+    val indexBuffer: ZBuffer? by data::indexBuffer
 
-    val hasIndexBuffer: Boolean
-        get() = data.hasIndexBuffer
+    val hasIndexBuffer: Boolean by data::hasIndexBuffer
 
-    override fun initialize(ctx: ZRenderingContext) {
+    override fun internalInitialize(ctx: ZRenderingContext) {
         buildBuffers()
-        renderer.initialize(ctx, data)
+        renderer.initialize()
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        renderer.bind(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {
+        return ZMeshRenderer(ctx, data)
     }
 
-    override fun render(ctx: ZRenderingContext) {
-        renderer.render(ctx, data)
+    override fun bind() {
+        renderer.bind()
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
-        renderer.unbind(ctx, data)
+    override fun render() {
+        renderer.render()
+    }
+
+    override fun unbind() {
+        renderer.unbind()
     }
 
     fun addBufferKey(bufferKey: ZBufferKey) {
@@ -115,11 +116,11 @@ class ZMeshData(
     }
 }
 
-expect class ZMeshRenderer(): ZComponentRender<ZMeshData> {
+expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData> {
 
-    override fun initialize(ctx: ZRenderingContext, data: ZMeshData)
+    override fun initialize()
 
-    override fun render(ctx: ZRenderingContext, data: ZMeshData)
+    override fun render()
 
 }
 
@@ -127,12 +128,8 @@ class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData, ZMeshRenderer>() {
     override val deserializationStrategy: DeserializationStrategy<ZMeshData>
         get() = ZMeshData.serializer()
 
-    override fun createRendererComponent(): ZMeshRenderer {
-        return ZMeshRenderer()
-    }
-
-    override fun createComponentInstance(data: ZMeshData, renderer: ZMeshRenderer): ZMesh {
-        return ZMesh(data, renderer)
+    override fun createComponentInstance(data: ZMeshData): ZMesh {
+        return ZMesh(data)
     }
 
 }

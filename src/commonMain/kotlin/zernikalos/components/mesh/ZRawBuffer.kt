@@ -20,20 +20,11 @@ open class ZRawBuffer internal constructor(data: ZRawBufferData): ZBaseComponent
     @JsName("initWithArgs")
     constructor(id: Int, dataArray: ByteArray): this(ZRawBufferData(id, dataArray))
 
-    var id: Int
-        get() = data.id
-        set(value) {
-            data.id = value
-        }
+    var id: Int by data::id
 
-    var dataArray: ByteArray
-        get() = data.dataArray
-        set(value) {
-            data.dataArray = value
-        }
+    var dataArray: ByteArray by data::dataArray
 
-    val hasData: Boolean
-        get() = data.hasData
+    val hasData: Boolean by data::hasData
 
 }
 

@@ -4,7 +4,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.*
 import kotlin.js.JsExport
@@ -13,44 +13,32 @@ import kotlin.js.JsName
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
-class ZUniform internal constructor(data: ZUniformData, renderer: ZUniformRenderer): ZComponent<ZUniformData, ZUniformRenderer>(data, renderer) {
+class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData, ZUniformRenderer>(data) {
 
     @JsName("init")
-    constructor(): this(ZUniformData(), ZUniformRenderer())
+    constructor(): this(ZUniformData())
 
-    var uniformName: String
-        get() = data.uniformName
-        set(value) {
-            data.uniformName = value
-        }
+    var uniformName: String by data::uniformName
 
-    var count: Int
-        get() = data.count
-        set(value) {
-            data.count = value
-        }
+    var count: Int by data::count
 
-    var dataType: ZDataType
-        get() = data.dataType
-        set(value) {
-            data.dataType = value
-        }
+    var dataType: ZDataType by data::dataType
 
-    var idx: Int
-        get() = data.idx
-        set(value) {
-            data.idx = value
-        }
+    var idx: Int by data::idx
 
-    override fun initialize(ctx: ZRenderingContext) {
+    override fun internalInitialize(ctx: ZRenderingContext) {
     }
 
-    fun bindLocation(ctx: ZRenderingContext, program: ZProgram) {
-        renderer.bindLocation(ctx, data, program)
+    override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
+        return ZUniformRenderer(ctx, data)
     }
 
-    fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, values: FloatArray) {
-        renderer.bindValue(ctx, shaderProgram, data, values)
+    fun bindLocation(program: ZProgram) {
+        renderer.bindLocation(program)
+    }
+
+    fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {
+        renderer.bindValue(shaderProgram, values)
     }
 
     override fun toString(): String {
@@ -71,25 +59,21 @@ data class ZUniformData(
     var idx: Int = -1
 ): ZComponentData()
 
-expect class ZUniformRenderer(): ZComponentRender<ZUniformData> {
+expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
 
-    override fun initialize(ctx: ZRenderingContext, data: ZUniformData)
+    override fun initialize()
 
-    fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram)
+    fun bindLocation(program: ZProgram)
 
-    fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, data: ZUniformData, values: FloatArray)
+    fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray)
 }
 
 class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData, ZUniformRenderer>() {
     override val deserializationStrategy: DeserializationStrategy<ZUniformData>
         get() = ZUniformData.serializer()
 
-    override fun createRendererComponent(): ZUniformRenderer {
-        return ZUniformRenderer()
-    }
-
-    override fun createComponentInstance(data: ZUniformData, renderer: ZUniformRenderer): ZUniform {
-        return ZUniform()
+    override fun createComponentInstance(data: ZUniformData): ZUniform {
+        return ZUniform(data)
     }
 
 }

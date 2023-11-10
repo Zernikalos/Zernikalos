@@ -1,11 +1,10 @@
-package zernikalos
+package zernikalos.context
 
 import android.opengl.GLES30
 import android.opengl.GLUtils
 import zernikalos.components.material.ZBitmap
 import zernikalos.ui.ZSurfaceView
 import java.nio.ByteBuffer
-import javax.microedition.khronos.opengles.GL
 
 actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 

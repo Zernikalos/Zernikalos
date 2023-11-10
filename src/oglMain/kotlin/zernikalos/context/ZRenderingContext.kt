@@ -1,4 +1,4 @@
-package zernikalos
+package zernikalos.context
 
 import kotlinx.serialization.SerialName
 import zernikalos.components.material.ZBitmap

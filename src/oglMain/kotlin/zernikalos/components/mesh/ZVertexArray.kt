@@ -1,37 +1,41 @@
 package zernikalos.components.mesh
 
-import zernikalos.GLWrap
-import zernikalos.ZGLRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.GLWrap
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 
-class ZVertexArray internal constructor(data: ZVertexArrayData, renderer: ZVertexArrayRenderer): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data, renderer), ZBindeable {
+class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
 
-    constructor(): this(ZVertexArrayData(), ZVertexArrayRenderer())
+    constructor(): this(ZVertexArrayData())
 
-    override fun initialize(ctx: ZRenderingContext) {
-        renderer.initialize(ctx, data)
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
     }
 
-    override fun bind(ctx: ZRenderingContext) {
-        renderer.bind(ctx, data)
+    override fun createRenderer(ctx: ZRenderingContext): ZVertexArrayRenderer {
+        return ZVertexArrayRenderer(ctx, data)
     }
 
-    override fun unbind(ctx: ZRenderingContext) {
-        renderer.unbind(ctx, data)
+    override fun bind() {
+        renderer.bind()
+    }
+
+    override fun unbind() {
+        renderer.unbind()
     }
 
 }
 
 class ZVertexArrayData: ZComponentData()
-class ZVertexArrayRenderer: ZComponentRender<ZVertexArrayData> {
+class ZVertexArrayRenderer(ctx: ZRenderingContext, data: ZVertexArrayData): ZComponentRender<ZVertexArrayData>(ctx, data) {
 
     private lateinit var vao: GLWrap
 
-    override fun initialize(ctx: ZRenderingContext, data: ZVertexArrayData) {
+    override fun initialize() {
         ctx as ZGLRenderingContext
 
         val auxVao = ctx.createVertexArray()
@@ -40,13 +44,13 @@ class ZVertexArrayRenderer: ZComponentRender<ZVertexArrayData> {
         ctx.bindVertexArray(vao)
     }
 
-    override fun bind(ctx: ZRenderingContext, data: ZVertexArrayData) {
+    override fun bind() {
         ctx as ZGLRenderingContext
 
         ctx.bindVertexArray(vao)
     }
 
-    override fun unbind(ctx: ZRenderingContext, data: ZVertexArrayData) {
+    override fun unbind() {
     }
 
 }

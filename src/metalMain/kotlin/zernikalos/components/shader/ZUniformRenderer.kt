@@ -2,20 +2,19 @@ package zernikalos.components.shader
 
 import kotlinx.cinterop.*
 import platform.posix.memcpy
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
-import kotlin.native.concurrent.freeze
 
-actual class ZUniformRenderer actual constructor() : ZComponentRender<ZUniformData> {
-    actual override fun initialize(ctx: ZRenderingContext, data: ZUniformData) {
+actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData) : ZComponentRender<ZUniformData>(ctx, data) {
+    actual override fun initialize() {
     }
 
-    actual fun bindLocation(ctx: ZRenderingContext, data: ZUniformData, program: ZProgram) {
+    actual fun bindLocation(program: ZProgram) {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual fun bindValue(ctx: ZRenderingContext, shaderProgram: ZShaderProgram, data: ZUniformData, values: FloatArray) {
+    actual fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {
 //        data.buffer.dataArray.usePinned { pinned ->
 //            buffer = ctx.device.newBufferWithBytes(pinned.addressOf(0), data.buffer.dataArray.size.toULong(), 1u)
 //        }

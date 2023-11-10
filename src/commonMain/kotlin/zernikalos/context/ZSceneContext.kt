@@ -1,8 +1,7 @@
-package zernikalos
+package zernikalos.context
 
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
-import zernikalos.ui.ZSurfaceView
 import zernikalos.uniformgenerator.*
 import kotlin.js.JsExport
 

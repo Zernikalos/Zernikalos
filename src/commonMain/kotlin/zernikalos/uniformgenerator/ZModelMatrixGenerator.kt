@@ -1,6 +1,6 @@
 package zernikalos.uniformgenerator
 
-import zernikalos.ZSceneContext
+import zernikalos.context.ZSceneContext
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 import zernikalos.upToRoot

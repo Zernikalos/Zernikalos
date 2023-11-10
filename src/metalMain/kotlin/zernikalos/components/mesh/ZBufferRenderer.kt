@@ -5,18 +5,18 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Metal.*
 import zernikalos.ZDataType
-import zernikalos.ZMtlRenderingContext
-import zernikalos.ZRenderingContext
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
 
-actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData> {
+actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
 
     var buffer: MTLBufferProtocol? = null
     lateinit var attributeDescriptor: MTLVertexAttributeDescriptor
     lateinit var layoutDescriptor: MTLVertexBufferLayoutDescriptor
 
-    actual override fun initialize(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun initialize() {
         if (data.isIndexBuffer) {
             initialzeBuffer(ctx, data)
         } else {
@@ -25,12 +25,12 @@ actual class ZBufferRenderer actual constructor() : ZComponentRender<ZBufferData
         }
     }
 
-    actual override fun bind(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun bind() {
         ctx as ZMtlRenderingContext
         ctx.renderEncoder?.setVertexBuffer(buffer, 0u, data.key.id.toULong())
     }
 
-    actual override fun unbind(ctx: ZRenderingContext, data: ZBufferData) {
+    actual override fun unbind() {
     }
 
     @OptIn(ExperimentalForeignApi::class)
