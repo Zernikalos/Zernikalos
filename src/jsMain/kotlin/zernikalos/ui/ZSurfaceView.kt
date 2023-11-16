@@ -26,8 +26,7 @@ actual class ZSurfaceView(val canvas: HTMLCanvasElement) {
     }
 
     private fun renderLoop() {
-        eventHandler?.onRender()
-        window.setTimeout({renderLoop()}, 1000/60)
+        window.setInterval({eventHandler?.onRender()}, 1000/60)
     }
 
 }
