@@ -124,7 +124,7 @@ kotlin {
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
 
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.0")
@@ -133,20 +133,20 @@ kotlin {
 
         val oglMain by creating {
             kotlin.srcDir("src/oglMain/kotlin")
-            dependsOn(commonMain)
+            dependsOn(commonMain.get())
         }
 
         val metalMain by creating {
             kotlin.srcDir("src/metalMain/kotlin")
-            dependsOn(commonMain)
+            dependsOn(commonMain.get())
         }
 
-        val androidMain by getting {
+        androidMain {
             kotlin.srcDir("src/androidMain/kotlin")
             dependsOn(oglMain)
         }
 
-        val jsMain by getting {
+        jsMain {
             dependsOn(oglMain)
         }
 
