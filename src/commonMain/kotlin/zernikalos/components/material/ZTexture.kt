@@ -56,6 +56,10 @@ data class ZTextureData(
 
 expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
 
+    override fun initialize()
+
+    override fun render()
+
 }
 
 class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData, ZTextureRenderer>() {

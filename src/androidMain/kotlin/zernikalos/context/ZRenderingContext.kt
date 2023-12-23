@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
 
 actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 
-    override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
+    actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
     }
 
     actual fun enable(feat: Int) {

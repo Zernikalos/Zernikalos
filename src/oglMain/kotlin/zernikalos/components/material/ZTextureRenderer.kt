@@ -9,7 +9,7 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
 
     lateinit var textureHandler: GLWrap
 
-    override fun initialize() {
+    actual override fun initialize() {
         ctx as ZGLRenderingContext
 
         textureHandler = ctx.genTexture()

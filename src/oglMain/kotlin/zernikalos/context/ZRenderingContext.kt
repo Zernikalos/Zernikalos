@@ -8,6 +8,8 @@ import kotlin.js.JsExport
 
 expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
+    override fun initWithSurfaceView(surfaceView: ZSurfaceView)
+
     /** Commons **/
 
     fun enable(feat: Int)
