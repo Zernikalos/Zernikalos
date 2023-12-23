@@ -7,6 +7,7 @@ import zernikalos.context.ZSceneContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
+import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.shader.ZShaderProgram
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport

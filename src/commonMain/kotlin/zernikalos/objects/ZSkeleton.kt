@@ -2,7 +2,7 @@ package zernikalos.objects
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.bone.ZBone
+import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZSceneContext
 
