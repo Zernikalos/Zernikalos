@@ -21,8 +21,6 @@ class ZModel: ZObject() {
     lateinit var mesh: ZMesh
     @ProtoNumber(6)
     var material: ZMaterial? = null
-    @ProtoNumber(7)
-    var skeleton: ZSkeleton? = null
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)

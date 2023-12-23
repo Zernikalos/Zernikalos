@@ -47,3 +47,9 @@ val protoFormat = ProtoBuf {
 fun loadFromProtoString(hexString: String): ZObject {
     return protoFormat.decodeFromHexString(ZkProtoDeserializer, hexString)
 }
+
+@JsExport
+fun loadFromProto(byteArray: ByteArray): ZObject {
+    return protoFormat.decodeFromByteArray(ZkProtoDeserializer, byteArray)
+}
+
