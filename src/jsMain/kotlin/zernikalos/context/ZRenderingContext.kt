@@ -20,8 +20,7 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
 
     private lateinit var gl: WebGL2RenderingContext
 
-
-    override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
+    actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
         setContext(surfaceView.canvas)
     }
 

@@ -38,6 +38,15 @@ android {
 }
 
 kotlin {
+
+    targets.configureEach {
+        compilations.configureEach {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+
     androidTarget {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
@@ -54,7 +63,7 @@ kotlin {
         browser {
             binaries.executable()
             distribution {
-                directory = File("$projectDir/output/")
+                outputDirectory = File("$projectDir/output/")
             }
             commonWebpackConfig {
                 output?.libraryTarget = "umd"

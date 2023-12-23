@@ -21,11 +21,14 @@ class ZModel: ZObject() {
     lateinit var mesh: ZMesh
     @ProtoNumber(6)
     var material: ZMaterial? = null
+    @ProtoNumber(7)
+    var skeleton: ZSkeleton? = null
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
         mesh.initialize(ctx)
         material?.initialize(ctx)
+        //skeleton?.initialize(ctx)
     }
 
     override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
