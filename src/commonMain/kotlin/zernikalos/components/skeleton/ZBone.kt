@@ -2,6 +2,7 @@ package zernikalos.components.skeleton
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZBaseComponent
 import zernikalos.components.ZBaseComponentSerializer
@@ -21,13 +22,19 @@ class ZBone internal constructor(data: ZBoneData): ZBaseComponent<ZBoneData>(dat
 
     var name: String by data::name
 
+    var idx: Int by data::idx
+
     var transform: ZTransform by data::transform
+
+    val parent: ZBone?
+        get() = data._parent
 
     val children: Array<ZBone>
         get() = data.children.toTypedArray()
 
-    fun addChildren(bone: ZBone) {
+    fun addChild(bone: ZBone) {
         data.children.add(bone)
+        bone.data._parent = this
     }
 
 }
@@ -39,10 +46,17 @@ data class ZBoneData(
     @ProtoNumber(2)
     var name: String = "",
     @ProtoNumber(3)
+    var idx: Int = -1,
+    @ProtoNumber(4)
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)
     val children: ArrayList<ZBone> = arrayListOf()
-): ZComponentData()
+): ZComponentData() {
+
+    @Transient
+    internal var _parent: ZBone? = null
+
+}
 
 class ZBoneSerializer: ZBaseComponentSerializer<ZBone, ZBoneData>() {
     override val deserializationStrategy: DeserializationStrategy<ZBoneData>

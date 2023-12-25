@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
 
 plugins {
     kotlin("multiplatform") apply true
@@ -59,16 +60,18 @@ kotlin {
             customField("author", "Aarón Negrín")
             customField("description", "Zernikalos Game Engine for the browser")
             customField("license", "MPL v2.0")
+            customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
         }
         browser {
             binaries.executable()
+            @OptIn(ExperimentalDistributionDsl::class)
             distribution {
                 outputDirectory = File("$projectDir/output/")
             }
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
                 output?.library = "zernikalos"
-                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
+                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
             }
             generateTypeScriptDefinitions()
         }
