@@ -4,6 +4,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZTreeNode
 import zernikalos.components.ZBaseComponent
 import zernikalos.components.ZBaseComponentSerializer
 import zernikalos.components.ZComponentData
@@ -13,7 +14,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBoneSerializer::class)
-class ZBone internal constructor(data: ZBoneData): ZBaseComponent<ZBoneData>(data) {
+class ZBone internal constructor(data: ZBoneData): ZBaseComponent<ZBoneData>(data), ZTreeNode<ZBone> {
 
     @JsName("init")
     constructor(): this(ZBoneData())
@@ -26,10 +27,13 @@ class ZBone internal constructor(data: ZBoneData): ZBaseComponent<ZBoneData>(dat
 
     var transform: ZTransform by data::transform
 
-    val parent: ZBone?
+    override var parent: ZBone? = null
         get() = data._parent
 
-    val children: Array<ZBone>
+    override val hasParent: Boolean
+        get() = parent != null
+
+    override val children: Array<ZBone>
         get() = data.children.toTypedArray()
 
     fun addChild(bone: ZBone) {
