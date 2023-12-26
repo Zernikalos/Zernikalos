@@ -9,6 +9,7 @@ import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.shader.ZShaderProgram
+import zernikalos.components.skeleton.ZSkinning
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 
@@ -22,6 +23,10 @@ class ZModel: ZObject() {
     lateinit var mesh: ZMesh
     @ProtoNumber(6)
     var material: ZMaterial? = null
+    @ProtoNumber(7)
+    var skinning: ZSkinning? = null
+    @ProtoNumber(8)
+    var skeleton: ZSkeleton? = null
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
