@@ -32,6 +32,7 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator("ModelViewProjectionMatrix", ZModelViewProjectionMatrixGenerator())
         addUniformGenerator("ProjectionMatrix", ZProjectionMatrixGenerator())
         addUniformGenerator("ModelMatrix", ZModelMatrixGenerator())
+        addUniformGenerator("Bones", ZBoneMatrixGenerator())
     }
 }
 

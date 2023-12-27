@@ -72,7 +72,9 @@ enum class ZFormatType {
     MAT4,
 
     @ProtoNumber(8)
-    TEXTURE
+    TEXTURE,
+    @ProtoNumber(9)
+    QUATERNION
 }
 
 @JsExport
@@ -95,6 +97,7 @@ data class ZDataType(
                 ZFormatType.MAT3 -> 9
                 ZFormatType.MAT4 -> 16
                 ZFormatType.TEXTURE -> 0
+                ZFormatType.QUATERNION -> 4
             }
         }
 
@@ -124,4 +127,5 @@ object ZTypes {
     val MAT4F = ZDataType(ZBaseType.FLOAT, ZFormatType.MAT4)
 
     val TEXTURE = ZDataType(ZBaseType.TEXTURE, ZFormatType.TEXTURE)
+    val QUATERNIONF = ZDataType(ZBaseType.FLOAT, ZFormatType.QUATERNION)
 }

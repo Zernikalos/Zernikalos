@@ -1,6 +1,10 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import zernikalos.ZBaseType
+import zernikalos.ZDataType
+import zernikalos.ZFormatType
+import zernikalos.ZTypes
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
@@ -23,6 +27,9 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
 
     override val count: Int
         get() = 1
+
+    override val dataType: ZDataType
+        get() = ZTypes.QUATERNIONF
 
     val norm2: Float
         get() = sqrt(dot(this, this))
