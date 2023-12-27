@@ -5,16 +5,11 @@ import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 import zernikalos.context.ZSceneContext
 import zernikalos.ZTypes
+import kotlin.js.JsExport
 
-interface ZUniformGenerator<T> {
+@JsExport
+interface ZUniformGenerator {
 
-    val type: ZDataType
+    fun compute(sceneContext: ZSceneContext, obj: ZObject): ZUniformValue
 
-    fun compute(sceneContext: ZSceneContext, obj: ZObject): T
-
-}
-
-interface ZUniformGeneratorMat4F: ZUniformGenerator<ZMatrix4> {
-    override val type: ZDataType
-        get() = ZTypes.MAT4F
 }

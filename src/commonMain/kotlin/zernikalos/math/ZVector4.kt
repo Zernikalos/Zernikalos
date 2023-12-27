@@ -27,6 +27,9 @@ class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: F
     override val size: Int
         get() = 4
 
+    override val count: Int
+        get() = 1
+
     fun setValues(x: Float, y: Float, z: Float, w: Float) {
         this.x = x
         this.y = y

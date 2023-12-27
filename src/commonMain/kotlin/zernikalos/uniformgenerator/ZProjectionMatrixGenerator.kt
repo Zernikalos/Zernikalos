@@ -1,15 +1,16 @@
 package zernikalos.uniformgenerator
 
+import zernikalos.ZTypes
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 
-class ZProjectionMatrixGenerator: ZUniformGeneratorMat4F {
-    override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZMatrix4 {
+class ZProjectionMatrixGenerator: ZUniformGenerator {
+    override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZUniformValue {
         val activeCamera = sceneContext.activeCamera
         if (activeCamera != null) {
-            return activeCamera.projectionMatrix
+            return ZUniformValue(ZTypes.MAT4F, activeCamera.projectionMatrix)
         }
-        return ZMatrix4.Identity
+        return ZUniformValue(ZTypes.MAT4F, ZMatrix4.Identity)
     }
 }

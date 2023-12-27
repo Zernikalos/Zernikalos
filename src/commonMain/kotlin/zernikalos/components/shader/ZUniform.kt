@@ -7,6 +7,7 @@ import zernikalos.ZDataType
 import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.*
+import zernikalos.uniformgenerator.ZUniformValue
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -37,8 +38,14 @@ class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData
         renderer.bindLocation(program)
     }
 
-    fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {
+    fun bindValue4fv(shaderProgram: ZShaderProgram, values: FloatArray) {
         renderer.bindValue(shaderProgram, values)
+    }
+
+    fun bindValue(shaderProgram: ZShaderProgram, uniform: ZUniformValue) {
+        when (uniform.type) {
+            ZTypes.MAT4F -> bindValue4fv(shaderProgram, uniform.value.values)
+        }
     }
 
     override fun toString(): String {

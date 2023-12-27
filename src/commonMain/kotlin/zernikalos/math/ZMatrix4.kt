@@ -13,6 +13,9 @@ class ZMatrix4(): ZAlgebraObject {
 
     override val values: FloatArray
 
+    override val count: Int
+        get() = 1
+
     override val size: Int
         get() = values.size
 

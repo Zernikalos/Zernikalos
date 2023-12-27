@@ -21,6 +21,9 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
     override val size: Int
         get() = 4
 
+    override val count: Int
+        get() = 1
+
     val norm2: Float
         get() = sqrt(dot(this, this))
 

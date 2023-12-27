@@ -30,6 +30,9 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
     override val size: Int
         get() = 3
 
+    override val count: Int
+        get() = 1
+
     operator fun set(i: Int, value: Float) {
         when(i) {
             0 -> x = value
