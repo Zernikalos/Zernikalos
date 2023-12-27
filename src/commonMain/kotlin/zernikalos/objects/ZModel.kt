@@ -10,8 +10,6 @@ import zernikalos.components.mesh.ZMesh
 import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.shader.ZShaderProgram
 import zernikalos.components.skeleton.ZSkinning
-import zernikalos.math.ZMatrix4
-import zernikalos.uniformgenerator.ZUniformValue
 import kotlin.js.JsExport
 
 @JsExport
@@ -43,7 +41,7 @@ class ZModel: ZObject() {
         shaderProgram.uniforms.forEach { (name, uniform) ->
             val uniformGenerator = sceneContext.getUniform(name)
             if (uniformGenerator != null) {
-                val uniformValue: ZUniformValue = uniformGenerator.compute(sceneContext, this)
+                val uniformValue = uniformGenerator.compute(sceneContext, this)
                 uniform.bindValue(shaderProgram, uniformValue)
             }
         }
