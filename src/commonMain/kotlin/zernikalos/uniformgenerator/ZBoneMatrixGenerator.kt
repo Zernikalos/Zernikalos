@@ -16,7 +16,9 @@ class ZBoneMatrixGenerator: ZUniformGenerator {
         val skeleton = obj.skeleton!!
         val bones = skeleton.bones
 
-        val boneMatrices = bones.map {
+        val boneMatrices = bones.filter {
+            obj.skinning?.boneIndices?.contains(it.idx)!!
+        }.map {
             it.transform.matrix
         }
 
