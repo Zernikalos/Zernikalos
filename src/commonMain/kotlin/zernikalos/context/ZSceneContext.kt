@@ -34,6 +34,8 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator("ProjectionMatrix", ZProjectionMatrixGenerator())
         addUniformGenerator("ModelMatrix", ZModelMatrixGenerator())
         addUniformGenerator("Bones", ZBoneMatrixGenerator())
+        addUniformGenerator("BindMatrix", ZBindMatrixGenerator())
+        addUniformGenerator("InverseBindMatrix", ZInverseBindMatrixGenerator())
     }
 }
 

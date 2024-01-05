@@ -99,6 +99,12 @@ class ZMatrix4(): ZAlgebraObject {
         invert(this, this)
     }
 
+    fun inverted(): ZMatrix4 {
+        val m = ZMatrix4()
+        invert(m, this)
+        return m
+    }
+
     fun scale(s: ZVector3) {
         scale(this, s)
     }
