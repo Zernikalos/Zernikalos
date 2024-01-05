@@ -12,16 +12,16 @@ open class ZSceneContext {
 
     var activeCamera: ZCamera? = null
 
-    private val uniformsGeneratorMap = HashMap<String, ZUniformGeneratorMat4F>()
+    private val uniformsGeneratorMap = HashMap<String, ZUniformGenerator>()
 
-    fun getUniform(key: String): ZUniformGeneratorMat4F? {
+    fun getUniform(key: String): ZUniformGenerator? {
         if (uniformsGeneratorMap.containsKey(key)) {
             return uniformsGeneratorMap[key]
         }
         return null
     }
 
-    fun addUniformGenerator(key: String, generator: ZUniformGeneratorMat4F) {
+    fun addUniformGenerator(key: String, generator: ZUniformGenerator) {
         uniformsGeneratorMap[key] = generator
     }
 
@@ -32,6 +32,7 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator("ModelViewProjectionMatrix", ZModelViewProjectionMatrixGenerator())
         addUniformGenerator("ProjectionMatrix", ZProjectionMatrixGenerator())
         addUniformGenerator("ModelMatrix", ZModelMatrixGenerator())
+        addUniformGenerator("Bones", ZBoneMatrixGenerator())
     }
 }
 

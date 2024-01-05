@@ -1,6 +1,8 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import zernikalos.ZDataType
+import zernikalos.ZTypes
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
@@ -10,8 +12,13 @@ import kotlin.math.tan
 @JsExport
 @Serializable
 class ZMatrix4(): ZAlgebraObject {
+    override val dataType: ZDataType
+        get() = ZTypes.MAT4F
 
     override val values: FloatArray
+
+    override val count: Int
+        get() = 1
 
     override val size: Int
         get() = values.size

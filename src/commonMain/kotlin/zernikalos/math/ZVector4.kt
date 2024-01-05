@@ -1,6 +1,8 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import zernikalos.ZDataType
+import zernikalos.ZTypes
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.sqrt
@@ -26,6 +28,12 @@ class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: F
 
     override val size: Int
         get() = 4
+
+    override val count: Int
+        get() = 1
+
+    override val dataType: ZDataType
+        get() = ZTypes.VEC4F
 
     fun setValues(x: Float, y: Float, z: Float, w: Float) {
         this.x = x
