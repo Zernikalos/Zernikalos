@@ -75,7 +75,7 @@ expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComp
     fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray)
 }
 
-class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData, ZUniformRenderer>() {
+class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData>() {
     override val deserializationStrategy: DeserializationStrategy<ZUniformData>
         get() = ZUniformData.serializer()
 

@@ -49,7 +49,7 @@ expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): Z
 
 }
 
-class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData, ZAttributeRenderer>() {
+class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData>() {
     override val deserializationStrategy: DeserializationStrategy<ZAttributeData>
         get() = ZAttributeData.serializer()
 

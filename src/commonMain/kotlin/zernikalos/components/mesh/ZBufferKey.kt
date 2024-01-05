@@ -15,7 +15,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZBufferKeySerializer::class)
 @JsExport
-class ZBufferKey internal constructor(data: ZBufferKeyData): ZBaseComponent<ZBufferKeyData>(data) {
+class ZBufferKey internal constructor(data: ZBufferKeyData): ZComponent<ZBufferKeyData, ZComponentRender<ZBufferKeyData>>(data) {
 
     @JsName("init")
     constructor(): this(ZBufferKeyData())
@@ -94,7 +94,7 @@ data class ZBufferKeyData(
     var bufferId: Int = -1
 ): ZComponentData()
 
-class ZBufferKeySerializer: ZBaseComponentSerializer<ZBufferKey, ZBufferKeyData>() {
+class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData>() {
     override val deserializationStrategy: DeserializationStrategy<ZBufferKeyData>
         get() = ZBufferKeyData.serializer()
 

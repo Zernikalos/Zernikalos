@@ -62,7 +62,7 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 
 }
 
-class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData, ZTextureRenderer>() {
+class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData>() {
 
     override val deserializationStrategy: DeserializationStrategy<ZTextureData> = ZTextureData.serializer()
 

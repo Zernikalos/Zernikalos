@@ -7,31 +7,21 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 
-abstract class ZBaseComponent<D: ZComponentData> internal constructor(data: D) {
-
-    val data: D
-
-    init {
-        this.data = data
-    }
-
-}
-
-abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(data: D): ZBaseComponent<D>(data) {
+abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(val data: D) {
 
     private var initialized: Boolean = false
 
     val isInitialized: Boolean
         get() = initialized
 
-    private lateinit var _renderer: R
+    private var _renderer: R? = null
 
     val renderer: R
         get() {
-            if (!initialized) {
+            if (!initialized || _renderer == null) {
                 throw Error("The component has not been initialized prior to access the renderer")
             }
-            return _renderer
+            return _renderer!!
         }
 
     fun initialize(ctx: ZRenderingContext) {
@@ -41,9 +31,13 @@ abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal co
         internalInitialize(ctx)
     }
 
-    protected abstract fun internalInitialize(ctx: ZRenderingContext)
+    protected open fun internalInitialize(ctx: ZRenderingContext) {
 
-    protected abstract fun createRenderer(ctx: ZRenderingContext): R
+    }
+
+    protected open fun createRenderer(ctx: ZRenderingContext): R? {
+        return null
+    }
 
 }
 
@@ -62,31 +56,9 @@ abstract class ZComponentRender<D: ZComponentData>(val ctx: ZRenderingContext, v
     open fun render() {}
 }
 
-abstract class ZBaseComponentSerializer<
-    T: ZBaseComponent<D>,
-    D: ZComponentData>
-    : KSerializer<T> {
-
-    abstract val deserializationStrategy: DeserializationStrategy<D>
-
-    override val descriptor: SerialDescriptor
-        get() = deserializationStrategy.descriptor
-
-    protected abstract fun createComponentInstance(data: D): T
-
-    override fun deserialize(decoder: Decoder): T {
-        val data = decoder.decodeSerializableValue(deserializationStrategy)
-        return createComponentInstance(data)
-    }
-
-    override fun serialize(encoder: Encoder, value: T) {}
-
-}
-
 abstract class ZComponentSerializer<
-    T: ZComponent<D, R>,
-    D: ZComponentData,
-    R: ZComponentRender<D>>
+    T: ZComponent<D, *>,
+    D: ZComponentData>
     : KSerializer<T> {
 
     abstract val deserializationStrategy: DeserializationStrategy<D>

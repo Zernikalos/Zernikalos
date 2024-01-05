@@ -3,14 +3,12 @@ package zernikalos.components.skeleton
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZBaseComponent
-import zernikalos.components.ZBaseComponentSerializer
-import zernikalos.components.ZComponentData
+import zernikalos.components.*
 import kotlin.js.JsExport
 
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)
-class ZSkinning internal constructor(data: ZSkinningData): ZBaseComponent<ZSkinningData>(data) {
+class ZSkinning internal constructor(data: ZSkinningData): ZComponent<ZSkinningData, ZComponentRender<ZSkinningData>>(data) {
 
     val boneIndices: Array<Int> by data::boneIndices
 
@@ -22,7 +20,7 @@ data class ZSkinningData(
     var boneIndices: Array<Int> = emptyArray()
 ): ZComponentData()
 
-class ZSkinningSerializer: ZBaseComponentSerializer<ZSkinning, ZSkinningData>() {
+class ZSkinningSerializer: ZComponentSerializer<ZSkinning, ZSkinningData>() {
     override val deserializationStrategy: DeserializationStrategy<ZSkinningData>
         get() = ZSkinningData.serializer()
 

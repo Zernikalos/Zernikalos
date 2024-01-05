@@ -3,9 +3,7 @@ package zernikalos.components.skeleton
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZBaseComponent
-import zernikalos.components.ZBaseComponentSerializer
-import zernikalos.components.ZComponentData
+import zernikalos.components.*
 import zernikalos.math.ZTransform
 import zernikalos.utils.findInTree
 import zernikalos.utils.treeTraverse
@@ -14,7 +12,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZSkeletonSerializer::class)
-class ZSkeleton internal constructor(data: ZSkeletonData): ZBaseComponent<ZSkeletonData>(data) {
+class ZSkeleton internal constructor(data: ZSkeletonData): ZComponent<ZSkeletonData, ZComponentRender<ZSkeletonData>>(data) {
 
     @JsName("init")
     constructor(): this(ZSkeletonData())
@@ -38,7 +36,7 @@ data class ZSkeletonData(
     var root: ZBone = ZBone()
 ): ZComponentData()
 
-class ZSkeletonSerializer: ZBaseComponentSerializer<ZSkeleton, ZSkeletonData>() {
+class ZSkeletonSerializer: ZComponentSerializer<ZSkeleton, ZSkeletonData>() {
     override val deserializationStrategy: DeserializationStrategy<ZSkeletonData>
         get() = ZSkeletonData.serializer()
 

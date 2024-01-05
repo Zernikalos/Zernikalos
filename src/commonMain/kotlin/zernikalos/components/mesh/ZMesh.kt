@@ -124,7 +124,7 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
 
 }
 
-class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData, ZMeshRenderer>() {
+class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData>() {
     override val deserializationStrategy: DeserializationStrategy<ZMeshData>
         get() = ZMeshData.serializer()
 

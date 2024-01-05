@@ -12,7 +12,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZRawBufferSerializer::class)
 @JsExport
-class ZRawBuffer internal constructor(data: ZRawBufferData): ZBaseComponent<ZRawBufferData>(data) {
+class ZRawBuffer internal constructor(data: ZRawBufferData): ZComponent<ZRawBufferData, ZComponentRender<ZRawBufferData>>(data) {
 
     @JsName("init")
     constructor(): this(ZRawBufferData())
@@ -40,7 +40,7 @@ open class ZRawBufferData(
         get() = !dataArray.isEmpty()
 }
 
-class ZRawBufferSerializer: ZBaseComponentSerializer<ZRawBuffer, ZRawBufferData>() {
+class ZRawBufferSerializer: ZComponentSerializer<ZRawBuffer, ZRawBufferData>() {
     override val deserializationStrategy: DeserializationStrategy<ZRawBufferData>
         get() = ZRawBufferData.serializer()
 

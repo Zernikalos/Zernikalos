@@ -5,16 +5,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZTreeNode
-import zernikalos.components.ZBaseComponent
-import zernikalos.components.ZBaseComponentSerializer
-import zernikalos.components.ZComponentData
+import zernikalos.components.*
 import zernikalos.math.ZTransform
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBoneSerializer::class)
-class ZBone internal constructor(data: ZBoneData): ZBaseComponent<ZBoneData>(data), ZTreeNode<ZBone> {
+class ZBone internal constructor(data: ZBoneData): ZComponent<ZBoneData, ZComponentRender<ZBoneData>>(data), ZTreeNode<ZBone> {
 
     @JsName("init")
     constructor(): this(ZBoneData())
@@ -62,7 +60,7 @@ data class ZBoneData(
 
 }
 
-class ZBoneSerializer: ZBaseComponentSerializer<ZBone, ZBoneData>() {
+class ZBoneSerializer: ZComponentSerializer<ZBone, ZBoneData>() {
     override val deserializationStrategy: DeserializationStrategy<ZBoneData>
         get() = ZBoneData.serializer()
 
