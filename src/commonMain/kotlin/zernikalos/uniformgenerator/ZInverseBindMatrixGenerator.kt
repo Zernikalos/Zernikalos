@@ -5,12 +5,9 @@ import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 
-class ZProjectionMatrixGenerator: ZUniformGenerator {
+class ZInverseBindMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
-        val activeCamera = sceneContext.activeCamera
-        if (activeCamera != null) {
-            return activeCamera.projectionMatrix
-        }
-        return ZMatrix4.Identity
+        val bindMatrix = sceneContext.getUniform("BindMatrix")?.compute(sceneContext, obj) as ZMatrix4
+        return bindMatrix.inverted()
     }
 }

@@ -1,6 +1,8 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import zernikalos.ZDataType
+import zernikalos.ZTypes
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.abs
@@ -29,6 +31,12 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
 
     override val size: Int
         get() = 3
+
+    override val count: Int
+        get() = 1
+
+    override val dataType: ZDataType
+        get() = ZTypes.VEC3F
 
     operator fun set(i: Int, value: Float) {
         when(i) {

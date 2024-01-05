@@ -7,8 +7,9 @@ import zernikalos.context.ZSceneContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
+import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.shader.ZShaderProgram
-import zernikalos.math.ZMatrix4
+import zernikalos.components.skeleton.ZSkinning
 import kotlin.js.JsExport
 
 @JsExport
@@ -21,6 +22,10 @@ class ZModel: ZObject() {
     lateinit var mesh: ZMesh
     @ProtoNumber(6)
     var material: ZMaterial? = null
+    @ProtoNumber(7)
+    var skinning: ZSkinning? = null
+    @ProtoNumber(8)
+    var skeleton: ZSkeleton? = null
 
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
@@ -36,8 +41,8 @@ class ZModel: ZObject() {
         shaderProgram.uniforms.forEach { (name, uniform) ->
             val uniformGenerator = sceneContext.getUniform(name)
             if (uniformGenerator != null) {
-                val uniformValue: ZMatrix4 = uniformGenerator.compute(sceneContext, this)
-                uniform.bindValue(shaderProgram, uniformValue.values)
+                val uniformValue = uniformGenerator.compute(sceneContext, this)
+                uniform.bindValue(shaderProgram, uniformValue)
             }
         }
 
