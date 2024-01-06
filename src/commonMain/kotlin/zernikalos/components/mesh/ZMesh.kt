@@ -69,7 +69,7 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
 }
 
 @Serializable
-class ZMeshData(
+data class ZMeshData(
     @ProtoNumber(1)
     var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(2)

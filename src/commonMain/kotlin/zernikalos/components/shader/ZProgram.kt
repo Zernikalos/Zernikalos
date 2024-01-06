@@ -3,6 +3,7 @@ package zernikalos.components.shader
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
 import kotlin.js.JsName
+import kotlin.random.Random
 
 class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData, ZProgramRenderer>(data), ZBindeable {
 
@@ -30,7 +31,16 @@ class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData
 
 }
 
-class ZProgramData(): ZComponentData()
+class ZProgramData(): ZComponentData() {
+
+    override fun hashCode(): Int {
+        return Random.nextInt()
+    }
+
+    override fun toString(): String {
+        return ""
+    }
+}
 
 expect class ZProgramRenderer(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData> {
 

@@ -30,7 +30,7 @@ class ZRawBuffer internal constructor(data: ZRawBufferData): ZComponent<ZRawBuff
 
 @Serializable
 @JsExport
-open class ZRawBufferData(
+data class ZRawBufferData(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)

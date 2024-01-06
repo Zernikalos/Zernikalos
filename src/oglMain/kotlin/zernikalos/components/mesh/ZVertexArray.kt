@@ -7,6 +7,7 @@ import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
+import kotlin.random.Random
 
 class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
 
@@ -30,7 +31,16 @@ class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVer
 
 }
 
-class ZVertexArrayData: ZComponentData()
+class ZVertexArrayData: ZComponentData() {
+    override fun hashCode(): Int {
+        return Random.nextInt()
+    }
+
+    override fun toString(): String {
+        return ""
+    }
+
+}
 class ZVertexArrayRenderer(ctx: ZRenderingContext, data: ZVertexArrayData): ZComponentRender<ZVertexArrayData>(ctx, data) {
 
     private lateinit var vao: GLWrap
