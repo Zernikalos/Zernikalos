@@ -34,10 +34,6 @@ class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData
         return ZUniformRenderer(ctx, data)
     }
 
-    fun bindLocation(program: ZProgram) {
-        renderer.bindLocation(program)
-    }
-
     fun bindValue4fv(shaderProgram: ZShaderProgram, values: FloatArray) {
         renderer.bindValue(shaderProgram, values)
     }
@@ -69,8 +65,6 @@ data class ZUniformData(
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
 
     override fun initialize()
-
-    fun bindLocation(program: ZProgram)
 
     fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray)
 }

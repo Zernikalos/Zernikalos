@@ -3,10 +3,14 @@ package zernikalos.components.shader
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
+import zernikalos.context.GLWrap
 
 actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData>(ctx, data) {
 
-    actual val program: ZProgram = ZProgram()
+    val program: ZProgram = ZProgram()
+
+    val programId: GLWrap
+        get() = program.renderer.programId
 
     actual override fun initialize() {
         program.initialize(ctx)
@@ -19,13 +23,13 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
 
         data.attributes.values.forEach { attr ->
             attr.initialize(ctx)
-            attr.bindLocation(program)
+            attr.renderer.bindLocation(programId)
         }
 
         program.link()
         data.uniforms.values.forEach { uniform ->
             uniform.initialize(ctx)
-            uniform.bindLocation(program)
+            uniform.renderer.bindLocation(programId)
         }
     }
 

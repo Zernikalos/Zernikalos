@@ -10,9 +10,6 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
 
     var uniformBuffer: MTLBufferProtocol? = null
 
-    actual val program: ZProgram
-        get() = TODO("Not yet implemented")
-
     actual override fun initialize() {
         ctx as ZMtlRenderingContext
 

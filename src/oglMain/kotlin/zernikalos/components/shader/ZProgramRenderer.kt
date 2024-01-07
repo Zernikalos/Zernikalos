@@ -1,15 +1,57 @@
 package zernikalos.components.shader
 
+import zernikalos.components.ZBindeable
+import zernikalos.components.ZComponent
+import zernikalos.components.ZComponentData
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
+import kotlin.js.JsName
+import kotlin.random.Random
 
-actual class ZProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData>(ctx, data) {
+class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData, ZProgramRenderer>(data), ZBindeable {
+
+    @JsName("init")
+    constructor(): this(ZProgramData())
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        renderer.initialize()
+    }
+
+    override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
+        return ZProgramRenderer(ctx, data)
+    }
+
+    override fun bind() {
+        renderer.bind()
+    }
+
+    override fun unbind() {
+    }
+
+    fun link() {
+        renderer.link()
+    }
+
+}
+
+class ZProgramData(): ZComponentData() {
+
+    override fun hashCode(): Int {
+        return Random.nextInt()
+    }
+
+    override fun toString(): String {
+        return ""
+    }
+}
+
+class ZProgramRenderer(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData>(ctx, data) {
 
     lateinit var programId: GLWrap
 
-    actual override fun initialize() {
+    override fun initialize() {
         ctx as ZGLRenderingContext
 
         val p = ctx.createProgram()
@@ -21,13 +63,13 @@ actual class ZProgramRenderer actual constructor(ctx: ZRenderingContext, data: Z
         programId = p
     }
 
-    actual override fun bind() {
+    override fun bind() {
         ctx as ZGLRenderingContext
 
         ctx.useProgram(programId)
     }
 
-    actual fun link() {
+    fun link() {
         ctx as ZGLRenderingContext
 
         ctx.linkProgram(programId)

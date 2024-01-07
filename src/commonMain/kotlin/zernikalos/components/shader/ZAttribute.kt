@@ -28,10 +28,6 @@ class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttribu
     override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
         return ZAttributeRenderer(ctx, data)
     }
-
-    fun bindLocation(program: ZProgram) {
-        renderer.bindLocation(program)
-    }
 }
 
 @Serializable
@@ -44,8 +40,6 @@ data class ZAttributeData(
 
 expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRender<ZAttributeData> {
     override fun initialize()
-
-    fun bindLocation(program: ZProgram)
 
 }
 
