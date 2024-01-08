@@ -17,9 +17,13 @@ class ZTexture internal constructor(data: ZTextureData): ZComponent<ZTextureData
     constructor(): this(ZTextureData())
 
     @JsName("initWithArgs")
-    constructor(id: String, dataArray: ByteArray): this(ZTextureData(id, dataArray))
+    constructor(id: String, width: Int, height: Int, dataArray: ByteArray): this(ZTextureData(id, width, height, dataArray))
 
     var id: String by data::id
+
+    var width: Int by data::width
+
+    var height: Int by data::height
 
     var dataArray: ByteArray by data::dataArray
 
@@ -46,6 +50,10 @@ data class ZTextureData(
     @ProtoNumber(1)
     var id: String = "",
     @ProtoNumber(2)
+    var width: Int = 0,
+    @ProtoNumber(3)
+    var height: Int = 0,
+    @ProtoNumber(4)
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData() {
 
