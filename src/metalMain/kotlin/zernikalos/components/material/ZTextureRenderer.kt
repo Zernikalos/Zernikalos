@@ -19,7 +19,7 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
     actual override fun initialize() {
         ctx as ZMtlRenderingContext
 
-        val descriptor = createTextureDescriptor()
+        //val descriptor = createTextureDescriptor()
 
 //        texture = ctx.device.newTextureWithDescriptor(descriptor)
 //

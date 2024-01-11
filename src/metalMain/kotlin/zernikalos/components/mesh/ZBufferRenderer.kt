@@ -20,7 +20,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
         if (data.isIndexBuffer) {
             initialzeBuffer(ctx, data)
         } else {
-            initializeBufferKey(ctx, data)
+            initializeBufferKey(data)
             initialzeBuffer(ctx, data)
         }
     }
@@ -63,7 +63,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
         buffer?.label = data.key.name
     }
 
-    private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferData) {
+    private fun initializeBufferKey(data: ZBufferData) {
         attributeDescriptor = MTLVertexAttributeDescriptor()
         attributeDescriptor.offset = data.key.offset.toULong()
         attributeDescriptor.bufferIndex = data.key.id.toULong()
