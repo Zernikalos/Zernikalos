@@ -38,7 +38,7 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
         ctx as ZMtlRenderingContext
         val textureLoader = MTKTextureLoader(ctx.device)
 
-        var err: CPointer<ObjCObjectVar<NSError?>>? = null
+        val err: CPointer<ObjCObjectVar<NSError?>>? = null
 
         val options: Map<Any?, *> = mapOf(MTKTextureLoaderOptionTextureUsage to MTLTextureUsageShaderRead,
             MTKTextureLoaderOptionTextureStorageMode to MTLStorageModePrivate)
@@ -49,29 +49,29 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
         }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
-    private fun copyTextureData() {
-        val region = MTLRegionMake3D(0u,0u, 0u, data.width.toULong(), data.height.toULong(), 1u)
-        val bytesPerRow = 4 * data.width
-
-        data.dataArray.usePinned { pinned ->
-            texture?.replaceRegion(
-                region,
-                0u,
-                pinned.addressOf(0),
-                bytesPerRow.toULong()
-            )
-        }
-    }
-
-    private fun createTextureDescriptor(): MTLTextureDescriptor {
-        val textureDescriptor = MTLTextureDescriptor()
-
-        textureDescriptor.pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB
-
-        textureDescriptor.width = data.width.toULong()
-        textureDescriptor.height = data.height.toULong()
-        return textureDescriptor
-    }
+//    @OptIn(ExperimentalForeignApi::class)
+//    private fun copyTextureData() {
+//        val region = MTLRegionMake3D(0u,0u, 0u, data.width.toULong(), data.height.toULong(), 1u)
+//        val bytesPerRow = 4 * data.width
+//
+//        data.dataArray.usePinned { pinned ->
+//            texture?.replaceRegion(
+//                region,
+//                0u,
+//                pinned.addressOf(0),
+//                bytesPerRow.toULong()
+//            )
+//        }
+//    }
+//
+//    private fun createTextureDescriptor(): MTLTextureDescriptor {
+//        val textureDescriptor = MTLTextureDescriptor()
+//
+//        textureDescriptor.pixelFormat = MTLPixelFormatRGBA8Unorm_sRGB
+//
+//        textureDescriptor.width = data.width.toULong()
+//        textureDescriptor.height = data.height.toULong()
+//        return textureDescriptor
+//    }
 
 }

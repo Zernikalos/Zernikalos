@@ -39,7 +39,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
     private fun initializeShader() {
         ctx as ZMtlRenderingContext
 
-        var err: CPointer<ObjCObjectVar<NSError?>>? = null
+        val err: CPointer<ObjCObjectVar<NSError?>>? = null
 
         initializeAttributes()
 
