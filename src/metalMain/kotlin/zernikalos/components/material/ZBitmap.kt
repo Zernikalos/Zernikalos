@@ -1,8 +1,11 @@
 package zernikalos.components.material
 
 actual class ZBitmap {
+
+    val byteArray: ByteArray
+
     actual constructor(byteArray: ByteArray) {
-        TODO("Not yet implemented")
+        this.byteArray = byteArray
     }
 
     actual fun dispose() {
