@@ -58,7 +58,7 @@ class ZMaterialRenderer(ctx: ZRenderingContext, data: ZMaterialData): ZComponent
 
 }
 
-class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData, ZMaterialRenderer>() {
+class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData>() {
     override val deserializationStrategy: DeserializationStrategy<ZMaterialData>
         get() = ZMaterialData.serializer()
 

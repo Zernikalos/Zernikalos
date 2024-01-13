@@ -69,7 +69,7 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
 }
 
 @Serializable
-class ZMeshData(
+data class ZMeshData(
     @ProtoNumber(1)
     var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(2)
@@ -124,7 +124,7 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
 
 }
 
-class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData, ZMeshRenderer>() {
+class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData>() {
     override val deserializationStrategy: DeserializationStrategy<ZMeshData>
         get() = ZMeshData.serializer()
 

@@ -47,7 +47,7 @@ expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZCo
 
 }
 
-class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData, ZViewportRenderer>() {
+class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData>() {
     override val deserializationStrategy: DeserializationStrategy<ZViewportData>
         get() = ZViewportData.serializer()
 

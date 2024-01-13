@@ -7,7 +7,4 @@ actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, data:
     actual override fun initialize() {
     }
 
-    actual fun bindLocation(program: ZProgram) {
-    }
-
 }

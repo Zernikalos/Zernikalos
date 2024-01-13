@@ -47,7 +47,7 @@ expect class ZShaderRenderer(ctx: ZRenderingContext, data: ZShaderData): ZCompon
 
 }
 
-class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData, ZShaderRenderer>() {
+class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData>() {
     override val deserializationStrategy: DeserializationStrategy<ZShaderData>
         get() = ZShaderData.serializer()
 

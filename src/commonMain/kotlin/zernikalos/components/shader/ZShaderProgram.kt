@@ -67,14 +67,13 @@ data class ZShaderProgramData(
 
 expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData> {
 
-    val program: ZProgram
     override fun initialize()
     override fun bind()
     override fun unbind()
 
 }
 
-class ZShaderProgramSerializer: ZComponentSerializer<ZShaderProgram, ZShaderProgramData, ZShaderProgramRenderer>() {
+class ZShaderProgramSerializer: ZComponentSerializer<ZShaderProgram, ZShaderProgramData>() {
     override val deserializationStrategy: DeserializationStrategy<ZShaderProgramData>
         get() = ZShaderProgramData.serializer()
 

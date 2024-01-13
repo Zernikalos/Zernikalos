@@ -13,9 +13,9 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
     actual override fun initialize() {
     }
 
-    actual fun bindLocation(program: ZProgram) {
+    fun bindLocation(programId: GLWrap) {
         ctx as ZGLRenderingContext
-        uniformId = ctx.getUniformLocation(program.renderer.programId, data.uniformName)
+        uniformId = ctx.getUniformLocation(programId, data.uniformName)
     }
 
     actual fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {

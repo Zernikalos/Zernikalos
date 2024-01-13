@@ -27,6 +27,12 @@ class ZModel: ZObject() {
     @ProtoNumber(8)
     var skeleton: ZSkeleton? = null
 
+    val hasTextures: Boolean
+        get() = material?.texture != null
+
+    val hasSkeleton: Boolean
+        get() = skeleton != null
+
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
         shaderProgram.initialize(ctx)
         mesh.initialize(ctx)

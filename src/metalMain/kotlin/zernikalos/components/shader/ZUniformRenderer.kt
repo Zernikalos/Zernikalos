@@ -10,9 +10,6 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
     actual override fun initialize() {
     }
 
-    actual fun bindLocation(program: ZProgram) {
-    }
-
     @OptIn(ExperimentalForeignApi::class)
     actual fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {
 //        data.buffer.dataArray.usePinned { pinned ->
