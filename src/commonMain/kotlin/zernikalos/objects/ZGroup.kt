@@ -10,6 +10,9 @@ import kotlin.js.JsExport
 @Serializable
 @SerialName("Group")
 class ZGroup: ZObject() {
+
+    override val type = ZObjectType.GROUP
+
     override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
     }
 

@@ -10,6 +10,9 @@ import kotlin.js.JsExport
 @JsExport
 @Serializable
 class ZScene: ZObject() {
+
+    override val type = ZObjectType.SCENE
+
     @Transient
     var viewport: ZViewport = ZViewport()
 

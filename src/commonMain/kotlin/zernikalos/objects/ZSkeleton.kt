@@ -9,6 +9,8 @@ import zernikalos.context.ZSceneContext
 @Serializable
 class ZSkeleton: ZObject() {
 
+    override val type = ZObjectType.SKELETON
+
     @ProtoNumber(4)
     lateinit var root: ZBone
 
