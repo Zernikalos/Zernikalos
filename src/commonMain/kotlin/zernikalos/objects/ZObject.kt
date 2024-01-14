@@ -8,6 +8,7 @@ import zernikalos.context.ZSceneContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
+import zernikalos.utils.randomId
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -16,17 +17,30 @@ import kotlin.js.JsName
 @Polymorphic
 abstract class ZObject {
     @ProtoNumber(1)
-    lateinit var id: String
+    val id: String = randomId()
 
     @ProtoNumber(2)
-    lateinit var name: String
+    private var _name: String = ""
+
+    var name: String
+        get() {
+            if (_name == "") {
+                return "${type.name.lowercase()}_$id"
+            }
+            return _name
+        }
+        set(value) {
+            _name = value
+        }
 
     @ProtoNumber(3)
-    val transform: ZTransform = ZTransform()
+    var transform: ZTransform = ZTransform()
 
     @JsName("children")
     @Transient
     var children: Array<@Polymorphic ZObject> = emptyArray()
+
+    abstract val type: ZObjectType
 
     @Transient
     private var _parent: ZObject? = null

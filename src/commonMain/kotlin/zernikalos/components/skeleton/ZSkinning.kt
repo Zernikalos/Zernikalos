@@ -5,12 +5,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)
 class ZSkinning internal constructor(data: ZSkinningData): ZComponent<ZSkinningData, ZComponentRender<ZSkinningData>>(data) {
 
-    val boneIndices: Array<Int> by data::boneIndices
+    @JsName("init")
+    constructor(): this(ZSkinningData())
+
+    var boneIndices: Array<Int> by data::boneIndices
 
 }
 

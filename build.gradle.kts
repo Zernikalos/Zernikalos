@@ -71,7 +71,8 @@ kotlin {
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
                 output?.library = "zernikalos"
-                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.PRODUCTION
+                mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
+                sourceMaps = true
             }
             generateTypeScriptDefinitions()
         }

@@ -14,8 +14,10 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-@SerialName("Model")
 class ZModel: ZObject() {
+
+    override val type = ZObjectType.MODEL
+
     @ProtoNumber(4)
     lateinit var shaderProgram: ZShaderProgram
     @ProtoNumber(5)

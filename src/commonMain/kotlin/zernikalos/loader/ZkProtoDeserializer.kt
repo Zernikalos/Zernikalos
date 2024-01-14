@@ -42,11 +42,11 @@ object ZkProtoDeserializer: KSerializer<ZObject> {
 
     private fun getZObject(decodedProtoObj: ProtoZkObject): ZObject {
         when (decodedProtoObj.type) {
-            "Scene" -> return decodedProtoObj.scene!!
-            "Group" -> return decodedProtoObj.group!!
-            "Model" -> return decodedProtoObj.model!!
-            "Camera" -> return decodedProtoObj.camera!!
-            "Skeleton" -> return decodedProtoObj.skeleton!!
+            ZObjectType.SCENE.name -> return decodedProtoObj.scene!!
+            ZObjectType.GROUP.name -> return decodedProtoObj.group!!
+            ZObjectType.MODEL.name -> return decodedProtoObj.model!!
+            ZObjectType.CAMERA.name -> return decodedProtoObj.camera!!
+            ZObjectType.SKELETON.name -> return decodedProtoObj.skeleton!!
         }
         throw Error("Type has not been found on object")
     }

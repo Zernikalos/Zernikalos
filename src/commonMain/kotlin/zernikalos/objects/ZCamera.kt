@@ -14,6 +14,8 @@ import kotlin.js.JsName
 @Serializable
 class ZCamera: ZObject {
 
+    override val type = ZObjectType.CAMERA
+
     @ProtoNumber(4)
     var lens: ZPerspectiveLens
 
@@ -32,9 +34,15 @@ class ZCamera: ZObject {
         this.lens = lens
     }
 
-    @JsName("init")
+    @JsName("initWithLookUp")
     constructor(lookAt: ZVector3, up: ZVector3) {
         this.transform.lookAt(lookAt, up)
+        this.lens = ZPerspectiveLens.Default
+    }
+
+    @JsName("init")
+    constructor() {
+        this.transform.lookAt(ZVector3.Zero, ZVector3.Up)
         this.lens = ZPerspectiveLens.Default
     }
 
