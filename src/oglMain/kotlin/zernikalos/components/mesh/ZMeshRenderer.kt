@@ -6,6 +6,7 @@ import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.toOglBaseType
+import zernikalos.logger.logger
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData>(ctx, data) {
 
@@ -25,12 +26,14 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
 
         vao.bind()
         if (data.hasIndexBuffer) {
+            logger.debugOnce("Using indexed buffer rendering")
             // If we have the index buffer for sure this will not be null
             val indexBuffer = data.indexBuffer!!
             val count = indexBuffer.count
             // TODO: you don't need to draw triangles all the time
             ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglBaseType(indexBuffer.dataType), 0)
         } else {
+            logger.debugOnce("Using vertices list rendering")
             // TODO: Fix this
             val count = data.buffers["position"]?.count!!
             ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)

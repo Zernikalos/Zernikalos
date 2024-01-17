@@ -7,7 +7,7 @@ import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import kotlin.random.Random
+import zernikalos.logger.logger
 
 class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
 
@@ -32,9 +32,6 @@ class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVer
 }
 
 class ZVertexArrayData: ZComponentData() {
-    override fun hashCode(): Int {
-        return Random.nextInt()
-    }
 
     override fun toString(): String {
         return ""
@@ -52,11 +49,13 @@ class ZVertexArrayRenderer(ctx: ZRenderingContext, data: ZVertexArrayData): ZCom
         // TODO Check existence
         vao = auxVao
         ctx.bindVertexArray(vao)
+        logger.debug("Creating and binding VAO with id ${vao.id}")
     }
 
     override fun bind() {
         ctx as ZGLRenderingContext
 
+        logger.debugOnce("Binding VAO with id ${vao.id}")
         ctx.bindVertexArray(vao)
     }
 

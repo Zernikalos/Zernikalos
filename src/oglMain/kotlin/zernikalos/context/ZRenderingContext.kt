@@ -48,6 +48,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun bindAttribLocation(program: GLWrap, index: Int, attrName: String)
 
+    fun getAttribLocation(program: GLWrap, attrName: String): Int
+
     /** UNIFORMS **/
 
     fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap

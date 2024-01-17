@@ -77,6 +77,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glBindAttribLocation(program.id as Int, index, attrName)
     }
 
+    actual fun getAttribLocation(program: GLWrap, attrName: String): Int {
+        return GLES30.glGetAttribLocation(program.id as Int, attrName)
+    }
+
     actual fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap {
         val id = GLES30.glGetUniformLocation(program.id as Int, uniformName)
         return GLWrap(id)

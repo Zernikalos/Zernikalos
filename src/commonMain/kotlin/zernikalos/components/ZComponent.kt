@@ -8,11 +8,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
 @JsExport
-abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(val data: D) {
+abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(val data: D): ZLoggable {
 
     var refId: Int by data::refId
 
@@ -57,7 +58,7 @@ abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal co
 
 @JsExport
 @Serializable
-abstract class ZComponentData {
+abstract class ZComponentData: ZLoggable {
 
     @ProtoNumber(500)
     protected var _refId: Int? = null
@@ -83,7 +84,7 @@ abstract class ZComponentData {
 }
 
 @JsExport
-abstract class ZComponentRender<D: ZComponentData>(val ctx: ZRenderingContext, val data: D) {
+abstract class ZComponentRender<D: ZComponentData>(val ctx: ZRenderingContext, val data: D): ZLoggable {
 
     abstract fun initialize()
 
