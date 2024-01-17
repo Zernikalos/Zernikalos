@@ -3,3 +3,5 @@ config.output.library = {
     type: "umd",
     export: "zernikalos"
 };
+
+config.devtool = 'source-map';

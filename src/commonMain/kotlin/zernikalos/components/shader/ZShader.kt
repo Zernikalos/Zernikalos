@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
+import zernikalos.utils.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -24,6 +25,7 @@ internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRendere
     var source: String by data::source
 
     override fun internalInitialize(ctx: ZRenderingContext) {
+        logger.debug("Initializing $type shader with source: \n $source")
         renderer.initialize()
     }
 

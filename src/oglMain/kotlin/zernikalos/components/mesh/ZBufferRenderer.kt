@@ -3,6 +3,7 @@ package zernikalos.components.mesh
 import zernikalos.components.ZComponentRender
 import zernikalos.context.*
 import zernikalos.toOglBaseType
+import zernikalos.utils.logger
 import kotlin.jvm.Transient
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
@@ -35,6 +36,8 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
 
         val glDataType = toOglBaseType(data.dataType)
 
+        logger.debug("Initializing vertex attrib at ${data.id} for ${data.name}")
+        //println("Initializing vertex attrib at ${data.id} for ${data.name}")
         ctx.enableVertexAttrib(data.id)
         ctx.vertexAttribPointer(
             data.id,
