@@ -99,6 +99,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         gl.bindAttribLocation(program.id as WebGLProgram, index, attrName)
     }
 
+    actual fun getAttribLocation(program: GLWrap, attrName: String): Int {
+        return gl.getAttribLocation(program.id as WebGLProgram, attrName)
+    }
+
     actual fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap {
         val id = gl.getUniformLocation(program.id as WebGLProgram, uniformName)
         return GLWrap(id)

@@ -6,10 +6,7 @@ import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.toOglBaseType
-import zernikalos.utils.ZLogger
-import zernikalos.utils.createLogger
-import zernikalos.utils.createLogger2
-import zernikalos.utils.logger
+import zernikalos.logger.logger
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData>(ctx, data) {
 
@@ -20,9 +17,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
         vao.initialize(ctx)
 
         data.buffers.values.forEach { buff ->
-            if (buff.id < 3) {
-                buff.initialize(ctx)
-            }
+            buff.initialize(ctx)
         }
     }
 

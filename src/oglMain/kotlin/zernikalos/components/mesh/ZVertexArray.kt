@@ -7,7 +7,7 @@ import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import zernikalos.utils.logger
+import zernikalos.logger.logger
 
 class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
 
@@ -48,8 +48,8 @@ class ZVertexArrayRenderer(ctx: ZRenderingContext, data: ZVertexArrayData): ZCom
         val auxVao = ctx.createVertexArray()
         // TODO Check existence
         vao = auxVao
-        logger.debug("Created VAO with id ${vao.id}")
-        bind()
+        ctx.bindVertexArray(vao)
+        logger.debug("Creating and binding VAO with id ${vao.id}")
     }
 
     override fun bind() {

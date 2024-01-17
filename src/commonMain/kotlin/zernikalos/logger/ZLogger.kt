@@ -1,4 +1,4 @@
-package zernikalos.utils
+package zernikalos.logger
 
 import kotlin.js.JsExport
 
@@ -11,7 +11,7 @@ inline fun <reified T: ZLoggable> T.createLogger(): ZLogger {
     return ZLogger(T::class.simpleName, this.hashCode())
 }
 
-inline fun <reified T: ZLoggable> T.createLogger2(): Lazy<ZLogger> {
+inline fun <reified T: ZLoggable> T.createLazyLogger(): Lazy<ZLogger> {
     return lazy { ZLogger(T::class.simpleName, this.hashCode()) }
 }
 
@@ -24,18 +24,29 @@ inline val <reified T: ZLoggable> T.logger: ZLogger
 class ZLogger(private val clsName: String?, val instanceId: Int) {
 
     private val logOnceSet = HashSet<String>()
+    private val adapters = ArrayList<ZLoggerAdapter>()
+
+    init {
+        adapters.add(ZLoggerAdapterConsole())
+    }
 
     fun debug(message: String) {
-        println(buildMessage(message))
+        debugMessage(message)
     }
 
     fun debugOnce(message: String) {
-        val genMessage = buildMessage(message)
-        if (genMessage in logOnceSet) {
+        if (message in logOnceSet) {
             return
         }
-        logOnceSet.add(genMessage)
-        println(genMessage)
+        logOnceSet.add(message)
+        debugMessage(message)
+    }
+
+    private fun debugMessage(message: String) {
+        val m = buildMessage(message)
+        adapters.forEach {
+            it.debug(m)
+        }
     }
 
     private fun buildMessage(message: String): String {

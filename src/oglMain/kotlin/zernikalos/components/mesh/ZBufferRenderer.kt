@@ -3,7 +3,7 @@ package zernikalos.components.mesh
 import zernikalos.components.ZComponentRender
 import zernikalos.context.*
 import zernikalos.toOglBaseType
-import zernikalos.utils.logger
+import zernikalos.logger.logger
 import kotlin.jvm.Transient
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
@@ -11,10 +11,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
     @Transient
     lateinit var buffer: GLWrap
 
-    fun getBufferTargetType(data: ZBufferData): BufferTargetType {
+    private fun getBufferTargetType(data: ZBufferData): BufferTargetType {
         return if (data.key.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
     }
-
 
     actual override fun initialize() {
         initializeBuffer(ctx, data)
@@ -36,8 +35,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
 
         val glDataType = toOglBaseType(data.dataType)
 
-        logger.debug("Initializing vertex attrib at ${data.id} for ${data.name}")
-        //println("Initializing vertex attrib at ${data.id} for ${data.name}")
+        logger.debug("Initializing vertex buffer at ${data.id} for ${data.name}")
         ctx.enableVertexAttrib(data.id)
         ctx.vertexAttribPointer(
             data.id,

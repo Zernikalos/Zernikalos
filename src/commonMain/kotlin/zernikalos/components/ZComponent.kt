@@ -8,7 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
-import zernikalos.utils.ZLoggable
+import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
