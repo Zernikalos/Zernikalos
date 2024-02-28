@@ -4,6 +4,7 @@ import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
+import zernikalos.logger.logger
 
 actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: ZTextureData) : ZComponentRender<ZTextureData>(ctx, data) {
 
@@ -12,6 +13,10 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
     actual override fun initialize() {
         ctx as ZGLRenderingContext
 
+        //logger.debug("Initializing Texture with id ${data.refId}")
+
+        val bitmap = ZBitmap(data.dataArray!!)
+
         textureHandler = ctx.genTexture()
 
         ctx.bindTexture(textureHandler)
@@ -19,9 +24,9 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
         ctx.texParameterMin()
         ctx.texParameterMag()
 
-        ctx.texImage2D(data.bitmap)
+        ctx.texImage2D(bitmap)
 
-        data.bitmap.dispose()
+        bitmap.dispose()
     }
 
     override fun bind() {

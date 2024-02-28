@@ -8,7 +8,8 @@ import zernikalos.context.ZRenderingContext
 actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData>(ctx, data) {
     actual override fun initialize() {
         ctx as ZGLRenderingContext
-        ctx.viewport(0, 0, 700, 700)
+        // TODO: This hardcoded code NEEDS to be changed asap
+        ctx.viewport(0, 0, 1080, 1934)
         ctx.enable(Enabler.DEPTH_TEST.value)
         ctx.cullFace(CullModeType.FRONT.value)
     }

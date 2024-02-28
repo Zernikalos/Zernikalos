@@ -13,7 +13,7 @@ actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, data:
     fun bindLocation(programId: GLWrap) {
         ctx as ZGLRenderingContext
 
-        logger.debug("Binding shader attribute ${data.attributeName} to layout ${data.id}")
+        logger.debug("Binding shader attribute ${data.attributeName} to layout ${data.id} to program ${programId.id}")
         ctx.bindAttribLocation(programId, data.id, data.attributeName)
     }
 

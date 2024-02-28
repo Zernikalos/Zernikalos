@@ -18,6 +18,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
 
         data.buffers.values.forEach { buff ->
             buff.initialize(ctx)
+            buff.bind()
         }
     }
 

@@ -4,6 +4,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
+import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZTransform
 import zernikalos.utils.findInTree
 import zernikalos.utils.treeTraverse
@@ -11,8 +12,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZSkeletonSerializer::class)
-class ZSkeleton internal constructor(data: ZSkeletonData): ZComponent<ZSkeletonData, ZComponentRender<ZSkeletonData>>(data) {
+class ZSkeleton internal constructor(data: ZSkeletonData): ZRefComponent<ZSkeletonData, ZComponentRender<ZSkeletonData>>(data) {
 
     @JsName("init")
     constructor(): this(ZSkeletonData())
@@ -31,14 +31,24 @@ class ZSkeleton internal constructor(data: ZSkeletonData): ZComponent<ZSkeletonD
 }
 
 @Serializable
+data class ZSkeletonDataWrapper(
+    @ProtoNumber(1)
+    override var refId: Int,
+    @ProtoNumber(2)
+    override var isReference: Boolean,
+    @ProtoNumber(100)
+    override var data: ZSkeletonData? = null
+): ZRefComponentData<ZSkeletonData>
+
+@Serializable
 data class ZSkeletonData(
-    @ProtoNumber(4)
+    @ProtoNumber(104)
     var root: ZBone = ZBone()
 ): ZComponentData()
 
-class ZSkeletonSerializer: ZComponentSerializer<ZSkeleton, ZSkeletonData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZSkeletonData>
-        get() = ZSkeletonData.serializer()
+class ZSkeletonSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZSkeleton, ZSkeletonData, ZSkeletonDataWrapper>(loaderContext) {
+    override val deserializationStrategy: DeserializationStrategy<ZSkeletonDataWrapper>
+        get() = ZSkeletonDataWrapper.serializer()
 
     override fun createComponentInstance(data: ZSkeletonData): ZSkeleton {
         return ZSkeleton(data)

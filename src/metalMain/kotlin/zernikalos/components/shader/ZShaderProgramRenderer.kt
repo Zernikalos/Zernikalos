@@ -8,12 +8,13 @@ import platform.Metal.*
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
+import zernikalos.logger.logger
 
 actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData) : ZComponentRender<ZShaderProgramData>(ctx, data) {
 
     var uniformBuffer: MTLBufferProtocol? = null
 
-    lateinit var library: MTLLibraryProtocol
+    var library: MTLLibraryProtocol? = null
     lateinit var vertexShader: MTLFunctionProtocol
     lateinit var fragmentShader: MTLFunctionProtocol
 
@@ -43,10 +44,21 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
 
         initializeAttributes()
 
-        library = ctx.device.newLibraryWithSource(shaderSource, MTLCompileOptions(), err)!!
+        logger.debug("Shader Source in use:")
+        logger.debug("\n$shaderSource")
 
-        vertexShader = library.newFunctionWithName("vertexShader")!!
-        fragmentShader = library.newFunctionWithName("fragmentShader")!!
+        try {
+            library = ctx.device.newLibraryWithSource(shaderSource, MTLCompileOptions(), err)!!
+        } catch (_: Error) {
+            throw Error("Error creating the shader library")
+        }
+
+        if (library == null) {
+            throw Error("Error creating the shader library")
+        }
+
+        vertexShader = library?.newFunctionWithName("vertexShader")!!
+        fragmentShader = library?.newFunctionWithName("fragmentShader")!!
     }
 
     private fun initializeAttributes() {
@@ -114,11 +126,11 @@ ColorInOut computeOutColor(Vertex in) {
 
 #if defined(ATTR_UV)
     out.texCoord.x = in.texCoord.x;
-    out.texCoord.y = 2 - in.texCoord.y;
+    out.texCoord.y = in.texCoord.y;
 #elif defined(ATTR_COLOR)
     out.color = in.color;
 #else
-    out.color = float2(1.0, 0.0);
+    out.color = float3(1.0, 0.0, 0.0);
 #endif 
     
     return out;

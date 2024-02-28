@@ -2,16 +2,15 @@ package zernikalos.components.material
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
+import zernikalos.loader.ZLoaderContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-@Serializable(with = ZTextureSerializer::class)
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData): ZRefComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())
@@ -44,6 +43,15 @@ class ZTexture internal constructor(data: ZTextureData): ZComponent<ZTextureData
     }
 }
 
+@Serializable
+data class ZTextureDataWrapper(
+    @ProtoNumber(1)
+    override var refId: Int = 0,
+    @ProtoNumber(2)
+    override var isReference: Boolean = false,
+    @ProtoNumber(100)
+    override var data: ZTextureData? = null
+): ZRefComponentData<ZTextureData>
 
 @Serializable
 data class ZTextureData(
@@ -57,8 +65,13 @@ data class ZTextureData(
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData() {
 
-    @Transient
-    var bitmap: ZBitmap = ZBitmap(dataArray)
+//    @ProtoNumber(1)
+//    override var refId: Int? = null
+//    @ProtoNumber(2)
+//    override var isReference: Boolean = false
+
+//    @Transient
+//    var bitmap: ZBitmap = ZBitmap(dataArray)
 
 }
 
@@ -70,9 +83,9 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 
 }
 
-class ZTextureSerializer: ZComponentSerializer<ZTexture, ZTextureData>() {
+class ZTextureSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZTexture, ZTextureData, ZTextureDataWrapper>(loaderContext) {
 
-    override val deserializationStrategy: DeserializationStrategy<ZTextureData> = ZTextureData.serializer()
+    override val deserializationStrategy: DeserializationStrategy<ZTextureDataWrapper> = ZTextureDataWrapper.serializer()
 
     override fun createComponentInstance(data: ZTextureData): ZTexture {
         return ZTexture(data)
