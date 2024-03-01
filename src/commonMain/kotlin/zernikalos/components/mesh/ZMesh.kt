@@ -15,7 +15,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZRef {
 
     @JsName("init")
     constructor(): this(ZMeshData())
@@ -66,13 +66,17 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
         data.buildBuffers()
     }
 
+    override var refId: Int
+        get() = computeRefIdFromString(data.toString())
+        set(value) {}
+
 }
 
 @Serializable
 data class ZMeshData(
-    @ProtoNumber(1)
+    @ProtoNumber(101)
     var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
-    @ProtoNumber(2)
+    @ProtoNumber(102)
     var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
 ): ZComponentData() {
 

@@ -6,16 +6,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
-import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
 @JsExport
 abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(val data: D): ZLoggable {
-
-    var refId: Int by data::refId
 
     private var initialized: Boolean = false
 
@@ -36,6 +32,9 @@ abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal co
         get() = _renderer != null
 
     fun initialize(ctx: ZRenderingContext) {
+        if (initialized) {
+            return
+        }
         _renderer = createRenderer(ctx)
         initialized = true
 
@@ -59,25 +58,6 @@ abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal co
 @JsExport
 @Serializable
 abstract class ZComponentData: ZLoggable {
-
-    @ProtoNumber(500)
-    protected var _refId: Int? = null
-    var refId: Int
-        get() {
-            if (_refId == null) {
-                _refId = computeRefId()
-            }
-            return _refId!!
-        }
-        set(value) {
-            _refId = value
-        }
-
-    private fun computeRefId(): Int {
-        val dataArray = toString().encodeToByteArray()
-        val hashValue = crc32(dataArray)
-        return if (hashValue < 0) hashValue.inv() else hashValue
-    }
 
     abstract override fun toString(): String
 
