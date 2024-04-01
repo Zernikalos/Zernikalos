@@ -12,7 +12,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZRawBufferSerializer::class)
 @JsExport
-class ZRawBuffer internal constructor(data: ZRawBufferData): ZComponent<ZRawBufferData, ZComponentRender<ZRawBufferData>>(data) {
+class ZRawBuffer internal constructor(data: ZRawBufferData): ZBasicComponent<ZRawBufferData>(data) {
 
     @JsName("init")
     constructor(): this(ZRawBufferData())

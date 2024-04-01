@@ -14,10 +14,6 @@ class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData
     @JsName("init")
     constructor(): this(ZProgramData())
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
         return ZProgramRenderer(ctx, data)
     }

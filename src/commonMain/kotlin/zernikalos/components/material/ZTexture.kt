@@ -26,10 +26,6 @@ class ZTexture internal constructor(data: ZTextureData): ZRefComponent<ZTextureD
 
     var dataArray: ByteArray by data::dataArray
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
         return ZTextureRenderer(ctx, data)
     }

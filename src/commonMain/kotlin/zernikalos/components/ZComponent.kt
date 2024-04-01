@@ -11,7 +11,10 @@ import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 
 @JsExport
-abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(val data: D): ZLoggable {
+open class ZComponent<
+    D: ZComponentData,
+    R: ZComponentRender<D>>
+internal constructor(protected val data: D): ZLoggable {
 
     private var initialized: Boolean = false
 
@@ -38,11 +41,11 @@ abstract class ZComponent<D: ZComponentData, R: ZComponentRender<D>> internal co
         _renderer = createRenderer(ctx)
         initialized = true
 
-        internalInitialize(ctx)
+        internalInitialize()
     }
 
-    protected open fun internalInitialize(ctx: ZRenderingContext) {
-
+    protected open fun internalInitialize() {
+        _renderer?.initialize()
     }
 
     protected open fun createRenderer(ctx: ZRenderingContext): R? {
@@ -64,7 +67,7 @@ abstract class ZComponentData: ZLoggable {
 }
 
 @JsExport
-abstract class ZComponentRender<D: ZComponentData>(val ctx: ZRenderingContext, val data: D): ZLoggable {
+abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRenderingContext, protected val data: D): ZLoggable {
 
     abstract fun initialize()
 
@@ -74,6 +77,16 @@ abstract class ZComponentRender<D: ZComponentData>(val ctx: ZRenderingContext, v
 
     open fun render() {}
 }
+
+typealias ZBasicComponent<D> = ZComponent<D, ZComponentRender<D>>
+
+class ZEmptyComponentData: ZComponentData() {
+    override fun toString(): String {
+        return ""
+    }
+}
+class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZComponent<ZEmptyComponentData, R>(ZEmptyComponentData())
+
 
 abstract class ZComponentSerializer<
     T: ZComponent<D, *>,

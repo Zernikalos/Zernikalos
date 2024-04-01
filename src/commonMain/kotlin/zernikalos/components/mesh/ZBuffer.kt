@@ -67,11 +67,6 @@ class ZBuffer internal constructor(data: ZBufferData): ZComponent<ZBufferData, Z
 
     val dataArray: ByteArray by data.buffer::dataArray
 
-
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZBufferRenderer {
         return ZBufferRenderer(ctx, data)
     }

@@ -15,7 +15,7 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: Z
 
         //logger.debug("Initializing Texture with id ${data.refId}")
 
-        val bitmap = ZBitmap(data.dataArray!!)
+        val bitmap = ZBitmap(data.dataArray)
 
         textureHandler = ctx.genTexture()
 

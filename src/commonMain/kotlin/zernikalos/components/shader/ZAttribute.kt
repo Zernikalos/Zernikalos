@@ -22,9 +22,6 @@ class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttribu
 
     var attributeName: String by data::attributeName
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
         return ZAttributeRenderer(ctx, data)
     }

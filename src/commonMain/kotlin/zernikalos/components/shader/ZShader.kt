@@ -24,9 +24,9 @@ internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRendere
 
     var source: String by data::source
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
+    override fun internalInitialize() {
         logger.debug("Initializing $type shader with source: \n $source")
-        renderer.initialize()
+        super.internalInitialize()
     }
 
     override fun createRenderer(ctx: ZRenderingContext): ZShaderRenderer {
