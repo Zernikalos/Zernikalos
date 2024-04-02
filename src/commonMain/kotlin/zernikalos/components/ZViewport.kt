@@ -20,10 +20,6 @@ internal constructor(data: ZViewportData):
 
     var clearColor: ZVector4 by data::clearColor
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZViewportRenderer {
         return ZViewportRenderer(ctx, data)
     }

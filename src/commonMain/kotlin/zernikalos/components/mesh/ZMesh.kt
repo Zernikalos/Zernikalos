@@ -29,9 +29,9 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
 
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
+    override fun internalInitialize() {
         buildBuffers()
-        renderer.initialize()
+        super.internalInitialize()
     }
 
     override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {

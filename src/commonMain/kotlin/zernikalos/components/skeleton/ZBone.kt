@@ -12,7 +12,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBoneSerializer::class)
-class ZBone internal constructor(data: ZBoneData): ZComponent<ZBoneData, ZComponentRender<ZBoneData>>(data), ZTreeNode<ZBone> {
+class ZBone internal constructor(data: ZBoneData): ZBasicComponent<ZBoneData>(data), ZTreeNode<ZBone> {
 
     @JsName("init")
     constructor(): this(ZBoneData())

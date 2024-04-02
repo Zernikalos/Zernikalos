@@ -13,10 +13,6 @@ class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVer
 
     constructor(): this(ZVertexArrayData())
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZVertexArrayRenderer {
         return ZVertexArrayRenderer(ctx, data)
     }

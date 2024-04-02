@@ -35,10 +35,6 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZComponent<
         data.attributes[name] = attribute
     }
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZShaderProgramRenderer {
         return ZShaderProgramRenderer(ctx, data)
     }

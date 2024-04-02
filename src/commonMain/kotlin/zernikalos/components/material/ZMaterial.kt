@@ -20,10 +20,6 @@ internal constructor(data: ZMaterialData):
 
     var texture: ZTexture? by data::texture
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        renderer.initialize()
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
     }

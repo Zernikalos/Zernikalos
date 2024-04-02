@@ -27,9 +27,6 @@ class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData
 
     var idx: Int by data::idx
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
     }

@@ -9,7 +9,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)
-class ZSkinning internal constructor(data: ZSkinningData): ZComponent<ZSkinningData, ZComponentRender<ZSkinningData>>(data) {
+class ZSkinning internal constructor(data: ZSkinningData): ZBasicComponent<ZSkinningData>(data) {
 
     @JsName("init")
     constructor(): this(ZSkinningData())
