@@ -14,9 +14,14 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
     val vao: ZVertexArray = ZVertexArray()
 
     actual override fun initialize() {
+        // TODO: This change was required to make it work with WebGL
+        data.indexBuffer?.initialize(ctx)
         vao.initialize(ctx)
 
-        data.buffers.values.forEach { buff ->
+        data.buffers.values.filter {buff ->
+            // TODO: This change was required to make it work with WebGL
+            buff.enabled && !buff.isIndexBuffer
+        }.forEach { buff ->
             buff.initialize(ctx)
             buff.bind()
         }
@@ -30,6 +35,8 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
             logger.debugOnce("Using indexed buffer rendering")
             // If we have the index buffer for sure this will not be null
             val indexBuffer = data.indexBuffer!!
+            // TODO: This change was required to make it work with WebGL
+            indexBuffer.bind()
             val count = indexBuffer.count
             // TODO: you don't need to draw triangles all the time
             ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglBaseType(indexBuffer.dataType), 0)
