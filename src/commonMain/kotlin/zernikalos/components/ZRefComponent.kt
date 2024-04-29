@@ -69,7 +69,7 @@ abstract class ZRefComponentSerializer<
         val refData = decoder.decodeSerializableValue(deserializationStrategy)
 
         if (refData.isReference) {
-            return loaderContext.getComponent(refData.refId!!) as T
+            return loaderContext.getComponent(refData.refId) as T
         }
 
         val component = createComponentInstance(refData.data!!)

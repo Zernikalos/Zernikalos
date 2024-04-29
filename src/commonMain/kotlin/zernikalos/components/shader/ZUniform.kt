@@ -11,18 +11,33 @@ import zernikalos.math.ZAlgebraObject
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
+// TODO: These guys are incorrect, they need to provide a new uniform each time
+val ZUniformProjectionMatrix = ZUniform("u_projMatrix", 1, ZTypes.MAT4F)
+val ZUniformViewMatrix = ZUniform("u_viewMatrix", 1, ZTypes.MAT4F)
+val ZUniformModelViewProjectionMatrix = { ZUniform("u_mvpMatrix", 1, ZTypes.MAT4F) }
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
 class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData, ZUniformRenderer>(data) {
 
+    @JsName("initWithArgs")
+    constructor(uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(uniformName, count, dataType))
     @JsName("init")
     constructor(): this(ZUniformData())
 
+    /**
+     * This is the name within the shader source code
+     */
     var uniformName: String by data::uniformName
 
+    /**
+     * How many elements of this will be used
+     */
     var count: Int by data::count
 
+    /**
+     * The datatype of all individual elements used by this uniform
+     */
     var dataType: ZDataType by data::dataType
 
     var idx: Int by data::idx

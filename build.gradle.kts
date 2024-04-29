@@ -39,6 +39,7 @@ android {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
 
     targets.configureEach {
         compilations.configureEach {
@@ -99,7 +100,7 @@ kotlin {
         }
     }
 
-    ios() {
+    iosArm64() {
         binaries.framework {
             isStatic = true
             baseName = appleFrameworkBaseName
@@ -130,8 +131,8 @@ kotlin {
 
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.3")
             }
         }
 
@@ -159,14 +160,19 @@ kotlin {
             kotlin.srcDir("src/macosMain/kotlin")
         }
 
-        val iosMain by getting {
+        iosMain {
             dependsOn(metalMain)
             kotlin.srcDir("src/iosMain/kotlin")
         }
 
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
+//        val iosMain by getting {
+//            dependsOn(metalMain)
+//            kotlin.srcDir("src/iosMain/kotlin")
+//        }
+//
+//        val iosSimulatorArm64Main by getting {
+//            dependsOn(iosMain)
+//        }
 
     }
 }

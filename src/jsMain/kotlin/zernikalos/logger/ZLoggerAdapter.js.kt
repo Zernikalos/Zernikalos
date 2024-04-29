@@ -10,7 +10,7 @@ abstract external class WindowConsole: Console {
 external val console: WindowConsole
 
 actual class ZLoggerAdapterConsole: ZLoggerAdapter() {
-    override fun debug(message: String) {
+    actual override fun debug(message: String) {
         console.debug(message)
     }
 

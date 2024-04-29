@@ -5,6 +5,7 @@ import zernikalos.components.ZComponentRender
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 
 actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData>(ctx, data) {
 
@@ -16,6 +17,7 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
     fun bindLocation(programId: GLWrap) {
         ctx as ZGLRenderingContext
         uniformId = ctx.getUniformLocation(programId, data.uniformName)
+        logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
     }
 
     actual fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {

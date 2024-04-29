@@ -8,6 +8,25 @@ import zernikalos.components.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
+enum class ZAttributeId(val id: Int) {
+    INDICES(0),
+    POSITION(1),
+    NORMAL(2),
+    COLOR(3),
+    UV(4),
+    BONE_WEIGHT(5),
+    BONE_INDEX(6)
+}
+
+// TODO: These guys are incorrect, they need to provide a new attribute each time
+val ZAttrIndices = ZAttribute(0, "indices")
+val ZAttrPosition = ZAttribute(1, "a_position")
+val ZAttrNormal = ZAttribute(2, "a_normal")
+val ZAttrColor = ZAttribute(3, "a_color")
+val ZAttrUv = ZAttribute(4, "a_uv")
+val ZAttrBoneWeight = ZAttribute(5, "a_boneWeight")
+val ZAttrBoneIndices = ZAttribute(6, "a_boneIndices")
+
 @JsExport
 @Serializable(with = ZAttributeSerializer::class)
 class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttributeData, ZAttributeRenderer>(data) {
@@ -24,6 +43,13 @@ class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttribu
 
     override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
         return ZAttributeRenderer(ctx, data)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is ZAttribute) {
+            return false
+        }
+        return data == other.data
     }
 }
 

@@ -6,6 +6,8 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
+import zernikalos.components.shader.ZAttributeId
+import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -15,7 +17,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZRef {
+class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZRef, ZLoggable {
 
     @JsName("init")
     constructor(): this(ZMeshData())
@@ -28,11 +30,6 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
     val indexBuffer: ZBuffer? by data::indexBuffer
 
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
-
-    override fun internalInitialize() {
-        buildBuffers()
-        super.internalInitialize()
-    }
 
     override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {
         return ZMeshRenderer(ctx, data)
@@ -52,6 +49,21 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
 
     fun addBufferKey(bufferKey: ZBufferKey) {
         data.addBufferKey(bufferKey)
+    }
+
+    fun getBufferByName(name: String): ZBuffer? {
+        return data.buffers[name]
+    }
+
+    @JsExport.Ignore
+    fun getBufferById(attrId: ZAttributeId): ZBuffer? {
+        return data.buffers.values.find {
+            attrId == it.attributeId
+        }
+    }
+
+    fun hasBufferKey(name: String): Boolean {
+        return data.hasBufferKey(name)
     }
 
     fun getBufferKey(name: String): ZBufferKey? {
@@ -95,6 +107,10 @@ data class ZMeshData(
 
     fun getBufferKey(name: String): ZBufferKey? {
         return bufferKeys.find { it.name == name }
+    }
+
+    fun hasBufferKey(name: String): Boolean {
+        return getBufferKey(name) != null
     }
 
     fun addRawBuffer(rawBuffer: ZRawBuffer) {

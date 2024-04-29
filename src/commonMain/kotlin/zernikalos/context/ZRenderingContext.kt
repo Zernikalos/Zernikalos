@@ -23,13 +23,6 @@ enum class BufferBit(val value: Int) {
     DEPTH_BUFFER(ExpectBufferBit.DEPTH_BUFFER)
 }
 
-enum class ShaderType(val value: Int) {
-    @SerialName("vertex")
-    VERTEX_SHADER(ExpectShaderType.VERTEX_SHADER),
-    @SerialName("fragment")
-    FRAGMENT_SHADER(ExpectShaderType.FRAGMENT_SHADER)
-}
-
 enum class CullModeType(val value: Int) {
     FRONT(ExpectCullModeType.FRONT),
     BACK(ExpectCullModeType.BACK),
