@@ -9,7 +9,7 @@ import platform.darwin._os_log_internal
 
 actual class ZLoggerAdapterConsole : ZLoggerAdapter() {
     @OptIn(ExperimentalForeignApi::class)
-    override fun debug(message: String) {
+    actual override fun debug(message: String) {
         _os_log_internal(
             __dso_handle.ptr,
             OS_LOG_DEFAULT,

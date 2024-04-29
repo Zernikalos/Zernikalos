@@ -5,5 +5,5 @@ abstract class ZLoggerAdapter {
 }
 
 expect class ZLoggerAdapterConsole(): ZLoggerAdapter {
-
+    override fun debug(message: String)
 }
