@@ -13,11 +13,11 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
 
         vertexDescriptor = MTLVertexDescriptor()
 
-        data.buffers.values.forEach { buffer ->
-            // Initialization is for all buffer types (indices and vertex data)
+        data.buffers.values.filter {buff ->
+            buff.enabled
+        }.forEach { buffer ->
             buffer.initialize(ctx)
             if (!buffer.isIndexBuffer) {
-                // But only the vertex buffers will set the descriptors
                 vertexDescriptor.attributes.setObject(buffer.renderer.attributeDescriptor, buffer.id.toULong())
                 vertexDescriptor.layouts.setObject(buffer.renderer.layoutDescriptor, buffer.id.toULong())
             }
@@ -26,10 +26,10 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
     }
 
     override fun bind() {
-        data.buffers.values.forEach { buffer ->
-            if (!buffer.isIndexBuffer) {
-                buffer.bind()
-            }
+        data.buffers.values.filter {buff ->
+            buff.enabled && !buff.isIndexBuffer
+        }.forEach { buffer ->
+            buffer.bind()
         }
     }
 

@@ -17,12 +17,16 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZS
     lateinit var vertexShader: MTLFunctionProtocol
     lateinit var fragmentShader: MTLFunctionProtocol
 
-    @OptIn(ExperimentalForeignApi::class)
     actual override fun initialize() {
+
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun initialize(source: ZShaderSource) {
         ctx as ZMtlRenderingContext
         var err: CPointer<ObjCObjectVar<NSError?>>? = null
 
-        library = ctx.device.newLibraryWithSource(shaderSource, MTLCompileOptions(), err)!!
+        library = ctx.device.newLibraryWithSource(source.metalShaderSource, MTLCompileOptions(), err)!!
 
         vertexShader = library.newFunctionWithName("vertexShader")!!
         fragmentShader = library.newFunctionWithName("fragmentShader")!!

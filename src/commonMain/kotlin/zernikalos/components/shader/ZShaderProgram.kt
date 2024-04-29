@@ -2,6 +2,7 @@ package zernikalos.components.shader
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.components.*
@@ -15,9 +16,7 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZComponent<
     @JsName("init")
     constructor(): this(ZShaderProgramData())
 
-    var vertexShader: ZShader by data::vertexShader
-
-    var fragmentShader: ZShader by data::fragmentShader
+    val shaderSource: ZShaderSource by data::shaderSource
 
     val attributes: Map<String, ZAttribute> by data::attributes
 
@@ -31,8 +30,21 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZComponent<
         return data.uniforms[name]
     }
 
+    fun clearUniforms() {
+        data.uniforms.clear()
+    }
+
+    @JsName("addAttributeByName")
     fun addAttribute(name: String, attribute: ZAttribute) {
         data.attributes[name] = attribute
+    }
+
+    fun addAttribute(attribute: ZAttribute) {
+        data.attributes[attribute.attributeName] = attribute
+    }
+
+    fun clearAttributes() {
+        data.attributes.clear()
     }
 
     override fun createRenderer(ctx: ZRenderingContext): ZShaderProgramRenderer {
@@ -51,10 +63,12 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZComponent<
 
 @Serializable
 data class ZShaderProgramData(
-    @ProtoNumber(1)
-    var vertexShader: ZShader = ZShader(),
-    @ProtoNumber(2)
-    var fragmentShader: ZShader = ZShader(),
+    @Transient
+    var vertexShader: ZShader = ZShader(ZShaderType.VERTEX_SHADER),
+    @Transient
+    var fragmentShader: ZShader = ZShader(ZShaderType.FRAGMENT_SHADER),
+    @Transient
+    var shaderSource: ZShaderSource = ZShaderSource(),
     @ProtoNumber(3)
     val attributes: LinkedHashMap<String, ZAttribute> = LinkedHashMap(),
     @ProtoNumber(4)

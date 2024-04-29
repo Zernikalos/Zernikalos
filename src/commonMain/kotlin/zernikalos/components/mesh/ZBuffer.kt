@@ -6,6 +6,7 @@ import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
+import zernikalos.components.shader.ZAttributeId
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -21,6 +22,14 @@ class ZBuffer internal constructor(data: ZBufferData): ZComponent<ZBufferData, Z
 
     @JsName("initWithArgs")
     constructor(key: ZBufferKey, buffer: ZRawBuffer): this(ZBufferData(key, buffer))
+
+    var enabled: Boolean = false
+    
+    @JsExport.Ignore
+    val attributeId: ZAttributeId
+        get() = ZAttributeId.entries.find {
+            id == it.id
+        }!!
 
     /**
      * ID for this Buffer.

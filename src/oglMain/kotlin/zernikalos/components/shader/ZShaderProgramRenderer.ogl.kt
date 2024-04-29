@@ -1,9 +1,12 @@
 package zernikalos.components.shader
 
-import zernikalos.context.ZGLRenderingContext
-import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
-import zernikalos.context.GLWrap
+import zernikalos.context.*
+
+enum class ZGlShaderType(val value: Int) {
+    VERTEX_SHADER(ExpectShaderType.VERTEX_SHADER),
+    FRAGMENT_SHADER(ExpectShaderType.FRAGMENT_SHADER)
+}
 
 actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData>(ctx, data) {
 
@@ -16,9 +19,11 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         program.initialize(ctx)
 
         data.vertexShader.initialize(ctx)
+        data.vertexShader.initialize(data.shaderSource)
         attachShader(data.vertexShader)
 
         data.fragmentShader.initialize(ctx)
+        data.fragmentShader.initialize(data.shaderSource)
         attachShader(data.fragmentShader)
 
         data.attributes.values.forEach { attr ->

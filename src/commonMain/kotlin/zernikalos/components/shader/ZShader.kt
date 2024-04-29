@@ -10,6 +10,12 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
+enum class ZShaderType {
+    VERTEX_SHADER,
+    FRAGMENT_SHADER
+}
+
+@JsExport
 @Serializable(with = ZShaderSerializer::class)
 class ZShader
 internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRenderer>(data) {
@@ -17,16 +23,14 @@ internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRendere
     @JsName("init")
     constructor(): this(ZShaderData())
 
-    @JsName("initWithArgs")
-    constructor(type: String, source: String): this(ZShaderData(type, source))
+    @JsName("initWithType")
+    constructor(type: ZShaderType): this(ZShaderData(type))
 
-    var type: String by data::type
+    val type: ZShaderType by data::type
 
-    var source: String by data::source
-
-    override fun internalInitialize() {
-        logger.debug("Initializing $type shader with source: \n $source")
-        super.internalInitialize()
+    @JsName("initializeWithSources")
+    fun initialize(source: ZShaderSource) {
+        renderer.initialize(source)
     }
 
     override fun createRenderer(ctx: ZRenderingContext): ZShaderRenderer {
@@ -37,15 +41,14 @@ internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRendere
 
 @Serializable
 data class ZShaderData(
-    @ProtoNumber(1)
-    var type: String = "",
-    @ProtoNumber(2)
-    var source: String = ""
+    var type: ZShaderType = ZShaderType.VERTEX_SHADER
 ): ZComponentData()
 
 expect class ZShaderRenderer(ctx: ZRenderingContext, data: ZShaderData): ZComponentRender<ZShaderData> {
 
     override fun initialize()
+
+    fun initialize(source: ZShaderSource)
 
 }
 
