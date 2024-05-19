@@ -54,6 +54,10 @@ abstract class ZObject {
     val isRoot: Boolean
         get() = !hasParent
 
+    private var _initialized: Boolean = false
+    val isInitialized: Boolean
+        get() = _initialized
+
     // TODO: Ugly hack for assigning parent after load from exporter
     init {
         for (child in children) {
@@ -63,7 +67,9 @@ abstract class ZObject {
 
     fun initialize(sceneContext: ZSceneContext, renderingContext: ZRenderingContext) {
         internalInitialize(sceneContext, renderingContext)
-        children.forEach { child -> child.initialize(sceneContext, renderingContext) }
+        children.forEach { child ->
+            child.initialize(sceneContext, renderingContext) }
+        _initialized = true
     }
 
     fun render(sceneContext: ZSceneContext, ctx: ZRenderingContext) {

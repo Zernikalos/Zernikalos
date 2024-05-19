@@ -18,13 +18,11 @@ open class ZernikalosBase: ZLoggable {
     lateinit var surfaceView: ZSurfaceView
     lateinit var renderingContext: ZRenderingContext
     lateinit var stateHandler: ZSceneStateHandler
-    lateinit var sceneContext: ZSceneContext
+    var sceneContext: ZSceneContext? = null
 
     val settings: ZSettings = ZSettings.getInstance()
 
-    init {
-        println("Starting engine")
-    }
+    var isInitialized: Boolean = false
 
     fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
         logger.info("Zernikalos Engine is ready!")
@@ -35,18 +33,25 @@ open class ZernikalosBase: ZLoggable {
         sceneContext = contextCreator.createSceneContext(surfaceView)
         renderingContext = contextCreator.createRenderingContext(surfaceView)
 
-        surfaceView.eventHandler = object : ZSurfaceViewEventHandler {
+        surfaceView.eventHandler = object: ZSurfaceViewEventHandler {
             override fun onReady() {
-                stateHandler.onReady(sceneContext, renderingContext)
-                initialized = true
+                stateHandler.onReady(sceneContext!!, renderingContext)
+                sceneContext?.scene?.initialize(sceneContext!!, renderingContext)
+                isInitialized = true
             }
 
             override fun onRender() {
-                if (!initialized) {
-                    initialized = true
-                    stateHandler.onReady(sceneContext, renderingContext)
+                if (!isInitialized) {
+                    isInitialized = true
+                    stateHandler.onReady(sceneContext!!, renderingContext)
                 }
-                stateHandler.onRender(sceneContext, renderingContext)
+                if (isInitialized && !sceneContext?.isInitialized!!) {
+                    sceneContext?.scene?.initialize(sceneContext!!, renderingContext)
+                }
+                if (isInitialized && sceneContext?.isInitialized!!) {
+                    stateHandler.onRender(sceneContext!!, renderingContext)
+                    sceneContext?.scene?.render(sceneContext!!, renderingContext)
+                }
             }
         }
         logger.info("View attached")

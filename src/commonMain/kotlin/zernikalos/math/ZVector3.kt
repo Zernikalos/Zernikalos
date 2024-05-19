@@ -38,6 +38,13 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
     override val dataType: ZDataType
         get() = ZTypes.VEC3F
 
+    val normalized: ZVector3
+        get() {
+            val result = ZVector3()
+            normalize(result, this)
+            return result
+        }
+
     operator fun set(i: Int, value: Float) {
         when(i) {
             0 -> x = value

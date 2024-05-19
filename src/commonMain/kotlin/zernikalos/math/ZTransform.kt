@@ -20,9 +20,9 @@ class ZTransform() {
     private val _rotation: ZQuaternion = ZQuaternion.Identity
     private val _scale: ZVector3 = ZVector3.Ones
 
-    private val _forward: ZVector3 = ZVector3.Forward
-    private val _right: ZVector3 = ZVector3.Right
-    private val _up: ZVector3 = ZVector3.Up
+    private var _forward: ZVector3 = ZVector3.Forward
+    private var _right: ZVector3 = ZVector3.Right
+    private var _up: ZVector3 = ZVector3.Up
 
 
     @JsName("initWithArgs")
@@ -31,6 +31,36 @@ class ZTransform() {
         _rotation.copy(rotation)
         _scale.copy(scale)
     }
+
+    var forward: ZVector3
+        get() = _forward
+        set(value) {
+            _forward = value.normalized
+            ZVector3.cross(_right, _forward, _up)
+            _right.normalize()
+            ZVector3.cross(_up, _right, _forward)
+            _up.normalize()
+        }
+
+    var right: ZVector3
+        get() = _right
+        set(value) {
+            _right = value.normalized
+            ZVector3.cross(_up, _right, _forward)
+            _up.normalize()
+            ZVector3.cross(_forward, _up, _right)
+            _forward.normalize()
+        }
+
+    var up: ZVector3
+        get() = _up
+        set(value) {
+            _up = value.normalized
+            ZVector3.cross(_forward, _up, _right)
+            _forward.normalize()
+            ZVector3.cross(_right, _forward, _up)
+            _right.normalize()
+        }
 
     var location: ZVector3
         get() = _location
