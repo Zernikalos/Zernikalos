@@ -1,14 +1,9 @@
 package zernikalos.logger
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ptr
-import platform.darwin.OS_LOG_DEFAULT
-import platform.darwin.OS_LOG_TYPE_DEBUG
-import platform.darwin.__dso_handle
-import platform.darwin._os_log_internal
 import platform.posix.printf
 
-actual class ZLoggerAdapterConsole : ZLoggerAdapter() {
+actual class ZLoggerAdapterConsole : ZLoggerAdapter {
     @OptIn(ExperimentalForeignApi::class)
     actual override fun debug(message: String) {
 //        _os_log_internal(
@@ -17,6 +12,19 @@ actual class ZLoggerAdapterConsole : ZLoggerAdapter() {
 //            OS_LOG_TYPE_DEBUG,
 //            message
 //        )
+        // TODO All of these must be changed
+        printf("$message\n")
+    }
+
+    actual override fun info(message: String) {
+        printf("$message\n")
+    }
+
+    actual override fun warn(message: String) {
+        printf("$message\n")
+    }
+
+    actual override fun error(message: String) {
         printf("$message\n")
     }
 

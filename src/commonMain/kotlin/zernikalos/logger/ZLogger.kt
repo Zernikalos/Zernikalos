@@ -1,11 +1,8 @@
 package zernikalos.logger
 
+import zernikalos.settings.ZLoggerSettings
+import zernikalos.settings.ZSettings
 import kotlin.js.JsExport
-
-@JsExport
-interface ZLoggable {
-
-}
 
 inline fun <reified T: ZLoggable> T.createLogger(): ZLogger {
     return ZLogger(T::class.simpleName, this.hashCode())
@@ -24,14 +21,10 @@ inline val <reified T: ZLoggable> T.logger: ZLogger
 class ZLogger(private val clsName: String?, val instanceId: Int) {
 
     private val logOnceSet = HashSet<String>()
-    private val adapters = ArrayList<ZLoggerAdapter>()
-
-    init {
-        adapters.add(ZLoggerAdapterConsole())
-    }
+    private val settings: ZLoggerSettings = ZSettings.getInstance().loggerSettings
 
     fun debug(message: String) {
-        debugMessage(message)
+        fireMessage(message, ZLogLevel.DEBUG)
     }
 
     fun debugOnce(message: String) {
@@ -39,19 +32,37 @@ class ZLogger(private val clsName: String?, val instanceId: Int) {
             return
         }
         logOnceSet.add(message)
-        debugMessage(message)
+        fireMessage(message, ZLogLevel.DEBUG)
     }
 
-    private fun debugMessage(message: String) {
-        val m = buildMessage(message)
-        adapters.forEach {
-            it.debug(m)
+    fun info(message: String) {
+        fireMessage(message, ZLogLevel.INFO)
+    }
+
+    private fun fireMessage(message: String, level: ZLogLevel) {
+        if (level < settings.logLevel) {
+            return
+        }
+        val m = buildMessage(message, level)
+        settings.adapters.forEach { adapter ->
+            when (level) {
+                ZLogLevel.DEBUG -> adapter.debug(m)
+                ZLogLevel.INFO -> adapter.info(m)
+                ZLogLevel.WARNING -> adapter.warn(m)
+                ZLogLevel.ERROR -> adapter.error(m)
+            }
         }
     }
 
-    private fun buildMessage(message: String): String {
-        return "[$clsName] $message"
+    private fun buildMessage(message: String, level: ZLogLevel): String {
+        return "${prettyLogLevel(level.name)} [$clsName] $message"
     }
+
+    private fun prettyLogLevel(levelName: String): String {
+        val max = ZLogLevel.entries.map { it.name }.maxBy { it.length }
+        val extraSpaces = max.length - levelName.length
+        return "${levelName}${" ".repeat(extraSpaces)}"
+        }
 
     companion object {
 
@@ -62,7 +73,7 @@ class ZLogger(private val clsName: String?, val instanceId: Int) {
                 return instances.getValue(instanceId)
             }
             val logger = ZLogger(clsName, instanceId)
-            instances.set(instanceId, logger)
+            instances[instanceId] = logger
             return logger
         }
     }

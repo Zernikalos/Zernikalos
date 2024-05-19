@@ -48,6 +48,7 @@ class AndroidNativeRenderer: GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(p0: GL10?, width: Int, height: Int) {
+        // TODO: Review this
         GLES20.glViewport(0, 0, width, height)
     }
 

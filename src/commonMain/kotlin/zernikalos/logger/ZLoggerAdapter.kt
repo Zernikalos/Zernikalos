@@ -1,9 +1,18 @@
 package zernikalos.logger
 
-abstract class ZLoggerAdapter {
-    abstract fun debug(message: String)
+import kotlin.js.JsExport
+
+@JsExport
+interface ZLoggerAdapter {
+    fun debug(message: String)
+    fun info(message: String)
+    fun warn(message: String)
+    fun error(message: String)
 }
 
 expect class ZLoggerAdapterConsole(): ZLoggerAdapter {
     override fun debug(message: String)
+    override fun info(message: String)
+    override fun warn(message: String)
+    override fun error(message: String)
 }

@@ -8,11 +8,19 @@ import kotlin.js.JsExport
 @JsExport
 open class ZSceneContext {
 
-    var scene: ZScene? = null
+    private var _scene: ZScene? = null
+    var scene: ZScene?
+        get() = _scene
+        set(value) {
+            _scene = value
+        }
 
     var activeCamera: ZCamera? = null
 
     private val uniformsGeneratorMap = HashMap<String, ZUniformGenerator>()
+
+    val isInitialized: Boolean
+        get() = scene?.isInitialized == true
 
     fun getUniform(key: String): ZUniformGenerator? {
         if (uniformsGeneratorMap.containsKey(key)) {
