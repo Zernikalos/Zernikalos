@@ -1,10 +1,18 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.context.ZSceneContext
-import zernikalos.context.ZRenderingContext
 import zernikalos.components.camera.ZPerspectiveLens
+import zernikalos.context.ZRenderingContext
+import zernikalos.context.ZSceneContext
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZVector3
 import kotlin.js.JsExport
