@@ -8,6 +8,7 @@
 
 package zernikalos
 
+import zernikalos.context.ZContext
 import zernikalos.context.ZContextCreator
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZSceneContext
@@ -24,9 +25,9 @@ import kotlin.js.JsExport
 open class ZernikalosBase: ZLoggable {
 
     lateinit var surfaceView: ZSurfaceView
-    lateinit var renderingContext: ZRenderingContext
     lateinit var stateHandler: ZSceneStateHandler
-    var sceneContext: ZSceneContext? = null
+
+    lateinit var context: ZContext
 
     val settings: ZSettings = ZSettings.getInstance()
 
@@ -38,27 +39,26 @@ open class ZernikalosBase: ZLoggable {
         this.stateHandler = stateHandler
         this.surfaceView = view
 
-        sceneContext = contextCreator.createSceneContext(surfaceView)
-        renderingContext = contextCreator.createRenderingContext(surfaceView)
+        context = contextCreator.createContext(surfaceView)
 
         surfaceView.eventHandler = object: ZSurfaceViewEventHandler {
             override fun onReady() {
-                stateHandler.onReady(sceneContext!!, renderingContext)
-                sceneContext?.scene?.initialize(sceneContext!!, renderingContext)
+                stateHandler.onReady(context)
+                context.scene?.initialize(context)
                 isInitialized = true
             }
 
             override fun onRender() {
                 if (!isInitialized) {
                     isInitialized = true
-                    stateHandler.onReady(sceneContext!!, renderingContext)
+                    stateHandler.onReady(context)
                 }
-                if (isInitialized && !sceneContext?.isInitialized!!) {
-                    sceneContext?.scene?.initialize(sceneContext!!, renderingContext)
+                if (isInitialized && !context.isInitialized) {
+                    context.scene?.initialize(context)
                 }
-                if (isInitialized && sceneContext?.isInitialized!!) {
-                    stateHandler.onRender(sceneContext!!, renderingContext)
-                    sceneContext?.scene?.render(sceneContext!!, renderingContext)
+                if (isInitialized && context.isInitialized) {
+                    stateHandler.onRender(context)
+                    context.scene?.render(context)
                 }
             }
         }

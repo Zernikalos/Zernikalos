@@ -11,8 +11,7 @@ package zernikalos.objects
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import zernikalos.components.ZViewport
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
+import zernikalos.context.ZContext
 import kotlin.js.JsExport
 
 @JsExport
@@ -24,11 +23,11 @@ class ZScene: ZObject() {
     @Transient
     var viewport: ZViewport = ZViewport()
 
-    override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
-        viewport.initialize(ctx)
+    override fun internalInitialize(ctx: ZContext) {
+        viewport.initialize(ctx.renderingContext)
     }
 
-    override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
+    override fun internalRender(ctx: ZContext) {
         viewport.render()
     }
 }

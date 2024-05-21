@@ -8,6 +8,7 @@
 
 package zernikalos
 
+import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZSceneContext
 import kotlin.js.JsExport
@@ -15,9 +16,9 @@ import kotlin.js.JsExport
 @JsExport
 interface ZSceneStateHandler {
 
-    fun onReady(sceneContext: ZSceneContext, renderingContext: ZRenderingContext)
+    fun onReady(context: ZContext)
 
     fun onResize(width: Int, height: Int)
 
-    fun onRender(sceneContext: ZSceneContext, renderingContext: ZRenderingContext)
+    fun onRender(context: ZContext)
 }

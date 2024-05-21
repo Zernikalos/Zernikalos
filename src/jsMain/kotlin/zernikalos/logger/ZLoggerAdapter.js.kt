@@ -12,7 +12,6 @@ import kotlin.js.Console
 
 abstract external class WindowConsole: Console {
     fun debug(vararg o: Any?)
-
 }
 
 external val console: WindowConsole
