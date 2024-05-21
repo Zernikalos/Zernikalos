@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos
 
-import zernikalos.ui.ZSurfaceView
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.context.createDefaultContextCreator
-import kotlin.js.JsExport
+import zernikalos.ui.ZSurfaceView
 
 @JsExport
 class Zernikalos: ZernikalosBase() {

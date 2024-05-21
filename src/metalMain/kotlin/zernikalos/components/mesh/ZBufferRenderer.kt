@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.components.mesh
 
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -5,10 +13,10 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Metal.*
 import zernikalos.ZDataType
-import zernikalos.context.ZMtlRenderingContext
-import zernikalos.context.ZRenderingContext
 import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
+import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
 

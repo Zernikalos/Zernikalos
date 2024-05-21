@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.components.shader
 
 import kotlinx.cinterop.CPointer
@@ -7,9 +15,9 @@ import platform.Foundation.NSError
 import platform.Metal.MTLCompileOptions
 import platform.Metal.MTLFunctionProtocol
 import platform.Metal.MTLLibraryProtocol
-import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderData) : ZComponentRender<ZShaderData>(ctx, data) {
 

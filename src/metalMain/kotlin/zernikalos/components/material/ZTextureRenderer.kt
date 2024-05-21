@@ -1,16 +1,26 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.components.material
 
 import kotlinx.cinterop.*
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.Foundation.create
-import platform.Metal.*
+import platform.Metal.MTLStorageModePrivate
+import platform.Metal.MTLTextureProtocol
+import platform.Metal.MTLTextureUsageShaderRead
 import platform.MetalKit.MTKTextureLoader
 import platform.MetalKit.MTKTextureLoaderOptionTextureStorageMode
 import platform.MetalKit.MTKTextureLoaderOptionTextureUsage
-import zernikalos.context.ZRenderingContext
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: ZTextureData) : ZComponentRender<ZTextureData>(ctx, data) {
 

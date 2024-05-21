@@ -1,9 +1,19 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.components.mesh
 
-import platform.Metal.*
+import platform.Metal.MTLIndexTypeUInt16
+import platform.Metal.MTLPrimitiveTypeTriangle
+import platform.Metal.MTLVertexDescriptor
+import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.components.ZComponentRender
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData) : ZComponentRender<ZMeshData>(ctx, data) {
 

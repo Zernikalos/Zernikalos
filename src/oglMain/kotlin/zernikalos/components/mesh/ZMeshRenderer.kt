@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
@@ -5,8 +13,8 @@ import zernikalos.components.ZComponentRender
 import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.toOglBaseType
 import zernikalos.logger.logger
+import zernikalos.toOglBaseType
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData>(ctx, data) {
 
