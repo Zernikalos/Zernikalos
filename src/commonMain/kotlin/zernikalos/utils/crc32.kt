@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.utils
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun crc32(bytes: ByteArray): Int {
-    var checksum: UInt = 0xFFFFFFFFu
+    var checksum = 0xFFFFFFFFu
     val uBytes = bytes.toUByteArray()
     val length = uBytes.size
     for (i in 0 until length) {

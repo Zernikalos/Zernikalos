@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.context
 
 import android.opengl.GLES30
@@ -91,7 +99,7 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun createBuffer(): GLWrap {
-        val buff: IntArray = IntArray(1)
+        val buff = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)
         val id = buff[0]
         return GLWrap(id)
@@ -119,7 +127,7 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun createVertexArray(): GLWrap {
-        val buff: IntArray = IntArray(1)
+        val buff = IntArray(1)
         GLES30.glGenVertexArrays(1, buff, 0)
         val id = buff[0]
         return GLWrap(id)
