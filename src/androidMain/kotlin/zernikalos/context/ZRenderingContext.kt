@@ -99,7 +99,7 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun createBuffer(): GLWrap {
-        val buff: IntArray = IntArray(1)
+        val buff = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)
         val id = buff[0]
         return GLWrap(id)
@@ -127,7 +127,7 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun createVertexArray(): GLWrap {
-        val buff: IntArray = IntArray(1)
+        val buff = IntArray(1)
         GLES30.glGenVertexArrays(1, buff, 0)
         val id = buff[0]
         return GLWrap(id)

@@ -11,11 +11,11 @@ package zernikalos.components.material
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
-actual class ZBitmap {
+actual class ZBitmap actual constructor(byteArray: ByteArray) {
 
     val nativeBitmap: Bitmap
 
-    actual constructor(byteArray: ByteArray) {
+    init {
         nativeBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
 

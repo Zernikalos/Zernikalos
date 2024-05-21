@@ -8,9 +8,7 @@
 
 package zernikalos.components.material
 
-expect class ZBitmap {
-
-    constructor(byteArray: ByteArray)
+expect class ZBitmap(byteArray: ByteArray) {
 
     fun dispose()
 

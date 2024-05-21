@@ -10,7 +10,7 @@ package zernikalos.utils
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun crc32(bytes: ByteArray): Int {
-    var checksum: UInt = 0xFFFFFFFFu
+    var checksum = 0xFFFFFFFFu
     val uBytes = bytes.toUByteArray()
     val length = uBytes.size
     for (i in 0 until length) {

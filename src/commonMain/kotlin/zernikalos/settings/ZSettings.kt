@@ -31,7 +31,7 @@ class ZSettings private constructor() {
          * @return The singleton instance of ZSettings.
          */
         fun getInstance(): ZSettings {
-            return instance as ZSettings
+            return instance
         }
     }
 }

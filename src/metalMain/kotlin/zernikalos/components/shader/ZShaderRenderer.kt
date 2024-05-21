@@ -32,7 +32,7 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZS
     @OptIn(ExperimentalForeignApi::class)
     actual fun initialize(source: ZShaderSource) {
         ctx as ZMtlRenderingContext
-        var err: CPointer<ObjCObjectVar<NSError?>>? = null
+        val err: CPointer<ObjCObjectVar<NSError?>>? = null
 
         library = ctx.device.newLibraryWithSource(source.metalShaderSource, MTLCompileOptions(), err)!!
 
