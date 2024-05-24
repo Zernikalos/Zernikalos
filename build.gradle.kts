@@ -7,19 +7,25 @@
  */
 
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalDistributionDsl
+
+// Constants
+val zernikalosName = "zernikalos"
+val zernikalosNameCapital = "Zernikalos"
+val zernikalosFullName = "io.zernikalos"
+val zernikalosVersion = "0.0.1"
 
 plugins {
     kotlin("multiplatform") apply true
     id("com.android.library") apply true
     id("org.jetbrains.kotlin.android") apply false
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("maven-publish")
     // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
 
-group = "zernikalos"
-version = "0.0.1"
+group = zernikalosName
+version = zernikalosVersion
 
 repositories {
     mavenLocal()
@@ -29,13 +35,13 @@ repositories {
 }
 
 android {
-    namespace="io.zernikalos"
+    namespace=zernikalosFullName
     compileSdk=33
 
     defaultConfig {
         minSdk=24
 
-        version="0.0.1"
+        version=zernikalosVersion
 
         testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
         // consumerProguardFiles="consumer-rules.pro"
@@ -73,13 +79,13 @@ kotlin {
         }
         browser {
             binaries.executable()
-            @OptIn(ExperimentalDistributionDsl::class)
-            distribution {
-                outputDirectory = File("$projectDir/output/")
-            }
+//            @OptIn(ExperimentalDistributionDsl::class)
+//            distribution {
+//                outputDirectory = File("$projectDir/output/")
+//            }
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
-                output?.library = "zernikalos"
+                output?.library = zernikalosName
                 mode = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.Mode.DEVELOPMENT
                 sourceMaps = true
             }
@@ -95,37 +101,19 @@ kotlin {
 //        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
 //    }
 
-    val appleFrameworkBaseName = "Zernikalos"
+    val xcf = XCFramework(zernikalosNameCapital)
+    val appleTargets = listOf(macosArm64(), iosArm64(), iosSimulatorArm64())
 
-    val xcf = XCFramework(appleFrameworkBaseName)
-
-    macosArm64() {
-        binaries.framework {
+    appleTargets.forEach {
+        it.binaries.framework {
             isStatic = true
-            baseName = appleFrameworkBaseName
-            binaryOption("bundleId", "io.zernikalos")
+            baseName = zernikalosNameCapital
+            binaryOption("bundleId", zernikalosFullName)
+            binaryOption("bundleVersion", zernikalosVersion)
+            debuggable = true
             xcf.add(this)
         }
     }
-
-    iosArm64() {
-        binaries.framework {
-            isStatic = true
-            baseName = appleFrameworkBaseName
-            binaryOption("bundleId", "io.zernikalos")
-            xcf.add(this)
-        }
-    }
-
-    iosSimulatorArm64() {
-        binaries.framework {
-            isStatic = true
-            baseName = appleFrameworkBaseName
-            binaryOption("bundleId", "io.zernikalos")
-            xcf.add(this)
-        }
-    }
-
     
     sourceSets {
         all {
@@ -160,6 +148,10 @@ kotlin {
         }
 
         jsMain {
+            // Required for compatibility with zdebugger (see webpack file)
+            dependencies {
+                implementation(devNpm("string-replace-loader", "3.1.0"))
+            }
             dependsOn(oglMain)
         }
 
@@ -172,15 +164,6 @@ kotlin {
             dependsOn(metalMain)
             kotlin.srcDir("src/iosMain/kotlin")
         }
-
-//        val iosMain by getting {
-//            dependsOn(metalMain)
-//            kotlin.srcDir("src/iosMain/kotlin")
-//        }
-//
-//        val iosSimulatorArm64Main by getting {
-//            dependsOn(iosMain)
-//        }
 
     }
 }
