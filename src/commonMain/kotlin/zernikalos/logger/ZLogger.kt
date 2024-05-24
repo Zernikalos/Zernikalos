@@ -69,7 +69,7 @@ class ZLogger(private val clsName: String?, val instanceId: Int) {
     private fun prettyLogLevel(levelName: String): String {
         val max = ZLogLevel.entries.map { it.name }.maxBy { it.length }
         val extraSpaces = max.length - levelName.length
-        return "${levelName}${" ".repeat(extraSpaces)}"
+        return "[Zernikalos - ${levelName}]${" ".repeat(extraSpaces)}"
         }
 
     companion object {
