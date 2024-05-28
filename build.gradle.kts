@@ -9,9 +9,9 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 // Constants
+val zernikalosGroup = "io.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNameCapital = "Zernikalos"
-val zernikalosFullName = "io.zernikalos"
 val zernikalosVersion = "0.0.1"
 
 plugins {
@@ -24,7 +24,7 @@ plugins {
     // id("org.jlleitschuh.gradle.ktlint")
 }
 
-group = zernikalosName
+group = zernikalosGroup
 version = zernikalosVersion
 
 repositories {
@@ -35,7 +35,7 @@ repositories {
 }
 
 android {
-    namespace=zernikalosFullName
+    namespace=zernikalosGroup
     compileSdk=33
 
     defaultConfig {
@@ -64,6 +64,8 @@ kotlin {
     }
 
     androidTarget {
+        publishLibraryVariants("release", "debug")
+
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
@@ -108,7 +110,7 @@ kotlin {
         it.binaries.framework {
             isStatic = true
             baseName = zernikalosNameCapital
-            binaryOption("bundleId", zernikalosFullName)
+            binaryOption("bundleId", zernikalosGroup)
             binaryOption("bundleVersion", zernikalosVersion)
             debuggable = true
             xcf.add(this)
@@ -150,6 +152,7 @@ kotlin {
         jsMain {
             // Required for compatibility with zdebugger (see webpack file)
             dependencies {
+                implementation(npm("ua-parser-js","1.0.37"))
                 implementation(devNpm("string-replace-loader", "3.1.0"))
             }
             dependsOn(oglMain)
