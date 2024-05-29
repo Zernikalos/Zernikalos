@@ -10,7 +10,7 @@ package zernikalos.context
 
 import zernikalos.ui.ZSurfaceView
 
-class ZDefaultContextCreator: ZContextCreator {
+class ZDefaultContextCreator: ZContextCreator() {
 
     override fun createSceneContext(surfaceView: ZSurfaceView): ZSceneContext {
         return createDefaultSceneContext()

@@ -65,6 +65,7 @@ fun loadFromProtoString(hexString: String): ZObject {
     return protoFormat.decodeFromHexString(ZkoFormat.serializer(), hexString).data.zObject
 }
 
+// TODO: These methods might not return ZObject but ZObject?
 @JsExport
 fun loadFromProto(byteArray: ByteArray): ZObject {
     val protoFormat = createSerializersModule()

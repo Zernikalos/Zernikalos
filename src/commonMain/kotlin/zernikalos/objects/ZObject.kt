@@ -12,14 +12,36 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
+import zernikalos.context.ZContext
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
 import zernikalos.utils.randomId
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
+/**
+ * Represents a generic object within the Zernikalos engine. This abstract class serves as the base for all objects
+ * within the engine, providing common properties and functions that are essential for the engine's operation.
+ *
+ * @property id A unique identifier for the object, automatically generated to ensure uniqueness.
+ * @property name The name of the object. If not explicitly set, a default name is generated based on the object's type and ID.
+ * @property transform An instance of [ZTransform] representing the object's position, rotation, and scale in the 3D space.
+ * @property children An array of [ZObject]s that are children of this object, allowing for a hierarchical structure.
+ * @property parent A reference to the parent [ZObject], if any. Null if the object has no parent, making it a root object.
+ * @property hasParent A boolean indicating whether this object has a parent object.
+ * @property isRoot A boolean indicating whether this object is a root object (i.e., has no parent).
+ * @property isInitialized A boolean indicating whether the object has been initialized. This is set to true after the first call to [initialize].
+ *
+ * The class provides several functions for object manipulation and lifecycle management, including:
+ * - [initialize]: Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.
+ * - [render]: Renders the object and its children. This function is responsible for drawing the object on the screen.
+ * - [addChild]: Adds a child object to this object, establishing a parent-child relationship.
+ * - [lookAt]: Adjusts the object's orientation so that it "looks at" a specified point in space.
+ * - [translate]: Moves the object by a specified amount along each axis.
+ *
+ * Abstract functions [internalInitialize] and [internalRender] must be implemented by subclasses to define specific initialization and rendering behaviors.
+ *
+ */
 @JsExport
 @Serializable
 @Polymorphic
@@ -73,18 +95,35 @@ abstract class ZObject {
         }
     }
 
-    fun initialize(sceneContext: ZSceneContext, renderingContext: ZRenderingContext) {
-        internalInitialize(sceneContext, renderingContext)
+    /**
+     * Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.
+     * It sets the object's state to initialized and recursively initializes all child objects.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for initialization.
+     */
+    fun initialize(ctx: ZContext) {
+        internalInitialize(ctx)
         children.forEach { child ->
-            child.initialize(sceneContext, renderingContext) }
+            child.initialize(ctx) }
         _initialized = true
     }
 
-    fun render(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
-        internalRender(sceneContext, ctx)
-        children.forEach { child -> child.render(sceneContext, ctx) }
+    /**
+     * Renders the object and its children to the screen. This function is responsible for drawing the object on the screen.
+     * It should be called every frame to update the object's appearance based on its current state and transformations.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for rendering.
+     */
+    fun render(ctx: ZContext) {
+        internalRender(ctx)
+        children.forEach { child -> child.render(ctx) }
     }
 
+    /**
+     * Adds a child object to this object, establishing a parent-child relationship. The child object will be rendered relative to this object's transform.
+     *
+     * @param child The child object to add.
+     */
     fun addChild(child: ZObject) {
         children += child
         assignThisParent(child)
@@ -94,21 +133,49 @@ abstract class ZObject {
         obj._parent = this
     }
 
+    /**
+     * Adjusts the object's orientation so that it "looks at" a specified point in space.
+     *
+     * @param look The point in space to look at.
+     */
     fun lookAt(look: ZVector3) {
         lookAt(look, ZVector3.Up)
     }
 
+    /**
+     * Adjusts the object's orientation so that it "looks at" a specified point in space, with a specified up direction. This changes the object's rotation to face the point, while aligning its up direction with the specified up vector.
+     *
+     * @param look The point in space to look at.
+     * @param up The up direction vector to align with.
+     */
     @JsName("lookAtWithUp")
     fun lookAt(look: ZVector3, up: ZVector3) {
         transform.lookAt(look, up)
     }
 
+    /**
+     * Moves the object by a specified amount along each axis. This changes the object's position based on the given x, y, and z offsets.
+     *
+     * @param x The amount to move along the X axis.
+     * @param y The amount to move along the Y axis.
+     * @param z The amount to move along the Z axis.
+     */
     fun translate(x: Float, y: Float, z: Float) {
         transform.translate(x, y, z)
     }
 
-    protected abstract fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext)
+    /**
+     * Abstract method to be implemented by subclasses for specific initialization behaviors. This method is called by the `initialize` method.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for initialization.
+     */
+    protected abstract fun internalInitialize(ctx: ZContext)
 
-    protected abstract fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext)
+    /**
+     * Abstract method to be implemented by subclasses for specific rendering behaviors. This method is called by the `render` method.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for rendering.
+     */
+    protected abstract fun internalRender(ctx: ZContext)
 
 }

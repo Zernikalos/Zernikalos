@@ -6,15 +6,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.objects
+package zernikalos.loader
 
-import kotlin.js.JsExport
+import org.khronos.webgl.Uint8Array
+import zernikalos.objects.ZObject
 
 @JsExport
-enum class ZObjectType {
-    SCENE,
-    MODEL,
-    GROUP,
-    CAMERA,
-    SKELETON;
+fun loadFromUint8Array(array: Uint8Array): ZObject {
+    return loadFromProto(array.asDynamic() as ByteArray)
 }

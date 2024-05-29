@@ -21,8 +21,7 @@ import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
 import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.skeleton.ZSkinning
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
+import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.ZLoggable
 import zernikalos.shadergenerator.ZAttributesEnabler
@@ -52,7 +51,7 @@ class ZModel: ZObject(), ZLoggable {
     val hasSkeleton: Boolean
         get() = skeleton != null
 
-    override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
+    override fun internalInitialize(ctx: ZContext) {
         val enabler = buildAttributeEnabler()
 
         val shaderSourceGenerator = ZShaderSourceGenerator()
@@ -68,9 +67,9 @@ class ZModel: ZObject(), ZLoggable {
         mesh.buildBuffers()
         enableRequiredBuffers(enabler)
 
-        shaderProgram.initialize(ctx)
-        mesh.initialize(ctx)
-        material?.initialize(ctx)
+        shaderProgram.initialize(ctx.renderingContext)
+        mesh.initialize(ctx.renderingContext)
+        material?.initialize(ctx.renderingContext)
         //skeleton?.initialize(ctx)
     }
 
@@ -113,14 +112,14 @@ class ZModel: ZObject(), ZLoggable {
         return enabler
     }
 
-    override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
+    override fun internalRender(ctx: ZContext) {
         shaderProgram.bind()
         material?.bind()
 
         shaderProgram.uniforms.forEach { (name, uniform) ->
-            val uniformGenerator = sceneContext.getUniform(name)
+            val uniformGenerator = ctx.sceneContext.getUniform(name)
             if (uniformGenerator != null) {
-                val uniformValue = uniformGenerator.compute(sceneContext, this)
+                val uniformValue = uniformGenerator.compute(ctx.sceneContext, this)
                 uniform.bindValue(shaderProgram, uniformValue)
             }
         }

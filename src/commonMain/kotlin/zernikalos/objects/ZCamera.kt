@@ -11,8 +11,7 @@ package zernikalos.objects
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.camera.ZPerspectiveLens
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
+import zernikalos.context.ZContext
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZVector3
 import kotlin.js.JsExport
@@ -54,10 +53,10 @@ class ZCamera: ZObject {
         this.lens = ZPerspectiveLens.Default
     }
 
-    override fun internalInitialize(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
+    override fun internalInitialize(ctx: ZContext) {
     }
 
-    override fun internalRender(sceneContext: ZSceneContext, ctx: ZRenderingContext) {
+    override fun internalRender(ctx: ZContext) {
     }
 
     companion object {

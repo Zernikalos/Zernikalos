@@ -11,11 +11,16 @@ package zernikalos.context
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport
 
-@JsExport
-interface ZContextCreator {
+abstract class ZContextCreator {
 
-    fun createSceneContext(surfaceView: ZSurfaceView): ZSceneContext
+    fun createContext(surfaceView: ZSurfaceView): ZContext {
+        val sceneContext = createSceneContext(surfaceView)
+        val renderingContext = createRenderingContext(surfaceView)
+        return ZContext(sceneContext, renderingContext)
+    }
 
-    fun createRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext
+    abstract fun createSceneContext(surfaceView: ZSurfaceView): ZSceneContext
+
+    abstract fun createRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext
 
 }

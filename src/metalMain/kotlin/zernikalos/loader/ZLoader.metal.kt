@@ -18,9 +18,9 @@ import platform.Foundation.dataWithContentsOfURL
 import zernikalos.objects.ZObject
 
 @OptIn(ExperimentalForeignApi::class)
-suspend fun loadFromFile(fileName: String): ZObject? = coroutineScope {
+suspend fun loadFromFile(filePath: String): ZObject? = coroutineScope {
     // Get the URL for the file iOS
-    val fileURL = NSBundle.mainBundle.URLForResource(fileName, null)
+    val fileURL = NSBundle.mainBundle.URLForResource(filePath, null)
 
     if (fileURL != null) {
         // Trying to load the file content
