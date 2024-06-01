@@ -9,6 +9,8 @@
 package zernikalos.stats
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.js.JsExport
 
 @JsExport
@@ -19,8 +21,8 @@ enum class ZOperativeSystem {
     WEB
 }
 
-@Serializable
 @JsExport
+@Serializable
 data class ZOsInfo(
     val os: ZOperativeSystem,
     val osVersion: String
@@ -35,6 +37,10 @@ class ZStats {
 
     init {
         osInfo = getZOsInfo()
+    }
+
+    fun toJson(): String {
+        return Json.encodeToString(this)
     }
 
 }

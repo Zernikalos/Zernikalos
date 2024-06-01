@@ -8,7 +8,7 @@
 
 package zernikalos.components.skeleton
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -71,7 +71,7 @@ data class ZBoneData(
 }
 
 class ZBoneSerializer: ZComponentSerializer<ZBone, ZBoneData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZBoneData>
+    override val kSerializer: KSerializer<ZBoneData>
         get() = ZBoneData.serializer()
 
     override fun createComponentInstance(data: ZBoneData): ZBone {

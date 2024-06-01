@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponent
@@ -78,7 +78,7 @@ expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): Z
 }
 
 class ZAttributeSerializer: ZComponentSerializer<ZAttribute, ZAttributeData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZAttributeData>
+    override val kSerializer: KSerializer<ZAttributeData>
         get() = ZAttributeData.serializer()
 
     override fun createComponentInstance(data: ZAttributeData): ZAttribute {

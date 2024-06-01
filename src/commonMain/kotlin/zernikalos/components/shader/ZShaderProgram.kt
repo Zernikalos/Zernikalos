@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -92,7 +92,7 @@ expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgram
 }
 
 class ZShaderProgramSerializer: ZComponentSerializer<ZShaderProgram, ZShaderProgramData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZShaderProgramData>
+    override val kSerializer: KSerializer<ZShaderProgramData>
         get() = ZShaderProgramData.serializer()
 
     override fun createComponentInstance(data: ZShaderProgramData): ZShaderProgram {

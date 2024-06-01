@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
@@ -93,7 +93,7 @@ expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComp
 }
 
 class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZUniformData>
+    override val kSerializer: KSerializer<ZUniformData>
         get() = ZUniformData.serializer()
 
     override fun createComponentInstance(data: ZUniformData): ZUniform {

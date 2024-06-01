@@ -12,8 +12,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZContext
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
 
 @Serializable
 class ZSkeleton: ZObject() {

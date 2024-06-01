@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import zernikalos.components.ZBasicComponent
 import zernikalos.components.ZComponentData
@@ -56,7 +56,7 @@ data class ZShaderSourceData(
 ): ZComponentData()
 
 class ZShaderSourceSerializer: ZComponentSerializer<ZShaderSource, ZShaderSourceData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZShaderSourceData>
+    override val kSerializer: KSerializer<ZShaderSourceData>
         get() = ZShaderSourceData.serializer()
 
     override fun createComponentInstance(data: ZShaderSourceData): ZShaderSource {

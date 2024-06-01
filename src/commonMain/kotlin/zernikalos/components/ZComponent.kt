@@ -8,7 +8,6 @@
 
 package zernikalos.components
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -22,7 +21,7 @@ import kotlin.js.JsExport
 open class ZComponent<
     D: ZComponentData,
     R: ZComponentRender<D>>
-internal constructor(protected val data: D): ZLoggable {
+internal constructor(internal val data: D): ZLoggable {
 
     private var initialized: Boolean = false
 
@@ -101,32 +100,45 @@ abstract class ZComponentSerializer<
     D: ZComponentData>
     : KSerializer<T> {
 
-    abstract val deserializationStrategy: DeserializationStrategy<D>
+    abstract val kSerializer: KSerializer<D>
 
     override val descriptor: SerialDescriptor
-        get() = deserializationStrategy.descriptor
+        get() = kSerializer.descriptor
 
     protected abstract fun createComponentInstance(data: D): T
 
     override fun deserialize(decoder: Decoder): T {
-        val data = decoder.decodeSerializableValue(deserializationStrategy)
+        val data = decoder.decodeSerializableValue(kSerializer)
         return createComponentInstance(data)
     }
 
-    override fun serialize(encoder: Encoder, value: T) {}
+    override fun serialize(encoder: Encoder, value: T) {
+        return encoder.encodeSerializableValue(kSerializer, value.data)
+    }
 
 }
 
 interface ZBindeable {
 
+    /**
+     * Binds the renderer.
+     * This method is called to prepare the renderer for drawing.
+     */
     fun bind()
 
+    /**
+     * Unbinds the renderer.
+     * This method is called after drawing to clean up.
+     */
     fun unbind()
 
 }
 
 interface ZRenderizable {
 
+    /**
+     * Draws the mesh on the screen using its renderer.
+     */
     fun render()
 
 }

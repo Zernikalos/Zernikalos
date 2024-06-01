@@ -9,7 +9,6 @@
 package zernikalos.context
 
 import zernikalos.ui.ZSurfaceView
-import kotlin.js.JsExport
 
 abstract class ZContextCreator {
 
