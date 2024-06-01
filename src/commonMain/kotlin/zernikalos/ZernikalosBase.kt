@@ -10,13 +10,10 @@ package zernikalos
 
 import zernikalos.context.ZContext
 import zernikalos.context.ZContextCreator
-import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZSceneContext
-import zernikalos.loader.loadFromProtoString
 import zernikalos.logger.ZLoggable
 import zernikalos.logger.logger
-import zernikalos.objects.ZObject
 import zernikalos.settings.ZSettings
+import zernikalos.stats.ZStats
 import zernikalos.ui.ZSurfaceView
 import zernikalos.ui.ZSurfaceViewEventHandler
 import kotlin.js.JsExport
@@ -29,9 +26,13 @@ open class ZernikalosBase: ZLoggable {
 
     lateinit var context: ZContext
 
+    @Suppress("unused")
     val settings: ZSettings = ZSettings.getInstance()
 
     var isInitialized: Boolean = false
+
+    @Suppress("unused")
+    val stats: ZStats = ZStats()
 
     fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
         logger.info("Zernikalos Engine is ready!")
@@ -63,9 +64,5 @@ open class ZernikalosBase: ZLoggable {
             }
         }
         logger.info("View attached")
-    }
-
-    fun load(hexString: String): ZObject {
-        return loadFromProtoString(hexString)
     }
 }
