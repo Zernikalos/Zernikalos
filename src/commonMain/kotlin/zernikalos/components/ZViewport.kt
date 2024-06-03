@@ -8,7 +8,7 @@
 
 package zernikalos.components
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import zernikalos.context.BufferBit
 import zernikalos.context.ZRenderingContext
@@ -53,7 +53,7 @@ expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZCo
 }
 
 class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZViewportData>
+    override val kSerializer: KSerializer<ZViewportData>
         get() = ZViewportData.serializer()
 
     override fun createComponentInstance(data: ZViewportData): ZViewport {

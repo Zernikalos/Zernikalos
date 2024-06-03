@@ -6,17 +6,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos
+package zernikalos.stats
 
-import zernikalos.context.ZContext
-import kotlin.js.JsExport
+import android.os.Build
 
-@JsExport
-interface ZSceneStateHandler {
-
-    fun onReady(context: ZContext)
-
-    fun onResize(width: Int, height: Int)
-
-    fun onRender(context: ZContext)
+actual fun getZOsInfo(): ZOsInfo {
+    return ZOsInfo(
+        os = ZOperativeSystem.ANDROID,
+        osVersion = Build.VERSION.RELEASE
+    )
 }

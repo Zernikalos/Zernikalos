@@ -6,6 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 // Constants
@@ -78,6 +79,13 @@ kotlin {
             customField("description", "Zernikalos Game Engine for the browser")
             customField("license", "MPL v2.0")
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
+        }
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
+            }
         }
         browser {
             binaries.executable()
@@ -130,7 +138,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0-RC")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.7.0-RC")
             }
         }
 

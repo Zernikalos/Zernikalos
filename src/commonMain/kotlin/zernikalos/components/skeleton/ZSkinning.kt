@@ -8,7 +8,7 @@
 
 package zernikalos.components.skeleton
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZBasicComponent
@@ -35,7 +35,7 @@ data class ZSkinningData(
 ): ZComponentData()
 
 class ZSkinningSerializer: ZComponentSerializer<ZSkinning, ZSkinningData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZSkinningData>
+    override val kSerializer: KSerializer<ZSkinningData>
         get() = ZSkinningData.serializer()
 
     override fun createComponentInstance(data: ZSkinningData): ZSkinning {

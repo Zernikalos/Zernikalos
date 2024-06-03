@@ -8,7 +8,7 @@
 
 package zernikalos.components.mesh
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
@@ -105,7 +105,7 @@ data class ZBufferKeyData(
 ): ZComponentData()
 
 class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZBufferKeyData>
+    override val kSerializer: KSerializer<ZBufferKeyData>
         get() = ZBufferKeyData.serializer()
 
     override fun createComponentInstance(data: ZBufferKeyData): ZBufferKey {

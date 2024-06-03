@@ -8,7 +8,7 @@
 
 package zernikalos.components.mesh
 
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -27,17 +27,22 @@ import kotlin.js.JsName
 @JsExport
 class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZRef, ZLoggable {
 
-    @JsName("init")
-    constructor(): this(ZMeshData())
-
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
      */
     val buffers: Map<String, ZBuffer> by data::buffers
 
+
     val indexBuffer: ZBuffer? by data::indexBuffer
 
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
+
+    override var refId: Int
+        get() = computeRefIdFromString(data.toString())
+        set(value) {}
+
+    @JsName("init")
+    constructor(): this(ZMeshData())
 
     override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {
         return ZMeshRenderer(ctx, data)
@@ -55,10 +60,19 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
         renderer.unbind()
     }
 
+    /**
+     * Adds a buffer key to the mesh data.
+     * @param bufferKey The key of the buffer to add.
+     */
     fun addBufferKey(bufferKey: ZBufferKey) {
         data.addBufferKey(bufferKey)
     }
 
+    /**
+     * Gets the buffer by its name.
+     * @param name The name of the buffer.
+     * @return The requested buffer if it exists, null otherwise.
+     */
     fun getBufferByName(name: String): ZBuffer? {
         return data.buffers[name]
     }
@@ -78,17 +92,25 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
         return data.getBufferKey(name)
     }
 
+    /**
+     * Adds a raw buffer to the mesh data.
+     * @param rawBuffer The raw buffer to add.
+     */
     fun addRawBuffer(rawBuffer: ZRawBuffer) {
         data.addRawBuffer(rawBuffer)
     }
 
+    /**
+     * Builds or prepares all the buffers for rendering.
+     * This most likely involves transferring data to GPU memory.
+     */
     fun buildBuffers() {
         data.buildBuffers()
     }
 
-    override var refId: Int
-        get() = computeRefIdFromString(data.toString())
-        set(value) {}
+//    fun toJson(): String {
+//        return Json.encodeToString(ZMesh.serializer(), this)
+//    }
 
 }
 
@@ -153,7 +175,7 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
 }
 
 class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData>() {
-    override val deserializationStrategy: DeserializationStrategy<ZMeshData>
+    override val kSerializer: KSerializer<ZMeshData>
         get() = ZMeshData.serializer()
 
     override fun createComponentInstance(data: ZMeshData): ZMesh {
