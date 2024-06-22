@@ -6,16 +6,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.uniformgenerator
+package zernikalos.generators.uniformgenerator
 
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
+import zernikalos.upToRoot
 
-class ZInverseBindMatrixGenerator: ZUniformGenerator {
+class ZModelMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
-        val bindMatrix = sceneContext.getUniform("BindMatrix")?.compute(sceneContext, obj) as ZMatrix4
-        return bindMatrix.inverted()
+        var m = ZMatrix4.Identity
+        for (parentObj in upToRoot(obj)) {
+            val parentMatrix = parentObj.transform.matrix
+            m = parentMatrix * m
+        }
+        return m
     }
 }

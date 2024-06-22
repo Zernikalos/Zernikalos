@@ -6,11 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.shadergenerator
+package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZShaderSource
 import zernikalos.logger.ZLoggable
-import zernikalos.shadergenerator.libs.*
+import zernikalos.generators.shadergenerator.libs.*
 
 actual class ZShaderSourceGenerator : ZLoggable {
 

@@ -6,21 +6,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.uniformgenerator
+package zernikalos.generators.uniformgenerator
 
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject
-import zernikalos.objects.ZModel
+import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 
-class ZBindMatrixGenerator: ZUniformGenerator {
+class ZInverseBindMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
-        obj as ZModel
-        if (obj.skeleton == null) {
-            throw Error("Unable to compute bone matrices without an skeleton attached to object ${obj.name}")
-        }
-        val skeleton = obj.skeleton!!
-
-        return skeleton.transform.matrix
+        val bindMatrix = sceneContext.getUniform("BindMatrix")?.compute(sceneContext, obj) as ZMatrix4
+        return bindMatrix.inverted()
     }
 }

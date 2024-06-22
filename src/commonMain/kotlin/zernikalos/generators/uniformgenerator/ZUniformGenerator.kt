@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.uniformgenerator
+package zernikalos.generators.uniformgenerator
 
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject

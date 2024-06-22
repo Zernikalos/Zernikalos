@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.shadergenerator.libs
+package zernikalos.generators.shadergenerator.libs
 
 const val shaderCommonHeaders = """
 #include <metal_stdlib>

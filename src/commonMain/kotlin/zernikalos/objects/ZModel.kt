@@ -24,8 +24,8 @@ import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.ZLoggable
-import zernikalos.shadergenerator.ZAttributesEnabler
-import zernikalos.shadergenerator.ZShaderSourceGenerator
+import zernikalos.generators.shadergenerator.ZAttributesEnabler
+import zernikalos.generators.shadergenerator.ZShaderSourceGenerator
 import kotlin.js.JsExport
 
 @JsExport
@@ -74,7 +74,7 @@ class ZModel: ZObject(), ZLoggable {
     }
 
     private fun addRequiredUniforms(enabler: ZAttributesEnabler) {
-        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix())
+        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         //shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         //shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
     }
