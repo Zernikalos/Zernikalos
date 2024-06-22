@@ -23,9 +23,12 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 // TODO: These guys are incorrect, they need to provide a new uniform each time
-val ZUniformProjectionMatrix = ZUniform("u_projMatrix", 1, ZTypes.MAT4F)
-val ZUniformViewMatrix = ZUniform("u_viewMatrix", 1, ZTypes.MAT4F)
-val ZUniformModelViewProjectionMatrix = { ZUniform("u_mvpMatrix", 1, ZTypes.MAT4F) }
+val ZUniformProjectionMatrix: ZUniform
+    get() = ZUniform("u_projMatrix", 1, ZTypes.MAT4F)
+val ZUniformViewMatrix: ZUniform
+    get() = ZUniform("u_viewMatrix", 1, ZTypes.MAT4F)
+val ZUniformModelViewProjectionMatrix: ZUniform
+    get() = ZUniform("u_mvpMatrix", 1, ZTypes.MAT4F)
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
