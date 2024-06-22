@@ -15,7 +15,6 @@ import zernikalos.logger.logger
 import zernikalos.settings.ZSettings
 import zernikalos.stats.ZStats
 import zernikalos.ui.ZSurfaceView
-import zernikalos.ui.ZSurfaceViewEventHandler
 import kotlin.js.JsExport
 
 @JsExport
@@ -29,8 +28,6 @@ open class ZernikalosBase: ZLoggable {
     @Suppress("unused")
     val settings: ZSettings = ZSettings.getInstance()
 
-    var isInitialized: Boolean = false
-
     @Suppress("unused")
     val stats: ZStats = ZStats()
 
@@ -42,27 +39,7 @@ open class ZernikalosBase: ZLoggable {
 
         context = contextCreator.createContext(surfaceView)
 
-        surfaceView.eventHandler = object: ZSurfaceViewEventHandler {
-            override fun onReady() {
-                stateHandler.onReady(context)
-                context.scene?.initialize(context)
-                isInitialized = true
-            }
-
-            override fun onRender() {
-                if (!isInitialized) {
-                    isInitialized = true
-                    stateHandler.onReady(context)
-                }
-                if (isInitialized && !context.isInitialized) {
-                    context.scene?.initialize(context)
-                }
-                if (isInitialized && context.isInitialized) {
-                    stateHandler.onRender(context)
-                    context.scene?.render(context)
-                }
-            }
-        }
+        surfaceView.eventHandler = createSurfaceViewEventHandler(context, stateHandler)
         logger.info("View attached")
     }
 }

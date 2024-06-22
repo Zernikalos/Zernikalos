@@ -14,9 +14,9 @@ import kotlin.js.JsExport
 @JsExport
 interface ZSceneStateHandler {
 
-    fun onReady(context: ZContext)
+    fun onReady(context: ZContext, done: () -> Unit)
 
     fun onResize(width: Int, height: Int)
 
-    fun onRender(context: ZContext)
+    fun onRender(context: ZContext, done: () -> Unit)
 }
