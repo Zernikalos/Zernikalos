@@ -19,24 +19,32 @@ import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-enum class ZAttributeId(val id: Int) {
-    INDICES(0),
-    POSITION(1),
-    NORMAL(2),
-    COLOR(3),
-    UV(4),
-    BONE_WEIGHT(5),
-    BONE_INDEX(6)
+@JsExport
+enum class ZAttributeId(val id: Int, val attrName: String) {
+    INDICES(0, "indices"),
+    POSITION(1, "a_position"),
+    NORMAL(2, "a_normal"),
+    COLOR(3, "a_color"),
+    UV(4, "a_uv"),
+    BONE_WEIGHT(5, "a_boneWeight"),
+    BONE_INDEX(6, "a_boneIndices")
 }
 
-// TODO: These guys are incorrect, they need to provide a new attribute each time
-val ZAttrIndices = ZAttribute(0, "indices")
-val ZAttrPosition = ZAttribute(1, "a_position")
-val ZAttrNormal = ZAttribute(2, "a_normal")
-val ZAttrColor = ZAttribute(3, "a_color")
-val ZAttrUv = ZAttribute(4, "a_uv")
-val ZAttrBoneWeight = ZAttribute(5, "a_boneWeight")
-val ZAttrBoneIndices = ZAttribute(6, "a_boneIndices")
+
+val ZAttrIndices: ZAttribute
+    get() = ZAttribute(ZAttributeId.INDICES)
+val ZAttrPosition: ZAttribute
+    get() = ZAttribute(ZAttributeId.POSITION)
+val ZAttrNormal: ZAttribute
+    get() = ZAttribute(ZAttributeId.NORMAL)
+val ZAttrColor: ZAttribute
+    get() = ZAttribute(ZAttributeId.COLOR)
+val ZAttrUv: ZAttribute
+    get() = ZAttribute(ZAttributeId.UV)
+val ZAttrBoneWeight: ZAttribute
+    get() = ZAttribute(ZAttributeId.BONE_WEIGHT)
+val ZAttrBoneIndices: ZAttribute
+    get() = ZAttribute(ZAttributeId.BONE_INDEX)
 
 @JsExport
 @Serializable(with = ZAttributeSerializer::class)
@@ -47,6 +55,9 @@ class ZAttribute internal constructor(data: ZAttributeData): ZComponent<ZAttribu
 
     @JsName("initWithArgs")
     constructor(id: Int, attributeName: String): this(ZAttributeData(id, attributeName))
+
+    @JsName("initWithAttrId")
+    constructor(attrId: ZAttributeId): this(ZAttributeData(attrId.id, attrId.attrName))
 
     var id: Int by data::id
 
