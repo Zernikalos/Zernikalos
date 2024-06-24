@@ -33,6 +33,7 @@ open class ZernikalosBase: ZLoggable {
 
     fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
         logger.info("Zernikalos Engine is ready!")
+        logger.info(stats.toJson())
 
         this.stateHandler = stateHandler
         this.surfaceView = view

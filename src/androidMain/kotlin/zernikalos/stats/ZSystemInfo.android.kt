@@ -10,9 +10,9 @@ package zernikalos.stats
 
 import android.os.Build
 
-actual fun getZOsInfo(): ZOsInfo {
-    return ZOsInfo(
-        os = ZOperativeSystem.ANDROID,
-        osVersion = Build.VERSION.RELEASE
+actual fun getZPlatformInfo(): ZPlatformInfo {
+    return ZPlatformInfo(
+        name = ZPlatformName.ANDROID,
+        version = Build.VERSION.RELEASE
     )
 }

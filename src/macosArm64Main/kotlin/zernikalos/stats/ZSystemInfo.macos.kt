@@ -8,6 +8,6 @@
 
 package zernikalos.stats
 
-actual fun getZOsInfo(): ZOsInfo {
+actual fun getZPlatformInfo(): ZPlatformInfo {
     TODO("Not yet implemented")
 }

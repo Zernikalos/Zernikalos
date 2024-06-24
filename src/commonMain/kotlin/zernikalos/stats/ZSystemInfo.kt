@@ -15,7 +15,7 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-enum class ZOperativeSystem {
+enum class ZPlatformName {
     ANDROID,
     IOS,
     WEB
@@ -23,9 +23,9 @@ enum class ZOperativeSystem {
 
 @JsExport
 @Serializable
-data class ZOsInfo(
-    val os: ZOperativeSystem,
-    val osVersion: String
+data class ZPlatformInfo(
+    val name: ZPlatformName,
+    val version: String
 )
 
 @Serializable
@@ -33,10 +33,10 @@ data class ZOsInfo(
 class ZStats {
 
     // This need to be split in order to make it work with JSON encoding correctly
-    val osInfo: ZOsInfo
+    val platform: ZPlatformInfo
 
     init {
-        osInfo = getZOsInfo()
+        platform = getZPlatformInfo()
     }
 
     fun toJson(): String {
@@ -45,4 +45,4 @@ class ZStats {
 
 }
 
-expect fun getZOsInfo(): ZOsInfo
+expect fun getZPlatformInfo(): ZPlatformInfo
