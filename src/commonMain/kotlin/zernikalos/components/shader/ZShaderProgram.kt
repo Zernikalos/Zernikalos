@@ -30,6 +30,9 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZComponent<
 
     val uniforms: Map<String, ZUniform> by data::uniforms
 
+    val uniformsNames: Set<String>
+        get() = uniforms.keys
+
     fun addUniform(name: String, uniform: ZUniform) {
         data.uniforms[name] = uniform
     }

@@ -6,19 +6,24 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.uniformgenerator
+package zernikalos.generators.uniformgenerator
 
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 
-class ZViewMatrixGenerator: ZUniformGenerator {
+class ZModelViewProjectionMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
-        val viewMatrix = sceneContext.activeCamera?.viewMatrix
-        if (viewMatrix == null) {
+        val modelMatrixGenerator = sceneContext.getUniform("ModelMatrix")
+        val viewProjectionMatrix = sceneContext.activeCamera?.viewProjectionMatrix
+        if (viewProjectionMatrix == null) {
             return ZMatrix4.Identity
         }
-        return viewMatrix
+        if (modelMatrixGenerator == null) {
+            return viewProjectionMatrix
+        }
+        val modelMatrix = modelMatrixGenerator.compute(sceneContext, obj) as ZMatrix4
+        return viewProjectionMatrix * modelMatrix
     }
 }

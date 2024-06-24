@@ -22,10 +22,10 @@ external class UAParser(userAgent: String) {
     fun getBrowser(): BrowserInfo
 }
 
-actual fun getZOsInfo(): ZOsInfo {
+actual fun getZPlatformInfo(): ZPlatformInfo {
     val parser = UAParser(window.navigator.userAgent)
-    return ZOsInfo(
-        os = ZOperativeSystem.WEB,
-        osVersion = parser.getBrowser().version
+    return ZPlatformInfo(
+        name = ZPlatformName.WEB,
+        version = parser.getBrowser().version
     )
 }

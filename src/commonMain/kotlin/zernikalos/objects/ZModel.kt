@@ -24,8 +24,8 @@ import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.ZLoggable
-import zernikalos.shadergenerator.ZAttributesEnabler
-import zernikalos.shadergenerator.ZShaderSourceGenerator
+import zernikalos.generators.shadergenerator.ZAttributesEnabler
+import zernikalos.generators.shadergenerator.ZShaderSourceGenerator
 import kotlin.js.JsExport
 
 @JsExport
@@ -74,7 +74,7 @@ class ZModel: ZObject(), ZLoggable {
     }
 
     private fun addRequiredUniforms(enabler: ZAttributesEnabler) {
-        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix())
+        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         //shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         //shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
     }
@@ -113,16 +113,16 @@ class ZModel: ZObject(), ZLoggable {
     }
 
     override fun internalRender(ctx: ZContext) {
-        shaderProgram.bind()
-        material?.bind()
-
         shaderProgram.uniforms.forEach { (name, uniform) ->
             val uniformGenerator = ctx.sceneContext.getUniform(name)
             if (uniformGenerator != null) {
                 val uniformValue = uniformGenerator.compute(ctx.sceneContext, this)
-                uniform.bindValue(shaderProgram, uniformValue)
+                uniform.bindValue(uniformValue)
             }
         }
+
+        shaderProgram.bind()
+        material?.bind()
 
         mesh.bind()
         mesh.render()

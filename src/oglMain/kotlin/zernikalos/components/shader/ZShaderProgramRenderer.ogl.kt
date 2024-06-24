@@ -13,6 +13,7 @@ import zernikalos.context.ExpectShaderType
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 
 enum class ZGlShaderType(val value: Int) {
     VERTEX_SHADER(ExpectShaderType.VERTEX_SHADER),
@@ -27,6 +28,8 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         get() = program.renderer.programId
 
     actual override fun initialize() {
+        ctx as ZGLRenderingContext
+
         program.initialize(ctx)
 
         data.vertexShader.initialize(ctx)
@@ -45,12 +48,16 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         program.link()
         data.uniforms.values.forEach { uniform ->
             uniform.initialize(ctx)
-            uniform.renderer.bindLocation(programId)
+            uniform.renderer.uniformId = ctx.getUniformLocation(programId, uniform.uniformName)
+            logger.debug("Binding ${uniform.uniformName} to uniformId ${uniform.renderer.uniformId}")
         }
     }
 
     actual override fun bind() {
         program.bind()
+        data.uniforms.values.forEach { uniform ->
+            uniform.renderer.bindValue()
+        }
     }
 
     actual override fun unbind() {

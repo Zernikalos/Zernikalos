@@ -8,6 +8,9 @@
 
 package zernikalos.stats
 
-actual fun getZOsInfo(): ZOsInfo {
-    TODO("Not yet implemented")
+import platform.UIKit.UIDevice
+
+
+actual fun getZPlatformInfo(): ZPlatformInfo {
+    return ZPlatformInfo(version = UIDevice().systemVersion, name = ZPlatformName.IOS)
 }

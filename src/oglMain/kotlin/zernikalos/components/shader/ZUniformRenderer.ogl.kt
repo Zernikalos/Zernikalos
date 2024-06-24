@@ -28,10 +28,13 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
         logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
     }
 
-    actual fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray) {
+    fun bindValue() {
         ctx as ZGLRenderingContext
+        if (data.value == null) {
+            return
+        }
         when (data.dataType) {
-            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, values)
+            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.values)
             else -> return
         }
     }

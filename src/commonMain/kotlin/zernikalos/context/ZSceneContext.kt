@@ -10,7 +10,7 @@ package zernikalos.context
 
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
-import zernikalos.uniformgenerator.*
+import zernikalos.generators.uniformgenerator.*
 import kotlin.js.JsExport
 
 @JsExport
