@@ -10,6 +10,7 @@ package zernikalos.components.shader
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
@@ -56,18 +57,14 @@ class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData
 
     var idx: Int by data::idx
 
+    var value: ZAlgebraObject? by data::value
+
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
     }
 
-    fun bindValue4fv(shaderProgram: ZShaderProgram, values: FloatArray) {
-        renderer.bindValue(shaderProgram, values)
-    }
-
-    fun bindValue(shaderProgram: ZShaderProgram, uniform: ZAlgebraObject) {
-        when (uniform.dataType) {
-            ZTypes.MAT4F -> bindValue4fv(shaderProgram, uniform.values)
-        }
+    fun bindValue(value: ZAlgebraObject) {
+        this.value = value
     }
 
     override fun toString(): String {
@@ -86,13 +83,15 @@ data class ZUniformData(
     var dataType: ZDataType = ZTypes.NONE,
     @ProtoNumber(4)
     var idx: Int = -1
-): ZComponentData()
+): ZComponentData() {
+
+    @Transient
+    var value: ZAlgebraObject? = null
+}
 
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
 
     override fun initialize()
-
-    fun bindValue(shaderProgram: ZShaderProgram, values: FloatArray)
 }
 
 class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData>() {

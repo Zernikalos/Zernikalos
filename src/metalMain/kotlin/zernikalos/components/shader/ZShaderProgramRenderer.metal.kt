@@ -8,11 +8,10 @@
 
 package zernikalos.components.shader
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.*
 import platform.Foundation.NSError
 import platform.Metal.*
+import platform.posix.memcpy
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
@@ -68,9 +67,26 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
     }
 
     actual override fun bind() {
+        data.uniforms.values.forEach { uniform ->
+            bindUniformValue(uniform)
+        }
     }
 
     actual override fun unbind() {
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun bindUniformValue(uniform: ZUniform) {
+        ctx as ZMtlRenderingContext
+
+        val contentPointer = uniformBuffer?.contents().rawValue // + data.dataType.byteSize.toLong()
+        uniform.value?.values?.usePinned { pinned ->
+            memcpy(interpretCPointer<CPointed>(contentPointer), pinned.addressOf(0), uniform.dataType.byteSize.toULong())
+        }
+
+        // TODO: This location is still hardcoded
+        ctx.renderEncoder?.setVertexBuffer(uniformBuffer, 0u, 7u)
+        ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, 7u)
     }
 
 }
