@@ -15,6 +15,7 @@ import platform.MetalKit.MTKView
 actual class ZSurfaceView(view: MTKView) {
 
     var nativeView: MTKView
+    private val viewDelegate: ZMtkViewDelegate = ZMtkViewDelegate()
 
     @OptIn(ExperimentalForeignApi::class)
     actual val width: Int
@@ -33,10 +34,21 @@ actual class ZSurfaceView(view: MTKView) {
             }
         }
 
-    actual var eventHandler: ZSurfaceViewEventHandler? = null
+    actual var eventHandler: ZSurfaceViewEventHandler?
+        get() = viewDelegate.eventHandler
+        set(value) {
+            viewDelegate.eventHandler = value
+        }
 
     init {
         nativeView = view
+        setViewDelegate()
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun setViewDelegate() {
+        viewDelegate.mtkView(nativeView, nativeView.drawableSize)
+        nativeView.delegate = viewDelegate
     }
 
 }

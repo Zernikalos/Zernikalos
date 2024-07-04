@@ -8,12 +8,11 @@
 
 package zernikalos.components
 
-import zernikalos.context.CullModeType
-import zernikalos.context.Enabler
-import zernikalos.context.ZGLRenderingContext
-import zernikalos.context.ZRenderingContext
+import zernikalos.context.*
 
 actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData>(ctx, data) {
+    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
+
     actual override fun initialize() {
         ctx as ZGLRenderingContext
         // TODO: This hardcoded code NEEDS to be changed asap
@@ -26,7 +25,7 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: 
         ctx as ZGLRenderingContext
         val v = data.clearColor
         ctx.clearColor(v.x, v.y, v.z, v.w)
-        ctx.clear(data.clearMask)
+        ctx.clear(clearMask)
     }
 
 }
