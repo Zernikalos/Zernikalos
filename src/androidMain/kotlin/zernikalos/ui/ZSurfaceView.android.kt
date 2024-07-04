@@ -15,7 +15,7 @@ import javax.microedition.khronos.opengles.GL10
 
 actual class ZSurfaceView(view: GLSurfaceView) {
 
-    lateinit var nativeSurfaceView: GLSurfaceView
+    var nativeSurfaceView: GLSurfaceView
     private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
 
     actual val width: Int
@@ -29,12 +29,7 @@ actual class ZSurfaceView(view: GLSurfaceView) {
         }
 
     init {
-        attachView(view)
-    }
-
-    fun attachView(nativeSurfaceView: GLSurfaceView) {
-        this.nativeSurfaceView = nativeSurfaceView
-
+        this.nativeSurfaceView = view
         setNativeRenderer()
     }
 

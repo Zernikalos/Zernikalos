@@ -11,13 +11,13 @@ package zernikalos.renderer
 import zernikalos.context.ZContext
 
 actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
-    override fun bind() {
+    actual override fun bind() {
     }
 
-    override fun unbind() {
+    actual override fun unbind() {
     }
 
-    override fun render() {
+    actual override fun render() {
         ctx.scene?.render(ctx)
     }
 }

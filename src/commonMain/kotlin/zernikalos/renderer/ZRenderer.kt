@@ -22,5 +22,9 @@ abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZBindeable
 
 }
 
-expect class ZRenderer(ctx: ZContext): ZRendererBase
+expect class ZRenderer(ctx: ZContext): ZRendererBase {
+    override fun bind()
+    override fun unbind()
+    override fun render()
+}
 

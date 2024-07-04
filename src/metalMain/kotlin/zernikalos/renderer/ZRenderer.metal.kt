@@ -12,6 +12,7 @@ import platform.Metal.*
 import platform.MetalKit.MTKView
 import zernikalos.context.ZContext
 import zernikalos.context.ZMtlRenderingContext
+import zernikalos.logger.logger
 
 actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
 
@@ -24,17 +25,22 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         depthDescriptor.depthCompareFunction = MTLCompareFunctionLess
         depthDescriptor.depthWriteEnabled = true
         depthState = renderingContext.device.newDepthStencilStateWithDescriptor(depthDescriptor)
+
+        nativeView.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8//MTLPixelFormat.depth32Float_stencil8
+        nativeView.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB //MTLPixelFormat.bgra8Unorm_srgb
+        nativeView.sampleCount = 1u
     }
 
-    override fun bind() {
+    actual override fun bind() {
     }
 
-    override fun unbind() {
+    actual override fun unbind() {
     }
 
-    override fun render() {
+    actual override fun render() {
+        // TODO: This should need to be improved
+
         /// Per frame updates hare
-
         renderingContext.makeCommandBuffer()
 
         if (renderingContext.commandBuffer == null) {
@@ -54,7 +60,6 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         renderEncoder.setFrontFacingWinding(MTLWindingClockwise)
         renderEncoder.setDepthStencilState(depthState)
 
-        // TODO: Draw call
         ctx.scene?.render(ctx)
 
         renderingContext.renderEncoder?.popDebugGroup()
