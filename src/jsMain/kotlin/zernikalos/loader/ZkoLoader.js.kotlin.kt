@@ -8,10 +8,26 @@
 
 package zernikalos.loader
 
-import org.khronos.webgl.Uint8Array
+import kotlinx.browser.window
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
 import zernikalos.objects.ZObject
+import kotlin.js.Promise
 
+/**
+ * Loads a [ZObject] from the specified URL.
+ *
+ * This function fetches the data from the URL, converts into a [ZObject] instance.
+ *
+ * @param url The URL from which to load the data.
+ * @return A [Promise] that resolves to the loaded [ZObject].
+ */
 @JsExport
-fun loadFromUint8Array(array: Uint8Array): ZObject {
-    return loadFromProto(array.asDynamic() as ByteArray)
+fun loadFromUrl(url: String): Promise<ZObject> {
+    return window.fetch(url).then { response ->
+        response.arrayBuffer()
+    }.then { buffer: ArrayBuffer ->
+        val int8Array = Int8Array(buffer)
+        loadFromProto(int8Array as ByteArray)
+    }
 }
