@@ -9,6 +9,7 @@
 package zernikalos
 
 import zernikalos.context.ZContext
+import zernikalos.renderer.ZRenderer
 import zernikalos.ui.ZSurfaceViewEventHandler
 
 enum class ZSurfaceViewEventHandlerState {
@@ -20,6 +21,8 @@ enum class ZSurfaceViewEventHandlerState {
 
 fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHandler): ZSurfaceViewEventHandler {
     return object: ZSurfaceViewEventHandler {
+
+        private val mainRenderer: ZRenderer = ZRenderer(context)
 
         var initializationState: ZSurfaceViewEventHandlerState = ZSurfaceViewEventHandlerState.READY
 
@@ -40,14 +43,14 @@ fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHa
         private fun initialize() {
             if (initializationState == ZSurfaceViewEventHandlerState.HANDLER_INITIALIZED) {
                 initializationState = ZSurfaceViewEventHandlerState.SCENE_INITIALIZED
-                context.scene?.initialize(context)
+                mainRenderer.initialize()
             }
         }
 
         private fun render() {
             if (initializationState == ZSurfaceViewEventHandlerState.SCENE_INITIALIZED) {
                 stateHandler.onRender(context, ::doneRender)
-                context.scene?.render(context)
+                mainRenderer.render()
             }
         }
 

@@ -42,7 +42,7 @@ internal constructor(data: ZViewportData):
 @Serializable
 data class ZViewportData(
     var clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f),
-    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
+//    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 ): ZComponentData()
 
 expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {

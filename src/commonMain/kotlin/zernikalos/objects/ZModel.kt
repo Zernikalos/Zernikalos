@@ -8,10 +8,7 @@
 
 package zernikalos.objects
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -22,6 +19,7 @@ import zernikalos.components.shader.*
 import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
+import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.ZLoggable
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
@@ -51,7 +49,12 @@ class ZModel: ZObject(), ZLoggable {
     val hasSkeleton: Boolean
         get() = skeleton != null
 
+    @Transient
+    private lateinit var renderer: ZModelRenderer
+
     override fun internalInitialize(ctx: ZContext) {
+        renderer = ZModelRenderer(ctx.renderingContext, this)
+
         val enabler = buildAttributeEnabler()
 
         val shaderSourceGenerator = ZShaderSourceGenerator()
@@ -67,10 +70,7 @@ class ZModel: ZObject(), ZLoggable {
         mesh.buildBuffers()
         enableRequiredBuffers(enabler)
 
-        shaderProgram.initialize(ctx.renderingContext)
-        mesh.initialize(ctx.renderingContext)
-        material?.initialize(ctx.renderingContext)
-        //skeleton?.initialize(ctx)
+        renderer.initialize()
     }
 
     private fun addRequiredUniforms(enabler: ZAttributesEnabler) {
@@ -121,15 +121,7 @@ class ZModel: ZObject(), ZLoggable {
             }
         }
 
-        shaderProgram.bind()
-        material?.bind()
-
-        mesh.bind()
-        mesh.render()
-        mesh.unbind()
-
-        material?.unbind()
-        shaderProgram.unbind()
+        renderer.render()
     }
 }
 
@@ -149,4 +141,11 @@ class ZModelSerializer(private val loaderContext: ZLoaderContext): KSerializer<Z
         TODO("Not yet implemented")
     }
 
+}
+
+expect class ZModelRenderer(ctx: ZRenderingContext, model: ZModel) {
+
+    fun initialize()
+
+    fun render()
 }
