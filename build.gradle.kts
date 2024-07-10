@@ -12,8 +12,13 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 // Constants
 val zernikalosGroup = "io.zernikalos"
 val zernikalosName = "zernikalos"
+val zernikalosNamedGroup = "${zernikalosGroup}.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
 val zernikalosVersion = "0.0.1"
+
+val zernikalosAuthorName = "Aarón Negrín"
+val zernikalosLicense = "MPL v2.0"
+val zernikalosSiteUrl = "https://zernikalos.io"
 
 plugins {
     kotlin("multiplatform") apply true
@@ -75,9 +80,9 @@ kotlin {
     js(IR) {
         moduleName = "@zernikalos/zernikalos"
         compilations["main"].packageJson {
-            customField("author", "Aarón Negrín")
+            customField("author", zernikalosAuthorName)
             customField("description", "Zernikalos Game Engine for the browser")
-            customField("license", "MPL v2.0")
+            customField("license", zernikalosLicense)
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
@@ -102,14 +107,6 @@ kotlin {
             generateTypeScriptDefinitions()
         }
     }
-//    val hostOs = System.getProperty("os.name")
-//    val isMingwX64 = hostOs.startsWith("Windows")
-//    val nativeTarget = when {
-//        hostOs == "Mac OS X" -> macosX64("native")
-//        hostOs == "Linux" -> linuxX64("native")
-//        isMingwX64 -> mingwX64("native")
-//        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-//    }
 
     val xcf = XCFramework(zernikalosNameCapital)
     val appleTargets = listOf(macosArm64(), iosArm64(), iosSimulatorArm64())
@@ -118,7 +115,7 @@ kotlin {
         it.binaries.framework {
             isStatic = true
             baseName = zernikalosNameCapital
-            binaryOption("bundleId", zernikalosGroup)
+            binaryOption("bundleId", zernikalosNamedGroup)
             binaryOption("bundleVersion", zernikalosVersion)
             debuggable = true
             xcf.add(this)
@@ -137,9 +134,9 @@ kotlin {
 
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0-RC")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.7.0-RC")
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.serialization.protobuf)
             }
         }
 

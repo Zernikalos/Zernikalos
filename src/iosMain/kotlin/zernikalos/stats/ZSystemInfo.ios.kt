@@ -10,7 +10,6 @@ package zernikalos.stats
 
 import platform.UIKit.UIDevice
 
-
 actual fun getZPlatformInfo(): ZPlatformInfo {
     return ZPlatformInfo(version = UIDevice().systemVersion, name = ZPlatformName.IOS)
 }
