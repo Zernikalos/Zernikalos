@@ -46,8 +46,13 @@ ColorInOut computeOutColor(Vertex in) {
     ColorInOut out;
 
     #if defined(USE_TEXTURE)
-        out.texCoord.x = in.texCoord.x;
-        out.texCoord.y = in.texCoord.y;
+        #if defined(FLIP_TEXTURE_Y)
+            out.texCoord.x = in.texCoord.x;
+            out.texCoord.y = 1.0 - in.texCoord.y;
+        #else
+            out.texCoord.x = in.texCoord.x;
+            out.texCoord.y = in.texCoord.y;
+        #endif
     #elif defined(USE_COLOR)
         out.color = in.color;
     #else
@@ -90,7 +95,8 @@ const val shaderFragmentMain = """
     float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap) {
         constexpr sampler colorSampler(mip_filter::linear,
                                        mag_filter::linear,
-                                       min_filter::linear);
+                                       min_filter::linear,
+                                       address::repeat);
     
         half4 colorSample = colorMap.sample(colorSampler, in.texCoord.xy);
     

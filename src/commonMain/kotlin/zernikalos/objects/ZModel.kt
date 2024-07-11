@@ -108,7 +108,12 @@ class ZModel: ZObject(), ZLoggable {
         enabler.usePosition = mesh.hasBufferKey("position")
         enabler.useColors = mesh.hasBufferKey("color")
         //enabler.useNormals = mesh.hasBufferKey("normal")
-        enabler.useTextures = hasTextures
+        if (hasTextures) {
+            enabler.useTextures = hasTextures
+            if (material?.texture?.flipY == true) {
+                enabler.flipTextureY = true
+            }
+        }
         return enabler
     }
 

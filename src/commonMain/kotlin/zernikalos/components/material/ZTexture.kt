@@ -24,13 +24,17 @@ class ZTexture internal constructor(data: ZTextureData): ZRefComponent<ZTextureD
     constructor(): this(ZTextureData())
 
     @JsName("initWithArgs")
-    constructor(id: String, width: Int, height: Int, dataArray: ByteArray): this(ZTextureData(id, width, height, dataArray))
+    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(ZTextureData(id, width, height, flipX, flipY, dataArray))
 
     var id: String by data::id
 
     var width: Int by data::width
 
     var height: Int by data::height
+
+    var flipX: Boolean by data::flipX
+
+    var flipY: Boolean by data::flipY
 
     var dataArray: ByteArray by data::dataArray
 
@@ -66,6 +70,10 @@ data class ZTextureData(
     @ProtoNumber(3)
     var height: Int = 0,
     @ProtoNumber(4)
+    var flipX: Boolean = false,
+    @ProtoNumber(5)
+    var flipY: Boolean = false,
+    @ProtoNumber(10)
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData() {
 
