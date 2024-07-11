@@ -17,6 +17,7 @@ class ZAttributesEnabler {
     var useColors: Boolean = false
     var useTextures: Boolean = false
     var useSkinning: Boolean = false
+    var flipTextureY: Boolean = false
 }
 
 expect class ZShaderSourceGenerator(): ZLoggable {

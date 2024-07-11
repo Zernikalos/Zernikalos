@@ -9,12 +9,22 @@
 package zernikalos.loader
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
+
+const val ZKO_VERSION = "0.2.0"
 
 @Serializable
 data class ZkoHeader(
     @ProtoNumber(1) val version: String
-)
+) {
+    init {
+        require(version == ZKO_VERSION) {
+            throw SerializationException("Wrong ZKO file version, expecting $ZKO_VERSION, got $version")
+        }
+
+    }
+}
 
 @Serializable
 data class ZkoFormat(

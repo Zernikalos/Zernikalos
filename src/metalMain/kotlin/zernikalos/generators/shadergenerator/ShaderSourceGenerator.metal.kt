@@ -21,6 +21,7 @@ actual class ZShaderSourceGenerator : ZLoggable {
         if (enabler.useNormals) source = "#define USE_NORMAL\n$source"
         if (enabler.useColors) source = "#define USE_COLOR\n$source"
         if (enabler.useTextures) source = "#define USE_TEXTURE\n$source"
+        if (enabler.flipTextureY) source = "#define FLIP_TEXTURE_Y\n$source"
 
         return source
     }

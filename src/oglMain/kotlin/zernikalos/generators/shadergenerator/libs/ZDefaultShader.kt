@@ -38,8 +38,12 @@ in vec3 a_position;
 void main() {
     gl_Position = u_mvpMatrix * vec4(a_position,1);
    
-#ifdef USE_TEXTURES 
-    v_uv = a_uv;
+#ifdef USE_TEXTURES
+    #ifdef FLIP_TEXTURE_Y
+        v_uv = vec2(a_uv.x, 1.0 - a_uv.y);;
+    #else
+        v_uv = a_uv;
+    #endif
 #endif
 #ifdef USE_COLORS
     v_color = a_color;
