@@ -12,7 +12,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZTreeNode
+import zernikalos.search.ZTreeNode
 import zernikalos.components.ZBasicComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer

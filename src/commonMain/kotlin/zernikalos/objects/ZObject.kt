@@ -12,6 +12,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.search.ZTreeNode
 import zernikalos.context.ZContext
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
@@ -45,7 +46,7 @@ import kotlin.js.JsName
 @JsExport
 @Serializable
 @Polymorphic
-abstract class ZObject {
+abstract class ZObject: ZTreeNode<ZObject> {
     @ProtoNumber(1)
     val id: String = randomId()
 
@@ -66,19 +67,19 @@ abstract class ZObject {
     @ProtoNumber(3)
     var transform: ZTransform = ZTransform()
 
-    @JsName("children")
+    //@JsName("children")
     @Transient
-    var children: Array<@Polymorphic ZObject> = emptyArray()
+    override var children: Array<@Polymorphic ZObject> = emptyArray()
 
     abstract val type: ZObjectType
 
     @Transient
     private var _parent: ZObject? = null
 
-    val parent: ZObject?
+    override val parent: ZObject?
         get() = _parent
 
-    val hasParent: Boolean
+    override val hasParent: Boolean
         get() = _parent != null
 
     val isRoot: Boolean
@@ -91,7 +92,7 @@ abstract class ZObject {
     // TODO: Ugly hack for assigning parent after load from exporter
     init {
         for (child in children) {
-            assignThisParent(child)
+            reparent(child)
         }
     }
 
@@ -126,10 +127,10 @@ abstract class ZObject {
      */
     fun addChild(child: ZObject) {
         children += child
-        assignThisParent(child)
+        reparent(child)
     }
 
-    private fun assignThisParent(obj: ZObject) {
+    private fun reparent(obj: ZObject) {
         obj._parent = this
     }
 
