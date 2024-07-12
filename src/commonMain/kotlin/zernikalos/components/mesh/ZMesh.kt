@@ -33,8 +33,18 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
     val buffers: Map<String, ZBuffer> by data::buffers
 
 
+    /**
+     * Represents an index buffer for a ZMesh.
+     *
+     * @property indexBuffer The index buffer.
+     */
     val indexBuffer: ZBuffer? by data::indexBuffer
 
+    /**
+     * Indicates whether the given `ZMesh` has an index buffer or not.
+     *
+     * @return `true` if the `ZMesh` has an index buffer, `false` otherwise.
+     */
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
 
     override var refId: Int
@@ -108,12 +118,11 @@ class ZMesh internal constructor(data: ZMeshData): ZComponent<ZMeshData, ZMeshRe
         data.buildBuffers()
     }
 
-//    fun toJson(): String {
-//        return Json.encodeToString(ZMesh.serializer(), this)
-//    }
-
 }
 
+/**
+ * @suppress
+ */
 @Serializable
 data class ZMeshData(
     @ProtoNumber(101)
@@ -166,6 +175,9 @@ data class ZMeshData(
     }
 }
 
+/**
+ * @suppress
+ */
 expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData> {
 
     override fun initialize()
@@ -174,6 +186,9 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
 
 }
 
+/**
+ * @suppress
+ */
 class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData>() {
     override val kSerializer: KSerializer<ZMeshData>
         get() = ZMeshData.serializer()
