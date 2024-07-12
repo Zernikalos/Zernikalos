@@ -18,14 +18,7 @@ import zernikalos.objects.ZObjectType
  *
  * @param obj The ZObject to initialize the search index with.
  */
-class ZSearchIndex(obj: ZObject) {
-    private val nameIndex: HashMap<String, ZObject> = hashMapOf()
-    private val typeIndex: HashMap<ZObjectType, ArrayList<ZObject>> = hashMapOf()
-
-    init {
-        addToIndices(obj)
-        indexChildren(obj)
-    }
+class ZSearchIndex(val obj: ZObject) {
 
     /**
      * Finds a ZObject in the search index by its name.
@@ -34,7 +27,7 @@ class ZSearchIndex(obj: ZObject) {
      * @return The ZObject with the specified name, or null if not found.
      */
     fun findByName(name: String): ZObject? {
-        return nameIndex[name]
+        return findInTree(obj) { obj.name == name }
     }
 
     /**
@@ -43,8 +36,7 @@ class ZSearchIndex(obj: ZObject) {
      * @return The first ZModel found, or null if no ZModel is present in the hierarchy.
      */
     fun findFirstModel(): ZModel? {
-        val models = typeIndex[ZObjectType.MODEL] ?: return null
-        return models.first() as ZModel
+        return findInTree(obj) {obj.type == ZObjectType.MODEL} as ZModel?
     }
 
     /**
@@ -53,22 +45,7 @@ class ZSearchIndex(obj: ZObject) {
      * @return The first ZCamera found, or null if no ZCamera is present in the hierarchy.
      */
     fun findFirstCamera(): ZCamera? {
-        val cameras = typeIndex[ZObjectType.CAMERA] ?: return null
-        return cameras.first() as ZCamera
+        return findInTree(obj) {obj.type == ZObjectType.CAMERA} as ZCamera?
     }
 
-    private fun addToIndices(obj: ZObject) {
-        nameIndex[obj.name] = obj
-        if (typeIndex[obj.type] == null) {
-            typeIndex[obj.type] = arrayListOf()
-        }
-        typeIndex[obj.type]?.add(obj)
-    }
-
-    private fun indexChildren(obj: ZObject) {
-        obj.children.forEach {
-            addToIndices(it)
-            indexChildren(it)
-        }
-    }
 }

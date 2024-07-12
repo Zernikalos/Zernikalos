@@ -10,6 +10,13 @@ package zernikalos.utils
 
 import zernikalos.ZTreeNode
 
+/**
+ * Traverses a tree structure starting from the given node and returns an iterator over the nodes.
+ *
+ * @param node The root node of the tree.
+ * @return An iterator over the nodes in the tree.
+ * @param T The type of the node that implements the ZTreeNode interface.
+ */
 fun <T: ZTreeNode<T>>treeTraverse(node: T): Iterator<T> {
     val q = arrayListOf(node)
     return object : Iterator<T> {

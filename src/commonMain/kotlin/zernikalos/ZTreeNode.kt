@@ -10,10 +10,15 @@ package zernikalos
 
 import kotlin.js.JsExport
 
+/**
+ * ZTreeNode interface represents a node in a tree structure.
+ *
+ * @param T the type of the node that implements ZTreeNode interface
+ */
 @JsExport
 interface ZTreeNode<T: ZTreeNode<T>> {
 
-    var parent: T?
+    val parent: T?
     val hasParent: Boolean
 
     val children: Array<T>

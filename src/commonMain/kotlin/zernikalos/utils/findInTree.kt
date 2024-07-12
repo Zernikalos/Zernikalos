@@ -10,6 +10,13 @@ package zernikalos.utils
 
 import zernikalos.ZTreeNode
 
+/**
+ * Finds a specific node in a tree on the given predicate.
+ *
+ * @param tree The root node of the tree.
+ * @param predicate The predicate function to determine if a node matches the search criteria.
+ * @return The first node that matches the predicate, or null if no matching node is found.
+ */
 fun <T: ZTreeNode<T>>findInTree(tree: T, predicate: (node: T)-> Boolean): T? {
     val it = treeTraverse(tree)
     while (it.hasNext()) {
