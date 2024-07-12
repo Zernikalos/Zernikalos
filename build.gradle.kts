@@ -6,6 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
@@ -26,6 +27,7 @@ plugins {
     id("org.jetbrains.kotlin.android") apply false
     id("org.jetbrains.kotlin.plugin.serialization")
     id("maven-publish")
+    id("org.jetbrains.dokka") version "1.9.20" apply true
     // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
@@ -176,3 +178,23 @@ kotlin {
 
     }
 }
+
+tasks.withType<DokkaTask>().configureEach {
+    val dokkaBaseConfiguration = """
+    {
+      "customAssets": ["${file("assets/zklogo.svg")}"],
+      "customStyleSheets": ["${file("assets/zk-docs-styles.css")}"],
+      "footerMessage": "(c) 2024 Zernikalos",
+      "separateInheritedMembers": false,
+
+      "mergeImplicitExpectActualDeclarations": false
+    }
+    """
+    pluginsMapConfiguration.set(
+        mapOf(
+            // fully qualified plugin name to json configuration
+            "org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration
+        )
+    )
+}
+
