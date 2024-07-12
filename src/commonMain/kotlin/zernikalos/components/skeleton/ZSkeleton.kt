@@ -14,8 +14,8 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZTransform
-import zernikalos.utils.findInTree
-import zernikalos.utils.treeTraverse
+import zernikalos.search.findInTree
+import zernikalos.search.treeAsList
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -28,7 +28,7 @@ class ZSkeleton internal constructor(data: ZSkeletonData): ZRefComponent<ZSkelet
     var root: ZBone by data::root
 
     val bones: Array<ZBone>
-        get() = treeTraverse(root).asSequence().toList().toTypedArray()
+        get() = treeAsList(root).toTypedArray()
 
     val transform: ZTransform by root::transform
 

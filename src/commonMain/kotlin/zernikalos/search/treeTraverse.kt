@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.utils
+package zernikalos.search
 
-import zernikalos.ZTreeNode
+import kotlin.js.JsExport
 
 /**
  * Traverses a tree structure starting from the given node and returns an iterator over the nodes.
@@ -30,4 +30,16 @@ fun <T: ZTreeNode<T>>treeTraverse(node: T): Iterator<T> {
         }
 
     }
+}
+
+/**
+ * Returns a list representation of the tree structure starting from the given node.
+ *
+ * @param node The root node of the tree.
+ * @return A list of nodes in the tree.
+ * @param T The type of the node that implements the ZTreeNode interface.
+ */
+@JsExport
+fun <T: ZTreeNode<T>>treeAsList(node: T): List<T> {
+    return treeTraverse(node).asSequence().toList()
 }

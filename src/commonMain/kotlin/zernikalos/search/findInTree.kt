@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.utils
+package zernikalos.search
 
-import zernikalos.ZTreeNode
+import kotlin.js.JsExport
 
 /**
  * Finds a specific node in a tree on the given predicate.
@@ -17,6 +17,7 @@ import zernikalos.ZTreeNode
  * @param predicate The predicate function to determine if a node matches the search criteria.
  * @return The first node that matches the predicate, or null if no matching node is found.
  */
+@JsExport
 fun <T: ZTreeNode<T>>findInTree(tree: T, predicate: (node: T)-> Boolean): T? {
     val it = treeTraverse(tree)
     while (it.hasNext()) {
