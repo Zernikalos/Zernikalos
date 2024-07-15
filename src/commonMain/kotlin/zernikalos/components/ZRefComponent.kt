@@ -22,8 +22,12 @@ interface ZRef {
     var refId: Int
 }
 
+interface ZRefComponent: ZComponent {
+    var refId: Int
+}
+
 @JsExport
-abstract class ZRefComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(data: D): ZComponent<D, R>(data), ZRef {
+abstract class ZRefComponentTemplate<D: ZComponentData> internal constructor(data: D): ZComponentTemplate<D>(data), ZRefComponent {
     private var _refId: Int? = null
 
     override var refId: Int
@@ -42,8 +46,26 @@ abstract class ZRefComponent<D: ZComponentData, R: ZComponentRender<D>> internal
         return computeRefIdFromString(toString())
     }
 
-    override fun toString(): String {
-        return data.toString()
+}
+
+abstract class ZRefRenderizableComponentTemplate<D: ZComponentData, R: ZComponentRender<D>>
+internal constructor(data: D): ZRenderizableComponentTemplate<D, R>(data), ZRefComponent {
+    private var _refId: Int? = null
+
+    override var refId: Int
+        get() {
+            if (_refId != null) {
+                return _refId!!
+            }
+            _refId = computeRefId()
+            return _refId!!
+        }
+        set(value) {
+            _refId = value
+        }
+
+    private fun computeRefId(): Int {
+        return computeRefIdFromString(toString())
     }
 }
 
@@ -60,7 +82,7 @@ interface ZRefComponentData<D: ZComponentData> {
 }
 
 abstract class ZRefComponentSerializer<
-    T: ZRefComponent<D, *>,
+    T: ZRefComponent,
     D: ZComponentData,
     R: ZRefComponentData<D>
     >(protected val loaderContext: ZLoaderContext)

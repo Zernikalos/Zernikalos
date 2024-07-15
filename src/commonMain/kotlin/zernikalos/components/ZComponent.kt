@@ -17,51 +17,65 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 
-@JsExport
-open class ZComponent<
-    D: ZComponentData,
-    R: ZComponentRender<D>>
-internal constructor(internal val data: D): ZLoggable {
+interface ZComponent {
+    val isInitialized: Boolean
+    val isRenderizable: Boolean
+    fun initialize(ctx: ZRenderingContext)
+}
 
+abstract class ZComponentTemplate<D: ZComponentData>
+internal constructor(internal val data: D): ZComponent, ZLoggable {
     private var initialized: Boolean = false
 
-    val isInitialized: Boolean
+    override val isInitialized: Boolean
         get() = initialized
 
-    private var _renderer: R? = null
+    override val isRenderizable: Boolean
+        get() = false
 
-    val renderer: R
-        get() {
-            if (!initialized || _renderer == null) {
-                throw Error("The component has not been initialized prior to access the renderer")
-            }
-            return _renderer!!
-        }
-
-    val isRenderizable: Boolean
-        get() = _renderer != null
-
-    fun initialize(ctx: ZRenderingContext) {
+    override fun initialize(ctx: ZRenderingContext) {
         if (initialized) {
             return
         }
-        _renderer = createRenderer(ctx)
         initialized = true
 
-        internalInitialize()
+        internalInitialize(ctx)
     }
 
-    protected open fun internalInitialize() {
-        _renderer?.initialize()
-    }
+    protected open fun internalInitialize(ctx: ZRenderingContext) {
 
-    protected open fun createRenderer(ctx: ZRenderingContext): R? {
-        return null
     }
 
     override fun toString(): String {
         return data.toString()
     }
+}
+
+@JsExport
+abstract class ZRenderizableComponentTemplate<
+    D: ZComponentData,
+    R: ZComponentRender<D>>
+internal constructor(data: D): ZComponentTemplate<D>(data) {
+
+    private var _renderer: R? = null
+
+    val renderer: R
+        get() {
+            if (!isInitialized || _renderer == null) {
+                throw Error("The component has not been initialized prior to access the renderer")
+            }
+            return _renderer!!
+        }
+
+    override val isRenderizable: Boolean
+        get() = _renderer != null
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        _renderer = createRenderer(ctx)
+        _renderer?.initialize()
+    }
+
+    protected abstract fun createRenderer(ctx: ZRenderingContext): R?
 
 }
 
@@ -85,18 +99,18 @@ abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRendering
     open fun render() {}
 }
 
-typealias ZBasicComponent<D> = ZComponent<D, ZComponentRender<D>>
+// typealias ZBasicComponent<D> = ZRenderizableComponentTemplate<D, ZComponentRender<D>>
 
 class ZEmptyComponentData: ZComponentData() {
     override fun toString(): String {
         return ""
     }
 }
-class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZComponent<ZEmptyComponentData, R>(ZEmptyComponentData())
+// class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZRenderizableComponentTemplate<ZEmptyComponentData, R>(ZEmptyComponentData())
 
 
 abstract class ZComponentSerializer<
-    T: ZComponent<D, *>,
+    T: ZComponent,
     D: ZComponentData>
     : KSerializer<T> {
 
@@ -113,7 +127,7 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
-        return encoder.encodeSerializableValue(kSerializer, value.data)
+        return encoder.encodeSerializableValue(kSerializer, (value as ZComponentTemplate<D>).data)
     }
 
 }

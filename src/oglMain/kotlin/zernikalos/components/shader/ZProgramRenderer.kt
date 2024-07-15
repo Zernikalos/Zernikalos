@@ -9,7 +9,7 @@
 package zernikalos.components.shader
 
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponent
+import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.context.GLWrap
@@ -17,7 +17,7 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsName
 
-class ZProgram internal constructor(data: ZProgramData): ZComponent<ZProgramData, ZProgramRenderer>(data), ZBindeable {
+class ZProgram internal constructor(data: ZProgramData): ZRenderizableComponentTemplate<ZProgramData, ZProgramRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZProgramData())

@@ -14,7 +14,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZComponent
+import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.components.ZComponentSerializer
@@ -33,7 +33,7 @@ val ZUniformModelViewProjectionMatrix: ZUniform
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
-class ZUniform internal constructor(data: ZUniformData): ZComponent<ZUniformData, ZUniformRenderer>(data) {
+class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponentTemplate<ZUniformData, ZUniformRenderer>(data) {
 
     @JsName("initWithArgs")
     constructor(uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(uniformName, count, dataType))

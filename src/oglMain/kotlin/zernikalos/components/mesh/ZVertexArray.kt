@@ -9,7 +9,7 @@
 package zernikalos.components.mesh
 
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponent
+import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.context.GLWrap
@@ -17,7 +17,7 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-class ZVertexArray internal constructor(data: ZVertexArrayData): ZComponent<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
+class ZVertexArray internal constructor(data: ZVertexArrayData): ZRenderizableComponentTemplate<ZVertexArrayData, ZVertexArrayRenderer>(data), ZBindeable {
 
     constructor(): this(ZVertexArrayData())
 

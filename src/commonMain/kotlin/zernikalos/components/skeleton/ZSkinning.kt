@@ -11,15 +11,15 @@ package zernikalos.components.skeleton
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZBasicComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentTemplate
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)
-class ZSkinning internal constructor(data: ZSkinningData): ZBasicComponent<ZSkinningData>(data) {
+class ZSkinning internal constructor(data: ZSkinningData): ZComponentTemplate<ZSkinningData>(data) {
 
     @JsName("init")
     constructor(): this(ZSkinningData())
