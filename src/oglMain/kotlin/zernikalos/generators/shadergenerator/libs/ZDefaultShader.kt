@@ -64,10 +64,9 @@ precision mediump float;
 out vec4 f_color;
 
 void main() {
-    #ifdef USE_TEXTURES
+    #if defined(USE_TEXTURES)
         f_color = texture(u_texture, v_uv);
-    #endif
-    #ifdef USE_COLORS
+    #elif defined(USE_COLORS)
         f_color = vec4(v_color.xyz, 1);
     #endif
 }
