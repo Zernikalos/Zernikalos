@@ -18,10 +18,6 @@ import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
 @JsExport
-interface ZRef {
-    var refId: Int
-}
-
 interface ZRefComponent: ZComponent {
     var refId: Int
 }
