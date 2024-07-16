@@ -13,9 +13,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZBasicComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentTemplate
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -25,7 +25,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZBufferKeySerializer::class)
 @JsExport
-class ZBufferKey internal constructor(data: ZBufferKeyData): ZBasicComponent<ZBufferKeyData>(data) {
+class ZBufferKey internal constructor(data: ZBufferKeyData): ZComponentTemplate<ZBufferKeyData>(data) {
 
     @JsName("init")
     constructor(): this(ZBufferKeyData())

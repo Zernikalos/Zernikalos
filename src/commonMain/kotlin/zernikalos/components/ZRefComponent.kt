@@ -13,60 +13,28 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.loader.ZLoaderContext
-import zernikalos.utils.crc32
-import kotlin.js.JsExport
 
-@JsExport
-interface ZRef {
+interface ZRefComponentWrapper<D: ZComponentData> {
+    @ProtoNumber(1)
     var refId: Int
-}
 
-@JsExport
-abstract class ZRefComponent<D: ZComponentData, R: ZComponentRender<D>> internal constructor(data: D): ZComponent<D, R>(data), ZRef {
-    private var _refId: Int? = null
-
-    override var refId: Int
-        get() {
-            if (_refId != null) {
-                return _refId!!
-            }
-            _refId = computeRefId()
-            return _refId!!
-        }
-        set(value) {
-            _refId = value
-        }
-
-    private fun computeRefId(): Int {
-        return computeRefIdFromString(toString())
-    }
-
-    override fun toString(): String {
-        return data.toString()
-    }
-}
-
-fun computeRefIdFromString(str: String): Int {
-    val dataArray = str.encodeToByteArray()
-    val hashValue = crc32(dataArray)
-    return if (hashValue < 0) hashValue.inv() else hashValue
-}
-
-interface ZRefComponentData<D: ZComponentData> {
-    var refId: Int
+    @ProtoNumber(2)
     var isReference: Boolean
+
+    @ProtoNumber(100)
     var data: D?
 }
 
 abstract class ZRefComponentSerializer<
-    T: ZRefComponent<D, *>,
+    T: ZComponent,
     D: ZComponentData,
-    R: ZRefComponentData<D>
+    K: ZRefComponentWrapper<D>
     >(protected val loaderContext: ZLoaderContext)
     : KSerializer<T> {
 
-    abstract val deserializationStrategy: DeserializationStrategy<R>
+    abstract val deserializationStrategy: DeserializationStrategy<K>
 
     override val descriptor: SerialDescriptor
         get() = deserializationStrategy.descriptor

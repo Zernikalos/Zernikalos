@@ -18,7 +18,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZRefComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponentTemplate<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())
@@ -59,7 +59,7 @@ data class ZTextureDataWrapper(
     override var isReference: Boolean = false,
     @ProtoNumber(100)
     override var data: ZTextureData? = null
-): ZRefComponentData<ZTextureData>
+): ZRefComponentWrapper<ZTextureData>
 
 @Serializable
 data class ZTextureData(

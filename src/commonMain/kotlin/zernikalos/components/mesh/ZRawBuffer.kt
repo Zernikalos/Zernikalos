@@ -11,9 +11,9 @@ package zernikalos.components.mesh
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZBasicComponent
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentTemplate
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -22,7 +22,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZRawBufferSerializer::class)
 @JsExport
-class ZRawBuffer internal constructor(data: ZRawBufferData): ZBasicComponent<ZRawBufferData>(data) {
+class ZRawBuffer internal constructor(data: ZRawBufferData): ZComponentTemplate<ZRawBufferData>(data) {
 
     @JsName("init")
     constructor(): this(ZRawBufferData())

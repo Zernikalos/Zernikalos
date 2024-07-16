@@ -21,7 +21,7 @@ import kotlin.js.JsName
 @JsExport
 class ZMaterial
 internal constructor(data: ZMaterialData):
-    ZRefComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
+    ZRenderizableComponentTemplate<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZMaterialData())
@@ -43,13 +43,12 @@ internal constructor(data: ZMaterialData):
 
 @Serializable
 data class ZMaterialDataWrapper(
-    @ProtoNumber(1)
     override var refId: Int = 0,
     @ProtoNumber(2)
     override var isReference: Boolean = false,
     @ProtoNumber(100)
     override var data: ZMaterialData? = null
-): ZRefComponentData<ZMaterialData>
+): ZRefComponentWrapper<ZMaterialData>
 
 @Serializable
 @JsExport

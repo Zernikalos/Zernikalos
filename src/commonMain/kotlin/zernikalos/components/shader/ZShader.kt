@@ -10,7 +10,7 @@ package zernikalos.components.shader
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import zernikalos.components.ZComponent
+import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.components.ZComponentSerializer
@@ -27,7 +27,7 @@ enum class ZShaderType {
 @JsExport
 @Serializable(with = ZShaderSerializer::class)
 class ZShader
-internal constructor (data: ZShaderData): ZComponent<ZShaderData, ZShaderRenderer>(data) {
+internal constructor (data: ZShaderData): ZRenderizableComponentTemplate<ZShaderData, ZShaderRenderer>(data) {
 
     @JsName("init")
     constructor(): this(ZShaderData())

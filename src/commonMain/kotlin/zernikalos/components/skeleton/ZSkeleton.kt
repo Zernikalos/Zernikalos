@@ -20,7 +20,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZSkeleton internal constructor(data: ZSkeletonData): ZRefComponent<ZSkeletonData, ZComponentRender<ZSkeletonData>>(data) {
+class ZSkeleton internal constructor(data: ZSkeletonData): ZComponentTemplate<ZSkeletonData>(data) {
 
     @JsName("init")
     constructor(): this(ZSkeletonData())
@@ -46,7 +46,7 @@ data class ZSkeletonDataWrapper(
     override var isReference: Boolean,
     @ProtoNumber(100)
     override var data: ZSkeletonData? = null
-): ZRefComponentData<ZSkeletonData>
+): ZRefComponentWrapper<ZSkeletonData>
 
 @Serializable
 data class ZSkeletonData(

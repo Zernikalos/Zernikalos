@@ -15,53 +15,90 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
+import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
-@JsExport
-open class ZComponent<
-    D: ZComponentData,
-    R: ZComponentRender<D>>
-internal constructor(internal val data: D): ZLoggable {
+interface ZComponent {
+    val isInitialized: Boolean
+    val isRenderizable: Boolean
+    var refId: Int
+    fun initialize(ctx: ZRenderingContext)
+}
 
+abstract class ZComponentTemplate<D: ZComponentData>
+internal constructor(internal val data: D): ZComponent, ZLoggable {
     private var initialized: Boolean = false
 
-    val isInitialized: Boolean
+    final override val isInitialized: Boolean
         get() = initialized
 
-    private var _renderer: R? = null
+    override val isRenderizable: Boolean
+        get() = false
 
-    val renderer: R
+    private var _refId: Int? = null
+
+    final override var refId: Int
         get() {
-            if (!initialized || _renderer == null) {
-                throw Error("The component has not been initialized prior to access the renderer")
+            if (_refId != null) {
+                return _refId!!
             }
-            return _renderer!!
+            _refId = computeRefId()
+            return _refId!!
+        }
+        set(value) {
+            _refId = value
         }
 
-    val isRenderizable: Boolean
-        get() = _renderer != null
-
-    fun initialize(ctx: ZRenderingContext) {
+    final override fun initialize(ctx: ZRenderingContext) {
         if (initialized) {
             return
         }
-        _renderer = createRenderer(ctx)
         initialized = true
 
-        internalInitialize()
+        internalInitialize(ctx)
     }
 
-    protected open fun internalInitialize() {
-        _renderer?.initialize()
-    }
+    protected open fun internalInitialize(ctx: ZRenderingContext) {
 
-    protected open fun createRenderer(ctx: ZRenderingContext): R? {
-        return null
     }
 
     override fun toString(): String {
         return data.toString()
     }
+
+    private fun computeRefId(): Int {
+        val str = this.toString()
+        val dataArray = str.encodeToByteArray()
+        val hashValue = crc32(dataArray)
+        return if (hashValue < 0) hashValue.inv() else hashValue
+    }
+}
+
+@JsExport
+abstract class ZRenderizableComponentTemplate<
+    D: ZComponentData,
+    R: ZComponentRender<D>>
+internal constructor(data: D): ZComponentTemplate<D>(data) {
+
+    private var _renderer: R? = null
+
+    val renderer: R
+        get() {
+            if (!isInitialized || _renderer == null) {
+                throw Error("The component has not been initialized prior to access the renderer")
+            }
+            return _renderer!!
+        }
+
+    override val isRenderizable: Boolean
+        get() = _renderer != null
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        _renderer = createRenderer(ctx)
+        _renderer?.initialize()
+    }
+
+    protected abstract fun createRenderer(ctx: ZRenderingContext): R?
 
 }
 
@@ -85,18 +122,18 @@ abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRendering
     open fun render() {}
 }
 
-typealias ZBasicComponent<D> = ZComponent<D, ZComponentRender<D>>
+// typealias ZBasicComponent<D> = ZRenderizableComponentTemplate<D, ZComponentRender<D>>
 
 class ZEmptyComponentData: ZComponentData() {
     override fun toString(): String {
         return ""
     }
 }
-class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZComponent<ZEmptyComponentData, R>(ZEmptyComponentData())
+// class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZRenderizableComponentTemplate<ZEmptyComponentData, R>(ZEmptyComponentData())
 
 
 abstract class ZComponentSerializer<
-    T: ZComponent<D, *>,
+    T: ZComponent,
     D: ZComponentData>
     : KSerializer<T> {
 
@@ -113,6 +150,7 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
+        value as ZComponentTemplate<D>
         return encoder.encodeSerializableValue(kSerializer, value.data)
     }
 
