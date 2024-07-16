@@ -14,7 +14,7 @@ class ZLoaderContext {
 
     private val componentsMap: HashMap<Int, ZComponent> = hashMapOf()
 
-    fun addComponent(refId: Int, component: ZComponent) {
+    fun addComponent(refId: Int, component: ZComponent?) {
         if (component == null) {
             return
         }

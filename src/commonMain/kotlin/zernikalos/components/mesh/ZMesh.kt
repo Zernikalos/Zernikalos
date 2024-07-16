@@ -25,7 +25,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplate<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZRefComponent, ZLoggable {
+class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplate<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZLoggable {
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
@@ -46,10 +46,6 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
      * @return `true` if the `ZMesh` has an index buffer, `false` otherwise.
      */
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
-
-    override var refId: Int
-        get() = computeRefIdFromString(data.toString())
-        set(value) {}
 
     @JsName("init")
     constructor(): this(ZMeshData())

@@ -15,11 +15,13 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
+import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
 interface ZComponent {
     val isInitialized: Boolean
     val isRenderizable: Boolean
+    var refId: Int
     fun initialize(ctx: ZRenderingContext)
 }
 
@@ -27,13 +29,27 @@ abstract class ZComponentTemplate<D: ZComponentData>
 internal constructor(internal val data: D): ZComponent, ZLoggable {
     private var initialized: Boolean = false
 
-    override val isInitialized: Boolean
+    final override val isInitialized: Boolean
         get() = initialized
 
     override val isRenderizable: Boolean
         get() = false
 
-    override fun initialize(ctx: ZRenderingContext) {
+    private var _refId: Int? = null
+
+    final override var refId: Int
+        get() {
+            if (_refId != null) {
+                return _refId!!
+            }
+            _refId = computeRefId()
+            return _refId!!
+        }
+        set(value) {
+            _refId = value
+        }
+
+    final override fun initialize(ctx: ZRenderingContext) {
         if (initialized) {
             return
         }
@@ -48,6 +64,13 @@ internal constructor(internal val data: D): ZComponent, ZLoggable {
 
     override fun toString(): String {
         return data.toString()
+    }
+
+    private fun computeRefId(): Int {
+        val str = this.toString()
+        val dataArray = str.encodeToByteArray()
+        val hashValue = crc32(dataArray)
+        return if (hashValue < 0) hashValue.inv() else hashValue
     }
 }
 
@@ -127,7 +150,8 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
-        return encoder.encodeSerializableValue(kSerializer, (value as ZComponentTemplate<D>).data)
+        value as ZComponentTemplate<D>
+        return encoder.encodeSerializableValue(kSerializer, value.data)
     }
 
 }
