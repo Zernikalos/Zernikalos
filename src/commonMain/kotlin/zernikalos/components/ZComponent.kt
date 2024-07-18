@@ -18,13 +18,67 @@ import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
+/**
+ * Represents a component in Zernikalos.
+ *
+ * These will encapsulate two different types of components:
+ * Basic components: For data storage and sharing
+ * Renderizable components: Which will be able to interact with the graphics APIs
+ */
 interface ZComponent {
+
+    /**
+     * Represents a boolean value indicating whether a component has been initialized.
+     *
+     * @property isInitialized Indicates whether the component has been initialized.
+     *
+     * @see ZComponent
+     * @see ZComponent.initialize
+     */
     val isInitialized: Boolean
+
+    /**
+     * Represents a boolean value indicating whether a component is renderizable.
+     *
+     * @property isRenderizable Represents whether the component is renderizable.
+     *
+     * @see ZComponent
+     * @see ZComponent.initialize
+     */
     val isRenderizable: Boolean
+
+    /**
+     * Represents the unique reference identifier for a component.
+     *
+     * @property refId The unique reference identifier for the component.
+     *
+     * @see ZComponent
+     * @see ZRefComponentSerializer
+     * @see ZLoaderContext
+     */
     var refId: Int
+
+    /**
+     * Initializes the ZComponent using the provided ZRenderingContext.
+     *
+     * @param ctx The ZRenderingContext used for initialization.
+     *
+     * @see ZComponent
+     * @see ZRenderingContext
+     */
     fun initialize(ctx: ZRenderingContext)
 }
 
+/**
+ * Represents a template for a basic component in Zernikalos.
+ * These are used for storing and sharing data
+ *
+ * @param D The type of ZComponentData associated with the template
+ *
+ * @property data The ZComponentData associated with the template*
+ * @property isRenderizable Indicates whether the component is renderizable
+ *
+ */
 abstract class ZComponentTemplate<D: ZComponentData>
 internal constructor(internal val data: D): ZComponent, ZLoggable {
     private var initialized: Boolean = false
@@ -74,7 +128,12 @@ internal constructor(internal val data: D): ZComponent, ZLoggable {
     }
 }
 
-@JsExport
+/**
+ * Represents a template for a Renderizable component in Zernikalos.
+ *
+ * @param R The type of ZComponentRender associated with the template
+ * @property renderer The ZComponentRender associated with the component. Throws an error if the component has not been initialized prior to access the renderer
+ */
 abstract class ZRenderizableComponentTemplate<
     D: ZComponentData,
     R: ZComponentRender<D>>
