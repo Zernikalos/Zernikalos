@@ -9,6 +9,8 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import java.net.URL
+import java.time.Year
 
 // Constants
 val zernikalosGroup = "io.zernikalos"
@@ -179,14 +181,17 @@ kotlin {
     }
 }
 
+fun getYear(): String {
+    return Year.now().toString()
+}
+
 tasks.withType<DokkaTask>().configureEach {
     val dokkaBaseConfiguration = """
     {
-      "customAssets": ["${file("assets/zklogo.svg")}"],
-      "customStyleSheets": ["${file("assets/zk-docs-styles.css")}"],
-      "footerMessage": "(c) 2024 Zernikalos",
+      "customAssets": ["${file("docsAssets/logo-icon.svg")}"],
+      "customStyleSheets": ["${file("docsAssets/zk-docs-styles.css")}"],
+      "footerMessage": "© ${getYear()} $zernikalosNameCapital",
       "separateInheritedMembers": false,
-
       "mergeImplicitExpectActualDeclarations": false
     }
     """
@@ -196,5 +201,13 @@ tasks.withType<DokkaTask>().configureEach {
             "org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration
         )
     )
+
+    dokkaSourceSets.configureEach {
+        sourceLink {
+            localDirectory.set(projectDir.resolve("src"))
+            remoteUrl.set(URL("https://github.com/Zernikalos/Zernikalos/tree/main/src"))
+            remoteLineSuffix.set("#L")
+        }
+    }
 }
 
