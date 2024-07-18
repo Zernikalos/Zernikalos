@@ -75,17 +75,7 @@ data class ZTextureData(
     var flipY: Boolean = false,
     @ProtoNumber(10)
     var dataArray: ByteArray = byteArrayOf(),
-): ZComponentData() {
-
-//    @ProtoNumber(1)
-//    override var refId: Int? = null
-//    @ProtoNumber(2)
-//    override var isReference: Boolean = false
-
-//    @Transient
-//    var bitmap: ZBitmap = ZBitmap(dataArray)
-
-}
+): ZComponentData()
 
 expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
 

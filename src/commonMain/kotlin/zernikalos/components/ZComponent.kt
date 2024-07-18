@@ -18,6 +18,7 @@ import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
 import kotlin.js.JsExport
 
+@JsExport
 interface ZComponent {
     val isInitialized: Boolean
     val isRenderizable: Boolean
@@ -122,15 +123,11 @@ abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRendering
     open fun render() {}
 }
 
-// typealias ZBasicComponent<D> = ZRenderizableComponentTemplate<D, ZComponentRender<D>>
-
 class ZEmptyComponentData: ZComponentData() {
     override fun toString(): String {
         return ""
     }
 }
-// class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZRenderizableComponentTemplate<ZEmptyComponentData, R>(ZEmptyComponentData())
-
 
 abstract class ZComponentSerializer<
     T: ZComponent,
