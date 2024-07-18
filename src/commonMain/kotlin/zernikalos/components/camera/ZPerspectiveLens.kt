@@ -8,27 +8,60 @@
 
 package zernikalos.components.camera
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentTemplate
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-@Serializable
+@Serializable(with = ZPerspectiveLensSerializer::class)
 @JsExport
-open class ZPerspectiveLens: ZLens {
-
-    @ProtoNumber(4)
-    var fov: Float
+open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
+    ZComponentTemplate<ZPerspectiveLensData>(data) {
 
     @JsName("init")
-    constructor(near: Float, far: Float, fov: Float) : super(near, far) {
+    constructor(near: Float, far: Float, fov: Float) : this(ZPerspectiveLensData(near, far, fov))
+
+    @JsName("initWithAspect")
+    constructor(near: Float, far: Float, fov: Float, aspectRatio: Float) : this(ZPerspectiveLensData(near, far, aspectRatio, fov))
+
+    var fov by data::fov
+
+    val projectionMatrix: ZMatrix4 by data::projectionMatrix
+
+    companion object {
+        val Default: ZPerspectiveLens
+            get() = ZPerspectiveLens(1f, 100f, 45f)
+
+    }
+}
+
+@Serializable
+class ZPerspectiveLensData(): ZLensData() {
+
+    @ProtoNumber(4)
+    var fov: Float = 0f
+
+    constructor(
+        near: Float = 0f,
+        far: Float = 0f,
+        fov: Float
+    ) : this() {
+        this.near = near
+        this.far = far
         this.fov = fov
     }
 
-    @JsName("initWithAspect")
-    constructor(near: Float, far: Float, fov: Float, aspectRatio: Float) : this(near, far, fov) {
-        _aspectRatio = aspectRatio
+    constructor(
+        near: Float = 0f,
+        far: Float = 0f,
+        fov: Float,
+        aspectRatio: Float
+    ) : this(near, far, fov) {
+        this.aspectRatio = aspectRatio
     }
 
     override val projectionMatrix: ZMatrix4
@@ -37,9 +70,16 @@ open class ZPerspectiveLens: ZLens {
             return matrix
         }
 
-    companion object {
-        val Default: ZPerspectiveLens
-            get() = ZPerspectiveLens(1f, 100f, 45f)
+    override fun toString(): String {
+        TODO("Not yet implemented")
+    }
+}
 
+class ZPerspectiveLensSerializer: ZComponentSerializer<ZPerspectiveLens, ZPerspectiveLensData>() {
+    override val kSerializer: KSerializer<ZPerspectiveLensData>
+        get() = ZPerspectiveLensData.serializer()
+
+    override fun createComponentInstance(data: ZPerspectiveLensData): ZPerspectiveLens {
+        return ZPerspectiveLens(data)
     }
 }
