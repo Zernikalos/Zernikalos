@@ -14,8 +14,6 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
-import zernikalos.components.camera.ZLens
-import zernikalos.components.camera.ZPerspectiveLens
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.material.ZMaterialSerializer
 import zernikalos.components.material.ZTexture
@@ -44,9 +42,6 @@ private fun createSerializersModule(): ProtoBuf {
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
 
-        polymorphic(ZLens::class) {
-            subclass(ZPerspectiveLens::class)
-        }
     }
 
     val protoFormat = ProtoBuf {
