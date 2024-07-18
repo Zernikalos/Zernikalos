@@ -25,7 +25,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplate<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable, ZLoggable {
+class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplate<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place

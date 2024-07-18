@@ -25,6 +25,7 @@ import kotlin.js.JsExport
  * Basic components: For data storage and sharing
  * Renderizable components: Which will be able to interact with the graphics APIs
  */
+@JsExport
 interface ZComponent {
 
     /**
@@ -181,15 +182,11 @@ abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRendering
     open fun render() {}
 }
 
-// typealias ZBasicComponent<D> = ZRenderizableComponentTemplate<D, ZComponentRender<D>>
-
 class ZEmptyComponentData: ZComponentData() {
     override fun toString(): String {
         return ""
     }
 }
-// class ZRenderOnlyComponent<R: ZComponentRender<ZEmptyComponentData>>() : ZRenderizableComponentTemplate<ZEmptyComponentData, R>(ZEmptyComponentData())
-
 
 abstract class ZComponentSerializer<
     T: ZComponent,
