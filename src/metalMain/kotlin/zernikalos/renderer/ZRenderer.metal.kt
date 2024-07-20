@@ -12,7 +12,6 @@ import platform.Metal.*
 import platform.MetalKit.MTKView
 import zernikalos.context.ZContext
 import zernikalos.context.ZMtlRenderingContext
-import zernikalos.logger.logger
 
 actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
 
@@ -69,5 +68,9 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         renderingContext.commandBuffer?.presentDrawable(drawable)
 
         renderingContext.commandBuffer?.commit()
+    }
+
+    actual override fun resize(width: Int, height: Int) {
+        ctx.scene?.onScreenResize(ctx, width, height)
     }
 }
