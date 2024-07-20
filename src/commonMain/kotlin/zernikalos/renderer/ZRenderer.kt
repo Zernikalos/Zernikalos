@@ -10,10 +10,11 @@ package zernikalos.renderer
 
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZRenderizable
+import zernikalos.components.ZResizable
 import zernikalos.context.ZContext
 import zernikalos.logger.ZLoggable
 
-abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZBindeable, ZRenderizable {
+abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZBindeable, ZRenderizable, ZResizable {
 
     fun initialize() {
         val scene = ctx.sceneContext.scene
@@ -26,5 +27,6 @@ expect class ZRenderer(ctx: ZContext): ZRendererBase {
     override fun bind()
     override fun unbind()
     override fun render()
+    override fun resize(width: Int, height: Int)
 }
 

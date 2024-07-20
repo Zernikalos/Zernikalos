@@ -59,6 +59,10 @@ class ZCamera: ZObject {
     override fun internalRender(ctx: ZContext) {
     }
 
+    override fun internalResize(ctx: ZContext, width: Int, height: Int) {
+        lens.setDimensions(width, height)
+    }
+
     companion object {
         val DefaultPerspectiveCamera: ZCamera
             get() = ZCamera(ZVector3.Zero, ZVector3.Up)

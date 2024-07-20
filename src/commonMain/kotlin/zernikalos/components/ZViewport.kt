@@ -20,7 +20,7 @@ import kotlin.js.JsName
 class ZViewport
 internal constructor(data: ZViewportData):
     ZRenderizableComponentTemplate<ZViewportData, ZViewportRenderer>(data),
-    ZRenderizable {
+    ZRenderizable, ZResizable {
 
     @JsName("init")
     constructor(): this(ZViewportData())
@@ -35,6 +35,13 @@ internal constructor(data: ZViewportData):
         renderer.render()
     }
 
+    override fun resize(width: Int, height: Int) {
+        data.viewBox.y = width.toFloat()
+        data.viewBox.z = height.toFloat()
+        renderer.onScreenResize(width, height)
+    }
+
+
 }
 
 @JsExport
@@ -42,12 +49,16 @@ internal constructor(data: ZViewportData):
 data class ZViewportData(
     var clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f),
 //    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
-): ZComponentData()
+): ZComponentData() {
+    var viewBox: ZVector4 = ZVector4(0f, 0f, 0f, 0f)
+}
 
 expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {
     override fun initialize()
 
     override fun render()
+
+    fun onScreenResize(width: Int, height: Int)
 
 }
 

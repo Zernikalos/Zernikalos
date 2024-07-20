@@ -37,6 +37,10 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
             get() = ZPerspectiveLens(1f, 100f, 45f)
 
     }
+
+    fun setDimensions(width: Int, height: Int) {
+        data.setDimensions(width, height)
+    }
 }
 
 @Serializable

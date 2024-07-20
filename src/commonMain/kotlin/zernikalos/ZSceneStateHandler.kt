@@ -16,7 +16,7 @@ interface ZSceneStateHandler {
 
     fun onReady(context: ZContext, done: () -> Unit)
 
-    fun onResize(width: Int, height: Int)
+    fun onResize(context: ZContext, width: Int, height: Int, done: () -> Unit)
 
     fun onRender(context: ZContext, done: () -> Unit)
 }

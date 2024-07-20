@@ -236,3 +236,8 @@ interface ZRenderizable {
     fun render()
 
 }
+
+interface ZResizable {
+
+    fun resize(width: Int, height: Int)
+}

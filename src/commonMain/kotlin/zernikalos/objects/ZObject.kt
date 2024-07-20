@@ -110,6 +110,21 @@ abstract class ZObject: ZTreeNode<ZObject> {
     }
 
     /**
+     * Event handler for the screen resizing.
+     * This method should not be called by the user
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for resizing.
+     * @param width The new width of the object.
+     * @param height The new height of the object.
+     */
+    fun onScreenResize(ctx: ZContext, width: Int, height: Int) {
+        internalResize(ctx, width, height)
+        children.forEach { child ->
+            child.onScreenResize(ctx, width, height)
+        }
+    }
+
+    /**
      * Renders the object and its children to the screen. This function is responsible for drawing the object on the screen.
      * It should be called every frame to update the object's appearance based on its current state and transformations.
      *
@@ -178,5 +193,17 @@ abstract class ZObject: ZTreeNode<ZObject> {
      * @param ctx The context of the current scene, providing necessary information and services for rendering.
      */
     protected abstract fun internalRender(ctx: ZContext)
+
+    /**
+     * Resizes the object and its children to the specified width and height.
+     * This function should be implemented by subclasses for specific resizing behaviors.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for resizing.
+     * @param width The new width of the object.
+     * @param height The new height of the object.
+     */
+    protected open fun internalResize(ctx: ZContext, width: Int, height: Int) {
+
+    }
 
 }

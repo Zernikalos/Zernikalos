@@ -13,4 +13,6 @@ interface ZSurfaceViewEventHandler {
     fun onReady()
 
     fun onRender()
+
+    fun onResize(width: Int, height: Int)
 }

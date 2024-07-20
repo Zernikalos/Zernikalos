@@ -30,7 +30,13 @@ fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHa
             initializationState = ZSurfaceViewEventHandlerState.HANDLER_INITIALIZED
         }
 
+        private var requiresResizing = false
+
+        // TODO: Review these functions
         private fun doneRender() {
+        }
+
+        private fun doneResize() {
         }
 
         private fun ready() {
@@ -54,15 +60,39 @@ fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHa
             }
         }
 
+        private fun resize(width: Int, height: Int) {
+            context.screenWidth = width
+            context.screenHeight = height
+            if (initializationState == ZSurfaceViewEventHandlerState.SCENE_INITIALIZED) {
+                stateHandler.onResize(context, width, height, ::doneResize)
+                mainRenderer.resize(width, height)
+                requiresResizing = false
+            } else {
+                requiresResizing = true
+            }
+        }
+
         override fun onReady() {
             ready()
             initialize()
+            if (requiresResizing) {
+                resize(context.screenWidth, context.screenHeight)
+            }
         }
 
         override fun onRender() {
             ready()
             initialize()
+            if (requiresResizing) {
+                resize(context.screenWidth, context.screenHeight)
+            }
             render()
+        }
+
+        override fun onResize(width: Int, height: Int) {
+            ready()
+            initialize()
+            resize(width, height)
         }
     }
 }

@@ -16,6 +16,9 @@ import kotlin.js.JsExport
 @JsExport
 class ZContext(val sceneContext: ZSceneContext, val renderingContext: ZRenderingContext) {
 
+    var screenWidth: Int = 0
+    var screenHeight: Int = 0
+
     var scene: ZScene? by sceneContext::scene
 
     var activeCamera: ZCamera? by sceneContext::activeCamera
