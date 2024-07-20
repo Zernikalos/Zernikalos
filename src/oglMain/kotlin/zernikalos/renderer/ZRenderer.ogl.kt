@@ -20,4 +20,8 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
     actual override fun render() {
         ctx.scene?.render(ctx)
     }
+
+    actual override fun resize(width: Int, height: Int) {
+        ctx.scene?.onScreenResize(ctx, width, height)
+    }
 }
