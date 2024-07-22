@@ -44,7 +44,7 @@ class ZModel: ZObject(), ZLoggable {
     var skeleton: ZSkeleton? = null
 
     val hasTextures: Boolean
-        get() = material?.texture != null && mesh.hasBufferKey("uv")
+        get() = material?.texture != null && mesh.hasBuffer("uv")
 
     val hasSkeleton: Boolean
         get() = skeleton != null
@@ -67,7 +67,6 @@ class ZModel: ZObject(), ZLoggable {
         shaderProgram.clearUniforms()
         addRequiredUniforms(enabler)
 
-        mesh.buildBuffers()
         enableRequiredBuffers(enabler)
 
         renderer.initialize()
@@ -105,8 +104,8 @@ class ZModel: ZObject(), ZLoggable {
 
     private fun buildAttributeEnabler(): ZAttributesEnabler {
         val enabler = ZAttributesEnabler()
-        enabler.usePosition = mesh.hasBufferKey("position")
-        enabler.useColors = mesh.hasBufferKey("color")
+        enabler.usePosition = mesh.hasBuffer("position")
+        enabler.useColors = mesh.hasBuffer("color")
         //enabler.useNormals = mesh.hasBufferKey("normal")
         if (hasTextures) {
             enabler.useTextures = hasTextures

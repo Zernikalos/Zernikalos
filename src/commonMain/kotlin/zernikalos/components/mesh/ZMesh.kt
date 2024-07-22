@@ -12,10 +12,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZDataType
+import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
-import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -67,14 +68,6 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
     }
 
     /**
-     * Adds a buffer key to the mesh data.
-     * @param bufferKey The key of the buffer to add.
-     */
-    fun addBufferKey(bufferKey: ZBufferKey) {
-        data.addBufferKey(bufferKey)
-    }
-
-    /**
      * Gets the buffer by its name.
      * @param name The name of the buffer.
      * @return The requested buffer if it exists, null otherwise.
@@ -83,6 +76,12 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
         return data.buffers[name]
     }
 
+    /**
+     * Gets the buffer by the specified attribute ID.
+     *
+     * @param attrId The attribute ID of the buffer.
+     * @return The requested buffer if it exists, null otherwise.
+     */
     @JsExport.Ignore
     fun getBufferById(attrId: ZAttributeId): ZBuffer? {
         return data.buffers.values.find {
@@ -90,31 +89,60 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
         }
     }
 
-    fun hasBufferKey(name: String): Boolean {
-        return data.hasBufferKey(name)
-    }
-
-    fun getBufferKey(name: String): ZBufferKey? {
-        return data.getBufferKey(name)
+    /**
+     * Checks if a buffer with the given name exists.
+     *
+     * @param name The name of the buffer.
+     * @return true if a buffer with the given name exists, false otherwise.
+     */
+    fun hasBuffer(name: String): Boolean {
+        return data.hasBuffer(name)
     }
 
     /**
-     * Adds a raw buffer to the mesh data.
-     * @param rawBuffer The raw buffer to add.
+     * Adds a buffer to the ZMesh.
+     *
+     * @param buffer The buffer to be added.
      */
-    fun addRawBuffer(rawBuffer: ZRawBuffer) {
-        data.addRawBuffer(rawBuffer)
-    }
-
-    /**
-     * Builds or prepares all the buffers for rendering.
-     * This most likely involves transferring data to GPU memory.
-     */
-    fun buildBuffers() {
-        data.buildBuffers()
+    fun addBuffer(buffer: ZBuffer) {
+        data.buffers[buffer.name] = buffer
     }
 
 }
+
+@Serializable
+@JsExport
+data class ZBufferKey(
+    @ProtoNumber(1)
+    var id: Int = -1,
+    @ProtoNumber(2)
+    var dataType: ZDataType = ZTypes.NONE,
+    @ProtoNumber(3)
+    var name: String = "",
+    @ProtoNumber(4)
+    var size: Int = -1,
+    @ProtoNumber(5)
+    var count: Int = -1,
+    @ProtoNumber(6)
+    var normalized: Boolean = false,
+    @ProtoNumber(7)
+    var offset: Int = -1,
+    @ProtoNumber(8)
+    var stride: Int = -1,
+    @ProtoNumber(9)
+    var isIndexBuffer: Boolean = false,
+    @ProtoNumber(10)
+    var bufferId: Int = -1
+)
+
+@Serializable
+@JsExport
+data class ZRawBuffer(
+    @ProtoNumber(1)
+    var id: Int = -1,
+    @ProtoNumber(2)
+    var dataArray: ByteArray = byteArrayOf()
+)
 
 /**
  * @suppress
@@ -136,23 +164,7 @@ data class ZMeshData(
     val hasIndexBuffer: Boolean
         get() = indexBuffer != null
 
-    fun addBufferKey(bufferKey: ZBufferKey) {
-        bufferKeys.add(bufferKey)
-    }
-
-    fun getBufferKey(name: String): ZBufferKey? {
-        return bufferKeys.find { it.name == name }
-    }
-
-    fun hasBufferKey(name: String): Boolean {
-        return getBufferKey(name) != null
-    }
-
-    fun addRawBuffer(rawBuffer: ZRawBuffer) {
-        rawBuffers.add(rawBuffer)
-    }
-
-    internal fun buildBuffers() {
+    init {
         bufferKeys.forEach { key ->
             val buffer = buildBufferForKey(key)
             if (buffer != null) {
@@ -161,9 +173,25 @@ data class ZMeshData(
         }
     }
 
+    fun hasBuffer(name: String): Boolean {
+        return buffers.containsKey(name)
+    }
+
     private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
         val rawBuffer = findBufferByKey(key) ?: return null
-        return ZBuffer(key, rawBuffer)
+        return ZBuffer(
+            key.id,
+            key.dataType,
+            key.name,
+            key.size,
+            key.count,
+            key.normalized,
+            key.offset,
+            key.stride,
+            key.isIndexBuffer,
+            key.bufferId,
+            rawBuffer.dataArray
+        )
     }
 
     private fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {

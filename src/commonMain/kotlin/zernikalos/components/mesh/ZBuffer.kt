@@ -8,7 +8,9 @@
 
 package zernikalos.components.mesh
 
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
+import zernikalos.ZTypes
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
@@ -25,11 +27,54 @@ import kotlin.js.JsName
 @JsExport
 class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTemplate<ZBufferData, ZBufferRenderer>(data), ZBindeable {
 
+    /**
+     * Initializes a new instance of `ZBuffer` class.
+     * It is used to instantiate a `ZBuffer` object with default data values.
+     */
     @JsName("init")
     constructor(): this(ZBufferData())
 
+    /**
+     * Initializes a ZBuffer object with the given arguments.
+     *
+     * @param id The ID of the buffer.
+     * @param dataType The data type of the buffer.
+     * @param name The name of the buffer.
+     * @param size How many elements are stored per data unit.
+     * @param count The number of elements of type `dataType` are stored in the buffer.
+     * @param normalized Whether the data in the buffer is normalized.
+     * @param offset The offset of the buffer data.
+     * @param stride The stride of the buffer data.
+     * @param isIndexBuffer Whether the buffer is an index buffer.
+     * @param bufferId The ID of the raw buffer associated with the buffer.
+     * @param dataArray The array of byte data for the buffer.
+     */
     @JsName("initWithArgs")
-    constructor(key: ZBufferKey, buffer: ZRawBuffer): this(ZBufferData(key, buffer))
+    constructor(
+        id: Int,
+        dataType: ZDataType,
+        name: String,
+        size: Int,
+        count: Int,
+        normalized: Boolean,
+        offset: Int,
+        stride: Int,
+        isIndexBuffer: Boolean,
+        bufferId: Int,
+        dataArray: ByteArray
+    ): this(ZBufferData(
+        id,
+        dataType,
+        name,
+        size,
+        count,
+        normalized,
+        offset,
+        stride,
+        isIndexBuffer,
+        bufferId,
+        dataArray
+    ))
 
     var enabled: Boolean = false
     
@@ -50,39 +95,47 @@ class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTem
      * Type of data stored
      *
      */
-    val dataType: ZDataType by data.key::dataType
+    val dataType: ZDataType by data::dataType
 
-    val name: String by data.key::name
+    val name: String by data::name
 
     /**
      * How many elements are stored per data unit.
      * Example: a Vec3 will have size equals to 3 in the same way a Scalar will be 1
      */
-    val size: Int by data.key::size
+    val size: Int by data::size
 
     /**
      * How many elements of this type are stored.
      * Example: If we store 15 Vec3 elements in the data array the count will have a value of 15.
      */
-    val count: Int by data.key::count
+    val count: Int by data::count
 
-    val normalized: Boolean by data.key::normalized
+    val normalized: Boolean by data::normalized
 
-    val offset: Int by data.key::offset
+    val offset: Int by data::offset
 
     /**
      * If the data is tightly represented within the array how many elements it requires to be jumped to the next one
      * Example: We store a Vec3 postion and a Vec3 normal in the very same array, the stride will be 6
      */
-    val stride: Int by data.key::stride
+    val stride: Int by data::stride
 
 
     /**
-     * Refers to the RawBuffer Id @see ZRawBuffer
+     * Represents the buffer ID associated with the ZBuffer.
      */
-    val bufferId: Int by data.buffer::id
+    val bufferId: Int by data::id
 
-    val dataArray: ByteArray by data.buffer::dataArray
+    /**
+     * Represents an array of bytes for ZBufferData data.
+     */
+    val dataArray: ByteArray by data::dataArray
+
+    /**
+     * Indicates whether the [data] has any data.
+     */
+    val hasData: Boolean by data::hasData
 
     override fun createRenderer(ctx: ZRenderingContext): ZBufferRenderer {
         return ZBufferRenderer(ctx, data)
@@ -100,13 +153,22 @@ class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTem
 
 @JsExport
 data class ZBufferData(
-    val key: ZBufferKey = ZBufferKey(),
-    val buffer: ZRawBuffer = ZRawBuffer()
+    var id: Int = -1,
+    var dataType: ZDataType = ZTypes.NONE,
+    var name: String = "",
+    var size: Int = -1,
+    var count: Int = -1,
+    var normalized: Boolean = false,
+    var offset: Int = -1,
+    var stride: Int = -1,
+    var isIndexBuffer: Boolean = false,
+    var bufferId: Int = -1,
+    var dataArray: ByteArray = byteArrayOf()
 ): ZComponentData() {
 
-    val id: Int by key::id
+    val hasData: Boolean
+        get() = dataArray.isNotEmpty()
 
-    val isIndexBuffer: Boolean by key::isIndexBuffer
 }
 
 expect class ZBufferRenderer(ctx: ZRenderingContext, data: ZBufferData): ZComponentRender<ZBufferData> {

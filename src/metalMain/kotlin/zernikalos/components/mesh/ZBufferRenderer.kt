@@ -35,7 +35,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
 
     actual override fun bind() {
         ctx as ZMtlRenderingContext
-        ctx.renderEncoder?.setVertexBuffer(buffer, 0u, data.key.id.toULong())
+        ctx.renderEncoder?.setVertexBuffer(buffer, 0u, data.id.toULong())
     }
 
     actual override fun unbind() {
@@ -61,27 +61,27 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
         //        }
 
         // The use of pinned is to get access to a constant memory location
-        data.buffer.dataArray.usePinned { pinned ->
+        data.dataArray.usePinned { pinned ->
             // Requires to set the initial position and how many bytes to copy
             // Notice that all buffers store only bytes
             // TODO: Check the options to this function
-            buffer = ctx.device.newBufferWithBytes(pinned.addressOf(0), data.buffer.dataArray.size.toULong(), 1u)
+            buffer = ctx.device.newBufferWithBytes(pinned.addressOf(0), data.dataArray.size.toULong(), 1u)
         }
 
-        buffer?.label = data.key.name
+        buffer?.label = data.name
     }
 
     private fun initializeBufferKey(data: ZBufferData) {
         attributeDescriptor = MTLVertexAttributeDescriptor()
-        attributeDescriptor.offset = data.key.offset.toULong()
-        attributeDescriptor.bufferIndex = data.key.id.toULong()
+        attributeDescriptor.offset = data.offset.toULong()
+        attributeDescriptor.bufferIndex = data.id.toULong()
         // In OGL we specify the base type and the size independently, not the same scenario in Metal
-        attributeDescriptor.format = toMtlFormat(data.key.dataType)
+        attributeDescriptor.format = toMtlFormat(data.dataType)
 
         layoutDescriptor = MTLVertexBufferLayoutDescriptor()
         // This stride is different than OGL, in Metal all the vertex data is added into the same buffer
         // on OGL we could have different buffers at this time
-        layoutDescriptor.stride = (data.key.dataType.byteSize).toULong()
+        layoutDescriptor.stride = (data.dataType.byteSize).toULong()
         // TODO: Check these 2 steps
         layoutDescriptor.stepRate = 1u
         layoutDescriptor.stepFunction = MTLStepFunctionPerVertex
