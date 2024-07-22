@@ -12,10 +12,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZDataType
+import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
-import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -91,6 +92,40 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
     }
 
 }
+
+@Serializable
+@JsExport
+data class ZBufferKey(
+    @ProtoNumber(1)
+    var id: Int = -1,
+    @ProtoNumber(2)
+    var dataType: ZDataType = ZTypes.NONE,
+    @ProtoNumber(3)
+    var name: String = "",
+    @ProtoNumber(4)
+    var size: Int = -1,
+    @ProtoNumber(5)
+    var count: Int = -1,
+    @ProtoNumber(6)
+    var normalized: Boolean = false,
+    @ProtoNumber(7)
+    var offset: Int = -1,
+    @ProtoNumber(8)
+    var stride: Int = -1,
+    @ProtoNumber(9)
+    var isIndexBuffer: Boolean = false,
+    @ProtoNumber(10)
+    var bufferId: Int = -1
+)
+
+@Serializable
+@JsExport
+data class ZRawBuffer(
+    @ProtoNumber(1)
+    var id: Int = -1,
+    @ProtoNumber(2)
+    var dataArray: ByteArray = byteArrayOf()
+)
 
 /**
  * @suppress
