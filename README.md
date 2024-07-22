@@ -1,7 +1,7 @@
 <h2 align="center">Zernikalos Engine</h2>
 
 <div align="center">
-<img src="assets/zklogo.svg" alt="Logo" width="124" height="124">
+<img src="docsAssets/logo-icon.svg" alt="Logo" width="124" height="124">
 
 
   <p align="center">
