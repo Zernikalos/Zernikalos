@@ -20,12 +20,12 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
     lateinit var buffer: GLWrap
 
     private val bufferTargetType: BufferTargetType
-        get() = if (data.key.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
+        get() = if (data.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
 
     actual override fun initialize() {
         initializeBuffer(ctx, data)
-        initializeBufferKey(ctx, data.key)
-        logger.debug("Initializing Buffer ${data.key.name}=[@${data.id}-${bufferTargetType.name}]")
+        initializeBufferKey(ctx, data)
+        logger.debug("Initializing Buffer ${data.name}=[@${data.id}-${bufferTargetType.name}]")
     }
 
     actual override fun bind() {
@@ -37,7 +37,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
     actual override fun unbind() {
     }
 
-    private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferKey) {
+    private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferData) {
         ctx as ZGLRenderingContext
 
         val glDataType = toOglBaseType(data.dataType)
@@ -54,7 +54,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
     }
 
     private fun initializeBuffer(ctx: ZRenderingContext, data: ZBufferData) {
-        if (!data.buffer.hasData) {
+        if (!data.hasData) {
             return
         }
         ctx as ZGLRenderingContext
@@ -66,7 +66,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
         //        }
 
         ctx.bindBuffer(bufferTargetType, buffer)
-        ctx.bufferData(bufferTargetType, data.buffer.dataArray, BufferUsageType.STATIC_DRAW)
+        ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
     }
 
 }

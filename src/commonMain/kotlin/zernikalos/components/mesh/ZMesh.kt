@@ -67,14 +67,6 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
     }
 
     /**
-     * Adds a buffer key to the mesh data.
-     * @param bufferKey The key of the buffer to add.
-     */
-    fun addBufferKey(bufferKey: ZBufferKey) {
-        data.addBufferKey(bufferKey)
-    }
-
-    /**
      * Gets the buffer by its name.
      * @param name The name of the buffer.
      * @return The requested buffer if it exists, null otherwise.
@@ -90,28 +82,12 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
         }
     }
 
-    fun hasBufferKey(name: String): Boolean {
-        return data.hasBufferKey(name)
+    fun hasBuffer(name: String): Boolean {
+        return data.hasBuffer(name)
     }
 
-    fun getBufferKey(name: String): ZBufferKey? {
-        return data.getBufferKey(name)
-    }
-
-    /**
-     * Adds a raw buffer to the mesh data.
-     * @param rawBuffer The raw buffer to add.
-     */
-    fun addRawBuffer(rawBuffer: ZRawBuffer) {
-        data.addRawBuffer(rawBuffer)
-    }
-
-    /**
-     * Builds or prepares all the buffers for rendering.
-     * This most likely involves transferring data to GPU memory.
-     */
-    fun buildBuffers() {
-        data.buildBuffers()
+    fun addBuffer(buffer: ZBuffer) {
+        data.buffers[buffer.name] = buffer
     }
 
 }
@@ -136,23 +112,7 @@ data class ZMeshData(
     val hasIndexBuffer: Boolean
         get() = indexBuffer != null
 
-    fun addBufferKey(bufferKey: ZBufferKey) {
-        bufferKeys.add(bufferKey)
-    }
-
-    fun getBufferKey(name: String): ZBufferKey? {
-        return bufferKeys.find { it.name == name }
-    }
-
-    fun hasBufferKey(name: String): Boolean {
-        return getBufferKey(name) != null
-    }
-
-    fun addRawBuffer(rawBuffer: ZRawBuffer) {
-        rawBuffers.add(rawBuffer)
-    }
-
-    internal fun buildBuffers() {
+    init {
         bufferKeys.forEach { key ->
             val buffer = buildBufferForKey(key)
             if (buffer != null) {
@@ -161,9 +121,25 @@ data class ZMeshData(
         }
     }
 
+    fun hasBuffer(name: String): Boolean {
+        return buffers.containsKey(name)
+    }
+
     private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
         val rawBuffer = findBufferByKey(key) ?: return null
-        return ZBuffer(key, rawBuffer)
+        return ZBuffer(
+            key.id,
+            key.dataType,
+            key.name,
+            key.size,
+            key.count,
+            key.normalized,
+            key.offset,
+            key.stride,
+            key.isIndexBuffer,
+            key.bufferId,
+            rawBuffer.dataArray
+        )
     }
 
     private fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
