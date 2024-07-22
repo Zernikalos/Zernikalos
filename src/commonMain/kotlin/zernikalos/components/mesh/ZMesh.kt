@@ -76,6 +76,12 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
         return data.buffers[name]
     }
 
+    /**
+     * Gets the buffer by the specified attribute ID.
+     *
+     * @param attrId The attribute ID of the buffer.
+     * @return The requested buffer if it exists, null otherwise.
+     */
     @JsExport.Ignore
     fun getBufferById(attrId: ZAttributeId): ZBuffer? {
         return data.buffers.values.find {
@@ -83,10 +89,21 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
         }
     }
 
+    /**
+     * Checks if a buffer with the given name exists.
+     *
+     * @param name The name of the buffer.
+     * @return true if a buffer with the given name exists, false otherwise.
+     */
     fun hasBuffer(name: String): Boolean {
         return data.hasBuffer(name)
     }
 
+    /**
+     * Adds a buffer to the ZMesh.
+     *
+     * @param buffer The buffer to be added.
+     */
     fun addBuffer(buffer: ZBuffer) {
         data.buffers[buffer.name] = buffer
     }

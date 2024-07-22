@@ -27,9 +27,28 @@ import kotlin.js.JsName
 @JsExport
 class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTemplate<ZBufferData, ZBufferRenderer>(data), ZBindeable {
 
+    /**
+     * Initializes a new instance of `ZBuffer` class.
+     * It is used to instantiate a `ZBuffer` object with default data values.
+     */
     @JsName("init")
     constructor(): this(ZBufferData())
 
+    /**
+     * Initializes a ZBuffer object with the given arguments.
+     *
+     * @param id The ID of the buffer.
+     * @param dataType The data type of the buffer.
+     * @param name The name of the buffer.
+     * @param size How many elements are stored per data unit.
+     * @param count The number of elements of type `dataType` are stored in the buffer.
+     * @param normalized Whether the data in the buffer is normalized.
+     * @param offset The offset of the buffer data.
+     * @param stride The stride of the buffer data.
+     * @param isIndexBuffer Whether the buffer is an index buffer.
+     * @param bufferId The ID of the raw buffer associated with the buffer.
+     * @param dataArray The array of byte data for the buffer.
+     */
     @JsName("initWithArgs")
     constructor(
         id: Int,
@@ -104,12 +123,18 @@ class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTem
 
 
     /**
-     * Refers to the RawBuffer Id @see ZRawBuffer
+     * Represents the buffer ID associated with the ZBuffer.
      */
     val bufferId: Int by data::id
 
+    /**
+     * Represents an array of bytes for ZBufferData data.
+     */
     val dataArray: ByteArray by data::dataArray
 
+    /**
+     * Indicates whether the [data] has any data.
+     */
     val hasData: Boolean by data::hasData
 
     override fun createRenderer(ctx: ZRenderingContext): ZBufferRenderer {
