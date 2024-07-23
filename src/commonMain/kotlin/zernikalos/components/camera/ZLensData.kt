@@ -63,6 +63,11 @@ abstract class ZLensData(): ZComponentData() {
         useComputedAspectRatio = false
     }
 
+    fun setDimensions(width: Int, height: Int) {
+        this.width = width.toFloat()
+        this.height = height.toFloat()
+    }
+
     private fun computeAspectRatio(): Float {
         if (width == null || height == null) {
             return 1f

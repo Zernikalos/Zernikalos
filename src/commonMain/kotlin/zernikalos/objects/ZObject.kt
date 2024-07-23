@@ -67,7 +67,6 @@ abstract class ZObject: ZTreeNode<ZObject> {
     @ProtoNumber(3)
     var transform: ZTransform = ZTransform()
 
-    //@JsName("children")
     @Transient
     override var children: Array<@Polymorphic ZObject> = emptyArray()
 
@@ -107,6 +106,21 @@ abstract class ZObject: ZTreeNode<ZObject> {
         children.forEach { child ->
             child.initialize(ctx) }
         _initialized = true
+    }
+
+    /**
+     * Event handler for the viewport resizing.
+     * This method should not be called by the user
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for resizing.
+     * @param width The new width of the viewport.
+     * @param height The new height of the viewport.
+     */
+    fun onViewportResize(ctx: ZContext, width: Int, height: Int) {
+        internalOnViewportResize(ctx, width, height)
+        children.forEach { child ->
+            child.onViewportResize(ctx, width, height)
+        }
     }
 
     /**
@@ -178,5 +192,17 @@ abstract class ZObject: ZTreeNode<ZObject> {
      * @param ctx The context of the current scene, providing necessary information and services for rendering.
      */
     protected abstract fun internalRender(ctx: ZContext)
+
+    /**
+     * Resizes the object and its children to the specified width and height.
+     * This function should be implemented by subclasses for specific resizing behaviors.
+     *
+     * @param ctx The context of the current scene, providing necessary information and services for resizing.
+     * @param width The new width of the object.
+     * @param height The new height of the object.
+     */
+    protected open fun internalOnViewportResize(ctx: ZContext, width: Int, height: Int) {
+
+    }
 
 }

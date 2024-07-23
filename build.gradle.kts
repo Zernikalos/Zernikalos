@@ -192,7 +192,7 @@ tasks.withType<DokkaTask>().configureEach {
       "customStyleSheets": ["${file("docsAssets/zk-docs-styles.css")}"],
       "footerMessage": "© ${getYear()} $zernikalosNameCapital",
       "separateInheritedMembers": false,
-      "mergeImplicitExpectActualDeclarations": false
+      "mergeImplicitExpectActualDeclarations": true
     }
     """
     pluginsMapConfiguration.set(

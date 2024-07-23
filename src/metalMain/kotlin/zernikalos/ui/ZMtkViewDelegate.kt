@@ -10,6 +10,7 @@ package zernikalos.ui
 
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGSize
 import platform.MetalKit.MTKView
 import platform.MetalKit.MTKViewDelegateProtocol
@@ -29,6 +30,10 @@ class ZMtkViewDelegate() : NSObject(), MTKViewDelegateProtocol {
 
     @OptIn(ExperimentalForeignApi::class)
     override fun mtkView(view: MTKView, drawableSizeWillChange: CValue<CGSize>) {
+        drawableSizeWillChange.useContents {
+            eventHandler?.onResize(this.width.toInt(), this.height.toInt())
+        }
+
     }
 
     override fun drawInMTKView(view: MTKView) {

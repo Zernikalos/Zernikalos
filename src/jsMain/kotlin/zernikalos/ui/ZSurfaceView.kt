@@ -28,8 +28,15 @@ actual class ZSurfaceView(val canvas: HTMLCanvasElement) {
     actual val height: Int
         get() = canvas.height
 
+    init {
+        canvas.onresize = { _ ->
+            eventHandler?.onResize(width, height)
+        }
+    }
+
     private fun onReady() {
         eventHandler?.onReady()
+        eventHandler?.onResize(width, height)
         renderLoop()
     }
 

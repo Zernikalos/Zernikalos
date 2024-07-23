@@ -236,3 +236,17 @@ interface ZRenderizable {
     fun render()
 
 }
+
+/**
+ * An interface for objects that will listen to changes on the viewport dimensions.
+ */
+interface ZResizable {
+
+    /**
+     * Notifies the listener when the viewport dimensions change.
+     *
+     * @param width The new width of the viewport.
+     * @param height The new height of the viewport.
+     */
+    fun onViewportResize(width: Int, height: Int)
+}
