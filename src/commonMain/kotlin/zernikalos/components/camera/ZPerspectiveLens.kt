@@ -13,14 +13,29 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZComponentTemplate
+import zernikalos.components.ZResizable
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
+/**
+ * Represents a perspective lens used for rendering in Zernikalos.
+ *
+ * @param data The ZPerspectiveLensData associated with the lens
+ *
+ * @property fov The field of view angle for the lens
+ * @property projectionMatrix The projection matrix for the lens
+ *
+ * @constructor Constructs a ZPerspectiveLens with the given data.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and field of view angle.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, field of view angle, and aspect ratio.
+ *
+ * @see ZResizable
+ */
 @Serializable(with = ZPerspectiveLensSerializer::class)
 @JsExport
 open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
-    ZComponentTemplate<ZPerspectiveLensData>(data) {
+    ZComponentTemplate<ZPerspectiveLensData>(data), ZResizable {
 
     @JsName("init")
     constructor(near: Float, far: Float, fov: Float) : this(ZPerspectiveLensData(near, far, fov))
@@ -28,6 +43,15 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
     @JsName("initWithAspect")
     constructor(near: Float, far: Float, fov: Float, aspectRatio: Float) : this(ZPerspectiveLensData(near, far, aspectRatio, fov))
 
+    /**
+     * Represents the field of view angle for the lens in a ZPerspectiveLens.
+     *
+     * @property fov The field of view angle for the lens.
+     *     This angle determines the extent of the scene that is visible in the camera's view.
+     *     A larger angle will capture a wider view, while a smaller angle will capture a narrower view.
+     *
+     * @see ZPerspectiveLens
+     */
     var fov by data::fov
 
     val projectionMatrix: ZMatrix4 by data::projectionMatrix
@@ -38,9 +62,10 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 
     }
 
-    fun setDimensions(width: Int, height: Int) {
+    override fun onViewportResize(width: Int, height: Int) {
         data.setDimensions(width, height)
     }
+
 }
 
 @Serializable

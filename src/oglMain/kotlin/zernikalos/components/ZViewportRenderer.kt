@@ -28,13 +28,13 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: 
         ctx.clear(clearMask)
     }
 
-    actual fun onScreenResize(width: Int, height: Int) {
+    actual fun onViewportResize(width: Int, height: Int) {
         ctx as ZGLRenderingContext
         ctx.viewport(
-            data.viewBox.w.toInt(),
-            data.viewBox.x.toInt(),
-            width,
-            height
+            data.viewBox.top,
+            data.viewBox.left,
+            data.viewBox.width,
+            data.viewBox.height
         )
     }
 

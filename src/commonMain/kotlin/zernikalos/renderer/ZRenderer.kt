@@ -27,6 +27,6 @@ expect class ZRenderer(ctx: ZContext): ZRendererBase {
     override fun bind()
     override fun unbind()
     override fun render()
-    override fun resize(width: Int, height: Int)
+    override fun onViewportResize(width: Int, height: Int)
 }
 

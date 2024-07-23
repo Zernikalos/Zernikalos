@@ -16,7 +16,7 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZScene: ZObject() {
+class ZScene(): ZObject() {
 
     override val type = ZObjectType.SCENE
 
@@ -31,7 +31,7 @@ class ZScene: ZObject() {
         viewport.render()
     }
 
-    override fun internalResize(ctx: ZContext, width: Int, height: Int) {
-        viewport.resize(width, height)
+    override fun internalOnViewportResize(ctx: ZContext, width: Int, height: Int) {
+        viewport.onViewportResize(width, height)
     }
 }

@@ -65,7 +65,7 @@ fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHa
             context.screenHeight = height
             if (initializationState == ZSurfaceViewEventHandlerState.SCENE_INITIALIZED) {
                 stateHandler.onResize(context, width, height, ::doneResize)
-                mainRenderer.resize(width, height)
+                mainRenderer.onViewportResize(width, height)
                 requiresResizing = false
             } else {
                 requiresResizing = true

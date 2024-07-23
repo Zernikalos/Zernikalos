@@ -17,7 +17,7 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: 
     actual override fun render() {
     }
 
-    actual fun onScreenResize(width: Int, height: Int) {
+    actual fun onViewportResize(width: Int, height: Int) {
     }
 
 }
