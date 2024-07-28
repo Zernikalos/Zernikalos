@@ -93,6 +93,22 @@ data class ZDataType(
     @ProtoNumber(2)
     val format: ZFormatType
 ) {
+
+    /**
+     * Represents the size of the data type.
+     *
+     * The size is determined based on the format of the data type. The formats have the following sizes:
+     * - NONE: 0
+     * - SCALAR: 1
+     * - VEC2: 2
+     * - VEC3: 3
+     * - VEC4: 4
+     * - MAT2: 4
+     * - MAT3: 9
+     * - MAT4: 16
+     * - TEXTURE: 0
+     * - QUATERNION: 4
+     */
     val size: Int
         get() {
             return when (format) {
@@ -109,6 +125,12 @@ data class ZDataType(
             }
         }
 
+    /**
+     * Represents the size of the data type in bytes.
+     *
+     * This variable is calculated by multiplying the [size] property of [ZDataType]
+     * with the [byteSize] property of [type].
+     */
     val byteSize: Int
         get() = size * type.byteSize
 }

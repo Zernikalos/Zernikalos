@@ -33,6 +33,7 @@ actual class ZShaderSourceGenerator : ZLoggable {
         if (enabler.useColors) shaderSource = "#define USE_COLORS\n$shaderSource"
         if (enabler.useTextures) shaderSource = "#define USE_TEXTURES\n$shaderSource"
         if (enabler.flipTextureY) shaderSource = "#define FLIP_TEXTURE_Y\n$shaderSource"
+        if (enabler.useSkinning) shaderSource = "#define USE_SKINNING\n$shaderSource"
 
         shaderSource = "#version 300 es\n$shaderSource"
 

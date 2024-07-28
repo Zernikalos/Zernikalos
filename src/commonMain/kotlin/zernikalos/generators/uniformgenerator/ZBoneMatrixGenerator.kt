@@ -18,15 +18,14 @@ import zernikalos.objects.ZObject
 class ZBoneMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
         obj as ZModel
-        if (obj.skeleton == null) {
+        if (!obj.hasSkeleton) {
             throw Error("Unable to compute bone matrices without an skeleton attached to object ${obj.name}")
         }
         val skeleton = obj.skeleton!!
         val bones = skeleton.bones
 
-        val boneMatrices = bones.filter {
-            obj.skinning?.boneIndices?.contains(it.idx)!!
-        }.map {
+        bones.sortBy { it.idx }
+        val boneMatrices= bones.map {
             it.transform.matrix
         }
 

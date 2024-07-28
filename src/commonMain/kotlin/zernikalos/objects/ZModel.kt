@@ -74,6 +74,10 @@ class ZModel: ZObject(), ZLoggable {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
+        if (enabler.useSkinning) {
+            shaderProgram.addUniform("Bones", ZBonesMatrixArray(skeleton!!.bones.size))
+            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(skeleton!!.bones.size))
+        }
     }
 
     private fun addRequiredAttributes(enabler: ZAttributesEnabler) {
@@ -110,6 +114,9 @@ class ZModel: ZObject(), ZLoggable {
             if (material?.texture?.flipY == true) {
                 enabler.flipTextureY = true
             }
+        }
+        if (hasSkeleton) {
+            enabler.useSkinning = true
         }
         return enabler
     }

@@ -35,6 +35,8 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
 
     var transform: ZTransform by data::transform
 
+    var inverseBindTransform: ZTransform by data::inverseBindTransform
+
     @Transient
     internal var _parent: ZBone? = null
     override val parent: ZBone?
@@ -70,6 +72,8 @@ data class ZBoneData(
     @ProtoNumber(4)
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)
+    var inverseBindTransform: ZTransform = ZTransform(),
+    @ProtoNumber(6)
     val children: ArrayList<ZBone> = arrayListOf()
 ): ZComponentData()
 
