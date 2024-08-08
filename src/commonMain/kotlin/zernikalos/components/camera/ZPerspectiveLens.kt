@@ -12,8 +12,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZComponentTemplate
 import zernikalos.components.ZResizable
+import zernikalos.components.ZSerializableComponent
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -35,7 +35,7 @@ import kotlin.js.JsName
 @Serializable(with = ZPerspectiveLensSerializer::class)
 @JsExport
 open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
-    ZComponentTemplate<ZPerspectiveLensData>(data), ZResizable {
+    ZSerializableComponent<ZPerspectiveLensData>(data), ZResizable {
 
     @JsName("init")
     constructor(near: Float, far: Float, fov: Float) : this(ZPerspectiveLensData(near, far, fov))

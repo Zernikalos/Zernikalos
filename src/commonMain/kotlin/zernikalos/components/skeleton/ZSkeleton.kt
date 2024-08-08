@@ -20,7 +20,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZSkeleton internal constructor(data: ZSkeletonData): ZComponentTemplate<ZSkeletonData>(data) {
+class ZSkeleton internal constructor(data: ZSkeletonData): ZSerializableComponent<ZSkeletonData>(data) {
 
     @JsName("init")
     constructor(): this(ZSkeletonData())

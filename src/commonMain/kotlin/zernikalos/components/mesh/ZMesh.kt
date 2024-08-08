@@ -17,6 +17,7 @@ import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
+import zernikalos.renderer.ZRendererBase
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -26,7 +27,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplate<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
@@ -51,7 +52,7 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponentTemplat
     @JsName("init")
     constructor(): this(ZMeshData())
 
-    override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {
+    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
         return ZMeshRenderer(ctx, data)
     }
 
@@ -207,7 +208,6 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
     override fun initialize()
 
     override fun render()
-
 }
 
 /**

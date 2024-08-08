@@ -8,6 +8,10 @@
 
 package zernikalos.utils
 
+fun randomNumId(): Int {
+    return crc32(randomId().encodeToByteArray())
+}
+
 fun randomId(): String {
     return getRandomString(16)
 }
