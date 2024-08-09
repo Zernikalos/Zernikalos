@@ -49,7 +49,6 @@ abstract class ZRefComponentSerializer<
         }
 
         val component = createComponentInstance(refData.data!!)
-        component.refId = refData.refId
 
         loaderContext.addComponent(refData.refId, component)
         return component

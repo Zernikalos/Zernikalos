@@ -10,12 +10,15 @@ package zernikalos.components
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
+import zernikalos.utils.crc32FromStr
+import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
 
 /**
@@ -26,7 +29,7 @@ import kotlin.js.JsExport
  * Renderizable components: Which will be able to interact with the graphics APIs
  */
 @JsExport
-interface ZComponent {
+interface ZComponent: ZRef {
 
     /**
      * Represents a boolean value indicating whether a component has been initialized.
@@ -49,17 +52,6 @@ interface ZComponent {
     val isRenderizable: Boolean
 
     /**
-     * Represents the unique reference identifier for a component.
-     *
-     * @property refId The unique reference identifier for the component.
-     *
-     * @see ZComponent
-     * @see ZRefComponentSerializer
-     * @see ZLoaderContext
-     */
-    var refId: Int
-
-    /**
      * Initializes the ZComponent using the provided ZRenderingContext.
      *
      * @param ctx The ZRenderingContext used for initialization.
@@ -68,6 +60,20 @@ interface ZComponent {
      * @see ZRenderingContext
      */
     fun initialize(ctx: ZRenderingContext)
+}
+
+@JsExport
+interface ZRef {
+    /**
+     * Represents the unique reference identifier for a component.
+     *
+     * @property refId The unique reference identifier for the component.
+     *
+     * @see ZComponent
+     * @see ZRefComponentSerializer
+     * @see ZLoaderContext
+     */
+    val refId: Int
 }
 
 /**
@@ -84,7 +90,12 @@ abstract class ZBaseComponent(
     protected val internalData: ZComponentData? = null
 ): ZComponent {
 
+    final override val refId: Int by lazy {
+        internalData?.refId ?: randomNumId()
+    }
+
     private var _renderer: ZBaseComponentRender? = null
+
     protected val internalRenderer: ZBaseComponentRender
         get() {
             if (!isInitialized || !isRenderizable) {
@@ -101,12 +112,6 @@ abstract class ZBaseComponent(
     final override val isInitialized: Boolean
         get() = initialized
 
-    final override var refId: Int
-
-    init {
-        refId = computeRefId()
-    }
-
     final override fun initialize(ctx: ZRenderingContext) {
         if (initialized) {
             return
@@ -116,13 +121,6 @@ abstract class ZBaseComponent(
         _renderer = createRenderer(ctx)
         _renderer?.initialize()
         internalInitialize(ctx)
-    }
-
-    private fun computeRefId(): Int {
-        val str = internalData?.toString() ?: this.toString()
-        val dataArray = str.encodeToByteArray()
-        val hashValue = crc32(dataArray)
-        return if (hashValue < 0) hashValue.inv() else hashValue
     }
 
     internal open fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
@@ -163,7 +161,23 @@ abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(dat
 
 @JsExport
 @Serializable
-abstract class ZComponentData: ZLoggable {
+abstract class ZComponentData: ZLoggable, ZRef {
+
+    private var _refId: Int? = null
+
+    @Transient
+    override val refId: Int
+        get() {
+            if (_refId == null) {
+                _refId = computeRefId()
+            }
+            return _refId!!
+        }
+
+    private fun computeRefId(): Int {
+        val hashValue = crc32FromStr(toString())
+        return if (hashValue < 0) hashValue.inv() else hashValue
+    }
 
     abstract override fun toString(): String
 
