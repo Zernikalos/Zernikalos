@@ -35,8 +35,10 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
 
     var transform: ZTransform by data::transform
 
-    override var parent: ZBone? = null
-        get() = data._parent
+    @Transient
+    internal var _parent: ZBone? = null
+    override val parent: ZBone?
+        get() = _parent
 
     override val hasParent: Boolean
         get() = parent != null
@@ -44,9 +46,15 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     override val children: Array<ZBone>
         get() = data.children.toTypedArray()
 
+    init {
+        children.forEach { b ->
+            b._parent = this
+        }
+    }
+
     fun addChild(bone: ZBone) {
         data.children.add(bone)
-        bone.data._parent = this
+        bone._parent = this
     }
 
 }
@@ -63,12 +71,8 @@ data class ZBoneData(
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)
     val children: ArrayList<ZBone> = arrayListOf()
-): ZComponentData() {
+): ZComponentData()
 
-    @Transient
-    internal var _parent: ZBone? = null
-
-}
 
 class ZBoneSerializer: ZComponentSerializer<ZBone, ZBoneData>() {
     override val kSerializer: KSerializer<ZBoneData>
