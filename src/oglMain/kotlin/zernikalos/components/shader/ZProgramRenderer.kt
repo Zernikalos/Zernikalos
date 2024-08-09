@@ -8,11 +8,12 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.*
+import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZBindeable
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
-import kotlin.js.JsName
 
 class ZProgram(): ZRenderizableComponent<ZProgramRenderer>(), ZBindeable {
 

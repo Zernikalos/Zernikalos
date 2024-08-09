@@ -8,12 +8,13 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.*
+import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZBindeable
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
-import zernikalos.renderer.ZRendererBase
 
 class ZVertexArray(): ZRenderizableComponent<ZVertexArrayRenderer>(), ZBindeable {
 

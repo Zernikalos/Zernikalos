@@ -17,7 +17,6 @@ import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
-import zernikalos.renderer.ZRendererBase
 import kotlin.js.JsExport
 import kotlin.js.JsName
 

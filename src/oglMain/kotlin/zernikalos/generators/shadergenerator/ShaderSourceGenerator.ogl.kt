@@ -9,9 +9,9 @@
 package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZShaderSource
-import zernikalos.logger.ZLoggable
 import zernikalos.generators.shadergenerator.libs.defaultFragmentShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultVertexShaderSource
+import zernikalos.logger.ZLoggable
 
 actual class ZShaderSourceGenerator : ZLoggable {
     actual fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {

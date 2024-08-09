@@ -8,7 +8,6 @@
 
 package zernikalos.context
 
-import kotlinx.serialization.SerialName
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport
 

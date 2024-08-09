@@ -8,10 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.cinterop.*
-import platform.posix.memcpy
 import zernikalos.components.ZComponentRender
-import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 
 actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData) : ZComponentRender<ZUniformData>(ctx, data) {

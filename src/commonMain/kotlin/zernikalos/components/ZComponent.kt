@@ -9,14 +9,12 @@
 package zernikalos.components
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
-import zernikalos.utils.crc32
 import zernikalos.utils.crc32FromStr
 import zernikalos.utils.randomNumId
 import kotlin.js.JsExport

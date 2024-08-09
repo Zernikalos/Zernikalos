@@ -8,10 +8,9 @@
 
 package zernikalos.objects
 
-import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
@@ -20,10 +19,9 @@ import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
-import zernikalos.logger.ZLoggable
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
 import zernikalos.generators.shadergenerator.ZShaderSourceGenerator
+import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 
 @JsExport
