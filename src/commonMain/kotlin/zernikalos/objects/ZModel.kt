@@ -129,24 +129,6 @@ class ZModel: ZObject(), ZLoggable {
     }
 }
 
-class ZModelSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZModel>, ZLoggable {
-
-    val deserializationStrategy: DeserializationStrategy<ZModel> = ZModel.serializer()
-
-    override val descriptor: SerialDescriptor
-        get() = deserializationStrategy.descriptor
-
-    override fun deserialize(decoder: Decoder): ZModel {
-        val model = decoder.decodeSerializableValue(deserializationStrategy)
-        return model
-    }
-
-    override fun serialize(encoder: Encoder, value: ZModel) {
-        TODO("Not yet implemented")
-    }
-
-}
-
 expect class ZModelRenderer(ctx: ZRenderingContext, model: ZModel) {
 
     fun initialize()

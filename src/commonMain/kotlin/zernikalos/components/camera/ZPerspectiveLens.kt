@@ -100,7 +100,7 @@ class ZPerspectiveLensData(): ZLensData() {
         }
 
     override fun toString(): String {
-        TODO("Not yet implemented")
+        return "[ZPerspectiveLensData(near: $near, far: $far, fov: $fov)]"
     }
 }
 

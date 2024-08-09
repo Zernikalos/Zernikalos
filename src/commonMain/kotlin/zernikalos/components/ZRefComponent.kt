@@ -45,6 +45,7 @@ abstract class ZRefComponentSerializer<
         val refData = decoder.decodeSerializableValue(deserializationStrategy)
 
         if (refData.isReference) {
+            @Suppress("UNCHECKED_CAST")
             return loaderContext.getComponent(refData.refId)!! as T
         }
 
