@@ -12,9 +12,9 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZRenderizableComponentTemplate
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
+import zernikalos.components.ZTemplateComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -25,7 +25,7 @@ import kotlin.js.JsName
  * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
  */
 @JsExport
-class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponentTemplate<ZBufferData, ZBufferRenderer>(data), ZBindeable {
+class ZBuffer internal constructor(data: ZBufferData): ZTemplateComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBuffer` class.

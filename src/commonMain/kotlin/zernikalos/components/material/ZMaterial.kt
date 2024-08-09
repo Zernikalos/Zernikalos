@@ -21,7 +21,7 @@ import kotlin.js.JsName
 @JsExport
 class ZMaterial
 internal constructor(data: ZMaterialData):
-    ZRenderizableComponentTemplate<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
+    ZTemplateComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZMaterialData())

@@ -12,13 +12,13 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZComponentTemplate
+import zernikalos.components.ZSerializableComponent
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZShaderSourceSerializer::class)
-class ZShaderSource internal constructor(data: ZShaderSourceData): ZComponentTemplate<ZShaderSourceData>(data) {
+class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializableComponent<ZShaderSourceData>(data) {
 
     @JsName("init")
     constructor(): this(ZShaderSourceData())

@@ -13,13 +13,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZComponentTemplate
+import zernikalos.components.ZSerializableComponent
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)
-class ZSkinning internal constructor(data: ZSkinningData): ZComponentTemplate<ZSkinningData>(data) {
+class ZSkinning internal constructor(data: ZSkinningData): ZSerializableComponent<ZSkinningData>(data) {
 
     @JsName("init")
     constructor(): this(ZSkinningData())

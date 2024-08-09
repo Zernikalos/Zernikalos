@@ -8,22 +8,16 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZRenderizableComponentTemplate
-import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
+import zernikalos.components.*
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsName
 
-class ZProgram internal constructor(data: ZProgramData): ZRenderizableComponentTemplate<ZProgramData, ZProgramRenderer>(data), ZBindeable {
-
-    @JsName("init")
-    constructor(): this(ZProgramData())
+class ZProgram(): ZRenderizableComponent<ZProgramRenderer>(), ZBindeable {
 
     override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
-        return ZProgramRenderer(ctx, data)
+        return ZProgramRenderer(ctx)
     }
 
     override fun bind() {
@@ -39,14 +33,7 @@ class ZProgram internal constructor(data: ZProgramData): ZRenderizableComponentT
 
 }
 
-class ZProgramData(): ZComponentData() {
-
-    override fun toString(): String {
-        return ""
-    }
-}
-
-class ZProgramRenderer(ctx: ZRenderingContext, data: ZProgramData): ZComponentRender<ZProgramData>(ctx, data) {
+class ZProgramRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
 
     lateinit var programId: GLWrap
 

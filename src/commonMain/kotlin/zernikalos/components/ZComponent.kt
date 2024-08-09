@@ -10,12 +10,15 @@ package zernikalos.components
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
 import zernikalos.utils.crc32
+import zernikalos.utils.crc32FromStr
+import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
 
 /**
@@ -26,7 +29,7 @@ import kotlin.js.JsExport
  * Renderizable components: Which will be able to interact with the graphics APIs
  */
 @JsExport
-interface ZComponent {
+interface ZComponent: ZRef {
 
     /**
      * Represents a boolean value indicating whether a component has been initialized.
@@ -49,17 +52,6 @@ interface ZComponent {
     val isRenderizable: Boolean
 
     /**
-     * Represents the unique reference identifier for a component.
-     *
-     * @property refId The unique reference identifier for the component.
-     *
-     * @see ZComponent
-     * @see ZRefComponentSerializer
-     * @see ZLoaderContext
-     */
-    var refId: Int
-
-    /**
      * Initializes the ZComponent using the provided ZRenderingContext.
      *
      * @param ctx The ZRenderingContext used for initialization.
@@ -68,6 +60,20 @@ interface ZComponent {
      * @see ZRenderingContext
      */
     fun initialize(ctx: ZRenderingContext)
+}
+
+@JsExport
+interface ZRef {
+    /**
+     * Represents the unique reference identifier for a component.
+     *
+     * @property refId The unique reference identifier for the component.
+     *
+     * @see ZComponent
+     * @see ZRefComponentSerializer
+     * @see ZLoaderContext
+     */
+    val refId: Int
 }
 
 /**
@@ -80,71 +86,19 @@ interface ZComponent {
  * @property isRenderizable Indicates whether the component is renderizable
  *
  */
-abstract class ZComponentTemplate<D: ZComponentData>
-internal constructor(internal val data: D): ZComponent, ZLoggable {
-    private var initialized: Boolean = false
+abstract class ZBaseComponent(
+    protected val internalData: ZComponentData? = null
+): ZComponent {
 
-    final override val isInitialized: Boolean
-        get() = initialized
+    final override val refId: Int by lazy {
+        internalData?.refId ?: randomNumId()
+    }
 
-    override val isRenderizable: Boolean
-        get() = false
+    private var _renderer: ZBaseComponentRender? = null
 
-    private var _refId: Int? = null
-
-    final override var refId: Int
+    protected val internalRenderer: ZBaseComponentRender
         get() {
-            if (_refId != null) {
-                return _refId!!
-            }
-            _refId = computeRefId()
-            return _refId!!
-        }
-        set(value) {
-            _refId = value
-        }
-
-    final override fun initialize(ctx: ZRenderingContext) {
-        if (initialized) {
-            return
-        }
-        initialized = true
-
-        internalInitialize(ctx)
-    }
-
-    protected open fun internalInitialize(ctx: ZRenderingContext) {
-
-    }
-
-    override fun toString(): String {
-        return data.toString()
-    }
-
-    private fun computeRefId(): Int {
-        val str = this.toString()
-        val dataArray = str.encodeToByteArray()
-        val hashValue = crc32(dataArray)
-        return if (hashValue < 0) hashValue.inv() else hashValue
-    }
-}
-
-/**
- * Represents a template for a Renderizable component in Zernikalos.
- *
- * @param R The type of ZComponentRender associated with the template
- * @property renderer The ZComponentRender associated with the component. Throws an error if the component has not been initialized prior to access the renderer
- */
-abstract class ZRenderizableComponentTemplate<
-    D: ZComponentData,
-    R: ZComponentRender<D>>
-internal constructor(data: D): ZComponentTemplate<D>(data) {
-
-    private var _renderer: R? = null
-
-    val renderer: R
-        get() {
-            if (!isInitialized || _renderer == null) {
+            if (!isInitialized || !isRenderizable) {
                 throw Error("The component has not been initialized prior to access the renderer")
             }
             return _renderer!!
@@ -153,25 +107,84 @@ internal constructor(data: D): ZComponentTemplate<D>(data) {
     override val isRenderizable: Boolean
         get() = _renderer != null
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
+    private var initialized: Boolean = false
+
+    final override val isInitialized: Boolean
+        get() = initialized
+
+    final override fun initialize(ctx: ZRenderingContext) {
+        if (initialized) {
+            return
+        }
+        initialized = true
+
         _renderer = createRenderer(ctx)
         _renderer?.initialize()
+        internalInitialize(ctx)
     }
 
-    protected abstract fun createRenderer(ctx: ZRenderingContext): R?
+    internal open fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
+        return null
+    }
+
+    protected open fun internalInitialize(ctx: ZRenderingContext) {
+
+    }
 
 }
 
+abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponent(data) {
+    internal val data: D
+        get() = internalData as D
+}
+
+abstract class ZRenderizableComponent<R: ZBaseComponentRender>: ZBaseComponent() {
+    val renderer: R
+        get() = internalRenderer as R
+}
+
+abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(data: D): ZBaseComponent(data) {
+    internal val data: D
+        get() = internalData as D
+
+    val renderer: R
+        get() = internalRenderer as R
+}
+
+/**
+ * Represents a template for a Renderizable component in Zernikalos.
+ *
+ * @param R The type of ZComponentRender associated with the template
+ * @property renderer The ZComponentRender associated with the component. Throws an error if the component has not been initialized prior to access the renderer
+ */
+
+
 @JsExport
 @Serializable
-abstract class ZComponentData: ZLoggable {
+abstract class ZComponentData: ZLoggable, ZRef {
+
+    private var _refId: Int? = null
+
+    @Transient
+    override val refId: Int
+        get() {
+            if (_refId == null) {
+                _refId = computeRefId()
+            }
+            return _refId!!
+        }
+
+    private fun computeRefId(): Int {
+        val hashValue = crc32FromStr(toString())
+        return if (hashValue < 0) hashValue.inv() else hashValue
+    }
 
     abstract override fun toString(): String
 
 }
 
 @JsExport
-abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRenderingContext, protected val data: D): ZLoggable {
+abstract class ZBaseComponentRender(protected val ctx: ZRenderingContext): ZLoggable {
 
     abstract fun initialize()
 
@@ -182,11 +195,8 @@ abstract class ZComponentRender<D: ZComponentData>(protected val ctx: ZRendering
     open fun render() {}
 }
 
-class ZEmptyComponentData: ZComponentData() {
-    override fun toString(): String {
-        return ""
-    }
-}
+@JsExport
+abstract class ZComponentRender<D: ZComponentData>(ctx: ZRenderingContext, protected val data: D): ZBaseComponentRender(ctx)
 
 abstract class ZComponentSerializer<
     T: ZComponent,
@@ -206,7 +216,7 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
-        value as ZComponentTemplate<D>
+        value as ZSerializableComponent<D>
         return encoder.encodeSerializableValue(kSerializer, value.data)
     }
 

@@ -19,7 +19,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZShaderProgramSerializer::class)
-class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizableComponentTemplate<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
+class ZShaderProgram internal constructor(data: ZShaderProgramData): ZTemplateComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZShaderProgramData())

@@ -15,14 +15,14 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.search.ZTreeNode
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZComponentTemplate
+import zernikalos.components.ZSerializableComponent
 import zernikalos.math.ZTransform
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBoneSerializer::class)
-class ZBone internal constructor(data: ZBoneData): ZComponentTemplate<ZBoneData>(data), ZTreeNode<ZBone> {
+class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneData>(data), ZTreeNode<ZBone> {
 
     @JsName("init")
     constructor(): this(ZBoneData())
