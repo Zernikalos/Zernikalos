@@ -12,11 +12,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.search.ZTreeNode
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZSerializableComponent
 import zernikalos.math.ZTransform
+import zernikalos.search.ZTreeNode
 import kotlin.js.JsExport
 import kotlin.js.JsName
 

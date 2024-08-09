@@ -9,14 +9,12 @@
 package zernikalos.components
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
-import zernikalos.utils.crc32
 import zernikalos.utils.crc32FromStr
 import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
@@ -134,19 +132,23 @@ abstract class ZBaseComponent(
 }
 
 abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponent(data) {
+    @Suppress("UNCHECKED_CAST")
     internal val data: D
         get() = internalData as D
 }
 
 abstract class ZRenderizableComponent<R: ZBaseComponentRender>: ZBaseComponent() {
+    @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
 }
 
 abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(data: D): ZBaseComponent(data) {
+    @Suppress("UNCHECKED_CAST")
     internal val data: D
         get() = internalData as D
 
+    @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
 }
@@ -158,9 +160,7 @@ abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(dat
  * @property renderer The ZComponentRender associated with the component. Throws an error if the component has not been initialized prior to access the renderer
  */
 
-
 @JsExport
-@Serializable
 abstract class ZComponentData: ZLoggable, ZRef {
 
     private var _refId: Int? = null
@@ -216,6 +216,7 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
+        @Suppress("UNCHECKED_CAST")
         value as ZSerializableComponent<D>
         return encoder.encodeSerializableValue(kSerializer, value.data)
     }

@@ -8,7 +8,6 @@
 
 package zernikalos.components.mesh
 
-import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.components.ZBindeable

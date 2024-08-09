@@ -11,7 +11,10 @@ package zernikalos.components.skeleton
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.*
+import zernikalos.components.ZComponentData
+import zernikalos.components.ZRefComponentSerializer
+import zernikalos.components.ZRefComponentWrapper
+import zernikalos.components.ZSerializableComponent
 import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZTransform
 import zernikalos.search.findInTree

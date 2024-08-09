@@ -110,6 +110,7 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 @JsExport
 data class GLWrap(val id: Any? = null)
 
+@JsExport
 enum class BufferTargetType(val value: Int) {
     @SerialName("array")
     ARRAY_BUFFER(ExpectBufferTargetType.ARRAY_BUFFER),
@@ -120,4 +121,59 @@ enum class BufferTargetType(val value: Int) {
 expect object ExpectBufferTargetType {
     val ARRAY_BUFFER: Int
     val ELEMENT_ARRAY_BUFFER: Int
+}
+
+enum class Enabler(val value: Int) {
+    DEPTH_TEST(ExpectEnabler.DEPTH_TEST)
+}
+
+@JsExport
+enum class BufferUsageType(val value: Int) {
+    @SerialName("static-draw")
+    STATIC_DRAW(ExpectBufferUsageType.STATIC_DRAW)
+}
+
+enum class BufferBit(val value: Int) {
+    COLOR_BUFFER(ExpectBufferBit.COLOR_BUFFER),
+    DEPTH_BUFFER(ExpectBufferBit.DEPTH_BUFFER)
+}
+
+enum class CullModeType(val value: Int) {
+    FRONT(ExpectCullModeType.FRONT),
+    BACK(ExpectCullModeType.BACK),
+    FRONT_AND_BACK(ExpectCullModeType.FRONT_AND_BACK)
+}
+
+enum class DrawModes(val value: Int) {
+    TRIANGLES(ExpectDrawModes.TRIANGLES),
+    LINES(ExpectDrawModes.LINES)
+}
+
+expect object ExpectEnabler {
+    val DEPTH_TEST: Int
+}
+
+expect object ExpectBufferBit {
+    val COLOR_BUFFER: Int
+    val DEPTH_BUFFER: Int
+}
+
+expect object ExpectShaderType {
+    val VERTEX_SHADER: Int
+    val FRAGMENT_SHADER: Int
+}
+
+expect object ExpectBufferUsageType {
+    val STATIC_DRAW: Int
+}
+
+expect object ExpectDrawModes {
+    val TRIANGLES: Int
+    val LINES: Int
+}
+
+expect object ExpectCullModeType {
+    val FRONT: Int
+    val BACK: Int
+    val FRONT_AND_BACK: Int
 }

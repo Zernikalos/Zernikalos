@@ -20,7 +20,7 @@ import kotlin.js.JsExport
 @JsExport
 open class ZernikalosBase: ZLoggable {
 
-    lateinit var surfaceView: ZSurfaceView
+    internal lateinit var surfaceView: ZSurfaceView
     lateinit var stateHandler: ZSceneStateHandler
 
     lateinit var context: ZContext
@@ -31,7 +31,7 @@ open class ZernikalosBase: ZLoggable {
     @Suppress("unused")
     val stats: ZStats = ZStats()
 
-    fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
+    internal fun initialize(view: ZSurfaceView, contextCreator: ZContextCreator, stateHandler: ZSceneStateHandler) {
         logger.info("Zernikalos Engine is ready!")
         logger.info(stats.toJson())
 

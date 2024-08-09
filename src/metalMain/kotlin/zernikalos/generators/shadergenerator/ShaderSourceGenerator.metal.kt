@@ -9,8 +9,8 @@
 package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZShaderSource
-import zernikalos.logger.ZLoggable
 import zernikalos.generators.shadergenerator.libs.*
+import zernikalos.logger.ZLoggable
 
 actual class ZShaderSourceGenerator : ZLoggable {
 

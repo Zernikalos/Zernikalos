@@ -8,6 +8,9 @@
 
 package zernikalos.ui
 
+import kotlin.js.JsExport
+
+@JsExport
 interface ZSurfaceViewEventHandler {
 
     fun onReady()
