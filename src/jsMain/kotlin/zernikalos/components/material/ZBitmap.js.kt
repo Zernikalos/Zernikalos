@@ -23,21 +23,39 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import kotlin.js.Promise
 
+@JsExport
 actual class ZBitmap {
 
-    val nativeData: ArrayBufferView
-    val htmlImageElement: HTMLImageElement
-    var imageBitmap: ImageBitmap? = null
-    var imageBitmapPromise: Promise<ImageBitmap>? = null
+    private val nativeData: ArrayBufferView
+    private val htmlImageElement: HTMLImageElement
+    private var _imageBitmap: ImageBitmap? = null
+    private var imageBitmapPromise: Promise<ImageBitmap>? = null
+
+    val imageBitmap: ImageBitmap?
+        get() = _imageBitmap
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    val isLoading: Promise<Nothing?>
+
+    @JsName("initWithByteArray")
     actual constructor(byteArray: ByteArray) {
         nativeData = Uint8Array(byteArray.toTypedArray())
+        // TODO: This part needs some review
         coroutineScope.launch {
-            imageBitmap = buildImageBitmap(nativeData)
+            _imageBitmap = buildImageBitmap(nativeData)
         }
         imageBitmapPromise = buildImageBitmapAsync(nativeData)
+
+        isLoading = Promise { res, rej ->
+            imageBitmapPromise?.then { img ->
+                _imageBitmap = img
+                res(null)
+            }?.catch { e ->
+                rej(e)
+            }
+        }
+
         htmlImageElement = buildImage(nativeData)
     }
 

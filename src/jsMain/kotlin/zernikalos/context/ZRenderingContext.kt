@@ -8,10 +8,6 @@
 
 package zernikalos.context
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.await
-import kotlinx.coroutines.launch
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.components.material.ZBitmap
@@ -35,7 +31,6 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
 actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
 
     private lateinit var gl: WebGL2RenderingContext
-    private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
     actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
         setContext(surfaceView.canvas)
@@ -196,47 +191,14 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun texImage2D(bitmap: ZBitmap) {
-        // TODO review
-        coroutineScope.launch {
-            gl.texImage2D(
-                WebGLRenderingContext.TEXTURE_2D,
-                0,
-                WebGL2RenderingContext.SRGB8_ALPHA8,
-                WebGLRenderingContext.RGBA,
-                WebGLRenderingContext.UNSIGNED_BYTE,
-                bitmap.imageBitmapPromise?.await()
-            )
-        }
-//        gl.texImage2D(
-//            WebGLRenderingContext.TEXTURE_2D,
-//            0,
-//            WebGL2RenderingContext.SRGB8_ALPHA8,
-//            WebGLRenderingContext.RGBA,
-//            WebGLRenderingContext.UNSIGNED_BYTE,
-//            bitmap.imageBitmap
-//        )
-//        gl.texImage2D(
-//            WebGLRenderingContext.TEXTURE_2D,
-//            0,
-//            WebGL2RenderingContext.SRGB8_ALPHA8,
-//            256,
-//            256,
-//            0,
-//            WebGLRenderingContext.RGBA,
-//            WebGLRenderingContext.UNSIGNED_BYTE,
-//            bitmap.nativeData
-//        )
-//        gl.texImage2D(
-//            WebGLRenderingContext.TEXTURE_2D,
-//            0,
-//            WebGLRenderingContext.RGB,
-//            400,
-//            400,
-//            0,
-//            WebGLRenderingContext.RGB,
-//            WebGLRenderingContext.UNSIGNED_BYTE,
-//            bitmap.nativeData
-//        )
+        gl.texImage2D(
+            WebGLRenderingContext.TEXTURE_2D,
+            0,
+            WebGL2RenderingContext.SRGB8_ALPHA8,
+            WebGLRenderingContext.RGBA,
+            WebGLRenderingContext.UNSIGNED_BYTE,
+            bitmap.imageBitmap
+        )
     }
 
 }

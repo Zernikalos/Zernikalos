@@ -14,6 +14,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
+import zernikalos.logger.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -40,6 +41,10 @@ class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTex
 
     override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
         return ZTextureRenderer(ctx, data)
+    }
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        logger.debug("Initializing texture $refId")
     }
 
     override fun bind() {

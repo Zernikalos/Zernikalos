@@ -13,14 +13,15 @@ import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 
-actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: ZTextureData) : ZComponentRender<ZTextureData>(ctx, data) {
+actual class ZTextureRenderer actual constructor(
+    ctx: ZRenderingContext,
+    data: ZTextureData
+) : ZComponentRender<ZTextureData>(ctx, data) {
 
     lateinit var textureHandler: GLWrap
 
     actual override fun initialize() {
         ctx as ZGLRenderingContext
-
-        //logger.debug("Initializing Texture with id ${data.refId}")
 
         val bitmap = ZBitmap(data.dataArray)
 
