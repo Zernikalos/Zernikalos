@@ -178,6 +178,24 @@ kotlin {
         }
     }
 
+    linuxX64("linux") {
+        binaries {
+            staticLib {
+                baseName = zernikalosName
+            }
+            sharedLib {
+                baseName = zernikalosName
+            }
+        }
+
+        compilations["main"].apply {
+            defaultSourceSet {
+                kotlin.srcDir("src/linuxMain/kotlin")
+                resources.srcDir("src/linuxMain/resources")
+            }
+        }
+    }
+
     sourceSets {
         all {
             //languageSettings.optIn("zernikalos.OptInAnnotation")
@@ -248,6 +266,11 @@ kotlin {
         iosMain {
             dependsOn(metalMain)
             kotlin.srcDir("src/iosMain/kotlin")
+        }
+
+        val linuxMain by getting {
+            dependsOn(oglMain)
+            kotlin.srcDir("src/linuxMain/kotlin")
         }
 
     }

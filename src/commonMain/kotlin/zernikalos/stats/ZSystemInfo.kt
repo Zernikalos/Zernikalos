@@ -18,7 +18,8 @@ import kotlin.js.JsExport
 enum class ZPlatformName {
     ANDROID,
     IOS,
-    WEB
+    WEB,
+    LINUX
 }
 
 @JsExport
