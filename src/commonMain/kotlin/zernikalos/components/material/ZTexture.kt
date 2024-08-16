@@ -14,9 +14,14 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
+import zernikalos.logger.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
+/**
+ * Represents a texture component in the Zernikalos framework.
+ *
+ */
 @JsExport
 class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
@@ -26,20 +31,44 @@ class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTex
     @JsName("initWithArgs")
     constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(ZTextureData(id, width, height, flipX, flipY, dataArray))
 
+    /**
+     * Represents the unique identifier for an instance of a ZTexture object.
+     */
     var id: String by data::id
 
+    /**
+     * Represents the width of the texture image
+     */
     var width: Int by data::width
 
+    /**
+     * Represents the height of the texture image
+     */
     var height: Int by data::height
 
+    /**
+     * Represents whether the texture should be flipped horizontally.
+     */
     var flipX: Boolean by data::flipX
 
+    /**
+     * Represents whether the texture should be flipped vertically.
+     */
     var flipY: Boolean by data::flipY
 
+    /**
+     * Represents an array of bytes used for storing the image data.
+     *
+     * @property dataArray The byte array containing the data.
+     */
     var dataArray: ByteArray by data::dataArray
 
     override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
         return ZTextureRenderer(ctx, data)
+    }
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        logger.debug("Initializing texture $refId")
     }
 
     override fun bind() {
@@ -51,8 +80,11 @@ class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTex
     }
 }
 
+/**
+ * @suppress
+ */
 @Serializable
-data class ZTextureDataWrapper(
+internal data class ZTextureDataWrapper(
     @ProtoNumber(1)
     override var refId: Int = 0,
     @ProtoNumber(2)
@@ -61,6 +93,9 @@ data class ZTextureDataWrapper(
     override var data: ZTextureData? = null
 ): ZRefComponentWrapper<ZTextureData>
 
+/**
+ * @suppress
+ */
 @Serializable
 data class ZTextureData(
     @ProtoNumber(1)
@@ -77,6 +112,9 @@ data class ZTextureData(
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData()
 
+/**
+ * @suppress
+ */
 expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
 
     override fun initialize()
@@ -85,7 +123,10 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 
 }
 
-class ZTextureSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZTexture, ZTextureData, ZTextureDataWrapper>(loaderContext) {
+/**
+ * @suppress
+ */
+internal class ZTextureSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZTexture, ZTextureData, ZTextureDataWrapper>(loaderContext) {
 
     override val deserializationStrategy: DeserializationStrategy<ZTextureDataWrapper> = ZTextureDataWrapper.serializer()
 

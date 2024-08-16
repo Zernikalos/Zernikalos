@@ -110,6 +110,9 @@ class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData,
 
 }
 
+/**
+ * @suppress
+ */
 @Serializable
 @JsExport
 data class ZBufferKey(
@@ -135,6 +138,9 @@ data class ZBufferKey(
     var bufferId: Int = -1
 )
 
+/**
+ * @suppress
+ */
 @Serializable
 @JsExport
 data class ZRawBuffer(
