@@ -8,7 +8,6 @@
 
 package zernikalos.components.material
 
-import kotlinx.coroutines.await
 import zernikalos.components.ZComponentRender
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
