@@ -179,6 +179,16 @@ kotlin {
     }
 
     linuxX64("linux") {
+        compilations["main"].cinterops {
+            val glfw by creating {
+                defFile("src/nativeInterop/cinterop/libglfw.def")
+            }
+        }
+        compilations["main"].apply {
+            defaultSourceSet {
+                kotlin.srcDir("src/linuxMain/kotlin")
+            }
+        }
         binaries {
             staticLib {
                 baseName = zernikalosName
@@ -188,12 +198,6 @@ kotlin {
             }
         }
 
-        compilations["main"].apply {
-            defaultSourceSet {
-                kotlin.srcDir("src/linuxMain/kotlin")
-                resources.srcDir("src/linuxMain/resources")
-            }
-        }
     }
 
     sourceSets {
