@@ -190,9 +190,7 @@ tasks.withType<DokkaTask>().configureEach {
     {
       "customAssets": ["${file("docsAssets/logo-icon.svg")}"],
       "customStyleSheets": ["${file("docsAssets/zk-docs-styles.css")}"],
-      "footerMessage": "© ${getYear()} $zernikalosNameCapital",
-      "separateInheritedMembers": false,
-      "mergeImplicitExpectActualDeclarations": true
+      "footerMessage": "© ${getYear()} $zernikalosNameCapital"
     }
     """
     pluginsMapConfiguration.set(

@@ -86,11 +86,16 @@ interface ZRef {
  */
 abstract class ZBaseComponent(
     protected val internalData: ZComponentData? = null
-): ZComponent {
+): ZComponent, ZLoggable {
 
-    final override val refId: Int by lazy {
-        internalData?.refId ?: randomNumId()
-    }
+    private var _refId: Int? = null
+    final override val refId: Int
+        get() {
+            if (_refId == null) {
+                _refId = internalData?.refId ?: randomNumId()
+            }
+            return _refId!!
+        }
 
     private var _renderer: ZBaseComponentRender? = null
 
