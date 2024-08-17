@@ -1,4 +1,7 @@
 headers = GLFW/glfw3.h
 compilerOpts.linux = -I/usr/include
 #linkerOpts.osx = -L/opt/local/lib -L/usr/local/opt/curl/lib -lcurl
-linkerOpts.linux = -L/usr/lib64 -lglfw
+linkerOpts.linux = -L/usr/lib64 -L/usr/lib -lglfw
+excludeDependentModules = false
+---
+#define GLFW_INCLUDE_VULKAN

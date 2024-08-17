@@ -1,0 +1,4 @@
+headers = vulkan/vulkan.h vulkan/vulkan_core.h
+compilerOpts.linux = -I/usr/include
+linkerOpts.linux = -L/usr/lib64 -L/usr/lib -lvulkan
+excludeDependentModules = false

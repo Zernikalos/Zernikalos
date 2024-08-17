@@ -1,0 +1,6 @@
+headers = GL/glew.h
+
+compilerOpts.linux = -I/usr/include
+#linkerOpts.osx = -L/opt/local/lib -L/usr/local/opt/curl/lib -lcurl
+linkerOpts.linux = -L/usr/lib -lGL
+excludeDependentModules = true

@@ -180,6 +180,12 @@ kotlin {
 
     linuxX64("linux") {
         compilations["main"].cinterops {
+//            val gl by creating {
+//                defFile("src/nativeInterop/cinterop/libgl.def")
+//            }
+            val vulkan by creating {
+                defFile("src/nativeInterop/cinterop/libvulkan.def")
+            }
             val glfw by creating {
                 defFile("src/nativeInterop/cinterop/libglfw.def")
             }
