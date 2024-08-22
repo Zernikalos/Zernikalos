@@ -55,6 +55,10 @@ class ZModel: ZObject(), ZLoggable {
 
         val enabler = buildAttributeEnabler()
 
+        if (hasSkeleton) {
+            skeleton?.initialize(ctx.renderingContext)
+        }
+
         val shaderSourceGenerator = ZShaderSourceGenerator()
         shaderSourceGenerator.buildShaderSource(enabler, shaderProgram.shaderSource)
 

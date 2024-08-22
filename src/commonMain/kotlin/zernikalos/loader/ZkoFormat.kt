@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
 
-const val ZKO_VERSION = "0.2.0"
+const val ZKO_VERSION = "0.3.0"
 
 @Serializable
 data class ZkoHeader(

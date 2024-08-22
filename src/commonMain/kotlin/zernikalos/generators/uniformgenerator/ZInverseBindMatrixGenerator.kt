@@ -27,7 +27,7 @@ class ZInverseBindMatrixGenerator: ZUniformGenerator {
 
         bones.sortBy { it.idx }
         val boneMatrices = bones.map {
-            it.inverseBindTransform.matrix
+            it.inverseBindMatrix
         }
 
         val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)

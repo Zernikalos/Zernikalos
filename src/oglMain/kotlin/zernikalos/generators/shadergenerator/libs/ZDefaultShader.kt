@@ -34,31 +34,34 @@ uniform mat4 u_mvpMatrix;
 #endif
 in vec3 a_position;
 
+#ifdef USE_SKINNING
+vec4 calcSkinnedPosition() {
+    vec4 skinnedPosition = vec4(0.0);
+     
+     // Sum the transformations from each influencing bone
+    for (int i = 0; i < 4; ++i) {
+        if (a_boneWeight[i] > 0.0) {
+            int boneID = int(a_boneIndices[i]);
+            mat4 boneMatrix = u_bones[boneID];
+            mat4 boneInverseMatrix = u_invBindMatrix[boneID];
+
+            // Apply the bone transformation
+            vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
+
+            skinnedPosition += a_boneWeight[i] * (boneMatrix * localPosition);
+        }
+    }
+    
+    return skinnedPosition;
+}
+#endif
+
 void main() {
     #ifdef USE_SKINNING
-        vec4 skinnedPosition = vec4(0.0);
-
-        // Sum the transformations from each influencing bone
-        for (int i = 0; i < 4; ++i)
-        {
-            if (a_boneWeight[i] > 0.0)
-            {
-                int boneID = int(a_boneIndices[i]);
-                mat4 boneMatrix = u_bones[boneID];
-                mat4 boneInverseMatrix = u_invBindMatrix[boneID];
-
-                // Apply the bone transformation
-                vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
-
-                skinnedPosition += a_boneWeight[i] * (boneMatrix * localPosition);
-            }
-        }
-
-        // Apply model, view, and projection transformations
-        gl_Position = u_mvpMatrix * skinnedPosition;
-     #else
+        gl_Position = u_mvpMatrix * calcSkinnedPosition();
+    #else
         gl_Position = u_mvpMatrix * vec4(a_position,1);
-     #endif
+    #endif
 
 #ifdef USE_TEXTURES
     #ifdef FLIP_TEXTURE_Y

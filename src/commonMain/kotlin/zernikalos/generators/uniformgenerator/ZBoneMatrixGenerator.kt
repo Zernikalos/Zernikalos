@@ -12,6 +12,8 @@ import zernikalos.ZTypes
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZAlgebraObjectCollection
+import zernikalos.math.ZMatrix4
+import zernikalos.math.ZQuaternion
 import zernikalos.objects.ZModel
 import zernikalos.objects.ZObject
 
@@ -25,8 +27,16 @@ class ZBoneMatrixGenerator: ZUniformGenerator {
         val bones = skeleton.bones
 
         bones.sortBy { it.idx }
-        val boneMatrices= bones.map {
-            it.transform.matrix
+        val boneMatrices= bones.map { it ->
+            if (it.name == "mixamorig_Head") {
+                val poseMat = ZMatrix4()
+                ZMatrix4.fromQuaternion(poseMat, ZQuaternion(0.7071f, 0f, 0.7071f, 0f))
+                val m = ZMatrix4()
+                ZMatrix4.mult(m, poseMat, it.bindMatrix)
+                return@map m
+            } else {
+                return@map it.bindMatrix
+            }
         }
 
         val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)

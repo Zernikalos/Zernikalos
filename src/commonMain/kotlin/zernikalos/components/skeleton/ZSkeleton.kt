@@ -15,6 +15,7 @@ import zernikalos.components.ZComponentData
 import zernikalos.components.ZRefComponentSerializer
 import zernikalos.components.ZRefComponentWrapper
 import zernikalos.components.ZSerializableComponent
+import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZTransform
 import zernikalos.search.findInTree
@@ -37,6 +38,10 @@ class ZSkeleton internal constructor(data: ZSkeletonData): ZSerializableComponen
 
     fun findBoneByName(name: String): ZBone? {
         return findInTree(root) { bone: ZBone -> bone.name == name }
+    }
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+        root.initialize(ctx)
     }
 
 }

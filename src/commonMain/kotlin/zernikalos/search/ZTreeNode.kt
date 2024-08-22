@@ -20,6 +20,9 @@ interface ZTreeNode<T: ZTreeNode<T>> {
 
     val parent: T?
     val hasParent: Boolean
+        get() = parent != null
+    val isRoot: Boolean
+        get() = !hasParent
 
     val children: Array<T>
 }
