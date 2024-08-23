@@ -13,7 +13,7 @@ import java.net.URL
 import java.time.Year
 
 // Constants
-val zernikalosGroup = "io.zernikalos"
+val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "${zernikalosGroup}.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
@@ -21,7 +21,7 @@ val zernikalosVersion = "0.0.1"
 
 val zernikalosAuthorName = "Aarón Negrín"
 val zernikalosLicense = "MPL v2.0"
-val zernikalosSiteUrl = "https://zernikalos.io"
+val zernikalosSiteUrl = "https://zernikalos.dev"
 
 plugins {
     kotlin("multiplatform") apply true
@@ -34,8 +34,10 @@ plugins {
     // id("org.jlleitschuh.gradle.ktlint")
 }
 
-group = zernikalosGroup
-version = zernikalosVersion
+allprojects {
+    group = zernikalosGroup
+    version = zernikalosVersion
+}
 
 repositories {
     mavenLocal()
