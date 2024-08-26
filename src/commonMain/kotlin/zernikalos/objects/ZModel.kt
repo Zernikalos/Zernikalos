@@ -16,7 +16,6 @@ import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
 import zernikalos.components.skeleton.ZSkeleton
-import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
@@ -36,9 +35,7 @@ class ZModel: ZObject(), ZLoggable {
     lateinit var shaderProgram: ZShaderProgram
     @Contextual @ProtoNumber(6)
     var material: ZMaterial? = null
-    @ProtoNumber(7)
-    var skinning: ZSkinning? = null
-    @Contextual @ProtoNumber(8)
+    @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null
 
     val hasTextures: Boolean
