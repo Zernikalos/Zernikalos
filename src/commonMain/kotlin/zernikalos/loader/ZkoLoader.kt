@@ -14,6 +14,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
+import zernikalos.action.ZSkeletalAction
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.material.ZMaterialSerializer
 import zernikalos.components.material.ZTexture
@@ -51,7 +52,12 @@ private fun createSerializersModule(): ProtoBuf {
     return protoFormat
 }
 
-
+@JsExport
+data class ZKo(
+    val header: ZkoHeader,
+    val root: ZObject,
+    val actions: List<ZSkeletalAction>? = null
+)
 
 @JsExport
 fun loadFromProtoString(hexString: String): ZObject {
@@ -61,9 +67,12 @@ fun loadFromProtoString(hexString: String): ZObject {
 
 // TODO: These methods might not return ZObject but ZObject?
 @JsExport
-fun loadFromProto(byteArray: ByteArray): ZObject {
+fun loadFromProto(byteArray: ByteArray): ZKo {
     val protoFormat = createSerializersModule()
     val zkoFormat = protoFormat.decodeFromByteArray(ZkoFormat.serializer(), byteArray)
-    return zkoFormat.data.zObject
+    val header = zkoFormat.header
+    val obj = zkoFormat.data.zObject
+    val actions = zkoFormat.actions
+    return ZKo(header, obj, actions)
 }
 

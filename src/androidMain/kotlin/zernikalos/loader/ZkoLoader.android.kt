@@ -13,8 +13,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import zernikalos.objects.ZObject
 
-suspend fun loadFromFile(context: Context, fileName: String): ZObject = coroutineScope {
-    val loaded = async<ZObject> {
+suspend fun loadFromFile(context: Context, fileName: String): ZKo = coroutineScope {
+    val loaded = async<ZKo> {
         val content = context.openFileInput(fileName).buffered().readBytes()
         return@async loadFromProto(content)
     }

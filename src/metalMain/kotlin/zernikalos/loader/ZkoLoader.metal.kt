@@ -24,7 +24,7 @@ class ZkoLoader {
 
     companion object {
         @OptIn(ExperimentalForeignApi::class)
-        suspend fun loadFromMainBundlePath(fileName: String): ZObject? = coroutineScope {
+        suspend fun loadFromMainBundlePath(fileName: String): ZKo? = coroutineScope {
             // Get the URL for the file iOS
             val fileURL = NSBundle.mainBundle.URLForResource(fileName, "zko")
 
@@ -47,7 +47,7 @@ class ZkoLoader {
         }
 
         @OptIn(ExperimentalForeignApi::class)
-        fun loadFromMainBundlePathSync(fileName: String): ZObject? {
+        fun loadFromMainBundlePathSync(fileName: String): ZKo? {
             // Get the URL for the file iOS
             val fileURL = NSBundle.mainBundle.URLForResource(fileName, "zko")
 

@@ -23,7 +23,7 @@ import kotlin.js.Promise
  * @return A [Promise] that resolves to the loaded [ZObject].
  */
 @JsExport
-fun loadFromUrl(url: String): Promise<ZObject> {
+fun loadFromUrl(url: String): Promise<ZKo> {
     return window.fetch(url).then { response ->
         response.arrayBuffer()
     }.then { buffer: ArrayBuffer ->
