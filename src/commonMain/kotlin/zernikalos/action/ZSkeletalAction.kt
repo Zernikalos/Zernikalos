@@ -14,12 +14,17 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZSkeletalAction {
-    val keyFrames: Array<ZKeyFrame>
-        get() = _keyFrames.toTypedArray()
+class ZSkeletalAction(
+    @ProtoNumber(1) val name: String
+) {
+    @ProtoNumber(2)
+    var duration: Float = 0f
 
     @ProtoNumber(10)
     private val _keyFrames: ArrayList<ZKeyFrame> = ArrayList()
+
+    val keyFrames: Array<ZKeyFrame>
+        get() = _keyFrames.toTypedArray()
 
     fun addKeyFrame(keyFrame: ZKeyFrame) {
         _keyFrames.add(keyFrame)
