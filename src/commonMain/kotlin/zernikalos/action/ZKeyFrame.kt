@@ -18,7 +18,7 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZKeyFrame(@ProtoNumber(1) var time: Float = 0f) {
+class ZKeyFrame(@ProtoNumber(1) var time: Float) {
 
     val pose: Map<String, ZBoneFrameTransform>
         get() = _pose
@@ -37,4 +37,30 @@ class ZKeyFrame(@ProtoNumber(1) var time: Float = 0f) {
     fun setBoneTransform(boneName: String, transform: ZBoneFrameTransform) {
         _pose[boneName] = transform
     }
+
+    companion object {
+
+        fun interpolate(time: Float, prev: ZKeyFrame, next: ZKeyFrame): ZKeyFrame {
+            val interpolatedKeyFrame = ZKeyFrame(time)
+
+            val allBones = prev.pose.keys.union(next.pose.keys)
+            for (boneName in allBones) {
+                val prevTransform = prev.getBoneTransform(boneName)
+                val nextTransform = next.getBoneTransform(boneName)
+
+                if (prevTransform != null && nextTransform != null) {
+                    val interpolatedTransform = ZBoneFrameTransform.interpolate(time, prevTransform, nextTransform)
+                    interpolatedKeyFrame.setBoneTransform(boneName, interpolatedTransform)
+                } else if (prevTransform != null) {
+                    interpolatedKeyFrame.setBoneTransform(boneName, prevTransform)
+                } else if (nextTransform != null) {
+                    interpolatedKeyFrame.setBoneTransform(boneName, nextTransform)
+                }
+            }
+
+            return interpolatedKeyFrame
+        }
+
+    }
+
 }

@@ -29,4 +29,20 @@ class ZSkeletalAction(
     fun addKeyFrame(keyFrame: ZKeyFrame) {
         _keyFrames.add(keyFrame)
     }
+
+    fun getKeyFrame(time: Float): ZKeyFrame {
+        val idx = _keyFrames.indexOfLast { it.time <= time }
+        val prev = _keyFrames.getOrNull(idx)
+        val next = _keyFrames.getOrNull(idx + 1)
+
+        if (prev != null && prev.time == time) {
+            return prev
+        }
+
+        return when {
+            prev == null -> _keyFrames.first()
+            next == null -> _keyFrames.last()
+            else -> ZKeyFrame.interpolate(time, prev, next)
+        }
+    }
 }

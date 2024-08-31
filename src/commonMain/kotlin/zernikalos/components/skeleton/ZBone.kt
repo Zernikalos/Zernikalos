@@ -12,12 +12,12 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.action.ZKeyFrame
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZSerializableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZMatrix4
-import zernikalos.math.ZQuaternion
 import zernikalos.math.ZTransform
 import zernikalos.search.ZTreeNode
 import kotlin.js.JsExport
@@ -42,7 +42,6 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
 
     var bindMatrix: ZMatrix4 = ZMatrix4.Identity
     var inverseBindMatrix: ZMatrix4 = ZMatrix4.Identity
-
     var poseMatrix: ZMatrix4 = ZMatrix4.Identity
 
     @Transient
@@ -77,9 +76,6 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     fun computePose(parentPoseMatrix: ZMatrix4) {
         val currentLocalPoseMatrix = ZMatrix4()
         val currentPoseMatrix = ZMatrix4()
-//        if (name == "mixamorigNeck") {
-//            ZMatrix4.fromQuaternion(currentPoseMatrix, ZQuaternion(0.7071f, 0f, 0.7071f, 0f))
-//        }
         ZMatrix4.mult(currentPoseMatrix, parentPoseMatrix, currentLocalPoseMatrix)
         for (child in children) {
             child.computePose(currentPoseMatrix)
@@ -87,6 +83,14 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         val globalPoseMatrix =  ZMatrix4()
         ZMatrix4.mult(globalPoseMatrix, inverseBindMatrix, currentPoseMatrix)
         poseMatrix = globalPoseMatrix
+    }
+
+    fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
+        val poseMat = keyFrame.getBoneTransform(name)!!.toTransform().matrix
+        ZMatrix4.mult(poseMatrix, parentPoseMatrix, poseMat)
+        for (child in children) {
+            child.computePoseFromKeyFrame(keyFrame, poseMatrix)
+        }
     }
 
     private fun computeInverseBindMatrix(parentBindMatrix: ZMatrix4) {
