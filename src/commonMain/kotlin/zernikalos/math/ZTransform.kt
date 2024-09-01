@@ -24,7 +24,7 @@ class ZTransform() {
     @Transient
     private val _matrix: ZMatrix4 = ZMatrix4.Identity
 
-    private val _location: ZVector3 = ZVector3.Zero
+    private val _position: ZVector3 = ZVector3.Zero
     private val _rotation: ZQuaternion = ZQuaternion.Identity
     private val _scale: ZVector3 = ZVector3.Ones
 
@@ -35,7 +35,7 @@ class ZTransform() {
 
     @JsName("initWithArgs")
     constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
-        _location.copy(location)
+        _position.copy(location)
         _rotation.copy(rotation)
         _scale.copy(scale)
     }
@@ -70,10 +70,10 @@ class ZTransform() {
             _right.normalize()
         }
 
-    var location: ZVector3
-        get() = _location
+    var position: ZVector3
+        get() = _position
         set(value) {
-            _location.copy(value)
+            _position.copy(value)
         }
 
     var rotation: ZQuaternion
@@ -91,14 +91,14 @@ class ZTransform() {
     val matrix: ZMatrix4
         get() {
             ZMatrix4.identity(_matrix)
-            ZMatrix4.translate(_matrix, _location)
+            ZMatrix4.translate(_matrix, _position)
             ZMatrix4.rotate(_matrix, _rotation)
             ZMatrix4.scale(_matrix, _scale)
             return _matrix
         }
 
     fun setLocation(x: Float, y: Float, z: Float) {
-        _location.setValues(x, y, z)
+        _position.setValues(x, y, z)
     }
 
     fun setRotation(angle: Float, x: Float, y: Float, z: Float) {
@@ -113,7 +113,7 @@ class ZTransform() {
     @JsName("setLookAtUp")
     fun lookAt(look: ZVector3, up: ZVector3) {
         val m = ZMatrix4()
-        ZMatrix4.lookAt(m, _location, look, up)
+        ZMatrix4.lookAt(m, _position, look, up)
         ZQuaternion.fromMatrix4(_rotation, m)
     }
 
@@ -122,9 +122,9 @@ class ZTransform() {
     }
 
     fun translate(x: Float, y: Float, z: Float) {
-        _location.x += x
-        _location.y += y
-        _location.z += z
+        _position.x += x
+        _position.y += y
+        _position.z += z
     }
 
     @JsName("translateByVector")
@@ -175,11 +175,11 @@ class ZTransform() {
         //R(V-P)
         ZVector3.rotateVector(v, _rotation, v)
         //Loc = P + R(V-P)
-        ZVector3.add(_location, point, v)
+        ZVector3.add(_position, point, v)
     }
 
     fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3) {
-        rotateAround(angle, point, axis, _location)
+        rotateAround(angle, point, axis, _position)
     }
 
     private fun transformLocalAxis() {
