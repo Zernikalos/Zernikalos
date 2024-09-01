@@ -11,7 +11,7 @@ include(":zernikalos")
 
 pluginManagement {
     plugins {
-        val kotlinPluginVersion = "2.0.20-RC"
+        val kotlinPluginVersion = "2.0.20"
         val androidPluginVer = "8.2.0"
 
         kotlin("multiplatform") version kotlinPluginVersion
