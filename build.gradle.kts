@@ -24,12 +24,12 @@ val zernikalosLicense = "MPL v2.0"
 val zernikalosSiteUrl = "https://zernikalos.dev"
 
 plugins {
-    kotlin("multiplatform") apply true
-    id("com.android.library") apply true
-    id("org.jetbrains.kotlin.android") apply false
-    id("org.jetbrains.kotlin.plugin.serialization")
+    kotlin("multiplatform") version libs.versions.kotlin.get() apply true
+    id("com.android.library") version libs.versions.androidGradlePlugin.get() apply true
+    id("org.jetbrains.kotlin.android") version libs.versions.kotlin.get() apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
     id("maven-publish")
-    id("org.jetbrains.dokka") version "1.9.20" apply true
+    id("org.jetbrains.dokka") version libs.versions.dokka.get() apply true
     // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
