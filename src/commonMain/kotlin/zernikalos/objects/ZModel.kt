@@ -72,8 +72,8 @@ class ZModel: ZObject(), ZLoggable {
 
     private fun addRequiredUniforms(enabler: ZAttributesEnabler) {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
-        //shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
-        //shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
+        shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
+        shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
     }
 
     private fun addRequiredAttributes(enabler: ZAttributesEnabler) {

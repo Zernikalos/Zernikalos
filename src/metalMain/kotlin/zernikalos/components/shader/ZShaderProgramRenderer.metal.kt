@@ -25,6 +25,9 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
     lateinit var vertexShader: MTLFunctionProtocol
     lateinit var fragmentShader: MTLFunctionProtocol
 
+    private val uniformsSize: Int
+        get() = data.uniforms.values.fold(0) { acc, zUniform -> acc + zUniform.dataType.byteSize }
+
     actual override fun initialize() {
         initializeShader()
         initializeUniformBuffer()
@@ -36,8 +39,6 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         data.uniforms.values.forEach { uniform ->
             uniform.initialize(ctx)
         }
-
-        val uniformsSize: Int = data.uniforms.values.fold(0) { acc, zUniform -> acc + zUniform.dataType.byteSize }
 
         uniformBuffer = ctx.device.newBufferWithLength(uniformsSize.toULong(), MTLResourceStorageModeShared)
         uniformBuffer?.label = "UniformBuffer"
@@ -66,22 +67,23 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         fragmentShader = library?.newFunctionWithName("fragmentShader")!!
     }
 
-    actual override fun bind() {
-        data.uniforms.values.forEach { uniform ->
-            bindUniformValue(uniform)
-        }
-    }
-
-    actual override fun unbind() {
-    }
-
     @OptIn(ExperimentalForeignApi::class)
-    private fun bindUniformValue(uniform: ZUniform) {
+    actual override fun bind() {
         ctx as ZMtlRenderingContext
 
-        val contentPointer = uniformBuffer?.contents().rawValue // + data.dataType.byteSize.toLong()
-        uniform.value?.values?.usePinned { pinned ->
-            memcpy(interpretCPointer<CPointed>(contentPointer), pinned.addressOf(0), uniform.dataType.byteSize.toULong())
+        var offset: Long = 0
+        data.uniforms.values.forEach { uniform ->
+            // Memory pointer where to copy the content from uniform pinned data
+            val contentPointer = uniformBuffer?.contents().rawValue + offset
+            uniform.value?.values?.usePinned { pinned ->
+                // Dest, Src and how many bytes
+                memcpy(
+                    interpretCPointer<CPointed>(contentPointer),
+                    pinned.addressOf(0),
+                    uniform.dataType.byteSize.toULong()
+                )
+            }
+            offset += uniform.dataType.byteSize
         }
 
         // TODO: This location is still hardcoded
@@ -89,5 +91,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, 7u)
     }
 
+    actual override fun unbind() {
+    }
 }
 
