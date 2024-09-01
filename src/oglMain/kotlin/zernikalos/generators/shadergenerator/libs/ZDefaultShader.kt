@@ -68,6 +68,8 @@ void main() {
         f_color = texture(u_texture, v_uv);
     #elif defined(USE_COLORS)
         f_color = vec4(v_color.xyz, 1);
+    #else
+        f_color = vec4(1, 1, 1, 1);
     #endif
 }
 """

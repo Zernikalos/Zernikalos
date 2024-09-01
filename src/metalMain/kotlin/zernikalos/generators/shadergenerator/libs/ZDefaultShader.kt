@@ -19,10 +19,8 @@ const val shaderUniforms = """
 typedef struct
 {
     matrix_float4x4 mvpMatrix;
-    // matrix_float4x4 mvpMatrix2;
-
-    //    matrix_float4x4 viewMatrix;
-    //    matrix_float4x4 modelMatrix;
+    matrix_float4x4 viewMatrix;
+    matrix_float4x4 projectionMatrix;
 } Uniforms;
 """
 
