@@ -25,12 +25,19 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
     fun bindLocation(programId: GLWrap) {
         ctx as ZGLRenderingContext
         uniformId = ctx.getUniformLocation(programId, data.uniformName)
-        logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
+        if (uniformId.isValid) {
+            logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
+        } else {
+            logger.debug("Invalid uniform ${data.uniformName}")
+        }
     }
 
     fun bindValue() {
         ctx as ZGLRenderingContext
         if (data.value == null) {
+            return
+        }
+        if (!uniformId.isValid) {
             return
         }
         when (data.dataType) {
