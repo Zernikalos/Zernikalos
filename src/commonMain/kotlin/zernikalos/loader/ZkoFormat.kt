@@ -11,9 +11,12 @@ package zernikalos.loader
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.action.ZSkeletalAction
+import kotlin.js.JsExport
 
-const val ZKO_VERSION = "0.2.0"
+const val ZKO_VERSION = "0.3.0"
 
+@JsExport
 @Serializable
 data class ZkoHeader(
     @ProtoNumber(1) val version: String
@@ -29,5 +32,6 @@ data class ZkoHeader(
 @Serializable
 data class ZkoFormat(
     @ProtoNumber(1) val header: ZkoHeader,
-    @ProtoNumber(2) val data: ProtoZkObject
+    @ProtoNumber(2) val data: ProtoZkObject,
+    @ProtoNumber(3) val actions: List<ZSkeletalAction>? = null
 )

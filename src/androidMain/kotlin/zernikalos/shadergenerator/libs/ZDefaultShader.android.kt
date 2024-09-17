@@ -10,9 +10,8 @@ package zernikalos.generators.shadergenerator.libs
 
 const val defaultVertexShaderSource = """
 #ifdef USE_SKINNING
-    uniform mat4 u_bones[150];
-    uniform mat4 u_bindMatrix;
-    uniform mat4 u_invBindMatrix;
+    uniform mat4 u_bones[100];
+    uniform mat4 u_invBindMatrix[100];
 #endif
 uniform mat4 u_projMatrix;
 uniform mat4 u_viewMatrix;
@@ -35,9 +34,35 @@ uniform mat4 u_mvpMatrix;
 #endif
 in vec3 a_position;
 
+#ifdef USE_SKINNING
+vec4 calcSkinnedPosition() {
+    vec4 skinnedPosition = vec4(0.0);
+     
+     // Sum the transformations from each influencing bone
+    for (int i = 0; i < 4; ++i) {
+        if (a_boneWeight[i] > 0.0) {
+            int boneID = int(a_boneIndices[i]);
+            mat4 boneMatrix = u_bones[boneID];
+            mat4 boneInverseMatrix = u_invBindMatrix[boneID];
+
+            // Apply the bone transformation
+            vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
+
+            skinnedPosition += a_boneWeight[i] * (boneMatrix * localPosition);
+        }
+    }
+    
+    return skinnedPosition;
+}
+#endif
+
 void main() {
-    gl_Position = u_mvpMatrix * vec4(a_position,1);
-   
+    #ifdef USE_SKINNING
+        gl_Position = u_mvpMatrix * calcSkinnedPosition();
+    #else
+        gl_Position = u_mvpMatrix * vec4(a_position,1);
+    #endif
+
 #ifdef USE_TEXTURES
     #ifdef FLIP_TEXTURE_Y
         v_uv = vec2(a_uv.x, 1.0 - a_uv.y);;

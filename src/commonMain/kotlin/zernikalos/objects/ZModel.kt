@@ -16,7 +16,6 @@ import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
 import zernikalos.components.skeleton.ZSkeleton
-import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
@@ -36,9 +35,7 @@ class ZModel: ZObject(), ZLoggable {
     lateinit var shaderProgram: ZShaderProgram
     @Contextual @ProtoNumber(6)
     var material: ZMaterial? = null
-    @ProtoNumber(7)
-    var skinning: ZSkinning? = null
-    @Contextual @ProtoNumber(8)
+    @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null
 
     val hasTextures: Boolean
@@ -54,6 +51,10 @@ class ZModel: ZObject(), ZLoggable {
         renderer = ZModelRenderer(ctx.renderingContext, this)
 
         val enabler = buildAttributeEnabler()
+
+        if (hasSkeleton) {
+            skeleton?.initialize(ctx.renderingContext)
+        }
 
         val shaderSourceGenerator = ZShaderSourceGenerator()
         shaderSourceGenerator.buildShaderSource(enabler, shaderProgram.shaderSource)
@@ -74,6 +75,10 @@ class ZModel: ZObject(), ZLoggable {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
+        if (enabler.useSkinning) {
+            shaderProgram.addUniform("Bones", ZBonesMatrixArray(skeleton!!.bones.size))
+            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(skeleton!!.bones.size))
+        }
     }
 
     private fun addRequiredAttributes(enabler: ZAttributesEnabler) {
@@ -110,6 +115,9 @@ class ZModel: ZObject(), ZLoggable {
             if (material?.texture?.flipY == true) {
                 enabler.flipTextureY = true
             }
+        }
+        if (hasSkeleton) {
+            enabler.useSkinning = true
         }
         return enabler
     }

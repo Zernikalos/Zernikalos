@@ -78,12 +78,6 @@ abstract class ZObject: ZTreeNode<ZObject> {
     override val parent: ZObject?
         get() = _parent
 
-    override val hasParent: Boolean
-        get() = _parent != null
-
-    val isRoot: Boolean
-        get() = !hasParent
-
     private var _initialized: Boolean = false
     val isInitialized: Boolean
         get() = _initialized

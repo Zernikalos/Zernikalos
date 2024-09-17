@@ -31,6 +31,14 @@ val ZUniformViewMatrix: ZUniform
 val ZUniformModelViewProjectionMatrix: ZUniform
     get() = ZUniform("u_mvpMatrix", 1, ZTypes.MAT4F)
 
+fun ZBonesMatrixArray(count: Int): ZUniform {
+    return ZUniform("u_bones", count, ZTypes.MAT4F)
+}
+
+fun ZInverseBindMatrixArray(count: Int): ZUniform {
+    return ZUniform("u_invBindMatrix", count, ZTypes.MAT4F)
+}
+
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
 class ZUniform internal constructor(data: ZUniformData): ZTemplateComponent<ZUniformData, ZUniformRenderer>(data) {

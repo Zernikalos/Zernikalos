@@ -108,7 +108,10 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-data class GLWrap(val id: Any? = null)
+data class GLWrap(val id: Any? = null) {
+    val isValid: Boolean
+        get() = id != null
+}
 
 @JsExport
 enum class BufferTargetType(val value: Int) {
