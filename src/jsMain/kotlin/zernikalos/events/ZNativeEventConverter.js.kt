@@ -6,19 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.ui
+package zernikalos.events
 
-import zernikalos.events.ZEvent
-import kotlin.js.JsExport
+actual class ZNativeEventSource actual constructor() {
+    actual var listener: ZNativeEventSourceListener?
+        get() = TODO("Not yet implemented")
+        set(value) {}
 
-@JsExport
-interface ZSurfaceViewEventHandler {
-
-    fun onReady()
-
-    fun onRender()
-
-    fun onResize(width: Int, height: Int)
-
-    fun onEvent(event: ZEvent)
 }

@@ -8,7 +8,14 @@
 
 package zernikalos.ui
 
+import android.annotation.SuppressLint
 import android.opengl.GLSurfaceView
+import android.view.MotionEvent
+import android.view.SurfaceView
+import android.view.View
+import android.view.View.OnTouchListener
+import zernikalos.events.ZAndroidEventConverter
+import zernikalos.events.ZTouchEvent
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -29,9 +36,16 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
             nativeRenderer.eventHandler = value
         }
 
+    private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
+
+    private val androidEventConverter: ZAndroidEventConverter = ZAndroidEventConverter()
+
+    private var lastTouchEvent: ZTouchEvent? = null
+
     init {
         this.nativeSurfaceView = view
         setNativeRenderer()
+        setNativeViewEventHandlers()
     }
 
     private fun setNativeRenderer() {
@@ -40,6 +54,20 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
 
         nativeSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         nativeSurfaceView.preserveEGLContextOnPause = true
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setNativeViewEventHandlers() {
+        nativeSurfaceView.setOnTouchListener { view, motionEvent ->
+            val zevent = androidEventConverter.convertMotionEvent(motionEvent, lastTouchEvent)
+            eventHandler?.onEvent(zevent)
+            lastTouchEvent = zevent
+            true
+        }
+
+        nativeSurfaceView.setOnClickListener {
+
+        }
     }
 }
 
