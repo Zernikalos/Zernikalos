@@ -8,34 +8,39 @@
 
 package zernikalos.math
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZkTransformSerializer::class)
+@Serializable
 class ZTransform() {
 
     @Transient
     private val _matrix: ZMatrix4 = ZMatrix4.Identity
 
+    @ProtoNumber(1)
     private val _position: ZVector3 = ZVector3.Zero
+
+    @ProtoNumber(2)
     private val _rotation: ZQuaternion = ZQuaternion.Identity
+
+    @ProtoNumber(3)
     private val _scale: ZVector3 = ZVector3.Ones
 
+    @Transient
     private var _forward: ZVector3 = ZVector3.Forward
+    @Transient
     private var _right: ZVector3 = ZVector3.Right
+    @Transient
     private var _up: ZVector3 = ZVector3.Up
 
 
     @JsName("initWithArgs")
-    constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
-        _position.copy(location)
+    constructor(position: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
+        _position.copy(position)
         _rotation.copy(rotation)
         _scale.copy(scale)
     }
@@ -97,7 +102,7 @@ class ZTransform() {
             return _matrix
         }
 
-    fun setLocation(x: Float, y: Float, z: Float) {
+    fun setPosition(x: Float, y: Float, z: Float) {
         _position.setValues(x, y, z)
     }
 
@@ -188,20 +193,4 @@ class ZTransform() {
         ZMatrix4.mult(_right, _matrix, _right)
     }
 
-}
-
-@Serializable
-data class ZkTransformSurrogate(val location: ZVector3, val rotation: ZQuaternion, val scale: ZVector3)
-
-class ZkTransformSerializer : KSerializer<ZTransform> {
-    override val descriptor: SerialDescriptor = ZkTransformSurrogate.serializer().descriptor
-
-    override fun serialize(encoder: Encoder, value: ZTransform) {
-
-    }
-
-    override fun deserialize(decoder: Decoder): ZTransform {
-        val surrogate = decoder.decodeSerializableValue(ZkTransformSurrogate.serializer())
-        return ZTransform(surrogate.location, surrogate.rotation, surrogate.scale)
-    }
 }
