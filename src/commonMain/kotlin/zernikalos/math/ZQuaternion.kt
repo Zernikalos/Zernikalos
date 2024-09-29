@@ -9,6 +9,8 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import kotlin.js.JsExport
@@ -20,13 +22,49 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebraObject {
+class ZQuaternion(): ZAlgebraObject {
 
-    @JsName("init")
-    constructor() : this(1f, 0f, 0f, 0f)
+    @ProtoNumber(1)
+    var w: Float
+        get() = _values[0]
+        set(value) {
+            _values[0] = value
+        }
+
+    @ProtoNumber(2)
+    var x: Float
+        get() = _values[1]
+        set(value) {
+            _values[1] = value
+        }
+
+    @ProtoNumber(3)
+    var y: Float
+        get() = _values[2]
+        set(value) {
+            _values[2] = value
+        }
+
+    @ProtoNumber(4)
+    var z: Float
+        get() = _values[3]
+        set(value) {
+            _values[3] = value
+        }
+
+    @Transient
+    private val _values = floatArrayOf(1f, 0f, 0f, 0f)
+
+    @JsName("initWithValues")
+    constructor(w: Float = 1f, x: Float = 0f, y: Float = 0f, z: Float = 0f) : this() {
+        this.w = w
+        this.x = x
+        this.y = y
+        this.z = z
+    }
 
     override val values: FloatArray
-        get() = floatArrayOf(w, x, y, z)
+        get() = _values
 
     override val size: Int
         get() = 4
@@ -35,7 +73,7 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
         get() = 1
 
     override val dataType: ZDataType
-        get() = ZTypes.QUATERNIONF
+        get() = ZTypes.QUATERNION
 
     val norm2: Float
         get() = sqrt(dot(this, this))
