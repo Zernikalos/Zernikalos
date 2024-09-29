@@ -9,6 +9,8 @@
 package zernikalos.math
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import kotlin.js.JsExport
@@ -17,10 +19,43 @@ import kotlin.math.sqrt
 
 @JsExport
 @Serializable
-class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: Float = 0f): ZAlgebraObject {
+class ZVector4(): ZAlgebraObject {
 
-    @JsName("init")
-    constructor() : this(0f, 0f, 0f, 0f)
+    @Transient
+    private val _values = FloatArray(4)
+
+    @ProtoNumber(1)
+    var x: Float
+        get() = _values[0]
+        set(value) {
+            _values[0] = value
+        }
+
+    @ProtoNumber(2)
+    var y: Float
+        get() = _values[1]
+        set(value) {
+            _values[1] = value
+        }
+
+    @ProtoNumber(3)
+    var z: Float
+        get() = _values[2]
+        set(value) {
+            _values[2] = value
+        }
+
+    @ProtoNumber(4)
+    var w: Float
+        get() = _values[3]
+        set(value) {
+            _values[3] = value
+        }
+
+    @JsName("initWithValues")
+    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f, w: Float = 0f): this() {
+        setValues(x, y, z, w)
+    }
 
     @JsName("initWithValue")
     constructor(v: Float): this(v, v, v, v)
@@ -29,7 +64,7 @@ class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: F
     constructor(v: ZVector3) : this(v.x, v.y, v.z, 1.0f)
 
     override val values: FloatArray
-        get() = floatArrayOf(x, y, z, w)
+        get() = _values
 
     val norm2: Float
         get() = sqrt(dot(this, this))
@@ -93,6 +128,10 @@ class ZVector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: F
 
     fun normalize() {
         normalize(this, this)
+    }
+
+    override fun toString(): String {
+        return "[$w, $x, $y, $z]"
     }
 
     companion object Op {
