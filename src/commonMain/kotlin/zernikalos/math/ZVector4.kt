@@ -8,8 +8,12 @@
 
 package zernikalos.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
@@ -18,34 +22,29 @@ import kotlin.js.JsName
 import kotlin.math.sqrt
 
 @JsExport
-@Serializable
+@Serializable(with = ZVector4Serializer::class)
 class ZVector4(): ZAlgebraObject {
 
-    @Transient
     private val _values = FloatArray(4)
 
-    @ProtoNumber(1)
     var x: Float
         get() = _values[0]
         set(value) {
             _values[0] = value
         }
 
-    @ProtoNumber(2)
     var y: Float
         get() = _values[1]
         set(value) {
             _values[1] = value
         }
 
-    @ProtoNumber(3)
     var z: Float
         get() = _values[2]
         set(value) {
             _values[2] = value
         }
 
-    @ProtoNumber(4)
     var w: Float
         get() = _values[3]
         set(value) {
@@ -136,7 +135,7 @@ class ZVector4(): ZAlgebraObject {
 
     companion object Op {
         fun add(result: ZVector4, op1: ZVector4, op2: ZVector4) {
-            result.x = op1.x + op2.y
+            result.x = op1.x + op2.x
             result.y = op1.y + op2.y
             result.z = op1.z + op2.z
             result.w = op1.w + op2.w
@@ -192,4 +191,28 @@ class ZVector4(): ZAlgebraObject {
             result.w = (1 - t) * op1.w + t * op2.w
         }
     }
+}
+
+@Serializable
+private data class ZVector4Surrogate(
+    @ProtoNumber(1) val x: Float,
+    @ProtoNumber(2) val y: Float,
+    @ProtoNumber(3) val z: Float,
+    @ProtoNumber(4) val w: Float,
+)
+
+private class ZVector4Serializer: KSerializer<ZVector4> {
+    override val descriptor: SerialDescriptor
+        get() = ZVector4Surrogate.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): ZVector4 {
+        val surrogate = decoder.decodeSerializableValue(ZVector4Surrogate.serializer())
+        return ZVector4(surrogate.x, surrogate.y, surrogate.z, surrogate.w)
+    }
+
+    override fun serialize(encoder: Encoder, value: ZVector4) {
+        val surrogate = ZVector4Surrogate(value.x, value.y, value.z, value.w)
+        encoder.encodeSerializableValue(ZVector4Surrogate.serializer(), surrogate)
+    }
+
 }
