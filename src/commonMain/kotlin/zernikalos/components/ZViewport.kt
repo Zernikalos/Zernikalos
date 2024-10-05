@@ -12,6 +12,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZBox2D
+import zernikalos.math.ZColor
 import zernikalos.math.ZVector4
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -37,7 +38,7 @@ internal constructor(data: ZViewportData):
      * @property z The blue component of the clear color.
      * @property w The alpha component of the clear color.
      */
-    var clearColor: ZVector4 by data::clearColor
+    var clearColor: ZColor by data::clearColor
 
     /**
      * Represents the view box used as viewport for rendering objects.
@@ -69,7 +70,7 @@ internal constructor(data: ZViewportData):
 
 @Serializable
 data class ZViewportData(
-    var clearColor: ZVector4 = ZVector4(.2f, .2f, .2f, 1.0f),
+    var clearColor: ZColor = ZColor(.2f, .2f, .2f, 1.0f),
 //    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 ): ZComponentData() {
     var viewBox: ZBox2D = ZBox2D(0, 0, 0, 0)

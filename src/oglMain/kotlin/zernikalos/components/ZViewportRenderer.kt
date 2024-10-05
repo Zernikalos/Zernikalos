@@ -24,7 +24,7 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: 
     actual override fun render() {
         ctx as ZGLRenderingContext
         val v = data.clearColor
-        ctx.clearColor(v.x, v.y, v.z, v.w)
+        ctx.clearColor(v.r, v.g, v.b, v.a)
         ctx.clear(clearMask)
     }
 

@@ -58,7 +58,7 @@ class ZVector2(): ZAlgebraObject {
         get() = sqrt(dot(this, this))
 
     override val size: Int
-        get() = 2
+        get() = dataType.size
 
     override val count: Int
         get() = 1
