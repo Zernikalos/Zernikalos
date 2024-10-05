@@ -23,7 +23,7 @@ class ZMatrix4(): ZAlgebraObject {
     override val dataType: ZDataType
         get() = ZTypes.MAT4F
 
-    override val values: FloatArray
+    override val values: FloatArray = FloatArray(16)
 
     override val count: Int
         get() = 1
@@ -32,7 +32,6 @@ class ZMatrix4(): ZAlgebraObject {
         get() = values.size
 
     init {
-        values = FloatArray(16)
         identity()
     }
 
@@ -260,9 +259,9 @@ class ZMatrix4(): ZAlgebraObject {
             for (i in 0..11) {
                 result.values[i] = m.values[i]
             }
-            for (i in 0..3) {
-                result.values[12 + i] = m.values[i] * translation.x + m.values[4 + i] * translation.y + m.values[8 + i] * translation.z + m.values[12 + i]
-            }
+            result.values[12] += translation.x
+            result.values[13] += translation.y
+            result.values[14] += translation.z
         }
 
         @JsName("translateByVector")
@@ -275,9 +274,9 @@ class ZMatrix4(): ZAlgebraObject {
         }
 
         private fun innerTranslate(result: ZMatrix4, x: Float, y: Float, z: Float) {
-            for (i in 0..3) {
-                result.values[12 + i] = result.values[i] * x + result.values[4 + i] * y + result.values[8 + i] * z + result.values[12 + i]
-            }
+            result.values[12] += x
+            result.values[13] += y
+            result.values[14] += z
         }
 
         fun rotate(result: ZMatrix4, q: ZQuaternion) {
