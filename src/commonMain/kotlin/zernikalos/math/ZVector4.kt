@@ -163,6 +163,17 @@ class ZVector4(): ZAlgebraObject {
             return op1.x * op2.x + op1.y * op2.y + op1.z * op2.z + op1.w * op2.w
         }
 
+        fun multMatrix(result: ZVector4, m: ZMatrix4, v: ZVector4) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+            val w = v.w
+            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
+            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
+            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
+            result[3] = m[3 + 4 * 0] * x + m[3 + 4 * 1] * y + m[3 + 4 * 2] * z + m[3 + 4 * 3] * w
+        }
+
         fun multScalar(result: ZVector4, scalar: Float, v: ZVector4) {
             result.x = scalar * v.x
             result.y = scalar * v.y

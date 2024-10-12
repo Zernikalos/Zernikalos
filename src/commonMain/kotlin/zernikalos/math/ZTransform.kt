@@ -96,7 +96,7 @@ class ZTransform() {
     val matrix: ZMatrix4
         get() {
             ZMatrix4.identity(_matrix)
-            ZMatrix4.translate(_matrix, _position)
+            ZMatrix4.setTranslation(_matrix, _position)
             ZMatrix4.rotate(_matrix, _rotation)
             ZMatrix4.scale(_matrix, _scale)
             return _matrix
@@ -188,9 +188,9 @@ class ZTransform() {
     }
 
     private fun transformLocalAxis() {
-        ZMatrix4.mult(_forward, _matrix, _forward)
-        ZMatrix4.mult(_up, _matrix, _up)
-        ZMatrix4.mult(_right, _matrix, _right)
+        ZVector3.multMatrix(_forward, _matrix, _forward)
+        ZVector3.multMatrix(_up, _matrix, _up)
+        ZVector3.multMatrix(_right, _matrix, _right)
     }
 
 }

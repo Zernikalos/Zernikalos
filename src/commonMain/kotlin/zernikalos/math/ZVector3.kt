@@ -205,6 +205,16 @@ class ZVector3(): ZAlgebraObject {
             return sqrt(x * x + y * y + z * z)
         }
 
+        fun multMatrix(result: ZVector3, m: ZMatrix4, v: ZVector3) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+            val w = 1.0f
+            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
+            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
+            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
+        }
+
         fun multScalar(result: ZVector3, scalar: Float, v: ZVector3) {
             result.x = scalar * v.x
             result.y = scalar * v.y
