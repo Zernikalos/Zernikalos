@@ -141,6 +141,10 @@ class ZVector3(): ZAlgebraObject {
         cross(this, this, v)
     }
 
+    fun rotate(q: ZQuaternion) {
+        rotateVector(this, q, this)
+    }
+
     fun copy(v: ZVector3) {
         copy(this, v)
     }
