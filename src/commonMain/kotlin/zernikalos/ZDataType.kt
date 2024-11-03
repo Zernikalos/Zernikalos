@@ -82,7 +82,11 @@ enum class ZFormatType {
     @ProtoNumber(8)
     TEXTURE,
     @ProtoNumber(9)
-    QUATERNION
+    QUATERNION,
+    @ProtoNumber(10)
+    EULER,
+    @ProtoNumber(11)
+    RGBA
 }
 
 @JsExport
@@ -122,6 +126,8 @@ data class ZDataType(
                 ZFormatType.MAT4 -> 16
                 ZFormatType.TEXTURE -> 0
                 ZFormatType.QUATERNION -> 4
+                ZFormatType.EULER -> 3
+                ZFormatType.RGBA -> 4
             }
         }
 
@@ -157,5 +163,7 @@ object ZTypes {
     val MAT4F = ZDataType(ZBaseType.FLOAT, ZFormatType.MAT4)
 
     val TEXTURE = ZDataType(ZBaseType.TEXTURE, ZFormatType.TEXTURE)
-    val QUATERNIONF = ZDataType(ZBaseType.FLOAT, ZFormatType.QUATERNION)
+    val QUATERNION = ZDataType(ZBaseType.FLOAT, ZFormatType.QUATERNION)
+    val EULER = ZDataType(ZBaseType.FLOAT, ZFormatType.EULER)
+    val RGBA = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.RGBA)
 }

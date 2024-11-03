@@ -8,7 +8,12 @@
 
 package zernikalos.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import kotlin.js.JsExport
@@ -17,11 +22,39 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 @JsExport
-@Serializable
-class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebraObject {
+@Serializable(with = ZVector3Serializer::class)
+class ZVector3(): ZAlgebraObject {
 
-    @JsName("init")
-    constructor() : this(0f, 0f, 0f)
+    private val _values = floatArrayOf(0f, 0f, 0f)
+
+    var x: Float
+        get() {
+            return _values[0]
+        }
+        set(value) {
+            _values[0] = value
+        }
+
+    var y: Float
+        get() {
+            return _values[1]
+        }
+        set(value) {
+            _values[1] = value
+        }
+
+    var z: Float
+        get() {
+            return _values[2]
+        }
+        set(value) {
+            _values[2] = value
+        }
+
+    @JsName("initWithValues")
+    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f): this() {
+        setValues(x, y ,z)
+    }
 
     @JsName("initWithValue")
     constructor(v: Float) : this(v, v, v)
@@ -95,6 +128,10 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
         zero(this)
     }
 
+    fun add(v: ZVector3) {
+        add(this, this, v)
+    }
+
     fun multScalar(scalar: Float) {
         multScalar(this, scalar, this )
     }
@@ -106,6 +143,10 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
     fun cross(v: ZVector3) {
         // TODO: This should not be working
         cross(this, this, v)
+    }
+
+    fun rotate(q: ZQuaternion) {
+        rotateVector(this, q, this)
     }
 
     fun copy(v: ZVector3) {
@@ -154,7 +195,7 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
         }
 
         fun add(result: ZVector3, op1: ZVector3, op2: ZVector3) {
-            result.x = op1.x + op2.y
+            result.x = op1.x + op2.x
             result.y = op1.y + op2.y
             result.z = op1.z + op2.z
         }
@@ -170,6 +211,16 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
         @JsName("norm2PerValue")
         fun norm2(x: Float, y: Float, z: Float): Float {
             return sqrt(x * x + y * y + z * z)
+        }
+
+        fun multMatrix(result: ZVector3, m: ZMatrix4, v: ZVector3) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+            val w = 1.0f
+            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
+            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
+            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
         }
 
         fun multScalar(result: ZVector3, scalar: Float, v: ZVector3) {
@@ -206,23 +257,46 @@ class ZVector3(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebr
             result.z = (1 - t) * op1.z + t * op2.z
         }
 
-        fun rotateVector(result: ZVector3, q: ZQuaternion, v: ZVector3) {
-            val q1 = ZQuaternion()
-            val q2 = ZQuaternion()
+        fun rotateVector(result: ZVector3, quat: ZQuaternion, v: ZVector3) {
+            val Qv = ZQuaternion()
+            val q = ZQuaternion()
 
             //Qv = Q(0,vx,vy,vz)
-            ZQuaternion.fromVec3(q1, v)
+            ZQuaternion.fromVec3(Qv, v)
             //q=q/||q||
-            ZQuaternion.normalize(q2, q)
+            ZQuaternion.normalize(q, quat)
 
             //q*Qv
-            ZQuaternion.mult(q1, q2, q1)
+            ZQuaternion.mult(Qv, q, Qv)
             //q^
-            ZQuaternion.conjugate(q2, q2)
+            ZQuaternion.conjugate(q, q)
             //q*Qv*q^
-            ZQuaternion.mult(q1, q1, q2)
-            result.setValues(q1.x, q1.y, q1.z)
+            ZQuaternion.mult(Qv, Qv, q)
+            result.setValues(Qv.x, Qv.y, Qv.z)
         }
 
     }
+}
+
+@Serializable
+private data class ZVector3Surrogate(
+    @ProtoNumber(1) val x: Float,
+    @ProtoNumber(2) val y: Float,
+    @ProtoNumber(3) val z: Float,
+)
+
+private class ZVector3Serializer: KSerializer<ZVector3> {
+    override val descriptor: SerialDescriptor
+        get() = ZVector3Surrogate.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): ZVector3 {
+        val surrogate = decoder.decodeSerializableValue(ZVector3Surrogate.serializer())
+        return ZVector3(surrogate.x, surrogate.y, surrogate.z)
+    }
+
+    override fun serialize(encoder: Encoder, value: ZVector3) {
+        val surrogate = ZVector3Surrogate(value.x, value.y, value.z)
+        encoder.encodeSerializableValue(ZVector3Surrogate.serializer(), surrogate)
+    }
+
 }

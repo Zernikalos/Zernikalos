@@ -8,7 +8,13 @@
 
 package zernikalos.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import kotlin.js.JsExport
@@ -19,14 +25,46 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 @JsExport
-@Serializable
-class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z: Float = 0f): ZAlgebraObject {
+@Serializable(with = ZQuaternionSerializer::class)
+class ZQuaternion(): ZAlgebraObject {
 
-    @JsName("init")
-    constructor() : this(1f, 0f, 0f, 0f)
+    private val _values = floatArrayOf(1f, 0f, 0f, 0f)
+
+    var w: Float
+        get() = _values[0]
+        set(value) {
+            _values[0] = value
+        }
+
+    var x: Float
+        get() = _values[1]
+        set(value) {
+            _values[1] = value
+        }
+
+    var y: Float
+        get() = _values[2]
+        set(value) {
+            _values[2] = value
+        }
+
+    var z: Float
+        get() = _values[3]
+        set(value) {
+            _values[3] = value
+        }
+
+
+    @JsName("initWithValues")
+    constructor(w: Float = 1f, x: Float = 0f, y: Float = 0f, z: Float = 0f) : this() {
+        this.w = w
+        this.x = x
+        this.y = y
+        this.z = z
+    }
 
     override val values: FloatArray
-        get() = floatArrayOf(w, x, y, z)
+        get() = _values
 
     override val size: Int
         get() = 4
@@ -35,7 +73,7 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
         get() = 1
 
     override val dataType: ZDataType
-        get() = ZTypes.QUATERNIONF
+        get() = ZTypes.QUATERNION
 
     val norm2: Float
         get() = sqrt(dot(this, this))
@@ -133,7 +171,7 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
 
         fun add(result: ZQuaternion, q1: ZQuaternion, q2: ZQuaternion) {
             result.w = q1.w + q2.w
-            result.x = q1.x + q2.y
+            result.x = q1.x + q2.x
             result.y = q1.y + q2.y
             result.z = q1.z + q2.z
         }
@@ -291,4 +329,28 @@ class ZQuaternion(var w: Float = 1f, var x: Float = 0f, var y: Float = 0f, var z
         }
 
     }
+}
+
+@Serializable
+private data class ZQuaternionSurrogate(
+    @ProtoNumber(1) val w: Float,
+    @ProtoNumber(2) val x: Float,
+    @ProtoNumber(3) val y: Float,
+    @ProtoNumber(4) val z: Float,
+)
+
+private class ZQuaternionSerializer: KSerializer<ZQuaternion> {
+    override val descriptor: SerialDescriptor
+        get() = ZQuaternionSurrogate.serializer().descriptor
+
+    override fun deserialize(decoder: Decoder): ZQuaternion {
+        val surrogate = decoder.decodeSerializableValue(ZQuaternionSurrogate.serializer())
+        return ZQuaternion(surrogate.w, surrogate.x, surrogate.y, surrogate.z)
+    }
+
+    override fun serialize(encoder: Encoder, value: ZQuaternion) {
+        val surrogate = ZQuaternionSurrogate(value.w, value.x, value.y, value.z)
+        encoder.encodeSerializableValue(ZQuaternionSurrogate.serializer(), surrogate)
+    }
+
 }

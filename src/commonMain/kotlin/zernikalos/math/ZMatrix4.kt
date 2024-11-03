@@ -17,13 +17,16 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.tan
 
+/**
+ * A 4x4 matrix implementation.
+ */
 @JsExport
 @Serializable
 class ZMatrix4(): ZAlgebraObject {
     override val dataType: ZDataType
         get() = ZTypes.MAT4F
 
-    override val values: FloatArray
+    override val values: FloatArray = FloatArray(16)
 
     override val count: Int
         get() = 1
@@ -32,105 +35,193 @@ class ZMatrix4(): ZAlgebraObject {
         get() = values.size
 
     init {
-        values = FloatArray(16)
         identity()
     }
 
+    /**
+     * Initializes a ZMatrix4 object with the provided array of float values.
+     *
+     * @throws Error if the provided array does not contain exactly 16 elements.
+     * @param values An array of float values to initialize the matrix with. The array should contain exactly 16 elements.
+     */
     @JsName("initWithValues")
     constructor(values: Array<Float>): this() {
-        checkDimension(values)
+        require(values.size == 16) { "Invalid Matrix 4x4 dimension" }
         copyFromValues(values)
     }
 
+    /**
+     * Constructs a 4x4 matrix from a given array of float values.
+     *
+     * @param values the float array containing 16 values to initialize the matrix
+     * @throws Error if the provided array does not contain exactly 16 values
+     */
     @JsName("initWithFloatArray")
     constructor(values: FloatArray): this() {
-        checkDimension(values)
+        require(values.size == 16) { "Invalid Matrix 4x4 dimension" }
         copyFromValues(values)
     }
 
+    /**
+     * Retrieves the value at the specified index. 0-15 index element.
+     *
+     * @param i The index of the element to retrieve.
+     * @return The float value at the specified index.
+     */
     operator fun get(i: Int): Float {
         return values[i]
     }
 
+    /**
+     * Sets the value at the specified index. 0-15 index element.
+     *
+     * @param i The index of the element to retrieve.
+     * @return The float value at the specified index.
+     */
+    operator fun set(i: Int, v: Float) {
+        values[i] = v
+    }
+
+    /**
+     * Retrieves the value at the specified 2D matrix coordinates.
+     *
+     * @param i The row index (0..3) of the matrix.
+     * @param j The column index (0..3) of the matrix.
+     * @return The float value at the specified 2D coordinates.
+     */
     @JsName("getIJ")
     operator fun get(i: Int, j: Int): Float {
         val k = 4 * j + i
         return values[k]
     }
 
+    /**
+     * Sets the value at the specified 2D matrix coordinates.
+     *
+     * @param i The row index (0..3) of the matrix.
+     * @param j The column index (0..3) of the matrix.
+     * @return The float value at the specified 2D coordinates.
+     */
     @JsName("setIJ")
     operator fun set(i: Int, j: Int, v: Float) {
         val k = 4 * j + i
         values[k] = v
     }
 
-    operator fun set(i: Int, v: Float) {
-        values[i] = v
-    }
-
+    /**
+     * Performs the Matrix addition operation.
+     *
+     * @return The result of the matrix addition.
+     */
     operator fun plus(m: ZMatrix4): ZMatrix4 {
         val result = ZMatrix4()
         add(result, this, m)
         return result
     }
 
+    /**
+     * Performs the Matrix subtraction operation.
+     *
+     * @return The result of the matrix addition.
+     */
     operator fun minus(m: ZMatrix4): ZMatrix4 {
         val result = ZMatrix4()
         subtract(result, this, m)
         return result
     }
 
+    /**
+     * Performs the Matrix multiplication operation.
+     *
+     * @return The result of the matrix addition.
+     */
     operator fun times(m: ZMatrix4): ZMatrix4 {
         val result = ZMatrix4()
         mult(result, this, m)
         return result
     }
 
+    /**
+     * Sets the current matrix to be the identity matrix.
+     */
     fun identity() {
         identity(this)
     }
 
+    /**
+     * Transposes the current ZMatrix4 instance in place.
+     *
+     * The transpose operation flips the matrix over its diagonal,
+     * switching the row and column indices of the matrix elements.
+     */
     fun transpose() {
         transposeIp(this)
     }
 
+    /**
+     * Translates the current matrix by the given vector.
+     *
+     * @param translation The vector by which to translate.
+     */
     @JsName("translateByVector")
     fun translate(translation: ZVector3) {
         translate(this, translation)
     }
 
+    /**
+     * Translates the current matrix by the specified x, y, and z values.
+     *
+     * @param x The translation distance along the x-axis.
+     * @param y The translation distance along the y-axis.
+     * @param z The translation distance along the z-axis.
+     */
     fun translate(x: Float, y: Float, z: Float) {
         translate(this, x, y, z)
     }
 
-    fun invert() {
-        invert(this, this)
+    /**
+     * Inverts the current ZMatrix4 instance in place.
+     *
+     * This method updates the current matrix to its inverse, altering the original matrix data.
+     * If the matrix is not invertible (i.e., its determinant is zero), no changes to the matrix
+     * will be applied and false will be returned.
+     */
+    fun invert(): Boolean {
+        return invert(this, this)
     }
 
+    /**
+     * Returns a new ZMatrix4 that is the inverse of the current matrix.
+     *
+     * @return A new ZMatrix4 representing the inverse of the current matrix.
+     */
     fun inverted(): ZMatrix4 {
         val m = ZMatrix4()
         invert(m, this)
         return m
     }
 
+    /**
+     * Scales the current matrix by the specified vector.
+     *
+     * @param s The vector by which to scale the matrix.
+     */
+    @JsName("scaleByVector")
     fun scale(s: ZVector3) {
         scale(this, s)
     }
 
+    /**
+     * Scales the current matrix by the specified vector.
+     *
+     * @param s The vector by which to scale the matrix.
+     */
+    fun scale(x: Float, y: Float, z: Float) {
+        scale(this, this, x, y, z)
+    }
+
     override fun toString(): String {
         return this.values.contentToString()
-    }
-
-    private fun checkDimension(values: Array<Float>) {
-        if (values.size != 16) {
-            throw Error("Invalid Matrix 4x4 dimension")
-        }
-    }
-
-    private fun checkDimension(values: FloatArray) {
-        if (values.size != 16) {
-            throw Error("Invalid Matrix 4x4 dimension")
-        }
     }
 
     private fun copyFromValues(values: FloatArray) {
@@ -145,11 +236,29 @@ class ZMatrix4(): ZAlgebraObject {
         }
     }
 
+    /**
+     * Provides a collection of operations for manipulating 4x4 matrices.
+     */
     companion object Op {
 
+        /**
+         * Provides a new instance of the identity 4x4 matrix.
+         *
+         * This matrix is a special kind of matrix in which all the elements on the main diagonal are ones,
+         * and all the other elements are zeros.
+         *
+         * Accessing this property will return a new identity matrix each time.
+         */
         val Identity: ZMatrix4
             get() = ZMatrix4()
 
+        /**
+         * Sets the given matrix to be the identity matrix.
+         *
+         * An identity matrix is a square matrix with ones on the main diagonal and zeros elsewhere.
+         *
+         * @param result The matrix to be set as the identity matrix.
+         */
         fun identity(result: ZMatrix4) {
             result.values[0]  = 1.0f
             result.values[1]  = 0.0f
@@ -172,64 +281,71 @@ class ZMatrix4(): ZAlgebraObject {
             result.values[15] = 1.0f
         }
 
+        /**
+         * Adds two 4x4 matrices and stores the result in the provided result matrix.
+         *
+         * @param result The matrix to store the result of the addition.
+         * @param m1 The first matrix to add.
+         * @param m2 The second matrix to add.
+         */
         fun add(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
                 result.values[i] = m1.values[i] + m2.values[i]
             }
         }
 
+        /**
+         * Subtracts two 4x4 matrices and stores the result in the provided result matrix.
+         *
+         * @param result The matrix to store the result of the subtraction.
+         * @param m1 The first matrix to subtract from.
+         * @param m2 The second matrix to be subtracted.
+         */
         fun subtract(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
                 result.values[i] = m1.values[i] - m2.values[i]
             }
         }
 
+        /**
+         * Multiplies two 4x4 matrices, storing the result in the result matrix.
+         *
+         * @param result The ZMatrix4 instance where the result of the multiplication will be stored.
+         * @param lm The left matrix (ZMatrix4) to be multiplied.
+         * @param rm The right matrix (ZMatrix4) to be multiplied.
+         */
         fun mult(result: ZMatrix4, lm: ZMatrix4, rm: ZMatrix4) {
             for (i in 0 .. 3) {
                 val rm_i0 = rm.values[4 * i]
-                var ri0 = lm.values[0] * rm_i0
-                var ri1 = lm.values[1] * rm_i0
-                var ri2 = lm.values[2] * rm_i0
-                var ri3 = lm.values[3] * rm_i0
+                var ri0 = lm[0] * rm_i0
+                var ri1 = lm[1] * rm_i0
+                var ri2 = lm[2] * rm_i0
+                var ri3 = lm[3] * rm_i0
 
                 for (j in 1..3) {
                     val rm_ij = rm.values[j + 4 * i]
-                    ri0 += lm.values[4 * j] * rm_ij
-                    ri1 += lm.values[1 + 4 * j] * rm_ij
-                    ri2 += lm.values[2 + 4 * j] * rm_ij
-                    ri3 += lm.values[3 + 4 * j] * rm_ij
+                    ri0 += lm[4 * j] * rm_ij
+                    ri1 += lm[1 + 4 * j] * rm_ij
+                    ri2 += lm[2 + 4 * j] * rm_ij
+                    ri3 += lm[3 + 4 * j] * rm_ij
                 }
 
-                result.values[4 * i] = ri0
-                result.values[1 + 4 * i] = ri1
-                result.values[2 + 4 * i] = ri2
-                result.values[3 + 4 * i] = ri3
+                result[4 * i] = ri0
+                result[1 + 4 * i] = ri1
+                result[2 + 4 * i] = ri2
+                result[3 + 4 * i] = ri3
             }
         }
 
-        @JsName("multVec4")
-        fun mult(result: ZVector4, m: ZMatrix4, v: ZVector4) {
-            val x = v.x
-            val y = v.y
-            val z = v.z
-            val w = v.w
-            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
-            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
-            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
-            result[3] = m[3 + 4 * 0] * x + m[3 + 4 * 1] * y + m[3 + 4 * 2] * z + m[3 + 4 * 3] * w
-        }
-
-        @JsName("multVec3")
-        fun mult(result: ZVector3, m: ZMatrix4, v: ZVector3) {
-            val x = v.x
-            val y = v.y
-            val z = v.z
-            val w = 1.0f
-            result[0] = m[0 + 4 * 0] * x + m[0 + 4 * 1] * y + m[0 + 4 * 2] * z + m[0 + 4 * 3] * w
-            result[1] = m[1 + 4 * 0] * x + m[1 + 4 * 1] * y + m[1 + 4 * 2] * z + m[1 + 4 * 3] * w
-            result[2] = m[2 + 4 * 0] * x + m[2 + 4 * 1] * y + m[2 + 4 * 2] * z + m[2 + 4 * 3] * w
-        }
-
+        /**
+         * Transposes the given 4x4 matrix `m` and stores the result in `result`.
+         *
+         * The transpose operation flips the matrix over its diagonal,
+         * switching the row and column indices of the matrix elements.
+         *
+         * @param result The matrix to store the transposed result.
+         * @param m The input matrix to transpose.
+         */
         fun transpose(result: ZMatrix4, m: ZMatrix4) {
             for (i in 0..3) {
                 val k = i * 4
@@ -240,6 +356,7 @@ class ZMatrix4(): ZAlgebraObject {
             }
         }
 
+        // TODO: This should be an instance method
         fun transposeIp(result: ZMatrix4) {
             // https://en.wikipedia.org/wiki/In-place_matrix_transposition
             for (i in 0.. 3) {
@@ -255,14 +372,35 @@ class ZMatrix4(): ZAlgebraObject {
             }
         }
 
+        /**
+         * Sets the translation component of a matrix using the specified translation vector.
+         *
+         * @param result The matrix in which the translation component will be set.
+         * @param translation The vector defining the translation to apply.
+         */
+        @JsName("setTranslationByVector")
+        fun setTranslation(result: ZMatrix4, translation: ZVector3) {
+            setInnerTranslation(result, translation.x, translation.y, translation.z)
+        }
+
+        /**
+         * Sets the translation components of the provided 4x4 matrix to the specified x, y, and z values.
+         *
+         * @param result The ZMatrix4 instance where the translation will be set.
+         * @param x The translation distance along the x-axis.
+         * @param y The translation distance along the y-axis.
+         * @param z The translation distance along the z-axis.
+         */
+        fun setTranslation(result: ZMatrix4, x: Float, y: Float, z: Float) {
+            setInnerTranslation(result, x, y, z)
+        }
+
         @JsName("translateByVectorCopy")
         fun translate(result: ZMatrix4, m: ZMatrix4, translation: ZVector3) {
-            for (i in 0..11) {
+            for (i in 0..m.size) {
                 result.values[i] = m.values[i]
             }
-            for (i in 0..3) {
-                result.values[12 + i] = m.values[i] * translation.x + m.values[4 + i] * translation.y + m.values[8 + i] * translation.z + m.values[12 + i]
-            }
+            innerTranslate(result, translation.x, translation.y, translation.z)
         }
 
         @JsName("translateByVector")
@@ -275,11 +413,23 @@ class ZMatrix4(): ZAlgebraObject {
         }
 
         private fun innerTranslate(result: ZMatrix4, x: Float, y: Float, z: Float) {
-            for (i in 0..3) {
-                result.values[12 + i] = result.values[i] * x + result.values[4 + i] * y + result.values[8 + i] * z + result.values[12 + i]
-            }
+            result.values[12] += x
+            result.values[13] += y
+            result.values[14] += z
         }
 
+        private fun setInnerTranslation(result: ZMatrix4, x: Float, y: Float, z: Float) {
+            result.values[12] = x
+            result.values[13] = y
+            result.values[14] = z
+        }
+
+        /**
+         * Rotates the given ZMatrix4 result by the specified ZQuaternion.
+         *
+         * @param result The ZMatrix4 to be rotated. This matrix will be modified to contain the result of the rotation.
+         * @param q The ZQuaternion representing the rotation to be applied.
+         */
         fun rotate(result: ZMatrix4, q: ZQuaternion) {
             val rotQuat = ZMatrix4()
             fromQuaternion(rotQuat, q)
@@ -287,14 +437,41 @@ class ZMatrix4(): ZAlgebraObject {
             mult(result, aux, rotQuat)
         }
 
+        /**
+         * Scales a given 4x4 matrix by specified x, y, and z scaling factors.
+         *
+         * @param result The matrix to store the result of the scaling operation.
+         * @param m The original matrix to be scaled.
+         * @param x The scaling factor along the x-axis.
+         * @param y The scaling factor along the y-axis.
+         * @param z The scaling factor along the z-axis.
+         */
+        @JsName("scaleByValues")
+        fun scale(result: ZMatrix4, m: ZMatrix4, x: Float, y: Float, z: Float) {
+            result[0, 0] = m[0, 0] * x
+            result[0, 1] = m[0, 1] * y
+            result[0, 2] = m[0, 2] * z
+            result[0, 3] = m[0, 3]
+
+            result[1, 0] = m[1, 0] * x
+            result[1, 1] = m[1, 1] * y
+            result[1, 2] = m[1, 2] * z
+            result[1, 3] = m[1, 3]
+
+            result[2, 0] = m[2, 0] * x
+            result[2, 1] = m[2, 1] * y
+            result[2, 2] = m[2, 2] * z
+            result[2, 3] = m[2, 3]
+
+            result[3, 0] = m[3, 0] * x
+            result[3, 1] = m[3, 1] * y
+            result[3, 2] = m[3, 2] * z
+            result[3, 3] = m[3, 3]
+        }
+
         @JsName("scaleByVectorCopy")
         fun scale(result: ZMatrix4, m: ZMatrix4, s: ZVector3) {
-            for (i in 0..3) {
-                result[i] = m[i] * s.x
-                result[4 + i] = m[4 + i] * s.y
-                result[8 + i] = m[8 + i] * s.z
-                result[12 + i] = m[12 + i]
-            }
+            scale(result, m, s.x, s.y, s.z)
         }
 
         fun scale(result: ZMatrix4, s: ZVector3) {
@@ -382,29 +559,37 @@ class ZMatrix4(): ZAlgebraObject {
 
             // calculate matrix inverse
             val invDet = 1.0f / det
-            result.values[0] = dst0  * invDet
-            result.values[1] = dst1  * invDet
-            result.values[2] = dst2  * invDet
-            result.values[3] = dst3  * invDet
+            result[0] = dst0  * invDet
+            result[1] = dst1  * invDet
+            result[2] = dst2  * invDet
+            result[3] = dst3  * invDet
 
-            result.values[4] = dst4  * invDet
-            result.values[5] = dst5  * invDet
-            result.values[6] = dst6  * invDet
-            result.values[7] = dst7  * invDet
+            result[4] = dst4  * invDet
+            result[5] = dst5  * invDet
+            result[6] = dst6  * invDet
+            result[7] = dst7  * invDet
 
-            result.values[8] = dst8  * invDet
-            result.values[9] = dst9  * invDet
-            result.values[10] = dst10 * invDet
-            result.values[11] = dst11 * invDet
+            result[8] = dst8  * invDet
+            result[9] = dst9  * invDet
+            result[10] = dst10 * invDet
+            result[11] = dst11 * invDet
 
-            result.values[12] = dst12 * invDet
-            result.values[13] = dst13 * invDet
-            result.values[14] = dst14 * invDet
-            result.values[15] = dst15 * invDet
+            result[12] = dst12 * invDet
+            result[13] = dst13 * invDet
+            result[14] = dst14 * invDet
+            result[15] = dst15 * invDet
 
             return true
         }
 
+        /**
+         * Sets up a view transformation matrix to represent a camera looking at a specified target.
+         *
+         * @param result The matrix to store the result of the lookAt operation.
+         * @param eye The position of the camera.
+         * @param center The point the camera is looking at.
+         * @param up The up direction from the camera's point of view.
+         */
         fun lookAt(result: ZMatrix4, eye: ZVector3, center: ZVector3, up: ZVector3) {
             val f = ZVector3()
 
@@ -426,31 +611,37 @@ class ZMatrix4(): ZAlgebraObject {
             val u = ZVector3()
             ZVector3.cross(u, s, f)
 
-            result.values[0] = s.x
-            result.values[1] = u.x
-            result.values[2] = -f.x
-            result.values[3] = 0.0f
+            result[0] = s.x
+            result[1] = u.x
+            result[2] = -f.x
+            result[3] = 0.0f
 
-            result.values[4] = s.y
-            result.values[5] = u.y
-            result.values[6] = -f.y
-            result.values[7] = 0.0f
+            result[4] = s.y
+            result[5] = u.y
+            result[6] = -f.y
+            result[7] = 0.0f
 
-            result.values[8] = s.z
-            result.values[9] = u.z
-            result.values[10] = -f.z
-            result.values[11] = 0.0f
+            result[8] = s.z
+            result[9] = u.z
+            result[10] = -f.z
+            result[11] = 0.0f
 
-            result.values[12] = 0.0f
-            result.values[13] = 0.0f
-            result.values[14] = 0.0f
-            result.values[15] = 1.0f
+            result[12] = 0.0f
+            result[13] = 0.0f
+            result[14] = 0.0f
+            result[15] = 1.0f
 
             val negEye = ZVector3()
             ZVector3.multScalar(negEye, -1.0f, eye)
             translate(result, negEye)
         }
 
+        /**
+         * Converts a quaternion into a 4x4 matrix representing the same rotation.
+         *
+         * @param result The 4x4 matrix to be populated with the rotation matrix.
+         * @param q The quaternion to be converted into a rotation matrix.
+         */
         fun fromQuaternion(result: ZMatrix4, q: ZQuaternion) {
             identity(result)
             val x: Float = q.x
@@ -497,25 +688,25 @@ class ZMatrix4(): ZAlgebraObject {
             val f: Float = 1f / tan(fov * (PI / 360f)).toFloat()
             val rangeReciprocal = 1.0f / (near - far)
 
-            result.values[0] = f / aspect
-            result.values[1] = 0f
-            result.values[2] = 0f
-            result.values[3] = 0f
+            result[0] = f / aspect
+            result[1] = 0f
+            result[2] = 0f
+            result[3] = 0f
 
-            result.values[4] = 0f
-            result.values[5] = f
-            result.values[6] = 0f
-            result.values[7] = 0f
+            result[4] = 0f
+            result[5] = f
+            result[6] = 0f
+            result[7] = 0f
 
-            result.values[8] = 0f
-            result.values[9] = 0f
-            result.values[10] = (far + near) * rangeReciprocal
-            result.values[11] = -1f
+            result[8] = 0f
+            result[9] = 0f
+            result[10] = (far + near) * rangeReciprocal
+            result[11] = -1f
 
-            result.values[12] = 0f
-            result.values[13] = 0f
-            result.values[14] = 2 * far * near * rangeReciprocal
-            result.values[15] = 0f
+            result[12] = 0f
+            result[13] = 0f
+            result[14] = 2 * far * near * rangeReciprocal
+            result[15] = 0f
         }
 
     }

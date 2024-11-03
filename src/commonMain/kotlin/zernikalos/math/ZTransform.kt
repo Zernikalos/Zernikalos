@@ -8,34 +8,39 @@
 
 package zernikalos.math
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZkTransformSerializer::class)
+@Serializable
 class ZTransform() {
 
     @Transient
     private val _matrix: ZMatrix4 = ZMatrix4.Identity
 
+    @ProtoNumber(1)
     private val _position: ZVector3 = ZVector3.Zero
+
+    @ProtoNumber(2)
     private val _rotation: ZQuaternion = ZQuaternion.Identity
+
+    @ProtoNumber(3)
     private val _scale: ZVector3 = ZVector3.Ones
 
+    @Transient
     private var _forward: ZVector3 = ZVector3.Forward
+    @Transient
     private var _right: ZVector3 = ZVector3.Right
+    @Transient
     private var _up: ZVector3 = ZVector3.Up
 
 
     @JsName("initWithArgs")
-    constructor(location: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
-        _position.copy(location)
+    constructor(position: ZVector3, rotation: ZQuaternion, scale: ZVector3): this() {
+        _position.copy(position)
         _rotation.copy(rotation)
         _scale.copy(scale)
     }
@@ -80,6 +85,7 @@ class ZTransform() {
         get() = _rotation
         set(value) {
             _rotation.copy(value)
+            updateLocalAxis()
         }
 
     var scale: ZVector3
@@ -91,18 +97,19 @@ class ZTransform() {
     val matrix: ZMatrix4
         get() {
             ZMatrix4.identity(_matrix)
-            ZMatrix4.translate(_matrix, _position)
+            ZMatrix4.setTranslation(_matrix, _position)
             ZMatrix4.rotate(_matrix, _rotation)
             ZMatrix4.scale(_matrix, _scale)
             return _matrix
         }
 
-    fun setLocation(x: Float, y: Float, z: Float) {
+    fun setPosition(x: Float, y: Float, z: Float) {
         _position.setValues(x, y, z)
     }
 
     fun setRotation(angle: Float, x: Float, y: Float, z: Float) {
         ZQuaternion.fromAngleAxis(_rotation, angle, x, y, z)
+        updateLocalAxis()
     }
 
     @JsName("rotateByVector")
@@ -115,6 +122,7 @@ class ZTransform() {
         val m = ZMatrix4()
         ZMatrix4.lookAt(m, _position, look, up)
         ZQuaternion.fromMatrix4(_rotation, m)
+        updateLocalAxis()
     }
 
     fun lookAt(look: ZVector3) {
@@ -150,6 +158,7 @@ class ZTransform() {
     @JsName("rotateByQuat")
     fun rotate(q: ZQuaternion) {
         ZQuaternion.mult(_rotation, _rotation, q)
+        updateLocalAxis()
     }
 
     fun rotate(angle: Float, x: Float, y: Float, z: Float) {
@@ -176,32 +185,36 @@ class ZTransform() {
         ZVector3.rotateVector(v, _rotation, v)
         //Loc = P + R(V-P)
         ZVector3.add(_position, point, v)
+        updateLocalAxis()
     }
 
     fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3) {
         rotateAround(angle, point, axis, _position)
     }
 
-    private fun transformLocalAxis() {
-        ZMatrix4.mult(_forward, _matrix, _forward)
-        ZMatrix4.mult(_up, _matrix, _up)
-        ZMatrix4.mult(_right, _matrix, _right)
+    /**
+     * Adjusts the position of the object by panning it to the right and up directions.
+     *
+     * @param offsetRight the amount to pan to the right.
+     * @param offsetUp the amount to pan upwards.
+     */
+    fun pan(offsetRight: Float, offsetUp: Float) {
+        val rightMove = _right * offsetRight
+        val upMove = _up * offsetUp
+
+        _position.add(rightMove)
+        _position.add(upMove)
     }
 
-}
-
-@Serializable
-data class ZkTransformSurrogate(val location: ZVector3, val rotation: ZQuaternion, val scale: ZVector3)
-
-class ZkTransformSerializer : KSerializer<ZTransform> {
-    override val descriptor: SerialDescriptor = ZkTransformSurrogate.serializer().descriptor
-
-    override fun serialize(encoder: Encoder, value: ZTransform) {
-
+    @JsName("panByVector")
+    fun pan(offset: ZVector2) {
+        pan(offset.x, offset.y)
     }
 
-    override fun deserialize(decoder: Decoder): ZTransform {
-        val surrogate = decoder.decodeSerializableValue(ZkTransformSurrogate.serializer())
-        return ZTransform(surrogate.location, surrogate.rotation, surrogate.scale)
+    private fun updateLocalAxis() {
+        ZVector3.rotateVector(_forward, _rotation, ZVector3.Forward)
+        ZVector3.rotateVector(_right, _rotation, ZVector3.Right)
+        ZVector3.rotateVector(_up, _rotation, ZVector3.Up)
     }
+
 }
