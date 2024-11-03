@@ -128,6 +128,10 @@ class ZVector3(): ZAlgebraObject {
         zero(this)
     }
 
+    fun add(v: ZVector3) {
+        add(this, this, v)
+    }
+
     fun multScalar(scalar: Float) {
         multScalar(this, scalar, this )
     }

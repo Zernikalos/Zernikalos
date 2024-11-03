@@ -192,6 +192,25 @@ class ZTransform() {
         rotateAround(angle, point, axis, _position)
     }
 
+    /**
+     * Adjusts the position of the object by panning it to the right and up directions.
+     *
+     * @param offsetRight the amount to pan to the right.
+     * @param offsetUp the amount to pan upwards.
+     */
+    fun pan(offsetRight: Float, offsetUp: Float) {
+        val rightMove = _right * offsetRight
+        val upMove = _up * offsetUp
+
+        _position.add(rightMove)
+        _position.add(upMove)
+    }
+
+    @JsName("panByVector")
+    fun pan(offset: ZVector2) {
+        pan(offset.x, offset.y)
+    }
+
     private fun updateLocalAxis() {
         ZVector3.rotateVector(_forward, _rotation, ZVector3.Forward)
         ZVector3.rotateVector(_right, _rotation, ZVector3.Right)
