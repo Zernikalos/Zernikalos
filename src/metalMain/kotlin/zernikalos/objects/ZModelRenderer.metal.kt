@@ -8,9 +8,7 @@
 
 package zernikalos.objects
 
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.*
 import platform.Foundation.NSError
 import platform.Metal.MTLRenderPipelineDescriptor
 import platform.Metal.MTLRenderPipelineStateProtocol
@@ -48,7 +46,7 @@ actual class ZModelRenderer actual constructor(
         model.shaderProgram.unbind()
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun createPipelineDescriptor(): MTLRenderPipelineStateProtocol? {
         ctx as ZMtlRenderingContext
 
@@ -65,9 +63,19 @@ actual class ZModelRenderer actual constructor(
         pipelineDescriptor.depthAttachmentPixelFormat = mtkView.depthStencilPixelFormat
         pipelineDescriptor.stencilAttachmentPixelFormat = mtkView.depthStencilPixelFormat
 
-        val err: CPointer<ObjCObjectVar<NSError?>>? = null
+        memScoped {
+            val err = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
+            val pipelineState = ctx.device.newRenderPipelineStateWithDescriptor(pipelineDescriptor, err.ptr)
 
-        return ctx.device.newRenderPipelineStateWithDescriptor(pipelineDescriptor, err)
+            if (err.value != null) {
+                println("Error: ${err.value?.localizedDescription}")
+                nativeHeap.free(err)
+                return null
+            }
+
+            nativeHeap.free(err)
+            return pipelineState
+        }
     }
 
 }
