@@ -12,7 +12,11 @@ import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.*
 import zernikalos.logger.ZLoggable
 
-actual class ZShaderSourceGenerator : ZLoggable {
+actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderSourceGenerator {
+    TODO("Not yet implemented")
+}
+
+class ZDefaultShaderSourceGenerator : ZShaderSourceGenerator {
 
     private fun buildMacrosFromEnabler(enabler: ZAttributesEnabler): String {
         var source = ""
@@ -26,7 +30,7 @@ actual class ZShaderSourceGenerator : ZLoggable {
         return source
     }
 
-    actual fun buildShaderSource(
+    override fun buildShaderSource(
         enabler: ZAttributesEnabler,
         source: ZShaderSource
     ) {

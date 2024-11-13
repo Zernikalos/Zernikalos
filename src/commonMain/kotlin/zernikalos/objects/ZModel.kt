@@ -20,12 +20,14 @@ import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
 import zernikalos.generators.shadergenerator.ZShaderSourceGenerator
+import zernikalos.generators.shadergenerator.ZShaderSourceGeneratorType
+import zernikalos.generators.shadergenerator.createShaderSourceGenerator
 import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZModel: ZObject(), ZLoggable {
+class ZModel: ZObject() {
 
     override val type = ZObjectType.MODEL
 
@@ -56,7 +58,7 @@ class ZModel: ZObject(), ZLoggable {
             skeleton?.initialize(ctx.renderingContext)
         }
 
-        val shaderSourceGenerator = ZShaderSourceGenerator()
+        val shaderSourceGenerator = createShaderSourceGenerator(ZShaderSourceGeneratorType.DEFAULT)
         shaderSourceGenerator.buildShaderSource(enabler, shaderProgram.shaderSource)
 
         // TODO

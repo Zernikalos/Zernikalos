@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZContext
+import zernikalos.logger.ZLoggable
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
 import zernikalos.search.ZTreeNode
@@ -46,7 +47,7 @@ import kotlin.js.JsName
 @JsExport
 @Serializable
 @Polymorphic
-abstract class ZObject: ZTreeNode<ZObject> {
+abstract class ZObject: ZTreeNode<ZObject>, ZLoggable {
     @ProtoNumber(1)
     val id: String = randomId()
 

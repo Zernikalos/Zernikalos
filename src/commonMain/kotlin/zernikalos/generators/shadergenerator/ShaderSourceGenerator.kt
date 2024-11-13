@@ -20,8 +20,14 @@ class ZAttributesEnabler {
     var flipTextureY: Boolean = false
 }
 
-expect class ZShaderSourceGenerator(): ZLoggable {
+interface ZShaderSourceGenerator: ZLoggable {
 
     fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource)
 
 }
+
+enum class ZShaderSourceGeneratorType {
+    DEFAULT
+}
+
+internal expect fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderSourceGenerator

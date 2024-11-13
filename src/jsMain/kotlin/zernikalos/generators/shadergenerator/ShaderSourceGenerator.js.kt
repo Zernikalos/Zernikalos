@@ -13,8 +13,12 @@ import zernikalos.generators.shadergenerator.libs.defaultFragmentShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultVertexShaderSource
 import zernikalos.logger.ZLoggable
 
-actual class ZShaderSourceGenerator : ZLoggable {
-    actual fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
+actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderSourceGenerator {
+    TODO("Not yet implemented")
+}
+
+class ZDefaultShaderSourceGenerator: ZShaderSourceGenerator {
+    override fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
         source.glslVertexShaderSource = buildVertexShaderSource(enabler)
         source.glslFragmentShaderSource = buildFragmentShaderSource(enabler)
     }
@@ -33,7 +37,7 @@ actual class ZShaderSourceGenerator : ZLoggable {
         if (enabler.useColors) shaderSource = "#define USE_COLORS\n$shaderSource"
         if (enabler.useTextures) shaderSource = "#define USE_TEXTURES\n$shaderSource"
         if (enabler.flipTextureY) shaderSource = "#define FLIP_TEXTURE_Y\n$shaderSource"
-        if (enabler.useSkinning) shaderSource = "#define USE_SKINNING\n$shaderSource"
+        // if (enabler.useSkinning) shaderSource = "#define USE_SKINNING\n$shaderSource"
 
         shaderSource = "#version 300 es\n$shaderSource"
 
