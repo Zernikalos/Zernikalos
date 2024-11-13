@@ -10,13 +10,12 @@ package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.*
-import zernikalos.logger.ZLoggable
 
-actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderSourceGenerator {
+actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderGenerator {
     TODO("Not yet implemented")
 }
 
-class ZDefaultShaderSourceGenerator : ZShaderSourceGenerator {
+class ZDefaultShaderGenerator : ZShaderGenerator {
 
     private fun buildMacrosFromEnabler(enabler: ZAttributesEnabler): String {
         var source = ""

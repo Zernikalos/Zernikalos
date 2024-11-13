@@ -12,14 +12,14 @@ import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultFragmentShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultVertexShaderSource
 
-actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderSourceGenerator {
+actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderGenerator {
     return when (type) {
-        ZShaderSourceGeneratorType.DEFAULT -> ZDefaultShaderSourceGenerator()
-        else -> ZDefaultShaderSourceGenerator()
+        ZShaderSourceGeneratorType.DEFAULT -> ZDefaultShaderGenerator()
+        else -> ZDefaultShaderGenerator()
     }
 }
 
-class ZDefaultShaderSourceGenerator: ZShaderSourceGenerator {
+class ZDefaultShaderGenerator: ZShaderGenerator {
     override fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
         source.glslVertexShaderSource = buildVertexShaderSource(enabler)
         source.glslFragmentShaderSource = buildFragmentShaderSource(enabler)
