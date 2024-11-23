@@ -8,41 +8,9 @@
 
 package zernikalos.generators.shadergenerator
 
-import zernikalos.components.shader.ZShaderSource
-import zernikalos.generators.shadergenerator.libs.*
-
-actual fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderGenerator {
-    TODO("Not yet implemented")
-}
-
-class ZDefaultShaderGenerator : ZShaderGenerator {
-
-    private fun buildMacrosFromEnabler(enabler: ZAttributesEnabler): String {
-        var source = ""
-
-        if (enabler.usePosition) source = "#define USE_POSITION\n$source"
-        if (enabler.useNormals) source = "#define USE_NORMAL\n$source"
-        if (enabler.useColors) source = "#define USE_COLOR\n$source"
-        if (enabler.useTextures) source = "#define USE_TEXTURE\n$source"
-        if (enabler.flipTextureY) source = "#define FLIP_TEXTURE_Y\n$source"
-
-        return source
+actual fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator {
+    when (type) {
+        ZShaderGeneratorType.DEFAULT -> return ZDefaultShaderGenerator()
+        else -> throw IllegalArgumentException("Unknown shader generator type: $type")
     }
-
-    override fun buildShaderSource(
-        enabler: ZAttributesEnabler,
-        source: ZShaderSource
-    ) {
-        val shaderSourceStr = """
-            $shaderCommonHeaders
-            ${buildMacrosFromEnabler(enabler)}
-            $shaderUniforms
-            $shaderVertexDefinitions
-            $shaderFragmentDefinitions
-            $shaderVertexMain
-            $shaderFragmentMain
-        """.trimIndent()
-        source.metalShaderSource = shaderSourceStr
-    }
-
 }

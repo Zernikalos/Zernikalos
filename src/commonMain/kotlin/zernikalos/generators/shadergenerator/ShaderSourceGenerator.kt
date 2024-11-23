@@ -8,7 +8,7 @@
 
 package zernikalos.generators.shadergenerator
 
-import zernikalos.components.shader.ZShaderSource
+import zernikalos.components.shader.*
 import zernikalos.logger.ZLoggable
 
 class ZAttributesEnabler {
@@ -18,16 +18,50 @@ class ZAttributesEnabler {
     var useTextures: Boolean = false
     var useSkinning: Boolean = false
     var flipTextureY: Boolean = false
+
+    var maxBones: Int = 0
 }
 
-interface ZShaderGenerator: ZLoggable {
+abstract class ZShaderGenerator(): ZLoggable {
 
-    fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource)
+    fun generate(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+        shaderProgram.clearAttributes()
+        addRequiredAttributes(enabler, shaderProgram)
+
+        shaderProgram.clearUniforms()
+        addRequiredUniforms(enabler, shaderProgram)
+
+        buildShaderSource(enabler, shaderProgram.shaderSource)
+    }
+
+    private fun addRequiredAttributes(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+        shaderProgram.addAttribute(ZAttrIndices)
+        if (enabler.usePosition) shaderProgram.addAttribute(ZAttrPosition)
+        if (enabler.useNormals) shaderProgram.addAttribute(ZAttrNormal)
+        if (enabler.useTextures) shaderProgram.addAttribute(ZAttrUv)
+        if (enabler.useColors) shaderProgram.addAttribute(ZAttrColor)
+        if (enabler.useSkinning) {
+            shaderProgram.addAttribute(ZAttrBoneIndices)
+            shaderProgram.addAttribute(ZAttrBoneWeight)
+        }
+    }
+
+    private fun addRequiredUniforms(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
+        shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
+        shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
+        if (enabler.useSkinning) {
+            shaderProgram.addUniform("Bones", ZBonesMatrixArray(enabler.maxBones))
+            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(enabler.maxBones))
+        }
+    }
+
+    protected abstract fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource)
 
 }
 
-enum class ZShaderSourceGeneratorType {
+enum class ZShaderGeneratorType {
     DEFAULT
 }
 
-internal expect fun createShaderSourceGenerator(type: ZShaderSourceGeneratorType): ZShaderGenerator
+internal expect fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator
