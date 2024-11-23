@@ -146,7 +146,12 @@ object ZTypes {
     val NONE = ZDataType(ZBaseType.NONE, ZFormatType.NONE)
 
     val BYTE = ZDataType(ZBaseType.BYTE, ZFormatType.SCALAR)
+
     val UBYTE = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.SCALAR)
+    val UBYTE2 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC2)
+    val UBYTE3 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC3)
+    val UBYTE4 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC4)
+
     val INT = ZDataType(ZBaseType.INT, ZFormatType.SCALAR)
     val UINT = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.SCALAR)
     val SHORT = ZDataType(ZBaseType.SHORT, ZFormatType.SCALAR)

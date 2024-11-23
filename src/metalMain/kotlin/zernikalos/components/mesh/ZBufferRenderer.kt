@@ -17,6 +17,7 @@ import zernikalos.ZTypes
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
 
@@ -76,7 +77,11 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
         attributeDescriptor.offset = data.offset.toULong()
         attributeDescriptor.bufferIndex = data.id.toULong()
         // In OGL we specify the base type and the size independently, not the same scenario in Metal
-        attributeDescriptor.format = toMtlFormat(data.dataType)
+        val format = toMtlFormat(data.dataType)
+        if (format == 0uL) {
+            logger.warn("MTLVertexFormat not recognized for ${data.dataType}")
+        }
+        attributeDescriptor.format = format
 
         layoutDescriptor = MTLVertexBufferLayoutDescriptor()
         // This stride is different than OGL, in Metal all the vertex data is added into the same buffer
@@ -91,6 +96,13 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZB
 
 fun toMtlFormat(dataType: ZDataType): MTLVertexFormat {
     return when (dataType) {
+        ZTypes.UBYTE -> MTLVertexFormatUChar
+        ZTypes.UBYTE2 -> MTLVertexFormatUChar2
+        ZTypes.UBYTE3 -> MTLVertexFormatUChar3
+        ZTypes.UBYTE4 -> MTLVertexFormatUChar4
+
+        ZTypes.BYTE -> MTLVertexFormatChar
+
         ZTypes.INT -> MTLVertexFormatInt
         ZTypes.UINT -> MTLVertexFormatUInt
 

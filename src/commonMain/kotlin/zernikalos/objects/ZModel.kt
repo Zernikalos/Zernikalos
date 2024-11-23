@@ -21,6 +21,7 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
 import zernikalos.generators.shadergenerator.ZShaderGeneratorType
 import zernikalos.generators.shadergenerator.createShaderGenerator
+import zernikalos.logger.logger
 import kotlin.js.JsExport
 
 @JsExport
@@ -61,6 +62,10 @@ class ZModel: ZObject() {
 
         enableRequiredBuffers(enabler)
 
+        logger.debug("[$name] Enabled buffers:\n${
+            mesh.buffers.values.filter { it.enabled }.joinToString(separator = ",\n") { it.toString() }
+        }")
+
         renderer.initialize()
     }
 
@@ -79,7 +84,7 @@ class ZModel: ZObject() {
         val enabler = ZAttributesEnabler()
         enabler.usePosition = mesh.hasBufferById(ZAttributeId.POSITION)
         enabler.useColors = mesh.hasBufferById(ZAttributeId.COLOR)
-        //enabler.useNormals = mesh.hasBufferKey("normal")
+        enabler.useNormals = mesh.hasBufferById(ZAttributeId.NORMAL)
         if (hasTextures) {
             enabler.useTextures = hasTextures
             if (material?.texture?.flipY == true) {

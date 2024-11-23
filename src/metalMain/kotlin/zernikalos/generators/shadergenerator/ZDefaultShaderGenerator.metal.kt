@@ -21,6 +21,7 @@ class ZDefaultShaderGenerator : ZShaderGenerator() {
         if (enabler.useColors) source = "#define USE_COLOR\n$source"
         if (enabler.useTextures) source = "#define USE_TEXTURE\n$source"
         if (enabler.flipTextureY) source = "#define FLIP_TEXTURE_Y\n$source"
+        if (enabler.useSkinning) source = "#define USE_SKINNING\n$source"
 
         return source
     }

@@ -47,6 +47,14 @@ class ZLogger(private val clsName: String?, val instanceId: Int) {
         fireMessage(message, ZLogLevel.INFO)
     }
 
+    fun warn(message: String) {
+        fireMessage(message, ZLogLevel.WARNING)
+    }
+
+    fun error(message: String) {
+        fireMessage(message, ZLogLevel.ERROR)
+    }
+
     private fun fireMessage(message: String, level: ZLogLevel) {
         if (level < settings.logLevel) {
             return
