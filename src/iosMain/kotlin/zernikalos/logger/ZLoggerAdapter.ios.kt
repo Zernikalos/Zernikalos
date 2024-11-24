@@ -23,7 +23,7 @@ actual class ZLoggerAdapterConsole : ZLoggerAdapter {
     }
 
     actual override fun warn(message: String) {
-        fireMessage(message, OS_LOG_TYPE_ERROR)
+        fireMessage(message, OS_LOG_TYPE_DEFAULT)
     }
 
     actual override fun error(message: String) {

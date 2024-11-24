@@ -11,10 +11,10 @@ package zernikalos.generators.shadergenerator
 import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultFragmentShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultVertexShaderSource
-import zernikalos.logger.ZLoggable
 
-actual class ZShaderSourceGenerator : ZLoggable {
-    actual fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
+class ZDefaultShaderGenerator(): ZShaderGenerator() {
+
+    override fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
         source.glslVertexShaderSource = buildVertexShaderSource(enabler)
         source.glslFragmentShaderSource = buildFragmentShaderSource(enabler)
     }

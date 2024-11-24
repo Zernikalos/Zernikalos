@@ -100,6 +100,16 @@ class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData,
     }
 
     /**
+     * Checks if a buffer with the given name exists by its ID.
+     *
+     * @param attrId The attribute ID of the buffer.
+     * @return true if a buffer with the given AttributeId exists, false otherwise.
+     */
+    fun hasBufferById(attrId: ZAttributeId): Boolean {
+        return getBufferById(attrId) != null
+    }
+
+    /**
      * Adds a buffer to the ZMesh.
      *
      * @param buffer The buffer to be added.

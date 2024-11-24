@@ -148,6 +148,10 @@ class ZBuffer internal constructor(data: ZBufferData): ZTemplateComponent<ZBuffe
         renderer.unbind()
     }
 
+    override fun toString(): String {
+        return "ZBuffer(attributeId=${this.attributeId}, bufferId=${data.bufferId})"
+    }
+
 }
 
 @JsExport

@@ -19,13 +19,14 @@ import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZAttributesEnabler
-import zernikalos.generators.shadergenerator.ZShaderSourceGenerator
-import zernikalos.logger.ZLoggable
+import zernikalos.generators.shadergenerator.ZShaderGeneratorType
+import zernikalos.generators.shadergenerator.createShaderGenerator
+import zernikalos.logger.logger
 import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZModel: ZObject(), ZLoggable {
+class ZModel: ZObject() {
 
     override val type = ZObjectType.MODEL
 
@@ -39,7 +40,7 @@ class ZModel: ZObject(), ZLoggable {
     var skeleton: ZSkeleton? = null
 
     val hasTextures: Boolean
-        get() = material?.texture != null && mesh.hasBuffer("uv")
+        get() = material?.texture != null && mesh.hasBufferById(ZAttributeId.UV)
 
     val hasSkeleton: Boolean
         get() = skeleton != null
@@ -56,60 +57,34 @@ class ZModel: ZObject(), ZLoggable {
             skeleton?.initialize(ctx.renderingContext)
         }
 
-        val shaderSourceGenerator = ZShaderSourceGenerator()
-        shaderSourceGenerator.buildShaderSource(enabler, shaderProgram.shaderSource)
-
-        // TODO
-        shaderProgram.clearAttributes()
-        addRequiredAttributes(enabler)
-
-        shaderProgram.clearUniforms()
-        addRequiredUniforms(enabler)
+        val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)
+        shaderSourceGenerator.generate(enabler, shaderProgram)
 
         enableRequiredBuffers(enabler)
+
+        logger.debug("[$name] Enabled buffers:\n${
+            mesh.buffers.values.filter { it.enabled }.joinToString(separator = ",\n") { it.toString() }
+        }")
 
         renderer.initialize()
     }
 
-    private fun addRequiredUniforms(enabler: ZAttributesEnabler) {
-        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
-        shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
-        shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
-        if (enabler.useSkinning) {
-            shaderProgram.addUniform("Bones", ZBonesMatrixArray(skeleton!!.bones.size))
-            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(skeleton!!.bones.size))
-        }
-    }
-
-    private fun addRequiredAttributes(enabler: ZAttributesEnabler) {
-        shaderProgram.addAttribute(ZAttrIndices)
-        if (enabler.usePosition) shaderProgram.addAttribute(ZAttrPosition)
-        if (enabler.useNormals) shaderProgram.addAttribute(ZAttrNormal)
-        if (enabler.useTextures) shaderProgram.addAttribute(ZAttrUv)
-        if (enabler.useColors) shaderProgram.addAttribute(ZAttrColor)
-        if (enabler.useSkinning) {
-            shaderProgram.addAttribute(ZAttrBoneIndices)
-            shaderProgram.addAttribute(ZAttrBoneWeight)
-        }
-    }
-
     private fun enableRequiredBuffers(enabler: ZAttributesEnabler) {
         mesh.indexBuffer?.enabled = true
-        if (enabler.usePosition) mesh.getBufferById(ZAttributeId.POSITION)?.enabled = true
-        if (enabler.useNormals) mesh.getBufferById(ZAttributeId.NORMAL)?.enabled = true
-        if (enabler.useTextures) mesh.getBufferById(ZAttributeId.UV)?.enabled = true
-        if (enabler.useColors) mesh.getBufferById(ZAttributeId.COLOR)?.enabled = true
-        if (enabler.useSkinning) {
-            mesh.getBufferById(ZAttributeId.BONE_WEIGHT)?.enabled = true
-            mesh.getBufferById(ZAttributeId.BONE_INDEX)?.enabled = true
-        }
+        mesh.getBufferById(ZAttributeId.POSITION)?.enabled = enabler.usePosition
+        mesh.getBufferById(ZAttributeId.NORMAL)?.enabled = enabler.useNormals
+        mesh.getBufferById(ZAttributeId.UV)?.enabled = enabler.useTextures
+        mesh.getBufferById(ZAttributeId.COLOR)?.enabled = enabler.useColors
+
+        mesh.getBufferById(ZAttributeId.BONE_WEIGHT)?.enabled = enabler.useSkinning
+        mesh.getBufferById(ZAttributeId.BONE_INDEX)?.enabled = enabler.useSkinning
     }
 
     private fun buildAttributeEnabler(): ZAttributesEnabler {
         val enabler = ZAttributesEnabler()
-        enabler.usePosition = mesh.hasBuffer("position")
-        enabler.useColors = mesh.hasBuffer("color")
-        //enabler.useNormals = mesh.hasBufferKey("normal")
+        enabler.usePosition = mesh.hasBufferById(ZAttributeId.POSITION)
+        enabler.useColors = mesh.hasBufferById(ZAttributeId.COLOR)
+        enabler.useNormals = mesh.hasBufferById(ZAttributeId.NORMAL)
         if (hasTextures) {
             enabler.useTextures = hasTextures
             if (material?.texture?.flipY == true) {
@@ -118,6 +93,7 @@ class ZModel: ZObject(), ZLoggable {
         }
         if (hasSkeleton) {
             enabler.useSkinning = true
+            enabler.maxBones = skeleton!!.bones.size
         }
         return enabler
     }

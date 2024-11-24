@@ -36,6 +36,10 @@ typedef struct
     #ifdef USE_TEXTURE
         float2 texCoord [[attribute(4)]];
     #endif
+    #ifdef USE_SKINNING
+        float4 boneWeights [[attribute(5)]];
+        float4 boneIndices [[attribute(6)]];
+    #endif
 } Vertex;
 """
 
