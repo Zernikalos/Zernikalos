@@ -18,6 +18,7 @@ val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "${zernikalosGroup}.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
 val zernikalosVersion = "0.0.1"
+val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
 val zernikalosLicense = "MPL v2.0"
@@ -25,6 +26,7 @@ val zernikalosSiteUrl = "https://zernikalos.dev"
 
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
+    kotlin("native.cocoapods") version libs.versions.kotlin.get()
     id("com.android.library") version libs.versions.androidGradlePlugin.get() apply true
     id("org.jetbrains.kotlin.android") version libs.versions.kotlin.get() apply false
     id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
@@ -87,7 +89,7 @@ kotlin {
         moduleName = "@zernikalos/zernikalos"
         compilations["main"].packageJson {
             customField("author", zernikalosAuthorName)
-            customField("description", "Zernikalos Game Engine for the browser")
+            customField("description", zernikalosDescription)
             customField("license", zernikalosLicense)
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -125,6 +127,18 @@ kotlin {
             binaryOption("bundleVersion", zernikalosVersion)
             debuggable = true
             xcf.add(this)
+        }
+    }
+
+    cocoapods {
+        name = zernikalosNameCapital
+        summary = zernikalosDescription
+        license = zernikalosLicense
+        authors = zernikalosAuthorName
+        homepage = zernikalosSiteUrl
+        version = zernikalosVersion
+        framework {
+            baseName = zernikalosNameCapital
         }
     }
     
