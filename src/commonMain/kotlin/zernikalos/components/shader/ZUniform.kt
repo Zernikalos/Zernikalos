@@ -65,7 +65,11 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
 
     var idx: Int by data::idx
 
-    var value: ZAlgebraObject? by data::value
+    var value: ZAlgebraObject
+        get() = data.value!!
+        set(value) {
+            data.value = value
+        }
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)

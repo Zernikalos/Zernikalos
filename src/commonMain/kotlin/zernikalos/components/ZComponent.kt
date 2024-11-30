@@ -162,6 +162,8 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender
         get() = internalRenderer as R
 
     override val isRenderizable: Boolean = true
+
+    abstract override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender?
 }
 
 /**
