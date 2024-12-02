@@ -21,26 +21,45 @@ class ZUniformBuffer internal constructor(data: ZUniformBufferData): ZTemplateCo
 
     val uniforms: List<ZUniform> by data::uniforms
 
+    val value: ZAlgebraObjectCollection by data::value
+
     override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
         return ZUniformBufferRenderer(ctx, data)
+    }
+
+    fun addUniform(uniform: ZUniform) {
+        data.addUniform(uniform)
     }
 
 }
 
 data class ZUniformBufferData(
     val uniformBlockName: String,
-    val uniforms: List<ZUniform>
+    val uniforms: ArrayList<ZUniform>
 ): ZComponentData() {
 
     val count: Int = uniforms.size
 
+    private var _value = ZAlgebraObjectCollection(requiredFloatSpace)
+
+    private val requiredFloatSpace: Int
+        get() = uniforms.sumOf { it.value.size }
+
     val value: ZAlgebraObjectCollection
         get() {
-            val requiredSpace = uniforms.sumOf { it.value.size }
-            val collection = ZAlgebraObjectCollection(requiredSpace)
-            collection.addAll(uniforms.map { it.value })
-            return collection
+            _value.copyAll(uniforms.sortedBy { it.id }.map { it.value })
+            return _value
         }
+
+    init {
+        uniforms.sortBy { it.id }
+    }
+
+    fun addUniform(uniform: ZUniform) {
+        uniforms.add(uniform)
+        uniforms.sortBy { it.id }
+        _value = ZAlgebraObjectCollection(requiredFloatSpace)
+    }
 }
 
 expect class ZUniformBufferRenderer(ctx: ZRenderingContext, data: ZUniformBufferData): ZComponentRender<ZUniformBufferData> {

@@ -22,7 +22,8 @@ interface ZAlgebraObject {
     val values: FloatArray
 
     /**
-     * Number of elements contained within the values array
+     * Number of elements contained within the values array with the specific type
+     * defined in dataType
      */
     val size: Int
 

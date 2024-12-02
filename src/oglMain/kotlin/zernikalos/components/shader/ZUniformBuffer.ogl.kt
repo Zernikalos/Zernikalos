@@ -40,7 +40,7 @@ actual class ZUniformBufferRenderer actual constructor(
         ctx as ZGLRenderingContext
 
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
-        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.value.values.toByteArray(), BufferUsageType.DYNAMIC_DRAW)
+        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.value.byteArray, BufferUsageType.DYNAMIC_DRAW)
     }
 
     actual override fun unbind() {

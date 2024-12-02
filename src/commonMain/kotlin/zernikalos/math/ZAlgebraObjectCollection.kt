@@ -10,6 +10,7 @@ package zernikalos.math
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.copyFloatArrayIntoByteArray
 
 /**
  * A collection class for managing and storing multiple instances of `ZAlgebraObject`.
@@ -29,6 +30,8 @@ class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
     private var _count: Int = 1
 
     override val values: FloatArray = FloatArray(dataSize)
+
+    val byteArray: ByteArray = ByteArray(dataSize * ZTypes.FLOAT.byteSize)
 
     override val dataType: ZDataType
         get() = _dataType
@@ -57,35 +60,68 @@ class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
         _count = count
     }
 
-    fun add(index: Int, value: ZAlgebraObject) {
+    /**
+     * Copies the values from the specified `ZAlgebraObject` into the collection
+     * starting at the location defined by `index`.
+     *
+     * @param index the position in the collection where the values should be copied.
+     * @param value the `ZAlgebraObject` containing the values to be copied into the collection.
+     * @throws Error if the data type of the `ZAlgebraObject` does not match the collection's data type.
+     */
+    fun copyInto(index: Int, value: ZAlgebraObject) {
         if (value.dataType.type != dataType.type) {
             throw Error("Unable to add object of type ${value.dataType.type} into a collection of ${dataType.type}")
         }
 
         value.values.copyInto(values, index * size)
+        copyFloatArrayIntoByteArray(value.values, byteArray, index * size)
     }
 
-    fun addAll(index: Int, values: Array<ZAlgebraObject>) {
+    /**
+     * Copies all values from the specified array of `ZAlgebraObject` starting at the given index
+     * into this collection. Each object in the array is copied sequentially into the collection.
+     *
+     * @param index the starting position in the collection from where the values should be copied.
+     * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
+     */
+    fun copyAllFromIndex(index: Int, values: Array<ZAlgebraObject>) {
         var auxIndex = index
         values.forEach {
-            add(auxIndex, it)
+            copyInto(auxIndex, it)
             auxIndex++
         }
     }
 
-    fun addAll(index: Int, values: List<ZAlgebraObject>) {
+    /**
+     * Copies all values from the specified list of `ZAlgebraObject` starting at the given index
+     * into this collection. Each object in the list is copied sequentially into the collection.
+     *
+     * @param index the starting position in the collection from where the values should be copied.
+     * @param values a list of `ZAlgebraObject` that contains the values to be copied into the collection.
+     */
+    fun copyAllFromIndex(index: Int, values: List<ZAlgebraObject>) {
         var auxIndex = index
         values.forEach {
-            add(auxIndex, it)
+            copyInto(auxIndex, it)
             auxIndex++
         }
     }
 
-    fun addAll(values: Array<ZAlgebraObject>) {
-        addAll(0, values)
+    /**
+     * Copies all values from the specified array of `ZAlgebraObject` into this collection.
+     *
+     * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
+     */
+    fun copyAll(values: Array<ZAlgebraObject>) {
+        copyAllFromIndex(0, values)
     }
 
-    fun addAll(values: List<ZAlgebraObject>) {
-        addAll(0, values)
+    /**
+     * Copies all values from the specified list of `ZAlgebraObject` into this collection.
+     *
+     * @param values a list of `ZAlgebraObject` that contains the values to be copied into the collection.
+     */
+    fun copyAll(values: List<ZAlgebraObject>) {
+        copyAllFromIndex(0, values)
     }
 }

@@ -94,6 +94,15 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         return GLWrap(id)
     }
 
+    actual fun getUniformBlockIndex(program: GLWrap, uniformBlockName: String): GLWrap {
+        val idx = GLES30.glGetUniformBlockIndex(program.id as Int, uniformBlockName)
+        return GLWrap(idx)
+    }
+
+    actual fun bindBufferBase(targetType: BufferTargetType, uniformBlockIndex: GLWrap, uniformBufferObject: GLWrap) {
+        GLES30.glBindBufferBase(targetType.value, uniformBlockIndex.id as Int, uniformBufferObject.id as Int)
+    }
+
     actual fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray) {
         GLES30.glUniformMatrix4fv(uniform.id as Int, count, transpose, values, 0)
     }
@@ -112,6 +121,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     actual fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType) {
         val buff = ByteBuffer.wrap(dataArray)
         GLES30.glBufferData(targetType.value, dataArray.size, buff, usageType.value)
+    }
+
+    actual fun bufferData(targetType: BufferTargetType, byteSize: Int, usageType: BufferUsageType) {
+        GLES30.glBufferData(targetType.value, byteSize, null, usageType.value)
     }
 
     actual fun enableVertexAttrib(index: Int) {
@@ -182,10 +195,12 @@ actual object ExpectEnabler {
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER
+    actual val UNIFORM_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
 }
 
 actual object ExpectBufferUsageType {
     actual val STATIC_DRAW: Int = GLES30.GL_STATIC_DRAW
+    actual val DYNAMIC_DRAW: Int = GLES30.GL_DYNAMIC_DRAW
 }
 
 actual object ExpectBufferBit {

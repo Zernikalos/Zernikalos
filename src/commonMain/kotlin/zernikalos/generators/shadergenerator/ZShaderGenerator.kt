@@ -11,8 +11,23 @@ package zernikalos.generators.shadergenerator
 import zernikalos.components.shader.*
 import zernikalos.logger.ZLoggable
 
-abstract class ZShaderGenerator(): ZLoggable {
+/**
+ * The ZShaderGenerator class is responsible for generating the attributes, uniforms and source required
+ * for a shader program based on the provided ZAttributesEnabler configuration.
+ * This class serves as a base class and requires concrete implementations to define the shader source
+ * code building process.
+ */
+internal abstract class ZShaderGenerator(): ZLoggable {
 
+    /**
+     * Generates and configures shader attributes and uniforms based on the specified enabler's settings.
+     * The shader source is also built within this method.
+     *
+     * @param enabler An instance of ZAttributesEnabler that specifies which attributes and uniforms
+     *                should be enabled in the shader program.
+     * @param shaderProgram An instance of ZShaderProgram that will be configured with the necessary
+     *                      attributes and uniforms as defined by the enabler.
+     */
     fun generate(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.clearAttributes()
         addRequiredAttributes(enabler, shaderProgram)
@@ -45,12 +60,12 @@ abstract class ZShaderGenerator(): ZLoggable {
         }
     }
 
-    protected abstract fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource)
+    /**
+     * Constructs and sets the shader source code based on the specified attributes enabled in the enabler.
+     *
+     * @param enabler A ZAttributesEnabler instance that determines which attributes should be included in the shader source.
+     * @param source A ZShaderSource instance that will be populated with the constructed shader code.
+     */
+    protected abstract fun buildShaderSource(enabler: ZShaderSourceParameters, source: ZShaderSource)
 
 }
-
-enum class ZShaderGeneratorType {
-    DEFAULT
-}
-
-internal expect fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator

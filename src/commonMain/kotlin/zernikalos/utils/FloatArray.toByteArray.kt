@@ -9,9 +9,9 @@
 package zernikalos.utils
 
 fun FloatArray.toByteArray(): ByteArray {
-    val byteArray = ByteArray(this.size * 4) // Cada Float se compone de 4 bytes
+    val byteArray = ByteArray(this.size * 4)
     this.forEachIndexed { index, value ->
-        val intBits = value.toBits() // Convertir el float en bits
+        val intBits = value.toBits()
         byteArray[index * 4 + 0] = (intBits shr 24 and 0xFF).toByte()
         byteArray[index * 4 + 1] = (intBits shr 16 and 0xFF).toByte()
         byteArray[index * 4 + 2] = (intBits shr 8 and 0xFF).toByte()
