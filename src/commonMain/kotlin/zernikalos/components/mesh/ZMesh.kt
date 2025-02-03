@@ -33,7 +33,6 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshD
      */
     val buffers: Map<String, ZBuffer> by data::buffers
 
-
     /**
      * Represents an index buffer for a ZMesh.
      *
@@ -51,7 +50,7 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshD
     @JsName("init")
     constructor(): this(ZMeshData())
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
+    override fun createRenderer(ctx: ZRenderingContext): ZComponentRender<ZMeshData> {
         return ZMeshRenderer(ctx, data)
     }
 

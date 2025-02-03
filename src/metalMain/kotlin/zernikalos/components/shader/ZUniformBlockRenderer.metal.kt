@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,10 +11,10 @@ package zernikalos.components.shader
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZRenderingContext
 
-actual class ZUniformBufferRenderer actual constructor(
+actual class ZUniformBlockRenderer actual constructor(
     ctx: ZRenderingContext,
-    data: ZUniformBufferData
-) : ZComponentRender<ZUniformBufferData>(ctx, data) {
+    data: ZUniformBlockData
+) : ZComponentRender<ZUniformBlockData>(ctx, data) {
     actual override fun initialize() {
     }
 

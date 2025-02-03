@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,6 +11,8 @@ package zernikalos.math
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.utils.copyFloatArrayIntoByteArray
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 /**
  * A collection class for managing and storing multiple instances of `ZAlgebraObject`.
@@ -23,6 +25,7 @@ import zernikalos.utils.copyFloatArrayIntoByteArray
  *
  * @property dataSize The total number of elements allocated in the collection.
  */
+@JsExport
 class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
 
     private var _dataType: ZDataType = ZTypes.FLOAT
@@ -55,6 +58,7 @@ class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
      * @param dataType The data type of the objects that the collection will manage.
      * @param count The number of instances of the algebraic object to be managed by the collection.
      */
+    @JsName("initWithDataTypeAndCount")
     constructor(dataType: ZDataType, count: Int): this(dataType.size * count) {
         _dataType = dataType
         _count = count
@@ -84,6 +88,7 @@ class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
      * @param index the starting position in the collection from where the values should be copied.
      * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
      */
+    @JsName("copyAllFromIndexAndArray")
     fun copyAllFromIndex(index: Int, values: Array<ZAlgebraObject>) {
         var auxIndex = index
         values.forEach {
@@ -112,6 +117,7 @@ class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
      *
      * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
      */
+    @JsName("copyAllFromArray")
     fun copyAll(values: Array<ZAlgebraObject>) {
         copyAllFromIndex(0, values)
     }
