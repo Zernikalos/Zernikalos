@@ -30,13 +30,13 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         nativeView.sampleCount = 1u
     }
 
-    actual override fun bind() {
+    actual fun bind() {
     }
 
-    actual override fun unbind() {
+    actual fun unbind() {
     }
 
-    actual override fun render() {
+    actual fun render() {
         // TODO: This should need to be improved
 
         /// Per frame updates hare

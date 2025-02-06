@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +9,7 @@
 package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
+import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentRender
 import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
@@ -16,7 +17,8 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 import zernikalos.toOglBaseType
 
-actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData>(ctx, data) {
+actual class ZMeshRenderer
+internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData): ZBaseComponentRender(ctx) {
 
     @Transient
     val vao: ZVertexArray = ZVertexArray()

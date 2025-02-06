@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,7 +21,7 @@ import kotlin.js.JsName
 @JsExport
 class ZMaterial
 internal constructor(data: ZMaterialData):
-    ZTemplateComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
+    ZRenderizableComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZMaterialData())
@@ -30,14 +30,6 @@ internal constructor(data: ZMaterialData):
 
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
     }
 }
 

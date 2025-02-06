@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,7 +19,7 @@ import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZShaderProgramSerializer::class)
-class ZShaderProgram internal constructor(data: ZShaderProgramData): ZTemplateComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
+class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZShaderProgramData())
@@ -60,14 +60,6 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZTemplateCo
 
     override fun createRenderer(ctx: ZRenderingContext): ZShaderProgramRenderer {
         return ZShaderProgramRenderer(ctx, data)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
     }
 
 }

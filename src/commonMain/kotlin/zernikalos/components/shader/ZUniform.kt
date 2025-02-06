@@ -17,7 +17,7 @@ import zernikalos.ZTypes
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZTemplateComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
 import kotlin.js.JsExport
@@ -41,7 +41,7 @@ fun ZInverseBindMatrixArray(count: Int): ZUniform {
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
-class ZUniform internal constructor(data: ZUniformData): ZTemplateComponent<ZUniformData, ZUniformRenderer>(data) {
+class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data) {
 
     @JsName("initWithArgs")
     constructor(uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(uniformName, count, dataType))

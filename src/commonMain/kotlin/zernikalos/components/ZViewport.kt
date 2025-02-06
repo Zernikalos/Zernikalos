@@ -13,7 +13,6 @@ import kotlinx.serialization.Serializable
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZBox2D
 import zernikalos.math.ZColor
-import zernikalos.math.ZVector4
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -24,7 +23,7 @@ import kotlin.js.JsName
 @Serializable(with = ZViewportSerializer::class)
 class ZViewport
 internal constructor(data: ZViewportData):
-    ZTemplateComponent<ZViewportData, ZViewportRenderer>(data),
+    ZRenderizableComponent<ZViewportData, ZViewportRenderer>(data),
     ZRenderizable, ZResizable {
 
     @JsName("init")
