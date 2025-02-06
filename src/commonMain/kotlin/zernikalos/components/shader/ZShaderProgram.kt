@@ -33,6 +33,17 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizab
     val uniformsNames: Set<String>
         get() = uniforms.keys
 
+    val attributeIds: Set<ZAttributeId>
+        get() = attributes.values.map { it.attrId }.toSet()
+
+    fun hasAttribute(name: String): Boolean {
+        return attributes.containsKey(name)
+    }
+
+    fun hasAttributeById(attrId: ZAttributeId): Boolean {
+        return attributes.values.any { it.id == attrId.id }
+    }
+
     fun addUniform(name: String, uniform: ZUniform) {
         data.uniforms[name] = uniform
     }

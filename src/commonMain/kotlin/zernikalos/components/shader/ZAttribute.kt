@@ -27,7 +27,8 @@ enum class ZAttributeId(val id: Int, val attrName: String) {
     COLOR(3, "a_color"),
     UV(4, "a_uv"),
     BONE_WEIGHT(5, "a_boneWeight"),
-    BONE_INDEX(6, "a_boneIndices")
+    BONE_INDEX(6, "a_boneIndices"),
+    CUSTOM(-1, "")
 }
 
 
@@ -62,6 +63,9 @@ class ZAttribute internal constructor(data: ZAttributeData): ZRenderizableCompon
     var id: Int by data::id
 
     var attributeName: String by data::attributeName
+
+    val attrId: ZAttributeId
+        get() = ZAttributeId.entries.find { it.id == id } ?: ZAttributeId.CUSTOM
 
     override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
         return ZAttributeRenderer(ctx, data)

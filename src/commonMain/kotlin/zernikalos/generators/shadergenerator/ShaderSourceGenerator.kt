@@ -11,17 +11,6 @@ package zernikalos.generators.shadergenerator
 import zernikalos.components.shader.*
 import zernikalos.logger.ZLoggable
 
-class ZAttributesEnabler {
-    var usePosition: Boolean = true
-    var useNormals: Boolean = false
-    var useColors: Boolean = false
-    var useTextures: Boolean = false
-    var useSkinning: Boolean = false
-    var flipTextureY: Boolean = false
-
-    var maxBones: Int = 0
-}
-
 abstract class ZShaderGenerator(): ZLoggable {
 
     fun generate(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {

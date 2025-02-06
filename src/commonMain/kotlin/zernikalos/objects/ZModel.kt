@@ -40,7 +40,7 @@ class ZModel: ZObject() {
     var skeleton: ZSkeleton? = null
 
     val hasTextures: Boolean
-        get() = material?.texture != null && mesh.hasBufferById(ZAttributeId.UV)
+        get() = material?.texture != null && mesh.hasBuffer(ZAttributeId.UV)
 
     val hasSkeleton: Boolean
         get() = skeleton != null
@@ -71,20 +71,22 @@ class ZModel: ZObject() {
 
     private fun enableRequiredBuffers(enabler: ZAttributesEnabler) {
         mesh.indexBuffer?.enabled = true
-        mesh.getBufferById(ZAttributeId.POSITION)?.enabled = enabler.usePosition
-        mesh.getBufferById(ZAttributeId.NORMAL)?.enabled = enabler.useNormals
-        mesh.getBufferById(ZAttributeId.UV)?.enabled = enabler.useTextures
-        mesh.getBufferById(ZAttributeId.COLOR)?.enabled = enabler.useColors
+        mesh.position?.enabled = enabler.usePosition
+        mesh.normal?.enabled = enabler.useNormals
+        mesh.uv?.enabled = enabler.useTextures
+        mesh.color?.enabled = enabler.useColors
 
-        mesh.getBufferById(ZAttributeId.BONE_WEIGHT)?.enabled = enabler.useSkinning
-        mesh.getBufferById(ZAttributeId.BONE_INDEX)?.enabled = enabler.useSkinning
+        mesh.boneWeight?.enabled = enabler.useSkinning
+        mesh.boneIndex?.enabled = enabler.useSkinning
     }
 
     private fun buildAttributeEnabler(): ZAttributesEnabler {
-        val enabler = ZAttributesEnabler()
-        enabler.usePosition = mesh.hasBufferById(ZAttributeId.POSITION)
-        enabler.useColors = mesh.hasBufferById(ZAttributeId.COLOR)
-        enabler.useNormals = mesh.hasBufferById(ZAttributeId.NORMAL)
+        val enabler = ZAttributesEnabler(
+            mesh.attributeIds.intersect(shaderProgram.attributeIds)
+        )
+        enabler.usePosition = ZAttributeId.POSITION in mesh
+        enabler.useColors = ZAttributeId.COLOR in mesh
+        enabler.useNormals = ZAttributeId.NORMAL in mesh
         if (hasTextures) {
             enabler.useTextures = hasTextures
             if (material?.texture?.flipY == true) {
