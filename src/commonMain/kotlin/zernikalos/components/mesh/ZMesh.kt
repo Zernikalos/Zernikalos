@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,7 +26,7 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
@@ -53,18 +53,6 @@ class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData,
 
     override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
         return ZMeshRenderer(ctx, data)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun render() {
-        renderer.render()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
     }
 
     /**
@@ -123,9 +111,28 @@ class ZMesh internal constructor(data: ZMeshData): ZTemplateComponent<ZMeshData,
 /**
  * @suppress
  */
+data class ZMeshData(
+    val buffers: HashMap<String, ZBuffer> = HashMap()
+): ZComponentData() {
+
+    val indexBuffer: ZBuffer?
+        get() = buffers.values.find { it.isIndexBuffer }
+
+    val hasIndexBuffer: Boolean
+        get() = indexBuffer != null
+
+    fun hasBuffer(name: String): Boolean {
+        return buffers.containsKey(name)
+    }
+
+}
+
+/**
+ * @suppress
+ */
 @Serializable
 @JsExport
-data class ZBufferKey(
+internal data class ZBufferKey(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)
@@ -153,32 +160,23 @@ data class ZBufferKey(
  */
 @Serializable
 @JsExport
-data class ZRawBuffer(
+internal data class ZRawBuffer(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)
     var dataArray: ByteArray = byteArrayOf()
 )
 
-/**
- * @suppress
- */
 @Serializable
-data class ZMeshData(
+internal data class ZMeshDataWrapper(
     @ProtoNumber(101)
-    var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
+    private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
-    var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
-): ZComponentData() {
+    private var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
+) {
 
     @Transient
     val buffers: HashMap<String, ZBuffer> = HashMap()
-
-    val indexBuffer: ZBuffer?
-        get() = buffers.values.find { it.isIndexBuffer }
-
-    val hasIndexBuffer: Boolean
-        get() = indexBuffer != null
 
     init {
         bufferKeys.forEach { key ->
@@ -187,14 +185,15 @@ data class ZMeshData(
                 buffers[key.name] = buffer
             }
         }
-    }
-
-    fun hasBuffer(name: String): Boolean {
-        return buffers.containsKey(name)
+        bufferKeys.clear()
+        rawBuffers.clear()
     }
 
     private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
-        val rawBuffer = findBufferByKey(key) ?: return null
+        val rawBuffer = rawBuffers.find { it.id == key.bufferId }
+        if (rawBuffer == null) {
+            return null
+        }
         return ZBuffer(
             key.id,
             key.dataType,
@@ -209,16 +208,12 @@ data class ZMeshData(
             rawBuffer.dataArray
         )
     }
-
-    private fun findBufferByKey(key: ZBufferKey): ZRawBuffer? {
-        return rawBuffers.find { it.id == key.bufferId }
-    }
 }
 
 /**
  * @suppress
  */
-expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentRender<ZMeshData> {
+expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZBaseComponentRender {
 
     override fun initialize()
 
@@ -228,12 +223,13 @@ expect class ZMeshRenderer(ctx: ZRenderingContext, data: ZMeshData): ZComponentR
 /**
  * @suppress
  */
-class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshData>() {
-    override val kSerializer: KSerializer<ZMeshData>
-        get() = ZMeshData.serializer()
+internal class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshDataWrapper>() {
+    override val kSerializer: KSerializer<ZMeshDataWrapper>
+        get() = ZMeshDataWrapper.serializer()
 
-    override fun createComponentInstance(data: ZMeshData): ZMesh {
-        return ZMesh(data)
+    override fun createComponentInstance(data: ZMeshDataWrapper): ZMesh {
+        val meshData = ZMeshData(data.buffers)
+        return ZMesh(meshData)
     }
 
 }

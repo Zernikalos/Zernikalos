@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,7 +13,7 @@ import zernikalos.ZTypes
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import zernikalos.components.ZTemplateComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -24,7 +24,7 @@ import kotlin.js.JsName
  * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
  */
 @JsExport
-class ZBuffer internal constructor(data: ZBufferData): ZTemplateComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
+class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBuffer` class.
@@ -138,14 +138,6 @@ class ZBuffer internal constructor(data: ZBufferData): ZTemplateComponent<ZBuffe
 
     override fun createRenderer(ctx: ZRenderingContext): ZBufferRenderer {
         return ZBufferRenderer(ctx, data)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
     }
 
     override fun toString(): String {

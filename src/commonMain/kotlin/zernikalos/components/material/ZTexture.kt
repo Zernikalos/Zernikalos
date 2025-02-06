@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,7 +23,7 @@ import kotlin.js.JsName
  *
  */
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())
@@ -69,14 +69,6 @@ class ZTexture internal constructor(data: ZTextureData): ZTemplateComponent<ZTex
 
     override fun internalInitialize(ctx: ZRenderingContext) {
         logger.debug("Initializing texture $refId")
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
     }
 }
 

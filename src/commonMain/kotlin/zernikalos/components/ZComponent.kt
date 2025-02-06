@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
-import zernikalos.utils.crc32FromStr
+import zernikalos.utils.computeRefId
 import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
 
@@ -98,22 +98,20 @@ abstract class ZBaseComponent(
         }
 
     private var _renderer: ZBaseComponentRender? = null
-
     protected val internalRenderer: ZBaseComponentRender
         get() {
-            if (!isInitialized || !isRenderizable) {
+            if (!isInitialized || !isRenderizable || !hasRenderer) {
                 throw Error("The component has not been initialized prior to access the renderer")
             }
             return _renderer!!
         }
 
-    override val isRenderizable: Boolean
-        get() = _renderer != null
-
     private var initialized: Boolean = false
-
     final override val isInitialized: Boolean
         get() = initialized
+
+    val hasRenderer: Boolean
+        get() = _renderer != null
 
     final override fun initialize(ctx: ZRenderingContext) {
         if (initialized) {
@@ -121,8 +119,10 @@ abstract class ZBaseComponent(
         }
         initialized = true
 
-        _renderer = createRenderer(ctx)
-        _renderer?.initialize()
+        if (isRenderizable) {
+            _renderer = createRenderer(ctx)
+            internalRenderer.initialize()
+        }
         internalInitialize(ctx)
     }
 
@@ -140,15 +140,19 @@ abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponen
     @Suppress("UNCHECKED_CAST")
     internal val data: D
         get() = internalData as D
+
+    override val isRenderizable: Boolean = false
 }
 
-abstract class ZRenderizableComponent<R: ZBaseComponentRender>: ZBaseComponent() {
+abstract class ZLightComponent<R: ZBaseComponentRender>: ZBaseComponent() {
     @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
+
+    override val isRenderizable: Boolean = true
 }
 
-abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(data: D): ZBaseComponent(data) {
+abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender>(data: D): ZBaseComponent(data) {
     @Suppress("UNCHECKED_CAST")
     internal val data: D
         get() = internalData as D
@@ -156,6 +160,8 @@ abstract class ZTemplateComponent<D: ZComponentData, R: ZComponentRender<D>>(dat
     @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
+
+    override val isRenderizable: Boolean = true
 }
 
 /**
@@ -174,22 +180,23 @@ abstract class ZComponentData: ZLoggable, ZRef {
     override val refId: Int
         get() {
             if (_refId == null) {
-                _refId = computeRefId()
+                _refId = computeRefId(toString())
             }
             return _refId!!
         }
-
-    private fun computeRefId(): Int {
-        val hashValue = crc32FromStr(toString())
-        return if (hashValue < 0) hashValue.inv() else hashValue
-    }
 
     abstract override fun toString(): String
 
 }
 
 @JsExport
-abstract class ZBaseComponentRender(protected val ctx: ZRenderingContext): ZLoggable {
+abstract class ZBaseComponentRender: ZLoggable {
+
+    protected val ctx: ZRenderingContext
+
+    internal constructor(ctx: ZRenderingContext) {
+        this.ctx = ctx
+    }
 
     abstract fun initialize()
 
@@ -205,7 +212,7 @@ abstract class ZComponentRender<D: ZComponentData>(ctx: ZRenderingContext, prote
 
 abstract class ZComponentSerializer<
     T: ZComponent,
-    D: ZComponentData>
+    D: Any>
     : KSerializer<T> {
 
     abstract val kSerializer: KSerializer<D>
@@ -230,26 +237,36 @@ abstract class ZComponentSerializer<
 
 interface ZBindeable {
 
+    val renderer: ZBaseComponentRender
+
     /**
      * Binds the renderer.
      * This method is called to prepare the renderer for drawing.
      */
-    fun bind()
+    fun bind() {
+        renderer.bind()
+    }
 
     /**
      * Unbinds the renderer.
      * This method is called after drawing to clean up.
      */
-    fun unbind()
+    fun unbind() {
+        renderer.unbind()
+    }
 
 }
 
 interface ZRenderizable {
 
+    val renderer: ZBaseComponentRender
+
     /**
      * Draws the mesh on the screen using its renderer.
      */
-    fun render()
+    fun render() {
+        renderer.render()
+    }
 
 }
 

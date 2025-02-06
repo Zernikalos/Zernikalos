@@ -14,7 +14,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
 import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZTemplateComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -48,7 +48,7 @@ val ZAttrBoneIndices: ZAttribute
 
 @JsExport
 @Serializable(with = ZAttributeSerializer::class)
-class ZAttribute internal constructor(data: ZAttributeData): ZTemplateComponent<ZAttributeData, ZAttributeRenderer>(data) {
+class ZAttribute internal constructor(data: ZAttributeData): ZRenderizableComponent<ZAttributeData, ZAttributeRenderer>(data) {
 
     @JsName("init")
     constructor(): this(ZAttributeData())
