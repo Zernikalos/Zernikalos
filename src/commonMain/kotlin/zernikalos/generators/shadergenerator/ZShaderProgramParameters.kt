@@ -2,7 +2,7 @@ package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZAttributeId
 
-class ZAttributesEnabler() {
+class ZShaderProgramParameters() {
     var usePosition: Boolean = true
     var useNormals: Boolean = false
     var useColors: Boolean = false

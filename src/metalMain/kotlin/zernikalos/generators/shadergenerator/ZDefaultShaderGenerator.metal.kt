@@ -13,7 +13,7 @@ import zernikalos.generators.shadergenerator.libs.*
 
 class ZDefaultShaderGenerator : ZShaderGenerator() {
 
-    private fun buildMacrosFromEnabler(enabler: ZAttributesEnabler): String {
+    private fun buildMacrosFromEnabler(enabler: ZShaderProgramParameters): String {
         var source = ""
 
         if (enabler.usePosition) source = "#define USE_POSITION\n$source"
@@ -27,7 +27,7 @@ class ZDefaultShaderGenerator : ZShaderGenerator() {
     }
 
     override fun buildShaderSource(
-        enabler: ZAttributesEnabler,
+        enabler: ZShaderProgramParameters,
         source: ZShaderSource
     ) {
         val shaderSourceStr = """
