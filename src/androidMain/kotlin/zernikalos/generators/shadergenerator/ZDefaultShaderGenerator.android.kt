@@ -14,20 +14,20 @@ import zernikalos.generators.shadergenerator.libs.defaultVertexShaderSource
 
 class ZDefaultShaderGenerator(): ZShaderGenerator() {
 
-    override fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource) {
+    override fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource) {
         source.glslVertexShaderSource = buildVertexShaderSource(enabler)
         source.glslFragmentShaderSource = buildFragmentShaderSource(enabler)
     }
 
-    private fun buildVertexShaderSource(enabler: ZAttributesEnabler): String {
+    private fun buildVertexShaderSource(enabler: ZShaderProgramParameters): String {
         return buildCommonShaderSource(defaultVertexShaderSource, enabler)
     }
 
-    private fun buildFragmentShaderSource(enabler: ZAttributesEnabler): String {
+    private fun buildFragmentShaderSource(enabler: ZShaderProgramParameters): String {
         return buildCommonShaderSource(defaultFragmentShaderSource, enabler)
     }
 
-    private fun buildCommonShaderSource(initialSource: String, enabler: ZAttributesEnabler): String {
+    private fun buildCommonShaderSource(initialSource: String, enabler: ZShaderProgramParameters): String {
         var shaderSource = initialSource
         if (enabler.useNormals) shaderSource = "#define USE_NORMALS\n$shaderSource"
         if (enabler.useColors) shaderSource = "#define USE_COLORS\n$shaderSource"

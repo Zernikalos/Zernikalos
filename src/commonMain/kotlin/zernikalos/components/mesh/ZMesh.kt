@@ -55,6 +55,35 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshD
         return ZMeshRenderer(ctx, data)
     }
 
+    operator fun get(attrId: ZAttributeId): ZBuffer? {
+        return getBufferById(attrId)
+    }
+
+    operator fun contains(attrId: ZAttributeId): Boolean {
+        return hasBuffer(attrId)
+    }
+
+    val attributeIds: Set<ZAttributeId>
+        get() = data.buffers.values.map { it.attributeId }.toSet()
+
+    val position: ZBuffer?
+        get() = getBufferById(ZAttributeId.POSITION)
+
+    val normal: ZBuffer?
+        get() = getBufferById(ZAttributeId.NORMAL)
+
+    val color: ZBuffer?
+        get() = getBufferById(ZAttributeId.COLOR)
+
+    val uv: ZBuffer?
+        get() = getBufferById(ZAttributeId.UV)
+
+    val boneWeight: ZBuffer?
+        get() = getBufferById(ZAttributeId.BONE_WEIGHT)
+
+    val boneIndex: ZBuffer?
+        get() = getBufferById(ZAttributeId.BONE_INDEX)
+
     /**
      * Gets the buffer by its name.
      * @param name The name of the buffer.
@@ -93,7 +122,8 @@ class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshD
      * @param attrId The attribute ID of the buffer.
      * @return true if a buffer with the given AttributeId exists, false otherwise.
      */
-    fun hasBufferById(attrId: ZAttributeId): Boolean {
+    @JsName("hasBufferById")
+    fun hasBuffer(attrId: ZAttributeId): Boolean {
         return getBufferById(attrId) != null
     }
 
@@ -168,7 +198,7 @@ internal data class ZRawBuffer(
 )
 
 @Serializable
-internal data class ZMeshDataWrapper(
+internal data class ZRawMeshData(
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
@@ -223,11 +253,11 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal class ZMeshSerializer: ZComponentSerializer<ZMesh, ZMeshDataWrapper>() {
-    override val kSerializer: KSerializer<ZMeshDataWrapper>
-        get() = ZMeshDataWrapper.serializer()
+internal class ZMeshSerializer: ZComponentSerializer<ZMesh, ZRawMeshData>() {
+    override val kSerializer: KSerializer<ZRawMeshData>
+        get() = ZRawMeshData.serializer()
 
-    override fun createComponentInstance(data: ZMeshDataWrapper): ZMesh {
+    override fun createComponentInstance(data: ZRawMeshData): ZMesh {
         val meshData = ZMeshData(data.buffers)
         return ZMesh(meshData)
     }

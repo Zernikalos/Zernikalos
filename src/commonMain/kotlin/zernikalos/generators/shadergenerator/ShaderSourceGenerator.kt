@@ -11,20 +11,9 @@ package zernikalos.generators.shadergenerator
 import zernikalos.components.shader.*
 import zernikalos.logger.ZLoggable
 
-class ZAttributesEnabler {
-    var usePosition: Boolean = true
-    var useNormals: Boolean = false
-    var useColors: Boolean = false
-    var useTextures: Boolean = false
-    var useSkinning: Boolean = false
-    var flipTextureY: Boolean = false
-
-    var maxBones: Int = 0
-}
-
 abstract class ZShaderGenerator(): ZLoggable {
 
-    fun generate(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+    fun generate(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.clearAttributes()
         addRequiredAttributes(enabler, shaderProgram)
 
@@ -34,7 +23,7 @@ abstract class ZShaderGenerator(): ZLoggable {
         buildShaderSource(enabler, shaderProgram.shaderSource)
     }
 
-    private fun addRequiredAttributes(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+    private fun addRequiredAttributes(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.addAttribute(ZAttrIndices)
         if (enabler.usePosition) shaderProgram.addAttribute(ZAttrPosition)
         if (enabler.useNormals) shaderProgram.addAttribute(ZAttrNormal)
@@ -46,7 +35,7 @@ abstract class ZShaderGenerator(): ZLoggable {
         }
     }
 
-    private fun addRequiredUniforms(enabler: ZAttributesEnabler, shaderProgram: ZShaderProgram) {
+    private fun addRequiredUniforms(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
@@ -56,7 +45,7 @@ abstract class ZShaderGenerator(): ZLoggable {
         }
     }
 
-    protected abstract fun buildShaderSource(enabler: ZAttributesEnabler, source: ZShaderSource)
+    protected abstract fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource)
 
 }
 
