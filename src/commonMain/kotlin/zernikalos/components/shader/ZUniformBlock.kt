@@ -12,7 +12,7 @@ import zernikalos.ZDataType
 import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import zernikalos.components.ZTemplateComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZAlgebraObjectCollection
@@ -45,7 +45,7 @@ interface IZUniform {
 }
 
 @JsExport
-class ZUniformBlock internal constructor(data: ZUniformBlockData): ZTemplateComponent<ZUniformBlockData, ZUniformBlockRenderer>(data) {
+class ZUniformBlock internal constructor(data: ZUniformBlockData): ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data) {
 
     val uniforms: List<IZUniform> by data::uniforms
 

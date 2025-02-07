@@ -51,16 +51,16 @@ class ZModel: ZObject() {
     override fun internalInitialize(ctx: ZContext) {
         renderer = ZModelRenderer(ctx.renderingContext, this)
 
-        val enabler = buildShaderParameters()
+        val shaderProgramParams = buildShaderParameters()
 
         if (hasSkeleton) {
             skeleton?.initialize(ctx.renderingContext)
         }
 
         val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)
-        shaderSourceGenerator.generate(enabler, shaderProgram)
+        shaderSourceGenerator.generate(shaderProgramParams, shaderProgram)
 
-        enableRequiredBuffers(enabler)
+        enableRequiredBuffers(shaderProgramParams)
 
         logger.debug("[$name] Enabled buffers:\n${
             mesh.buffers.values.filter { it.enabled }.joinToString(separator = ",\n") { it.toString() }

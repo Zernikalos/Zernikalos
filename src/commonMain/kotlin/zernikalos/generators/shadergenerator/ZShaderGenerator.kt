@@ -38,25 +38,25 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         buildShaderSource(enabler, shaderProgram.shaderSource)
     }
 
-    private fun addRequiredAttributes(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
+    private fun addRequiredAttributes(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.addAttribute(ZAttrIndices)
-        if (enabler.usePosition) shaderProgram.addAttribute(ZAttrPosition)
-        if (enabler.useNormals) shaderProgram.addAttribute(ZAttrNormal)
-        if (enabler.useTextures) shaderProgram.addAttribute(ZAttrUv)
-        if (enabler.useColors) shaderProgram.addAttribute(ZAttrColor)
-        if (enabler.useSkinning) {
+        if (params.usePosition) shaderProgram.addAttribute(ZAttrPosition)
+        if (params.useNormals) shaderProgram.addAttribute(ZAttrNormal)
+        if (params.useTextures) shaderProgram.addAttribute(ZAttrUv)
+        if (params.useColors) shaderProgram.addAttribute(ZAttrColor)
+        if (params.useSkinning) {
             shaderProgram.addAttribute(ZAttrBoneIndices)
             shaderProgram.addAttribute(ZAttrBoneWeight)
         }
     }
 
-    private fun addRequiredUniforms(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
+    private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
-        if (enabler.useSkinning) {
-            shaderProgram.addUniform("Bones", ZBonesMatrixArray(enabler.maxBones))
-            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(enabler.maxBones))
+        if (params.useSkinning) {
+            shaderProgram.addUniform("Bones", ZBonesMatrixArray(params.maxBones))
+            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(params.maxBones))
         }
     }
 
@@ -66,6 +66,6 @@ internal abstract class ZShaderGenerator(): ZLoggable {
      * @param enabler A ZAttributesEnabler instance that determines which attributes should be included in the shader source.
      * @param source A ZShaderSource instance that will be populated with the constructed shader code.
      */
-    protected abstract fun buildShaderSource(enabler: ZShaderSourceParameters, source: ZShaderSource)
+    protected abstract fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource)
 
 }
