@@ -21,7 +21,6 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZS
     actual override fun initialize() {
     }
 
-
     actual fun initialize(source: ZShaderSource) {
         val type: ZGlShaderType = if (data.type == ZShaderType.VERTEX_SHADER) ZGlShaderType.VERTEX_SHADER else ZGlShaderType.FRAGMENT_SHADER
         val shad = createShader(ctx, type)

@@ -15,6 +15,10 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
+fun ZUniform.bindValue() {
+    renderer.bindValue()
+}
+
 actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData>(ctx, data) {
 
     lateinit var uniformId: GLWrap

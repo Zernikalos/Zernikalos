@@ -10,6 +10,7 @@ package zernikalos.components.shader
 
 import zernikalos.components.ZComponentRender
 import zernikalos.context.*
+import zernikalos.math.ZAlgebraObjectCollection
 
 actual class ZUniformBlockRenderer actual constructor(
     ctx: ZRenderingContext,
@@ -31,15 +32,17 @@ actual class ZUniformBlockRenderer actual constructor(
         bind()
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
 
-        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.value.byteSize, BufferUsageType.DYNAMIC_DRAW)
+        val algObj = data.value as ZAlgebraObjectCollection
+        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, algObj.byteSize, BufferUsageType.DYNAMIC_DRAW)
         ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, uniformBlockIndex, ubo!!)
     }
 
     actual override fun bind() {
         ctx as ZGLRenderingContext
 
+        val algObj = data.value as ZAlgebraObjectCollection
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
-        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.value.byteArray, BufferUsageType.DYNAMIC_DRAW)
+        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, algObj.byteArray, BufferUsageType.DYNAMIC_DRAW)
     }
 
     actual override fun unbind() {

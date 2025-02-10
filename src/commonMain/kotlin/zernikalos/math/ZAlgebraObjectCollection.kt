@@ -26,7 +26,7 @@ import kotlin.js.JsName
  * @property dataSize The total number of elements allocated in the collection.
  */
 @JsExport
-class ZAlgebraObjectCollection(dataSize: Int): ZAlgebraObject {
+class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
 
     private var _dataType: ZDataType = ZTypes.FLOAT
 

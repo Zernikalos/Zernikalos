@@ -41,7 +41,8 @@ fun ZInverseBindMatrixArray(count: Int): ZUniform {
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
-class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data) {
+class ZUniform internal constructor(data: ZUniformData):
+    ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data), ZBaseUniform {
 
     @JsName("initWithArgs")
     constructor(id: Int, uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(id, uniformName, count, dataType))
@@ -52,12 +53,12 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
      * Represents the unique identifier for a `ZUniform` instance.
      * This ID is used to differentiate between different uniform components
      */
-    var id: Int by data::id
+    override var id: Int by data::id
 
     /**
      * This is the name within the shader source code
      */
-    var uniformName: String by data::uniformName
+    override var uniformName: String by data::uniformName
 
     /**
      * How many elements of this will be used
@@ -69,7 +70,7 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
      */
     var dataType: ZDataType by data::dataType
 
-    var value: ZAlgebraObject
+    override var value: ZAlgebraObject
         get() = data.value!!
         set(value) {
             data.value = value
@@ -80,7 +81,7 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
     }
 
     fun bindValue(value: ZAlgebraObject) {
-        this.value = value
+        data.value = value
     }
 
     override fun toString(): String {

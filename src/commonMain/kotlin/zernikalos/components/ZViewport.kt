@@ -54,10 +54,6 @@ internal constructor(data: ZViewportData):
         return ZViewportRenderer(ctx, data)
     }
 
-    override fun render() {
-        renderer.render()
-    }
-
     override fun onViewportResize(width: Int, height: Int) {
         data.viewBox.width = width
         data.viewBox.height = height

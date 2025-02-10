@@ -8,7 +8,6 @@
 
 package zernikalos.components.shader
 
-import zernikalos.ZDataType
 import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
@@ -17,77 +16,60 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZAlgebraObjectCollection
 import kotlin.js.JsExport
+import kotlin.js.JsName
+
+// TODO: Usa dos gets, en vez de un accessor con un "." usa simplemente [unifA][unifB]
 
 @JsExport
-interface IZUniform {
-    /**
-     * Represents the unique identifier for a `ZUniform` instance.
-     * This ID is used to differentiate between different uniform components
-     */
-    var id: Int
+class ZUniformBlock internal constructor(data: ZUniformBlockData):
+    ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data), ZBaseUniform {
 
-    /**
-     * This is the name within the shader source code
-     */
-    var uniformName: String
+    val uniforms: MutableMap<String, ZBaseUniform> by data::uniforms
 
-    /**
-     * How many elements of this will be used
-     */
-    var count: Int
+    override val id: Int = 0
 
-    /**
-     * The datatype of all individual elements used by this uniform
-     */
-    var dataType: ZDataType
+    override val uniformName: String by data::uniformBlockName
 
-    var value: ZAlgebraObject
-}
+    override var value: ZAlgebraObject by data::value
 
-@JsExport
-class ZUniformBlock internal constructor(data: ZUniformBlockData): ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data) {
+    operator fun set(uniformName: String, value: ZBaseUniform) {
+        data.uniforms[uniformName] = value
+    }
 
-    val uniforms: List<IZUniform> by data::uniforms
-
-    val value: ZAlgebraObjectCollection by data::value
+    @JsName("bindValue")
+    operator fun set(uniformName: String, value: ZAlgebraObject) {
+        data.uniforms[uniformName]?.value = value
+    }
 
     override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
         return ZUniformBlockRenderer(ctx, data)
-    }
-
-    fun addUniform(uniform: IZUniform) {
-        data.addUniform(uniform)
     }
 
 }
 
 data class ZUniformBlockData(
     val uniformBlockName: String,
-    val uniforms: ArrayList<IZUniform>
+    val uniforms: HashMap<String, ZBaseUniform>
 ): ZComponentData() {
 
     val count: Int = uniforms.size
 
-    private val requiredFloatSpace: Int
-        get() = uniforms.sumOf { it.value.size }
+    private val requiredDataSize: Int
+        get() = uniforms.values.sumOf { it.value.size }
 
-    private var _value = ZAlgebraObjectCollection(requiredFloatSpace)
+    private var _value = ZAlgebraObjectCollection(requiredDataSize)
 
-    val value: ZAlgebraObjectCollection
+    var value: ZAlgebraObject
         get() {
-            _value.copyAll(uniforms.sortedBy { it.id }.map { it.value })
+            if (_value.dataSize != requiredDataSize) {
+                _value = ZAlgebraObjectCollection(requiredDataSize)
+            }
+            _value.copyAll(uniforms.values.sortedBy { it.id }.map { it.value })
             return _value
         }
-
-    init {
-        uniforms.sortBy { it.id }
-    }
-
-    fun addUniform(uniform: IZUniform) {
-        uniforms.add(uniform)
-        uniforms.sortBy { it.id }
-        _value = ZAlgebraObjectCollection(requiredFloatSpace)
-    }
+        set(value) {
+            _value = value as ZAlgebraObjectCollection
+        }
 }
 
 expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRender<ZUniformBlockData> {
