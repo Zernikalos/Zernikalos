@@ -26,13 +26,13 @@ class ZMatrix4(): ZAlgebraObject {
     override val dataType: ZDataType
         get() = ZTypes.MAT4F
 
-    override val values: FloatArray = FloatArray(16)
+    override val floatArray: FloatArray = FloatArray(16)
 
     override val count: Int
         get() = 1
 
     override val size: Int
-        get() = values.size
+        get() = floatArray.size
 
     init {
         identity()
@@ -69,7 +69,7 @@ class ZMatrix4(): ZAlgebraObject {
      * @return The float value at the specified index.
      */
     operator fun get(i: Int): Float {
-        return values[i]
+        return floatArray[i]
     }
 
     /**
@@ -79,7 +79,7 @@ class ZMatrix4(): ZAlgebraObject {
      * @return The float value at the specified index.
      */
     operator fun set(i: Int, v: Float) {
-        values[i] = v
+        floatArray[i] = v
     }
 
     /**
@@ -92,7 +92,7 @@ class ZMatrix4(): ZAlgebraObject {
     @JsName("getIJ")
     operator fun get(i: Int, j: Int): Float {
         val k = 4 * j + i
-        return values[k]
+        return floatArray[k]
     }
 
     /**
@@ -105,7 +105,7 @@ class ZMatrix4(): ZAlgebraObject {
     @JsName("setIJ")
     operator fun set(i: Int, j: Int, v: Float) {
         val k = 4 * j + i
-        values[k] = v
+        floatArray[k] = v
     }
 
     /**
@@ -221,18 +221,18 @@ class ZMatrix4(): ZAlgebraObject {
     }
 
     override fun toString(): String {
-        return this.values.contentToString()
+        return this.floatArray.contentToString()
     }
 
     private fun copyFromValues(values: FloatArray) {
         values.forEachIndexed { index, value ->
-            this.values[index] = value
+            this.floatArray[index] = value
         }
     }
 
     private fun copyFromValues(values: Array<Float>) {
         values.forEachIndexed { index, value ->
-            this.values[index] = value
+            this.floatArray[index] = value
         }
     }
 
@@ -260,25 +260,25 @@ class ZMatrix4(): ZAlgebraObject {
          * @param result The matrix to be set as the identity matrix.
          */
         fun identity(result: ZMatrix4) {
-            result.values[0]  = 1.0f
-            result.values[1]  = 0.0f
-            result.values[2]  = 0.0f
-            result.values[3]  = 0.0f
+            result.floatArray[0]  = 1.0f
+            result.floatArray[1]  = 0.0f
+            result.floatArray[2]  = 0.0f
+            result.floatArray[3]  = 0.0f
 
-            result.values[4]  = 0.0f
-            result.values[5]  = 1.0f
-            result.values[6]  = 0.0f
-            result.values[7]  = 0.0f
+            result.floatArray[4]  = 0.0f
+            result.floatArray[5]  = 1.0f
+            result.floatArray[6]  = 0.0f
+            result.floatArray[7]  = 0.0f
 
-            result.values[8]  = 0.0f
-            result.values[9]  = 0.0f
-            result.values[10] = 1.0f
-            result.values[11] = 0.0f
+            result.floatArray[8]  = 0.0f
+            result.floatArray[9]  = 0.0f
+            result.floatArray[10] = 1.0f
+            result.floatArray[11] = 0.0f
 
-            result.values[12] = 0.0f
-            result.values[13] = 0.0f
-            result.values[14] = 0.0f
-            result.values[15] = 1.0f
+            result.floatArray[12] = 0.0f
+            result.floatArray[13] = 0.0f
+            result.floatArray[14] = 0.0f
+            result.floatArray[15] = 1.0f
         }
 
         /**
@@ -290,7 +290,7 @@ class ZMatrix4(): ZAlgebraObject {
          */
         fun add(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
-                result.values[i] = m1.values[i] + m2.values[i]
+                result.floatArray[i] = m1.floatArray[i] + m2.floatArray[i]
             }
         }
 
@@ -303,7 +303,7 @@ class ZMatrix4(): ZAlgebraObject {
          */
         fun subtract(result: ZMatrix4, m1: ZMatrix4, m2: ZMatrix4) {
             for (i in 0..15) {
-                result.values[i] = m1.values[i] - m2.values[i]
+                result.floatArray[i] = m1.floatArray[i] - m2.floatArray[i]
             }
         }
 
@@ -316,14 +316,14 @@ class ZMatrix4(): ZAlgebraObject {
          */
         fun mult(result: ZMatrix4, lm: ZMatrix4, rm: ZMatrix4) {
             for (i in 0 .. 3) {
-                val rm_i0 = rm.values[4 * i]
+                val rm_i0 = rm.floatArray[4 * i]
                 var ri0 = lm[0] * rm_i0
                 var ri1 = lm[1] * rm_i0
                 var ri2 = lm[2] * rm_i0
                 var ri3 = lm[3] * rm_i0
 
                 for (j in 1..3) {
-                    val rm_ij = rm.values[j + 4 * i]
+                    val rm_ij = rm.floatArray[j + 4 * i]
                     ri0 += lm[4 * j] * rm_ij
                     ri1 += lm[1 + 4 * j] * rm_ij
                     ri2 += lm[2 + 4 * j] * rm_ij
@@ -349,10 +349,10 @@ class ZMatrix4(): ZAlgebraObject {
         fun transpose(result: ZMatrix4, m: ZMatrix4) {
             for (i in 0..3) {
                 val k = i * 4
-                result.values[i] = m.values[k]
-                result.values[i + 4] = m.values[k + 1]
-                result.values[i + 8] = m.values[k + 2]
-                result.values[i + 12] = m.values[k + 3]
+                result.floatArray[i] = m.floatArray[k]
+                result.floatArray[i + 4] = m.floatArray[k + 1]
+                result.floatArray[i + 8] = m.floatArray[k + 2]
+                result.floatArray[i + 12] = m.floatArray[k + 3]
             }
         }
 
@@ -365,9 +365,9 @@ class ZMatrix4(): ZAlgebraObject {
                     val k1 = 4 * j + i
                     // (j, i)
                     val k2 = 4 * i + j
-                    val tmp = result.values[k2]
-                    result.values[k2] = result.values[k1]
-                    result.values[k1] = tmp
+                    val tmp = result.floatArray[k2]
+                    result.floatArray[k2] = result.floatArray[k1]
+                    result.floatArray[k1] = tmp
                 }
             }
         }
@@ -398,7 +398,7 @@ class ZMatrix4(): ZAlgebraObject {
         @JsName("translateByVectorCopy")
         fun translate(result: ZMatrix4, m: ZMatrix4, translation: ZVector3) {
             for (i in 0..m.size) {
-                result.values[i] = m.values[i]
+                result.floatArray[i] = m.floatArray[i]
             }
             innerTranslate(result, translation.x, translation.y, translation.z)
         }
@@ -413,15 +413,15 @@ class ZMatrix4(): ZAlgebraObject {
         }
 
         private fun innerTranslate(result: ZMatrix4, x: Float, y: Float, z: Float) {
-            result.values[12] += x
-            result.values[13] += y
-            result.values[14] += z
+            result.floatArray[12] += x
+            result.floatArray[13] += y
+            result.floatArray[14] += z
         }
 
         private fun setInnerTranslation(result: ZMatrix4, x: Float, y: Float, z: Float) {
-            result.values[12] = x
-            result.values[13] = y
-            result.values[14] = z
+            result.floatArray[12] = x
+            result.floatArray[13] = y
+            result.floatArray[14] = z
         }
 
         /**
@@ -433,7 +433,7 @@ class ZMatrix4(): ZAlgebraObject {
         fun rotate(result: ZMatrix4, q: ZQuaternion) {
             val rotQuat = ZMatrix4()
             fromQuaternion(rotQuat, q)
-            val aux = ZMatrix4(result.values)
+            val aux = ZMatrix4(result.floatArray)
             mult(result, aux, rotQuat)
         }
 
@@ -486,22 +486,22 @@ class ZMatrix4(): ZAlgebraObject {
          */
         fun invert(result: ZMatrix4, m: ZMatrix4): Boolean {
             // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
-            val src0  = m.values[0]
-            val src4  = m.values[1]
-            val src8  = m.values[2]
-            val src12 = m.values[3]
-            val src1  = m.values[4]
-            val src5  = m.values[5]
-            val src9  = m.values[6]
-            val src13 = m.values[7]
-            val src2  = m.values[8]
-            val src6  = m.values[9]
-            val src10 = m.values[10]
-            val src14 = m.values[11]
-            val src3  = m.values[12]
-            val src7  = m.values[13]
-            val src11 = m.values[14]
-            val src15 = m.values[15]
+            val src0  = m.floatArray[0]
+            val src4  = m.floatArray[1]
+            val src8  = m.floatArray[2]
+            val src12 = m.floatArray[3]
+            val src1  = m.floatArray[4]
+            val src5  = m.floatArray[5]
+            val src9  = m.floatArray[6]
+            val src13 = m.floatArray[7]
+            val src2  = m.floatArray[8]
+            val src6  = m.floatArray[9]
+            val src10 = m.floatArray[10]
+            val src14 = m.floatArray[11]
+            val src3  = m.floatArray[12]
+            val src7  = m.floatArray[13]
+            val src11 = m.floatArray[14]
+            val src15 = m.floatArray[15]
 
             // calculate pairs for first 8 elements (cofactors)
             val atmp0  = src10 * src15

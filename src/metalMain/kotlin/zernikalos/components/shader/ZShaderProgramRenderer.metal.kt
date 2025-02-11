@@ -75,7 +75,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         data.uniforms.singles.forEach { uniform ->
             // Memory pointer where to copy the content from uniform pinned data
             val contentPointer = uniformBuffer?.contents().rawValue + offset
-            uniform.value?.values?.usePinned { pinned ->
+            uniform.value?.floatArray?.usePinned { pinned ->
                 // Dest, Src and how many bytes
                 memcpy(
                     interpretCPointer<CPointed>(contentPointer),

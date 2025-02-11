@@ -19,9 +19,8 @@ interface ZAlgebraObject {
      */
     val dataType: ZDataType
 
-    // TODO: Rename as floatArray, also add byteArray
-    val values: FloatArray
-
+    val floatArray: FloatArray
+    
     /**
      * Number of elements contained within the values array with the specific type
      * defined in dataType

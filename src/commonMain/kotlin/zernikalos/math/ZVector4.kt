@@ -62,7 +62,7 @@ class ZVector4(): ZAlgebraObject {
     @JsName("initWithVec3")
     constructor(v: ZVector3) : this(v.x, v.y, v.z, 1.0f)
 
-    override val values: FloatArray
+    override val floatArray: FloatArray
         get() = _values
 
     val norm2: Float

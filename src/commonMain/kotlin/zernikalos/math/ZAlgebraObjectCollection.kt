@@ -32,7 +32,7 @@ class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
 
     private var _count: Int = 1
 
-    override val values: FloatArray = FloatArray(dataSize)
+    override val floatArray: FloatArray = FloatArray(dataSize)
 
     val byteArray: ByteArray = ByteArray(dataSize * ZTypes.FLOAT.byteSize)
 
@@ -77,8 +77,8 @@ class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
             throw Error("Unable to add object of type ${value.dataType.type} into a collection of ${dataType.type}")
         }
 
-        value.values.copyInto(values, index * size)
-        copyFloatArrayIntoByteArray(value.values, byteArray, index * size)
+        value.floatArray.copyInto(floatArray, index * size)
+        copyFloatArrayIntoByteArray(value.floatArray, byteArray, index * size)
     }
 
     /**

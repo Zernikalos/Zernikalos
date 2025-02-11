@@ -10,7 +10,6 @@ package zernikalos.math
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -63,7 +62,7 @@ class ZQuaternion(): ZAlgebraObject {
         this.z = z
     }
 
-    override val values: FloatArray
+    override val floatArray: FloatArray
         get() = _values
 
     override val size: Int
@@ -270,7 +269,7 @@ class ZQuaternion(): ZAlgebraObject {
 
         //TODO: Optimize this method
         fun fromMatrix4(result: ZQuaternion, m: ZMatrix4) {
-            val v = m.values
+            val v = m.floatArray
             val m00 = v[0]
             val m01 = v[4]
             val m02 = v[8]

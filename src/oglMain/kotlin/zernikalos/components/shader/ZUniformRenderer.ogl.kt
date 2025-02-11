@@ -42,7 +42,7 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
             return
         }
         when (data.dataType) {
-            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.values)
+            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.floatArray)
             else -> return
         }
     }
