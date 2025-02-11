@@ -201,6 +201,28 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         )
     }
 
+    actual fun getUniformBlockIndex(
+        program: GLWrap,
+        uniformBlockName: String
+    ): GLWrap {
+        TODO("Not yet implemented")
+    }
+
+    actual fun bindBufferBase(
+        targetType: BufferTargetType,
+        uniformBlockIndex: GLWrap,
+        uniformBufferObject: GLWrap
+    ) {
+    }
+
+    @JsName("emptyBufferData")
+    actual fun bufferData(
+        targetType: BufferTargetType,
+        byteSize: Int,
+        usageType: BufferUsageType
+    ) {
+    }
+
 }
 
 actual object ExpectEnabler {
@@ -210,10 +232,12 @@ actual object ExpectEnabler {
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = WebGLRenderingContext.ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER
+    actual val UNIFORM_BUFFER: Int = -1
 }
 
 actual object ExpectBufferUsageType {
     actual val STATIC_DRAW: Int = WebGLRenderingContext.STATIC_DRAW
+    actual val DYNAMIC_DRAW: Int = WebGLRenderingContext.DYNAMIC_DRAW
 }
 
 actual object ExpectBufferBit {

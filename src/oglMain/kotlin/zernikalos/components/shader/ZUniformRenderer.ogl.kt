@@ -17,22 +17,23 @@ import zernikalos.logger.logger
 
 actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData>(ctx, data) {
 
-    lateinit var uniformId: GLWrap
+    lateinit private var _uniformId: GLWrap
 
     actual override fun initialize() {
     }
 
-    fun bindLocation(programId: GLWrap) {
-        ctx as ZGLRenderingContext
-        uniformId = ctx.getUniformLocation(programId, data.uniformName)
-        if (uniformId.isValid) {
-            logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
-        } else {
-            logger.debug("Invalid uniform ${data.uniformName}")
+    var uniformId: GLWrap
+        get() = _uniformId
+        set(value) {
+            _uniformId = value
+            if (uniformId.isValid) {
+                logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
+            } else {
+                logger.debug("Invalid uniform ${data.uniformName}")
+            }
         }
-    }
 
-    fun bindValue() {
+    override fun bind() {
         ctx as ZGLRenderingContext
         if (data.value == null) {
             return
@@ -41,7 +42,7 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: Z
             return
         }
         when (data.dataType) {
-            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.values)
+            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.floatArray)
             else -> return
         }
     }

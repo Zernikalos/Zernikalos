@@ -14,12 +14,22 @@ import kotlin.js.JsExport
 @JsExport
 interface ZAlgebraObject {
 
+    /**
+     * The data type stored
+     */
     val dataType: ZDataType
 
-    val values: FloatArray
-
+    val floatArray: FloatArray
+    
+    /**
+     * Number of elements contained within the values array with the specific type
+     * defined in dataType
+     */
     val size: Int
 
+    /**
+     * Number of individual instances this object represents
+     */
     val count: Int
 
 }

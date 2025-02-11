@@ -1,0 +1,100 @@
+/*
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package zernikalos.components.shader
+
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZRenderizableComponent
+import zernikalos.context.ZRenderingContext
+import zernikalos.math.ZAlgebraObject
+import zernikalos.math.ZAlgebraObjectCollection
+import kotlin.js.JsExport
+import kotlin.js.JsName
+
+@Serializable(with = ZUniformBlockSerializer::class)
+@JsExport
+class ZUniformBlock internal constructor(data: ZUniformBlockData):
+    ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data), ZBaseUniform {
+
+    val uniforms: MutableMap<String, ZBaseUniform> by data::uniforms
+
+    override val id: Int = 0
+
+    override val uniformName: String by data::uniformBlockName
+
+    override var value: ZAlgebraObject by data::value
+
+    operator fun set(uniformName: String, value: ZBaseUniform) {
+        data.uniforms[uniformName] = value
+    }
+
+    @JsName("bindValue")
+    operator fun set(uniformName: String, value: ZAlgebraObject) {
+        data.uniforms[uniformName]?.value = value
+    }
+
+    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
+        return ZUniformBlockRenderer(ctx, data)
+    }
+
+}
+
+@Serializable
+data class ZUniformBlockData(
+    val uniformBlockName: String,
+    val uniforms: HashMap<String, ZBaseUniform>
+): ZComponentData() {
+
+    val count: Int = uniforms.size
+
+    private val requiredDataSize: Int
+        get() = uniforms.values.sumOf { it.value.size }
+
+    @Transient
+    private var _value = ZAlgebraObjectCollection(requiredDataSize)
+
+    var value: ZAlgebraObject
+        get() {
+            if (_value.dataSize != requiredDataSize) {
+                _value = ZAlgebraObjectCollection(requiredDataSize)
+            }
+            _value.copyAll(uniforms.values.sortedBy { it.id }.map { it.value })
+            return _value
+        }
+        set(value) {
+            _value = value as ZAlgebraObjectCollection
+        }
+}
+
+expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRender<ZUniformBlockData> {
+
+    override fun initialize()
+
+    override fun bind()
+
+    override fun unbind()
+
+    override fun render()
+
+}
+
+class ZUniformBlockSerializer: ZComponentSerializer<ZUniformBlock, ZUniformBlockData>() {
+    override val kSerializer: KSerializer<ZUniformBlockData>
+        get() = ZUniformBlockData.serializer()
+
+    override fun createComponentInstance(data: ZUniformBlockData): ZUniformBlock {
+        return ZUniformBlock(data)
+    }
+
+}

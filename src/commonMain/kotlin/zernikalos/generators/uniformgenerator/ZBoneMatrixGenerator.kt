@@ -40,7 +40,7 @@ class ZBoneMatrixGenerator: ZUniformGenerator {
         }
 
         val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)
-        boneCollection.addAll(0, boneMatrices)
+        boneCollection.copyAllFromIndex(0, boneMatrices)
 
         return boneCollection
     }

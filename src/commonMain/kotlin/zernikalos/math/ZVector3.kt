@@ -64,7 +64,7 @@ class ZVector3(): ZAlgebraObject {
         fromVec4(this, v4)
     }
 
-    override val values: FloatArray
+    override val floatArray: FloatArray
         get() = floatArrayOf(x, y, z)
 
     val norm2: Float

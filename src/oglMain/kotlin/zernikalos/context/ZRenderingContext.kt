@@ -64,6 +64,10 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray)
 
+    fun getUniformBlockIndex(program: GLWrap, uniformBlockName: String): GLWrap
+
+    fun bindBufferBase(targetType: BufferTargetType, uniformBlockIndex: GLWrap, uniformBufferObject: GLWrap)
+
     /** VBO **/
 
     fun createBuffer(): GLWrap
@@ -71,6 +75,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
     fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap)
 
     fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType)
+
+    fun bufferData(targetType: BufferTargetType, byteSize: Int, usageType: BufferUsageType)
 
     fun enableVertexAttrib(index: Int)
 
@@ -118,12 +124,14 @@ enum class BufferTargetType(val value: Int) {
     @SerialName("array")
     ARRAY_BUFFER(ExpectBufferTargetType.ARRAY_BUFFER),
     @SerialName("element")
-    ELEMENT_ARRAY_BUFFER(ExpectBufferTargetType.ELEMENT_ARRAY_BUFFER)
+    ELEMENT_ARRAY_BUFFER(ExpectBufferTargetType.ELEMENT_ARRAY_BUFFER),
+    UNIFORM_BUFFER(ExpectBufferTargetType.UNIFORM_BUFFER)
 }
 
 expect object ExpectBufferTargetType {
     val ARRAY_BUFFER: Int
     val ELEMENT_ARRAY_BUFFER: Int
+    val UNIFORM_BUFFER: Int
 }
 
 enum class Enabler(val value: Int) {
@@ -133,7 +141,8 @@ enum class Enabler(val value: Int) {
 @JsExport
 enum class BufferUsageType(val value: Int) {
     @SerialName("static-draw")
-    STATIC_DRAW(ExpectBufferUsageType.STATIC_DRAW)
+    STATIC_DRAW(ExpectBufferUsageType.STATIC_DRAW),
+    DYNAMIC_DRAW(ExpectBufferUsageType.DYNAMIC_DRAW)
 }
 
 enum class BufferBit(val value: Int) {
@@ -168,6 +177,7 @@ expect object ExpectShaderType {
 
 expect object ExpectBufferUsageType {
     val STATIC_DRAW: Int
+    val DYNAMIC_DRAW: Int
 }
 
 expect object ExpectDrawModes {

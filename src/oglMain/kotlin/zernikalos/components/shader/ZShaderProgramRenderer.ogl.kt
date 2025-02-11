@@ -24,9 +24,6 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
 
     val program: ZProgram = ZProgram()
 
-    val programId: GLWrap
-        get() = program.renderer.programId
-
     actual override fun initialize() {
         ctx as ZGLRenderingContext
 
@@ -42,20 +39,23 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
 
         data.attributes.values.forEach { attr ->
             attr.initialize(ctx)
-            attr.renderer.bindLocation(programId)
+            attr.renderer.bindLocation(program.renderer.programId)
         }
 
         program.link()
-        data.uniforms.values.forEach { uniform ->
+        data.uniforms.singles.forEach { uniform ->
             uniform.initialize(ctx)
-            uniform.renderer.bindLocation(programId)
+            uniform.renderer.uniformId = ctx.getUniformLocation(
+                program.renderer.programId,
+                uniform.uniformName
+            )
         }
     }
 
     actual override fun bind() {
         program.bind()
-        data.uniforms.values.forEach { uniform ->
-            uniform.renderer.bindValue()
+        data.uniforms.singles.forEach { uniform ->
+            uniform.renderer.bind()
         }
     }
 

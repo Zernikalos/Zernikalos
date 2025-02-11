@@ -28,7 +28,7 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizab
 
     val attributes: Map<String, ZAttribute> by data::attributes
 
-    val uniforms: Map<String, ZUniform> by data::uniforms
+    val uniforms: ZUniformCollection by data::uniforms
 
     val uniformsNames: Set<String>
         get() = uniforms.keys
@@ -48,7 +48,7 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizab
         data.uniforms[name] = uniform
     }
 
-    fun getUniform(name: String): ZUniform? {
+    fun getUniform(name: String): ZBaseUniform? {
         return data.uniforms[name]
     }
 
@@ -85,8 +85,8 @@ data class ZShaderProgramData(
     var shaderSource: ZShaderSource = ZShaderSource(),
     @ProtoNumber(3)
     val attributes: LinkedHashMap<String, ZAttribute> = LinkedHashMap(),
-    @ProtoNumber(4)
-    var uniforms: LinkedHashMap<String, ZUniform> = LinkedHashMap()
+    @Transient
+    var uniforms: ZUniformCollection = ZUniformCollection()
 ): ZComponentData()
 
 expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData> {

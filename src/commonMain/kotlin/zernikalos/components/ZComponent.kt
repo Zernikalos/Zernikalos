@@ -19,6 +19,20 @@ import zernikalos.utils.computeRefId
 import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
 
+@JsExport
+interface ZRef {
+    /**
+     * Represents the unique reference identifier for a component.
+     *
+     * @property refId The unique reference identifier for the component.
+     *
+     * @see ZComponent
+     * @see ZRefComponentSerializer
+     * @see ZLoaderContext
+     */
+    val refId: Int
+}
+
 /**
  * Represents a component in Zernikalos.
  *
@@ -58,20 +72,6 @@ interface ZComponent: ZRef {
      * @see ZRenderingContext
      */
     fun initialize(ctx: ZRenderingContext)
-}
-
-@JsExport
-interface ZRef {
-    /**
-     * Represents the unique reference identifier for a component.
-     *
-     * @property refId The unique reference identifier for the component.
-     *
-     * @see ZComponent
-     * @see ZRefComponentSerializer
-     * @see ZLoaderContext
-     */
-    val refId: Int
 }
 
 /**
@@ -162,15 +162,25 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender
         get() = internalRenderer as R
 
     override val isRenderizable: Boolean = true
+
+    abstract override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender?
 }
 
-/**
- * Represents a template for a Renderizable component in Zernikalos.
- *
- * @param R The type of ZComponentRender associated with the template
- * @property renderer The ZComponentRender associated with the component. Throws an error if the component has not been initialized prior to access the renderer
- */
 
+/**
+ * Represents an abstract base class for data objects associated with components in the Zernikalos Engine.
+ *
+ * This class provides a mechanism to calculate and cache a unique reference identifier (`refId`)
+ * for the data object, facilitating its usage in serialization, reference management, and
+ * other engine functionalities. The `refId` is computed lazily based on the object's string representation.
+ *
+ * Implementations of this class are commonly used as data containers in component-based architectures
+ * within the engine. These subclasses should define specific data structures and properties related
+ * to their components.
+ *
+ * Subclasses must override the `toString` method to provide the string representation required for
+ * computing the `refId`.
+ */
 @JsExport
 abstract class ZComponentData: ZLoggable, ZRef {
 
@@ -188,6 +198,10 @@ abstract class ZComponentData: ZLoggable, ZRef {
     abstract override fun toString(): String
 
 }
+
+/**
+ * RENDERER SECTION
+ */
 
 @JsExport
 abstract class ZBaseComponentRender: ZLoggable {
@@ -209,6 +223,10 @@ abstract class ZBaseComponentRender: ZLoggable {
 
 @JsExport
 abstract class ZComponentRender<D: ZComponentData>(ctx: ZRenderingContext, protected val data: D): ZBaseComponentRender(ctx)
+
+/**
+ * SERIALIZATION SECTION
+ */
 
 abstract class ZComponentSerializer<
     T: ZComponent,

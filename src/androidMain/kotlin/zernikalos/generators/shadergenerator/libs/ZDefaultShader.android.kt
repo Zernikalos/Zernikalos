@@ -9,6 +9,13 @@
 package zernikalos.generators.shadergenerator.libs
 
 const val defaultVertexShaderSource = """
+    
+uniform MatrixBlock
+{
+  mat4 projection;
+  mat4 modelview;
+} matrices;
+
 #ifdef USE_SKINNING
     uniform mat4 u_bones[100];
     uniform mat4 u_invBindMatrix[100];

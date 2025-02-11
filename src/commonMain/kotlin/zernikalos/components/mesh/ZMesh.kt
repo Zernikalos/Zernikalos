@@ -26,13 +26,15 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData): ZRenderizableComponent<ZMeshData, ZMeshRenderer>(data), ZBindeable, ZRenderizable {
+class ZMesh internal constructor(data: ZMeshData):
+    ZRenderizableComponent<ZMeshData, ZMeshRenderer>(data),
+    ZBindeable,
+    ZRenderizable {
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
      */
     val buffers: Map<String, ZBuffer> by data::buffers
-
 
     /**
      * Represents an index buffer for a ZMesh.
@@ -162,7 +164,7 @@ data class ZMeshData(
  */
 @Serializable
 @JsExport
-internal data class ZBufferKey(
+data class ZBufferKey(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)
@@ -190,7 +192,7 @@ internal data class ZBufferKey(
  */
 @Serializable
 @JsExport
-internal data class ZRawBuffer(
+data class ZRawBuffer(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)

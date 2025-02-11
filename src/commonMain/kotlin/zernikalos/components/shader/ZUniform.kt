@@ -23,35 +23,41 @@ import zernikalos.math.ZAlgebraObject
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-// TODO: These guys are incorrect, they need to provide a new uniform each time
 val ZUniformProjectionMatrix: ZUniform
-    get() = ZUniform("u_projMatrix", 1, ZTypes.MAT4F)
+    get() = ZUniform(0, "u_projMatrix", 1, ZTypes.MAT4F)
 val ZUniformViewMatrix: ZUniform
-    get() = ZUniform("u_viewMatrix", 1, ZTypes.MAT4F)
+    get() = ZUniform(1, "u_viewMatrix", 1, ZTypes.MAT4F)
 val ZUniformModelViewProjectionMatrix: ZUniform
-    get() = ZUniform("u_mvpMatrix", 1, ZTypes.MAT4F)
+    get() = ZUniform(2, "u_mvpMatrix", 1, ZTypes.MAT4F)
 
 fun ZBonesMatrixArray(count: Int): ZUniform {
-    return ZUniform("u_bones", count, ZTypes.MAT4F)
+    return ZUniform(5,"u_bones", count, ZTypes.MAT4F)
 }
 
 fun ZInverseBindMatrixArray(count: Int): ZUniform {
-    return ZUniform("u_invBindMatrix", count, ZTypes.MAT4F)
+    return ZUniform(6, "u_invBindMatrix", count, ZTypes.MAT4F)
 }
 
 @Serializable(with = ZUniformSerializer::class)
 @JsExport
-class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data) {
+class ZUniform internal constructor(data: ZUniformData):
+    ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data), ZBaseUniform {
 
     @JsName("initWithArgs")
-    constructor(uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(uniformName, count, dataType))
+    constructor(id: Int, uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(id, uniformName, count, dataType))
     @JsName("init")
     constructor(): this(ZUniformData())
 
     /**
+     * Represents the unique identifier for a `ZUniform` instance.
+     * This ID is used to differentiate between different uniform components
+     */
+    override var id: Int by data::id
+
+    /**
      * This is the name within the shader source code
      */
-    var uniformName: String by data::uniformName
+    override var uniformName: String by data::uniformName
 
     /**
      * How many elements of this will be used
@@ -63,16 +69,14 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
      */
     var dataType: ZDataType by data::dataType
 
-    var idx: Int by data::idx
-
-    var value: ZAlgebraObject? by data::value
+    override var value: ZAlgebraObject
+        get() = data.value!!
+        set(value) {
+            data.value = value
+        }
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
-    }
-
-    fun bindValue(value: ZAlgebraObject) {
-        this.value = value
     }
 
     override fun toString(): String {
@@ -83,14 +87,14 @@ class ZUniform internal constructor(data: ZUniformData): ZRenderizableComponent<
 
 @Serializable
 data class ZUniformData(
+    @ProtoNumber(4)
+    var id: Int = -1,
     @ProtoNumber(1)
     var uniformName: String = "",
     @ProtoNumber(2)
     var count: Int = -1,
     @ProtoNumber(3)
     var dataType: ZDataType = ZTypes.NONE,
-    @ProtoNumber(4)
-    var idx: Int = -1
 ): ZComponentData() {
 
     @Transient

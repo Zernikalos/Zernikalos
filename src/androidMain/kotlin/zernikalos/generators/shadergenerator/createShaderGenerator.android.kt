@@ -8,9 +8,9 @@
 
 package zernikalos.generators.shadergenerator
 
-actual fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator {
-    when (type) {
-        ZShaderGeneratorType.DEFAULT -> return ZDefaultShaderGenerator()
+internal actual fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator {
+    return when (type) {
+        ZShaderGeneratorType.DEFAULT -> ZDefaultShaderGenerator()
         else -> throw IllegalArgumentException("Unknown shader generator type: $type")
     }
 }

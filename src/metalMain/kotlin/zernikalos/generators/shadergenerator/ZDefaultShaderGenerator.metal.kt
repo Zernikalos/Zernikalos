@@ -11,7 +11,7 @@ package zernikalos.generators.shadergenerator
 import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.*
 
-class ZDefaultShaderGenerator : ZShaderGenerator() {
+internal class ZDefaultShaderGenerator : ZShaderGenerator() {
 
     private fun buildMacrosFromEnabler(enabler: ZShaderProgramParameters): String {
         var source = ""
