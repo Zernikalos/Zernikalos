@@ -23,7 +23,6 @@ import zernikalos.math.ZAlgebraObject
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-// TODO: These guys are incorrect, they need to provide a new uniform each time
 val ZUniformProjectionMatrix: ZUniform
     get() = ZUniform(0, "u_projMatrix", 1, ZTypes.MAT4F)
 val ZUniformViewMatrix: ZUniform
@@ -78,10 +77,6 @@ class ZUniform internal constructor(data: ZUniformData):
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
-    }
-
-    fun bindValue(value: ZAlgebraObject) {
-        data.value = value
     }
 
     override fun toString(): String {

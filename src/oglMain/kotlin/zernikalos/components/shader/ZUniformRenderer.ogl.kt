@@ -15,28 +15,25 @@ import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-fun ZUniform.bindValue() {
-    renderer.bindValue()
-}
-
 actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData>(ctx, data) {
 
-    lateinit var uniformId: GLWrap
+    lateinit private var _uniformId: GLWrap
 
     actual override fun initialize() {
     }
 
-    fun bindLocation(programId: GLWrap) {
-        ctx as ZGLRenderingContext
-        uniformId = ctx.getUniformLocation(programId, data.uniformName)
-        if (uniformId.isValid) {
-            logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
-        } else {
-            logger.debug("Invalid uniform ${data.uniformName}")
+    var uniformId: GLWrap
+        get() = _uniformId
+        set(value) {
+            _uniformId = value
+            if (uniformId.isValid) {
+                logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
+            } else {
+                logger.debug("Invalid uniform ${data.uniformName}")
+            }
         }
-    }
 
-    fun bindValue() {
+    override fun bind() {
         ctx as ZGLRenderingContext
         if (data.value == null) {
             return

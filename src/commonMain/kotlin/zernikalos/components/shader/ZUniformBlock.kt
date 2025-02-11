@@ -8,9 +8,13 @@
 
 package zernikalos.components.shader
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -18,8 +22,7 @@ import zernikalos.math.ZAlgebraObjectCollection
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-// TODO: Usa dos gets, en vez de un accessor con un "." usa simplemente [unifA][unifB]
-
+@Serializable(with = ZUniformBlockSerializer::class)
 @JsExport
 class ZUniformBlock internal constructor(data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data), ZBaseUniform {
@@ -47,6 +50,7 @@ class ZUniformBlock internal constructor(data: ZUniformBlockData):
 
 }
 
+@Serializable
 data class ZUniformBlockData(
     val uniformBlockName: String,
     val uniforms: HashMap<String, ZBaseUniform>
@@ -57,6 +61,7 @@ data class ZUniformBlockData(
     private val requiredDataSize: Int
         get() = uniforms.values.sumOf { it.value.size }
 
+    @Transient
     private var _value = ZAlgebraObjectCollection(requiredDataSize)
 
     var value: ZAlgebraObject
@@ -81,5 +86,15 @@ expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockDa
     override fun unbind()
 
     override fun render()
+
+}
+
+class ZUniformBlockSerializer: ZComponentSerializer<ZUniformBlock, ZUniformBlockData>() {
+    override val kSerializer: KSerializer<ZUniformBlockData>
+        get() = ZUniformBlockData.serializer()
+
+    override fun createComponentInstance(data: ZUniformBlockData): ZUniformBlock {
+        return ZUniformBlock(data)
+    }
 
 }

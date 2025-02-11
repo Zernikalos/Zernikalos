@@ -26,7 +26,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
     lateinit var fragmentShader: MTLFunctionProtocol
 
     private val uniformsSize: Int
-        get() = data.uniforms.values.fold(0) { acc, zUniform -> acc + zUniform.dataType.byteSize }
+        get() = data.uniforms.singles.asSequence().fold(0) { acc, zUniform -> acc + zUniform.dataType.byteSize }
 
     actual override fun initialize() {
         initializeShader()
@@ -36,7 +36,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
     private fun initializeUniformBuffer() {
         ctx as ZMtlRenderingContext
 
-        data.uniforms.values.forEach { uniform ->
+        data.uniforms.singles.forEach { uniform ->
             uniform.initialize(ctx)
         }
 
@@ -72,7 +72,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, d
         ctx as ZMtlRenderingContext
 
         var offset: Long = 0
-        data.uniforms.values.forEach { uniform ->
+        data.uniforms.singles.forEach { uniform ->
             // Memory pointer where to copy the content from uniform pinned data
             val contentPointer = uniformBuffer?.contents().rawValue + offset
             uniform.value?.values?.usePinned { pinned ->

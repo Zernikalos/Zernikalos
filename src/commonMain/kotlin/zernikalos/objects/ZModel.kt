@@ -104,8 +104,7 @@ class ZModel: ZObject() {
         shaderProgram.uniforms.forEach { (name, uniform) ->
             val uniformGenerator = ctx.sceneContext.getUniform(name)
             if (uniformGenerator != null) {
-                val uniformValue = uniformGenerator.compute(ctx.sceneContext, this)
-                uniform.bindValue(uniformValue)
+                uniform.value = uniformGenerator.compute(ctx.sceneContext, this)
             }
         }
 
