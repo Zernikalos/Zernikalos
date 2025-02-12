@@ -6,10 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-import java.net.URL
 import java.time.Year
 
 // Constants
@@ -31,7 +29,7 @@ plugins {
     id("org.jetbrains.kotlin.android") version libs.versions.kotlin.get() apply false
     id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
     id("maven-publish")
-    id("org.jetbrains.dokka") version libs.versions.dokka.get() apply true
+    id("org.jetbrains.dokka") version libs.versions.dokka.get()
     // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
@@ -201,27 +199,18 @@ fun getYear(): String {
     return Year.now().toString()
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    val dokkaBaseConfiguration = """
-    {
-      "customAssets": ["${file("docsAssets/logo-icon.svg")}"],
-      "customStyleSheets": ["${file("docsAssets/zk-docs-styles.css")}"],
-      "footerMessage": "© ${getYear()} $zernikalosNameCapital"
-    }
-    """
-    pluginsMapConfiguration.set(
-        mapOf(
-            // fully qualified plugin name to json configuration
-            "org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration
-        )
-    )
-
+dokka {
+    moduleName.set(zernikalosNameCapital)
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl.set(URL("https://github.com/Zernikalos/Zernikalos/tree/main/src"))
+            remoteUrl("https://github.com/Zernikalos/Zernikalos/tree/main/src")
             remoteLineSuffix.set("#L")
         }
     }
+    pluginsConfiguration.html {
+        customStyleSheets.from("docsAssets/zk-docs-styles.css")
+        customAssets.from("docsAssets/logo-icon.svg")
+        footerMessage.set("© ${getYear()} $zernikalosNameCapital")
+    }
 }
-
