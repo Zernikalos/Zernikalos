@@ -83,13 +83,6 @@ abstract class ZObject: ZTreeNode<ZObject>, ZLoggable {
     val isInitialized: Boolean
         get() = _initialized
 
-    // TODO: Ugly hack for assigning parent after load from exporter
-    init {
-        for (child in children) {
-            reparent(child)
-        }
-    }
-
     /**
      * Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.
      * It sets the object's state to initialized and recursively initializes all child objects.

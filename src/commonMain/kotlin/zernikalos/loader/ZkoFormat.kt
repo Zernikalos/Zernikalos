@@ -14,7 +14,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZSkeletalAction
 import kotlin.js.JsExport
 
-const val ZKO_VERSION = "0.3.0"
+const val ZKO_VERSION = "0.4.0"
 
 @JsExport
 @Serializable
@@ -32,6 +32,7 @@ data class ZkoHeader(
 @Serializable
 data class ZkoFormat(
     @ProtoNumber(1) val header: ZkoHeader,
-    @ProtoNumber(2) val data: ProtoZkObject,
-    @ProtoNumber(3) val actions: List<ZSkeletalAction>? = null
+    @ProtoNumber(3) val objects: Map<String, ZkoObjectProto>,
+    @ProtoNumber(4) val hierarchy: ZkoHierarchyNode,
+    @ProtoNumber(5) val actions: List<ZSkeletalAction>? = null
 )
