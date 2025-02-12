@@ -59,19 +59,22 @@ data class ZKo(
     val actions: List<ZSkeletalAction>? = null
 )
 
-@JsExport
-fun loadFromProtoString(hexString: String): ZObject {
-    val protoFormat = createSerializersModule()
-    return protoFormat.decodeFromHexString(ZkoFormat.serializer(), hexString).data.zObject
-}
-
-// TODO: These methods might not return ZObject but ZObject?
+/**
+ * Decodes a ByteArray into a [ZKo] object.
+ *
+ * This function parses the given byte array,
+ * extracts the header, objects, hierarchy, and actions, and reconstructs the
+ * root [ZObject] hierarchy.
+ *
+ * @param byteArray The byte array containing the serialized ZKo data.
+ * @return A [ZKo] instance reconstructed from the provided data.
+ */
 @JsExport
 fun loadFromProto(byteArray: ByteArray): ZKo {
     val protoFormat = createSerializersModule()
     val zkoFormat = protoFormat.decodeFromByteArray(ZkoFormat.serializer(), byteArray)
     val header = zkoFormat.header
-    val obj = zkoFormat.data.zObject
+    val obj = ZkoHierarchyNode.transformHierarchy(zkoFormat.hierarchy, zkoFormat.objects)
     val actions = zkoFormat.actions
     return ZKo(header, obj, actions)
 }

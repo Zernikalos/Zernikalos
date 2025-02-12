@@ -8,33 +8,28 @@
 
 package zernikalos.loader
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.objects.*
 
 @Serializable
-data class ProtoZkObject(
+data class ZkoObjectProto(
     @ProtoNumber(1) val type: String,
-    @ProtoNumber(2) val scene: ZScene?,
-    @ProtoNumber(3) val group: ZGroup?,
-    @Contextual @ProtoNumber(4) val model: ZModel?,
-    @ProtoNumber(5) val camera: ZCamera?,
-    @ProtoNumber(6) val skeleton: ZSkeleton?,
-    @ProtoNumber(100) val children: Array<ProtoZkObject>? = emptyArray()
+    @ProtoNumber(2) val refId: String,
+
+    @ProtoNumber(3) val scene: ZScene?,
+    @ProtoNumber(4) val group: ZGroup?,
+    @ProtoNumber(5) val model: ZModel?,
+    @ProtoNumber(6) val camera: ZCamera?,
+    @ProtoNumber(7) val skeleton: ZSkeleton?,
+    @ProtoNumber(100) val children: Array<ZkoObjectProto>? = emptyArray()
 ) {
     val zObject: ZObject
         get() {
             val obj = detectZObject()
-            fillChildren(obj)
             return obj
         }
 
-    private fun fillChildren(obj: ZObject) {
-        children?.forEach { child ->
-            obj.addChild(child.zObject)
-        }
-    }
     private fun detectZObject(): ZObject {
         when (type) {
             ZObjectType.SCENE.name -> return scene!!
