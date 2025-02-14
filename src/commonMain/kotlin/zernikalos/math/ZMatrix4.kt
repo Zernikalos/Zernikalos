@@ -220,8 +220,16 @@ class ZMatrix4(): ZAlgebraObject {
         scale(this, this, x, y, z)
     }
 
-    override fun toString(): String {
-        return this.floatArray.contentToString()
+    override fun toString(): String = buildString {
+        for (i in 0..3) {
+            append("[ ")
+            for (j in 0..3) {
+                val value = this@ZMatrix4[i, j]
+                val rounded = (value * 100).toInt() / 100.0
+                append(rounded).append(" ")
+            }
+            append("]\n")
+        }
     }
 
     private fun copyFromValues(values: FloatArray) {

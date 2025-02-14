@@ -75,30 +75,51 @@ class ZTransform() {
             _right.normalize()
         }
 
+    /**
+     * Represents the position of the object in a 3D space.
+     *
+     * @see ZVector3
+     */
     var position: ZVector3
         get() = _position
         set(value) {
             _position.copy(value)
         }
 
+    /**
+     * Represents the rotation of the object in a 3D space.
+     *
+     * @see ZQuaternion
+     */
     var rotation: ZQuaternion
         get() = _rotation
         set(value) {
             _rotation.copy(value)
+            _rotation.normalize()
             updateLocalAxis()
         }
 
+    /**
+     * Represents the scale of the object in a 3D space.
+     *
+     * @see ZVector3
+     */
     var scale: ZVector3
         get() = _scale
         set(value) {
             _scale.copy(value)
         }
 
+    /**
+     * Represents the transformation matrix that defines local transformation of an object in a 3D space.
+     *
+     * @see ZMatrix4
+     */
     val matrix: ZMatrix4
         get() {
             ZMatrix4.identity(_matrix)
             ZMatrix4.setTranslation(_matrix, _position)
-            ZMatrix4.rotate(_matrix, _rotation)
+            ZMatrix4.rotate(_matrix, rotation)
             ZMatrix4.scale(_matrix, _scale)
             return _matrix
         }
@@ -109,12 +130,14 @@ class ZTransform() {
 
     fun setRotation(angle: Float, x: Float, y: Float, z: Float) {
         ZQuaternion.fromAngleAxis(_rotation, angle, x, y, z)
+        _rotation.normalize()
         updateLocalAxis()
     }
 
     @JsName("rotateByVector")
     fun setRotation(angle: Float, axis: ZVector3) {
         ZQuaternion.fromAngleAxis(_rotation, angle, axis)
+        _rotation.normalize()
     }
 
     @JsName("setLookAtUp")
@@ -122,6 +145,7 @@ class ZTransform() {
         val m = ZMatrix4()
         ZMatrix4.lookAt(m, _position, look, up)
         ZQuaternion.fromMatrix4(_rotation, m)
+        _rotation.normalize()
         updateLocalAxis()
     }
 
@@ -158,6 +182,7 @@ class ZTransform() {
     @JsName("rotateByQuat")
     fun rotate(q: ZQuaternion) {
         ZQuaternion.mult(_rotation, _rotation, q)
+        _rotation.normalize()
         updateLocalAxis()
     }
 
@@ -177,12 +202,15 @@ class ZTransform() {
         val q = ZQuaternion()
         ZQuaternion.fromAngleAxis(q, angle, axis)
         ZQuaternion.mult(_rotation, _rotation, q)
+        _rotation.normalize()
 
         val v = ZVector3()
         //V-P
         ZVector3.subtract(v, through, point)
         //R(V-P)
-        ZVector3.rotateVector(v, _rotation, v)
+        ZVector3.rotateVector(v, rotation, v)
+        _rotation.normalize()
+
         //Loc = P + R(V-P)
         ZVector3.add(_position, point, v)
         updateLocalAxis()
@@ -212,6 +240,8 @@ class ZTransform() {
     }
 
     private fun updateLocalAxis() {
+        _rotation.normalize()
+
         ZVector3.rotateVector(_forward, _rotation, ZVector3.Forward)
         ZVector3.rotateVector(_right, _rotation, ZVector3.Right)
         ZVector3.rotateVector(_up, _rotation, ZVector3.Up)
