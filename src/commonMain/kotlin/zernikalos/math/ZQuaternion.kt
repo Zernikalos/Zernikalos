@@ -19,6 +19,7 @@ import zernikalos.ZTypes
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -77,6 +78,9 @@ class ZQuaternion(): ZAlgebraObject {
     val norm2: Float
         get() = sqrt(dot(this, this))
 
+    val isNormalized: Boolean
+        get() = abs(norm2 - 1.0f) < 0.0001f
+
     fun setValues(w: Float, x: Float, y: Float, z: Float) {
         this.x = x
         this.y = y
@@ -126,11 +130,18 @@ class ZQuaternion(): ZAlgebraObject {
         invert(this, this)
     }
 
+    /**
+     * Normalizes the quaternion.
+     *
+     * This method modifies the quaternion.
+     */
     fun normalize() {
         normalize(this, this)
     }
 
-    // TODO: Check!
+    /**
+     * Rotates the quaternion by a specified angle around a specified axis.
+     */
     fun rotate(angle: Float, axis: ZVector3) {
         rotate(this, this, angle, axis)
     }
@@ -146,7 +157,6 @@ class ZQuaternion(): ZAlgebraObject {
     override fun toString(): String {
         return "[$w : $x, $y, $z]"
     }
-
 
     companion object Op {
 
@@ -216,6 +226,9 @@ class ZQuaternion(): ZAlgebraObject {
             result.z = q.z * r
         }
 
+        /**
+         * Normalizes the quaternion.
+         */
         fun normalize(result: ZQuaternion, q: ZQuaternion) {
             val n = q.norm2
             multScalar(result, 1 / n, q)
@@ -227,10 +240,13 @@ class ZQuaternion(): ZAlgebraObject {
             multScalar(result, n2, result)
         }
 
+        /**
+         * Rotates a quaternion by a specified angle around a specified axis.
+         */
         fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3) {
-            val opRot = ZQuaternion(q.w, q.x, q.y, q.z)
+            val opRot = ZQuaternion()
             fromAngleAxis(opRot, angle, axis)
-            mult(result, result, opRot)
+            mult(result, q, opRot)
         }
 
         fun fromVec3(result: ZQuaternion, v: ZVector3) {
