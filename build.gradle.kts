@@ -204,11 +204,12 @@ dokka {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl("https://github.com/Zernikalos/Zernikalos/tree/main/src")
+            remoteUrl("https://gitlab.com/Zernikalos/Zernikalos/tree/main/src")
             remoteLineSuffix.set("#L")
         }
     }
     pluginsConfiguration.html {
+        templatesDir = file("docs/dokkaTemplates")
         customStyleSheets.from("docsAssets/zk-docs-styles.css")
         customAssets.from("docsAssets/logo-icon.svg")
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")
