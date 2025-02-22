@@ -1,0 +1,9 @@
+stages:
+  - build
+
+build_job:
+  stage: build
+  script:
+    - ./gradlew build
+  only:
+    - main
