@@ -1,3 +1,5 @@
+image: amazoncorretto
+
 stages:
   - build
 
