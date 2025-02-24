@@ -13,7 +13,7 @@ import java.time.Year
 // Constants
 val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
-val zernikalosNamedGroup = "${zernikalosGroup}.$zernikalosName"
+val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
 val zernikalosVersion = "0.0.1"
 val zernikalosDescription = "Zernikalos Game Engine"
@@ -21,6 +21,12 @@ val zernikalosDescription = "Zernikalos Game Engine"
 val zernikalosAuthorName = "Aarón Negrín"
 val zernikalosLicense = "MPL v2.0"
 val zernikalosSiteUrl = "https://zernikalos.dev"
+
+val gitlabGroup = "io.gitlab"
+val zernikalosGitlabGroup = "$gitlabGroup.$zernikalosName"
+val gitlabProjectId = 67293086
+val gitlabName = project.findProperty("gitlab_name") as String? ?: "Deploy-Token"
+val gitlabAccessToken = project.findProperty("gitlab_access_token") as String? ?: ""
 
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
@@ -44,6 +50,21 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     google()
+}
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://gitlab.com/api/v4/projects/${gitlabProjectId}/packages/maven")
+            credentials(HttpHeaderCredentials::class) {
+                name = gitlabName
+                value = gitlabAccessToken
+            }
+            authentication {
+                create("header", HttpHeaderAuthentication::class)
+            }
+        }
+    }
 }
 
 android {
@@ -215,3 +236,28 @@ dokka {
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")
     }
 }
+
+// Custom tasks
+tasks.register("generateVersionConstants") {
+    val outputDir = file("src/commonMain/kotlin/zernikalos")
+    val outputFile = file("$outputDir/ZVersion.kt")
+
+    inputs.property("version", zernikalosVersion)
+
+    outputs.dir(outputDir)
+
+    doLast {
+        outputDir.mkdirs()
+        outputFile.writeText("""
+            package zernikalos
+
+            object ZVersion {
+                const val VERSION = "${project.version}"
+            }
+        """.trimIndent())
+    }
+}
+
+//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//    dependsOn("generateVersionConstants")
+//}

@@ -11,6 +11,5 @@ package zernikalos.generators.shadergenerator
 internal actual fun createShaderGenerator(type: ZShaderGeneratorType): ZShaderGenerator {
     when (type) {
         ZShaderGeneratorType.DEFAULT -> return ZDefaultShaderGenerator()
-        else -> throw IllegalArgumentException("Unknown shader generator type: $type")
     }
 }

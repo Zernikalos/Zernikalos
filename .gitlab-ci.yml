@@ -2,10 +2,22 @@ image: mobiledevops/android-sdk-image:34.0.0
 
 stages:
   - build
+  - publish
 
-build_job:
+build:
   stage: build
   script:
     - ./gradlew build
-  only:
-    - main
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+publish:
+  stage: publish
+  script:
+    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN
+    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_MESSAGE =~ /^release/'
