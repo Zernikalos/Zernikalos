@@ -19,5 +19,4 @@ publish:
   variables:
     GITLAB_TOKEN: $GITLAB_TOKEN
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_COMMIT_MESSAGE =~ /^release/'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^release/'

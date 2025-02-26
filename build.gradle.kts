@@ -169,6 +169,7 @@ kotlin {
             languageSettings.optIn("zernikalos.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
+            languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
         }
 
         commonMain {

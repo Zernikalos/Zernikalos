@@ -12,16 +12,16 @@ import zernikalos.components.ZComponent
 
 class ZLoaderContext {
 
-    private val componentsMap: HashMap<Int, ZComponent> = hashMapOf()
+    private val componentsMap: HashMap<String, ZComponent> = hashMapOf()
 
-    fun addComponent(refId: Int, component: ZComponent?) {
+    fun addComponent(refId: String, component: ZComponent?) {
         if (component == null) {
             return
         }
         componentsMap[refId] = component
     }
 
-    fun getComponent(refId: Int): ZComponent? {
+    fun getComponent(refId: String): ZComponent? {
         if (!componentsMap.containsKey(refId)) {
             throw Error("Unable to find the required component with refId: $refId")
         }

@@ -15,12 +15,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.ZLoggable
-import zernikalos.utils.computeRefId
-import zernikalos.utils.randomNumId
 import kotlin.js.JsExport
+import kotlin.uuid.Uuid
 
 @JsExport
 interface ZRef {
+
     /**
      * Represents the unique reference identifier for a component.
      *
@@ -29,7 +29,7 @@ interface ZRef {
      * @see ZComponent
      * @see ZRefComponentSerializer
      */
-    val refId: Int
+    val refId: String
 }
 
 /**
@@ -87,13 +87,15 @@ abstract class ZBaseComponent(
     protected val internalData: ZComponentData? = null
 ): ZComponent, ZLoggable {
 
-    private var _refId: Int? = null
-    final override val refId: Int
+    private var _uuid: Uuid? = null
+    final override val refId: String
         get() {
-            if (_refId == null) {
-                _refId = internalData?.refId ?: randomNumId()
+            _uuid = if (_uuid == null && internalData == null) {
+                Uuid.random()
+            } else {
+                Uuid.parseHexDash(internalData!!.refId)
             }
-            return _refId!!
+            return _uuid.toString()
         }
 
     private var _renderer: ZBaseComponentRender? = null
@@ -183,15 +185,15 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender
 @JsExport
 abstract class ZComponentData: ZLoggable, ZRef {
 
-    private var _refId: Int? = null
+    private var _uuid: Uuid? = null
 
     @Transient
-    override val refId: Int
+    override val refId: String
         get() {
-            if (_refId == null) {
-                _refId = computeRefId(toString())
+            if (_uuid == null) {
+                _uuid = Uuid.random()
             }
-            return _refId!!
+            return _uuid.toString()
         }
 
     abstract override fun toString(): String
