@@ -78,7 +78,7 @@ class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<
 @Serializable
 internal data class ZTextureDataWrapper(
     @ProtoNumber(1)
-    override var refId: Int = 0,
+    override var refId: String = "",
     @ProtoNumber(2)
     override var isReference: Boolean = false,
     @ProtoNumber(100)

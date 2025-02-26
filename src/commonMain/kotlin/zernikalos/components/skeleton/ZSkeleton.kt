@@ -49,7 +49,7 @@ class ZSkeleton internal constructor(data: ZSkeletonData): ZSerializableComponen
 @Serializable
 data class ZSkeletonDataWrapper(
     @ProtoNumber(1)
-    override var refId: Int,
+    override var refId: String,
     @ProtoNumber(2)
     override var isReference: Boolean,
     @ProtoNumber(100)

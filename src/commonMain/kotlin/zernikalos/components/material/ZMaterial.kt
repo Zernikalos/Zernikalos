@@ -36,7 +36,7 @@ internal constructor(data: ZMaterialData):
 @Serializable
 data class ZMaterialDataWrapper(
     @ProtoNumber(1)
-    override var refId: Int = 0,
+    override var refId: String = "",
     @ProtoNumber(2)
     override var isReference: Boolean = false,
     @ProtoNumber(100)

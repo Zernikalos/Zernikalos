@@ -18,7 +18,7 @@ import zernikalos.loader.ZLoaderContext
 
 interface ZRefComponentWrapper<D: ZComponentData> {
     @ProtoNumber(1)
-    var refId: Int
+    var refId: String
 
     @ProtoNumber(2)
     var isReference: Boolean
