@@ -8,20 +8,20 @@
 
 package zernikalos.loader
 
-import zernikalos.components.ZComponent
+import zernikalos.components.ZRef
 
 class ZLoaderContext {
 
-    private val componentsMap: HashMap<String, ZComponent> = hashMapOf()
+    private val componentsMap: HashMap<String, ZRef> = hashMapOf()
 
-    fun addComponent(refId: String, component: ZComponent?) {
+    fun addComponent(refId: String, component: ZRef?) {
         if (component == null) {
             return
         }
         componentsMap[refId] = component
     }
 
-    fun getComponent(refId: String): ZComponent? {
+    fun getComponent(refId: String): ZRef? {
         if (!componentsMap.containsKey(refId)) {
             throw Error("Unable to find the required component with refId: $refId")
         }

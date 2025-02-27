@@ -12,12 +12,13 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.components.ZRef
 import zernikalos.context.ZContext
 import zernikalos.logger.ZLoggable
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
 import zernikalos.search.ZTreeNode
-import zernikalos.utils.randomId
+import zernikalos.utils.genRefId
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -47,9 +48,9 @@ import kotlin.js.JsName
 @JsExport
 @Serializable
 @Polymorphic
-abstract class ZObject: ZTreeNode<ZObject>, ZLoggable {
+abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     @ProtoNumber(1)
-    val id: String = randomId()
+    override val refId: String = genRefId()
 
     @ProtoNumber(2)
     private var _name: String = ""
@@ -57,7 +58,7 @@ abstract class ZObject: ZTreeNode<ZObject>, ZLoggable {
     var name: String
         get() {
             if (_name == "") {
-                return "${type.name.lowercase()}_$id"
+                return "${type.name.lowercase()}_${refId.substring(0, 6)}"
             }
             return _name
         }
