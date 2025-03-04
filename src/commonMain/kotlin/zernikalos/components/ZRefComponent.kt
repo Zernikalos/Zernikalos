@@ -16,7 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.loader.ZLoaderContext
 
-interface ZRefComponentWrapper<D: ZComponentData> {
+interface ZRefComponentWrapper<D: ZRef> {
     @ProtoNumber(1)
     var refId: String
 

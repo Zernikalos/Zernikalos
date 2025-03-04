@@ -10,22 +10,17 @@ package zernikalos.objects
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZRefComponentWrapper
-import zernikalos.components.material.ZMaterialData
+import zernikalos.components.ZRefComponentSerializer
 import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext
-import zernikalos.math.ZTransform
 import zernikalos.search.findInTree
 import zernikalos.search.treeAsList
-import kotlin.getValue
 import kotlin.js.JsExport
-import kotlin.setValue
 
 @JsExport
 @Serializable
@@ -51,7 +46,7 @@ class ZSkeleton: ZObject() {
 }
 
 @Serializable
-data class ZSkeletonDataWrapper(
+data class ZSkeletonProtoRef(
     @ProtoNumber(1)
     val type: String,
     @ProtoNumber(2)
@@ -64,14 +59,14 @@ data class ZSkeletonDataWrapper(
 
 class ZSkeletonSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZSkeleton> {
     override val descriptor: SerialDescriptor
-        get() = ZSkeletonDataWrapper.serializer().descriptor
+        get() = ZSkeletonProtoRef.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: ZSkeleton) {
         TODO("Not yet implemented")
     }
 
     override fun deserialize(decoder: Decoder): ZSkeleton {
-        val data = decoder.decodeSerializableValue(ZSkeletonDataWrapper.serializer())
+        val data = decoder.decodeSerializableValue(ZSkeletonProtoRef.serializer())
         return if (data.isReference) {
             loaderContext.getComponent(data.refId) as ZSkeleton
         } else {
