@@ -36,6 +36,7 @@ private fun createSerializersModule(): ProtoBuf {
             defaultDeserializer { ZGroup.serializer() }
         }
 
+        contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}
         contextual(ZMaterial::class) { _ -> ZMaterialSerializer(loaderContext)}
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}

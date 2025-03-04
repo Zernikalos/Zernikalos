@@ -8,6 +8,7 @@
 
 package zernikalos.loader
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -32,7 +33,7 @@ data class ZkoHeader(
 @Serializable
 data class ZkoFormat(
     @ProtoNumber(1) val header: ZkoHeader,
-    @ProtoNumber(3) val objects: Map<String, ZkoObjectProto>,
+    @ProtoNumber(3) val objects: List<@Contextual ZkoObjectProto>,
     @ProtoNumber(4) val hierarchy: ZkoHierarchyNode,
     @ProtoNumber(5) val actions: List<ZSkeletalAction>? = null
 )

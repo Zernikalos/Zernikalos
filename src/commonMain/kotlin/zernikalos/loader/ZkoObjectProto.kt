@@ -8,35 +8,65 @@
 
 package zernikalos.loader
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.objects.*
 
 @Serializable
 data class ZkoObjectProto(
+    val type: String,
+    val refId: String,
+    val isReference: Boolean,
+    val zObject: ZObject
+)
+
+@Serializable
+data class ZkoObjectProtoDef(
     @ProtoNumber(1) val type: String,
     @ProtoNumber(2) val refId: String,
+    @ProtoNumber(3) val isReference: Boolean,
 
     @ProtoNumber(100) val scene: ZScene?,
     @ProtoNumber(101) val group: ZGroup?,
     @ProtoNumber(102) val model: ZModel?,
     @ProtoNumber(103) val camera: ZCamera?,
     @ProtoNumber(104) val skeleton: ZSkeleton?,
-) {
-    val zObject: ZObject
-        get() {
-            val obj = detectZObject()
-            return obj
-        }
+)
 
-    private fun detectZObject(): ZObject {
-        when (type) {
-            ZObjectType.SCENE.name -> return scene!!
-            ZObjectType.GROUP.name -> return group!!
-            ZObjectType.MODEL.name -> return model!!
-            ZObjectType.CAMERA.name -> return camera!!
-            ZObjectType.SKELETON.name -> return skeleton!!
+class ZkoObjectProtoSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZkoObjectProto> {
+    override val descriptor: SerialDescriptor
+        get() = ZkoObjectProtoDef.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: ZkoObjectProto) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deserialize(decoder: Decoder): ZkoObjectProto {
+        val data = decoder.decodeSerializableValue(ZkoObjectProtoDef.serializer())
+        val zobj = detectZObject(data)
+        loaderContext.addComponent(zobj.refId, zobj)
+        return ZkoObjectProto(
+            data.type,
+            data.refId,
+            data.isReference,
+            zobj
+        )
+    }
+
+    private fun detectZObject(data: ZkoObjectProtoDef): ZObject {
+        when (data.type) {
+            ZObjectType.SCENE.name -> return data.scene!!
+            ZObjectType.GROUP.name -> return data.group!!
+            ZObjectType.MODEL.name -> return data.model!!
+            ZObjectType.CAMERA.name -> return data.camera!!
+            ZObjectType.SKELETON.name -> return data.skeleton!!
         }
         throw Error("Type has not been found on object")
     }
+
 }
