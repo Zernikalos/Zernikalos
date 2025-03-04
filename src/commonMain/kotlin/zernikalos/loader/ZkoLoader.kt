@@ -9,7 +9,6 @@
 package zernikalos.loader
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromHexString
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -19,8 +18,6 @@ import zernikalos.components.material.ZMaterial
 import zernikalos.components.material.ZMaterialSerializer
 import zernikalos.components.material.ZTexture
 import zernikalos.components.material.ZTextureSerializer
-import zernikalos.components.skeleton.ZSkeleton
-import zernikalos.components.skeleton.ZSkeletonSerializer
 import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -35,6 +32,7 @@ private fun createSerializersModule(): ProtoBuf {
             subclass(ZGroup::class)
             subclass(ZScene::class)
             subclass(ZCamera::class)
+            subclass(ZSkeleton::class)
             defaultDeserializer { ZGroup.serializer() }
         }
 

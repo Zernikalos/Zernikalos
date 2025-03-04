@@ -9,13 +9,16 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
-import zernikalos.components.skeleton.ZSkeleton
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZShaderProgramParameters
@@ -52,10 +55,6 @@ class ZModel: ZObject() {
         renderer = ZModelRenderer(ctx.renderingContext, this)
 
         val shaderProgramParams = buildShaderParameters()
-
-        if (hasSkeleton) {
-            skeleton?.initialize(ctx.renderingContext)
-        }
 
         val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)
         shaderSourceGenerator.generate(shaderProgramParams, shaderProgram)

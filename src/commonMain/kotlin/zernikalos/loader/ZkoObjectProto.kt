@@ -17,12 +17,11 @@ data class ZkoObjectProto(
     @ProtoNumber(1) val type: String,
     @ProtoNumber(2) val refId: String,
 
-    @ProtoNumber(3) val scene: ZScene?,
-    @ProtoNumber(4) val group: ZGroup?,
-    @ProtoNumber(5) val model: ZModel?,
-    @ProtoNumber(6) val camera: ZCamera?,
-    @ProtoNumber(7) val skeleton: ZSkeleton?,
-    @ProtoNumber(100) val children: Array<ZkoObjectProto>? = emptyArray()
+    @ProtoNumber(100) val scene: ZScene?,
+    @ProtoNumber(101) val group: ZGroup?,
+    @ProtoNumber(102) val model: ZModel?,
+    @ProtoNumber(103) val camera: ZCamera?,
+    @ProtoNumber(104) val skeleton: ZSkeleton?,
 ) {
     val zObject: ZObject
         get() {

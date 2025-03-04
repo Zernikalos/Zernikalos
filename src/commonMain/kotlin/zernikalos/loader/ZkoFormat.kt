@@ -14,7 +14,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZSkeletalAction
 import kotlin.js.JsExport
 
-const val ZKO_VERSION = "0.4.0"
+const val ZKO_VERSION = "0.5.0"
 
 @JsExport
 @Serializable
