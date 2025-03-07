@@ -136,7 +136,11 @@ kotlin {
     }
 
     val xcf = XCFramework(zernikalosNameCapital)
-    val appleTargets = listOf(macosArm64(), iosArm64(), iosSimulatorArm64())
+    val appleTargets = listOf(
+        macosArm64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    )
 
     appleTargets.forEach {
         it.binaries.framework {
@@ -144,7 +148,7 @@ kotlin {
             baseName = zernikalosNameCapital
             binaryOption("bundleId", zernikalosNamedGroup)
             binaryOption("bundleVersion", zernikalosVersion)
-            debuggable = true
+            debuggable = buildType.name != "RELEASE"
             xcf.add(this)
         }
     }

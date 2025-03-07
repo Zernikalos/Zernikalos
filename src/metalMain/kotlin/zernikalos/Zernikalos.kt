@@ -11,7 +11,10 @@ package zernikalos
 import platform.MetalKit.MTKView
 import zernikalos.context.createDefaultContextCreator
 import zernikalos.ui.ZSurfaceView
+import kotlin.experimental.ExperimentalObjCName
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("Zernikalos")
 class Zernikalos: ZernikalosBase() {
 
     fun initialize(view: MTKView, stateHandler: ZSceneStateHandler) {

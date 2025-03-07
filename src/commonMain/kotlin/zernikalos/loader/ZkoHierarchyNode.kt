@@ -15,15 +15,20 @@ data class ZkoHierarchyNode(
          * linking child objects to their respective parents.
          *
          * @param hierarchyNode The root node of the hierarchy to transform.
-         * @param objectsMap A map of reference IDs to `ZkoObjectProto` objects, used to retrieve the corresponding `ZObject`.
+         * @param objects A map of reference IDs to `ZkoObjectProto` objects, used to retrieve the corresponding `ZObject`.
          * @return The transformed `ZObject` representing the root of the hierarchy.
          * @throws Error If a reference ID in the hierarchy cannot be found in the `objectsMap`.
          */
-        fun transformHierarchy(hierarchyNode: ZkoHierarchyNode, objectsMap: Map<String, ZkoObjectProto>): ZObject {
+        fun transformHierarchy(hierarchyNode: ZkoHierarchyNode, objects: List<ZkoObjectProto>): ZObject {
+            val objectsMap = objects.associateBy { it.refId }
+            return internalTransformHierarchy(hierarchyNode, objectsMap)
+        }
+
+        private fun internalTransformHierarchy(hierarchyNode: ZkoHierarchyNode, objectsMap: Map<String, ZkoObjectProto>): ZObject {
             val objProto = objectsMap[hierarchyNode.refId] ?: throw Error("Object not found")
             val obj = objProto.zObject
             hierarchyNode.children?.forEach {
-                obj.addChild(transformHierarchy(it, objectsMap))
+                obj.addChild(internalTransformHierarchy(it, objectsMap))
             }
             return obj
         }
