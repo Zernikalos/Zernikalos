@@ -106,6 +106,8 @@ class ZCamera(): ZObject() {
     override fun internalRender(ctx: ZContext) {
     }
 
+    fun setViewportResize(width: Int, height: Int) = lens.onViewportResize(width, height)
+
     override fun internalOnViewportResize(ctx: ZContext, width: Int, height: Int) {
         lens.onViewportResize(width, height)
     }

@@ -27,13 +27,11 @@ class ZMtkViewDelegate() : NSObject(), MTKViewDelegateProtocol {
         eventHandler?.onReady()
     }
 
-
     @OptIn(ExperimentalForeignApi::class)
     override fun mtkView(view: MTKView, drawableSizeWillChange: CValue<CGSize>) {
         drawableSizeWillChange.useContents {
             eventHandler?.onResize(this.width.toInt(), this.height.toInt())
         }
-
     }
 
     override fun drawInMTKView(view: MTKView) {
