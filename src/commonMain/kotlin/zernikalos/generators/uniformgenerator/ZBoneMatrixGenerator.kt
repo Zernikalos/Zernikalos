@@ -18,6 +18,7 @@ import zernikalos.objects.ZModel
 import zernikalos.objects.ZObject
 
 class ZBoneMatrixGenerator: ZUniformGenerator {
+
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
         obj as ZModel
         if (!obj.hasSkeleton) {
@@ -26,16 +27,14 @@ class ZBoneMatrixGenerator: ZUniformGenerator {
         val skeleton = obj.skeleton!!
         val bones = skeleton.bones
 
-        //bones.sortBy { it.idx }
-        val boneMatrices= bones.map { it ->
-            if (it.name == "mixamorig_Head") {
-                val poseMat = ZMatrix4()
-                ZMatrix4.fromQuaternion(poseMat, ZQuaternion(0.7071f, 0f, 0.7071f, 0f))
-                val m = ZMatrix4()
-                ZMatrix4.mult(m, poseMat, it.bindMatrix)
-                return@map m
-            } else {
+        // Sort bones according to the order defined in the skinning's boneIds array
+        val boneIdsList = obj.skinning!!.boneIds.toList()
+        val sortedBones = bones.sortedBy { bone -> boneIdsList.indexOf(bone.id) }
+        val boneMatrices= sortedBones.map { it ->
+            if (obj.action == null) {
                 return@map it.bindMatrix
+            } else {
+                return@map it.poseMatrix
             }
         }
 

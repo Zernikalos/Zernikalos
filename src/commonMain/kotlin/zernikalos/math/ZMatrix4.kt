@@ -644,6 +644,13 @@ class ZMatrix4(): ZAlgebraObject {
             translate(result, negEye)
         }
 
+        @JsName("fromQuaternionIp")
+        fun fromQuaternion(q: ZQuaternion): ZMatrix4 {
+            val result =  ZMatrix4()
+            ZMatrix4.fromQuaternion(result, q)
+            return result
+        }
+
         /**
          * Converts a quaternion into a 4x4 matrix representing the same rotation.
          *
