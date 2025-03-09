@@ -100,6 +100,25 @@ class ZTransform() {
         }
 
     /**
+     * Represents the rotation of the object using Euler angles in radians.
+     * The Euler angles define the rotation about the three principal axes (roll, pitch, yaw).
+     */
+    var rotationEuler: ZEuler
+        get() = rotation.toEuler()
+        set(value) {
+            ZQuaternion.fromEuler(_rotation, value)
+        }
+
+    val yaw: Float
+        get() = rotationEuler.yaw
+
+    val pitch: Float
+        get() = rotationEuler.pitch
+
+    val roll: Float
+        get() = rotationEuler.roll
+
+    /**
      * Represents the scale of the object in a 3D space.
      *
      * @see ZVector3
