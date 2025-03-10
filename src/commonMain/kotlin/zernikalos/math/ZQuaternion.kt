@@ -371,6 +371,7 @@ class ZQuaternion(): ZAlgebraObject {
             result.z = cr * cp * sy - sr * sp * cy
         }
 
+        @JsName("fromEulerIp")
         fun fromEuler(euler: ZEuler): ZQuaternion {
             val result = ZQuaternion()
             fromEuler(result, euler)
@@ -384,6 +385,7 @@ class ZQuaternion(): ZAlgebraObject {
          * @param yaw Rotation around Z axis
          * @return A new quaternion representing the rotation
          */
+        @JsName("fromEulerWithValues")
         fun fromEuler(roll: Float, pitch: Float, yaw: Float): ZQuaternion {
             val result = ZQuaternion()
             val euler = ZEuler(roll, pitch, yaw)
