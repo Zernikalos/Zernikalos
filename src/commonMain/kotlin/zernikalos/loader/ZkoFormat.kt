@@ -13,18 +13,26 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZSkeletalAction
+import zernikalos.utils.ZSemVer
 import kotlin.js.JsExport
 
 const val ZKO_VERSION = "0.5.0"
+
+val ZkoVersion = ZSemVer.parse(ZKO_VERSION)
 
 @JsExport
 @Serializable
 data class ZkoHeader(
     @ProtoNumber(1) val version: String
 ) {
+
+    val currentVersion = ZSemVer.parse(version)
+
     init {
-        require(version == ZKO_VERSION) {
-            throw SerializationException("Wrong ZKO file version, expecting $ZKO_VERSION, got $version")
+        require(ZkoVersion.isCompatibleWith(currentVersion)) {
+            throw SerializationException("Wrong ZKO file version, " +
+                "expecting ${ZkoVersion.toString()} compatible version, " +
+                "got ${currentVersion.toString()}")
         }
 
     }
