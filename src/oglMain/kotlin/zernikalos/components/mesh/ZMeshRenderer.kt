@@ -40,6 +40,7 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
     actual override fun render() {
         ctx as ZGLRenderingContext
 
+        val drawMode = convertDrawMode(data.drawMode)
         vao.bind()
         if (data.hasIndexBuffer) {
             logger.debugOnce("Using indexed buffer rendering")
@@ -48,15 +49,22 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
             // TODO: This change was required to make it work with WebGL
             indexBuffer.bind()
             val count = indexBuffer.count
-            // TODO: you don't need to draw triangles all the time
-            ctx.drawElements(DrawModes.TRIANGLES.value, count, toOglBaseType(indexBuffer.dataType), 0)
+            ctx.drawElements(drawMode.value, count, toOglBaseType(indexBuffer.dataType), 0)
         } else {
             logger.debugOnce("Using vertices list rendering")
             // TODO: Fix this
             val count = data.buffers["position"]?.count!!
-            ctx.drawArrays(DrawModes.TRIANGLES.value, 0, count)
+            ctx.drawArrays(drawMode.value, 0, count)
         }
         vao.unbind()
     }
 
+}
+
+fun convertDrawMode(drawMode: ZDrawMode): DrawModes {
+    return when (drawMode) {
+        ZDrawMode.LINES -> return DrawModes.LINES
+        ZDrawMode.TRIANGLES -> return DrawModes.TRIANGLES
+        else -> return DrawModes.TRIANGLES
+    }
 }
