@@ -150,6 +150,22 @@ class ZQuaternion(): ZAlgebraObject {
         fromMatrix4(this, m)
     }
 
+    fun fromAngleAxis(angle: Float, x: Float, y: Float, z: Float) {
+        fromAngleAxis(this, angle, x, y, z)
+    }
+
+    fun toMatrix4(): ZMatrix4 {
+        val m = ZMatrix4()
+        ZMatrix4.fromQuaternion(m, this)
+        return m
+    }
+
+    fun toEuler(): ZEuler {
+        val result = ZEuler()
+        ZEuler.fromQuaternion(result, this)
+        return result
+    }
+
     fun copy(q: ZQuaternion) {
         copy(this, q)
     }
@@ -333,6 +349,46 @@ class ZQuaternion(): ZAlgebraObject {
             result.x = qx
             result.y = qy
             result.z = qz
+        }
+
+        /**
+         * Converts Euler angles to quaternion using ZYX (yaw-pitch-roll) convention.
+         * @param result The quaternion to store the result in
+         * @param euler The Euler angles to convert from
+         */
+        fun fromEuler(result: ZQuaternion, euler: ZEuler) {
+            // Convert angles to radians and divide by 2 as we need half angles
+            val cr = cos(euler.roll * 0.5f)
+            val cp = cos(euler.pitch * 0.5f)
+            val cy = cos(euler.yaw * 0.5f)
+            val sr = sin(euler.roll * 0.5f)
+            val sp = sin(euler.pitch * 0.5f)
+            val sy = sin(euler.yaw * 0.5f)
+
+            result.w = cr * cp * cy + sr * sp * sy
+            result.x = sr * cp * cy - cr * sp * sy
+            result.y = cr * sp * cy + sr * cp * sy
+            result.z = cr * cp * sy - sr * sp * cy
+        }
+
+        fun fromEuler(euler: ZEuler): ZQuaternion {
+            val result = ZQuaternion()
+            fromEuler(result, euler)
+            return result
+        }
+
+        /**
+         * Creates a new quaternion from Euler angles.
+         * @param roll Rotation around X axis
+         * @param pitch Rotation around Y axis
+         * @param yaw Rotation around Z axis
+         * @return A new quaternion representing the rotation
+         */
+        fun fromEuler(roll: Float, pitch: Float, yaw: Float): ZQuaternion {
+            val result = ZQuaternion()
+            val euler = ZEuler(roll, pitch, yaw)
+            fromEuler(result, euler)
+            return result
         }
 
         fun slerp(result: ZQuaternion, t: Float, q1: ZQuaternion, q2: ZQuaternion) {
