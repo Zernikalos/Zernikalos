@@ -9,7 +9,11 @@
 package zernikalos.components.mesh
 
 import platform.Metal.MTLIndexTypeUInt16
+import platform.Metal.MTLPrimitiveTypeLine
+import platform.Metal.MTLPrimitiveTypeLineStrip
+import platform.Metal.MTLPrimitiveTypePoint
 import platform.Metal.MTLPrimitiveTypeTriangle
+import platform.Metal.MTLPrimitiveTypeTriangleStrip
 import platform.Metal.MTLVertexDescriptor
 import zernikalos.components.ZComponentRender
 import zernikalos.context.ZMtlRenderingContext
@@ -49,7 +53,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
         val indices = data.indexBuffer!!
 
         ctx.renderEncoder?.drawIndexedPrimitives(
-            MTLPrimitiveTypeTriangle,
+            convertDrawMode(data.drawMode),
             indices.count.toULong(),
             MTLIndexTypeUInt16,
             indices.renderer.buffer!!,
@@ -57,4 +61,12 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMes
         )
     }
 
+}
+
+fun convertDrawMode(drawMode: ZDrawMode): ULong = when (drawMode) {
+    ZDrawMode.POINTS -> MTLPrimitiveTypePoint
+    ZDrawMode.LINES -> MTLPrimitiveTypeLine
+    ZDrawMode.TRIANGLES -> MTLPrimitiveTypeTriangle
+    ZDrawMode.LINE_STRIP -> MTLPrimitiveTypeLineStrip
+    ZDrawMode.TRIANGLE_STRIP -> MTLPrimitiveTypeTriangleStrip
 }

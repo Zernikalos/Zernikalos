@@ -50,6 +50,9 @@ class ZMesh internal constructor(data: ZMeshData):
      */
     val hasIndexBuffer: Boolean by data::hasIndexBuffer
 
+    var drawMode: ZDrawMode by data::drawMode
+
+
     @JsName("init")
     constructor(): this(ZMeshData())
 
@@ -144,6 +147,7 @@ class ZMesh internal constructor(data: ZMeshData):
  * @suppress
  */
 data class ZMeshData(
+    var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     val buffers: HashMap<String, ZBuffer> = HashMap()
 ): ZComponentData() {
 
@@ -201,6 +205,8 @@ data class ZRawBuffer(
 
 @Serializable
 internal data class ZRawMeshData(
+    @ProtoNumber(11)
+    var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
@@ -260,7 +266,10 @@ internal class ZMeshSerializer: ZComponentSerializer<ZMesh, ZRawMeshData>() {
         get() = ZRawMeshData.serializer()
 
     override fun createComponentInstance(data: ZRawMeshData): ZMesh {
-        val meshData = ZMeshData(data.buffers)
+        val meshData = ZMeshData(
+            data.drawMode,
+            data.buffers
+        )
         return ZMesh(meshData)
     }
 

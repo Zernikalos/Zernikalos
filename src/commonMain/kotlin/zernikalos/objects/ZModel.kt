@@ -17,6 +17,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.material.ZMaterial
+import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
 import zernikalos.context.ZContext
@@ -47,6 +48,12 @@ class ZModel: ZObject() {
 
     val hasSkeleton: Boolean
         get() = skeleton != null
+
+    var drawMode: ZDrawMode
+        get() = mesh.drawMode
+        set(value) {
+            mesh.drawMode = value
+        }
 
     @Transient
     private lateinit var renderer: ZModelRenderer
