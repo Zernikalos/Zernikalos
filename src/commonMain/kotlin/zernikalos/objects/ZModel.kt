@@ -56,6 +56,10 @@ class ZModel: ZObject() {
 
         val shaderProgramParams = buildShaderParameters()
 
+        if (hasSkeleton) {
+            skeleton?.initialize(ctx)
+        }
+
         val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)
         shaderSourceGenerator.generate(shaderProgramParams, shaderProgram)
 

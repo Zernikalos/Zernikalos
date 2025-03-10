@@ -39,6 +39,7 @@ class ZSkeleton: ZObject() {
     }
 
     override fun internalInitialize(ctx: ZContext) {
+        root.initialize(ctx.renderingContext)
     }
 
     override fun internalRender(ctx: ZContext) {
