@@ -9,9 +9,12 @@
 package zernikalos.context
 
 import platform.Metal.*
+import zernikalos.ui.ZMtlSurfaceView
 import zernikalos.ui.ZSurfaceView
 
-class ZMtlRenderingContext constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
+class ZMtlRenderingContext constructor(view: ZSurfaceView): ZRenderingContext {
+
+    val surfaceView: ZMtlSurfaceView = view as ZMtlSurfaceView
 
     val device: MTLDeviceProtocol
     val commandQueue: MTLCommandQueueProtocol

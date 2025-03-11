@@ -13,12 +13,12 @@ import kotlinx.cinterop.useContents
 import platform.MetalKit.MTKView
 
 @OptIn(ExperimentalForeignApi::class)
-actual class ZSurfaceView(view: MTKView) {
+class ZMtlSurfaceView(view: MTKView): ZSurfaceView {
 
     var nativeView: MTKView
     private val viewDelegate: ZMtkViewDelegate = ZMtkViewDelegate()
 
-    actual val width: Int
+    override val surfaceWidth: Int
         get() {
             nativeView.drawableSize().useContents {
                 val widthValue = this.width
@@ -26,7 +26,7 @@ actual class ZSurfaceView(view: MTKView) {
             }
         }
 
-    actual val height: Int
+    override val surfaceHeight: Int
         get() {
             nativeView.drawableSize.useContents {
                 val heightValue = this.height
@@ -34,11 +34,11 @@ actual class ZSurfaceView(view: MTKView) {
             }
         }
 
-    actual var eventHandler: ZSurfaceViewEventHandler?
+    override var eventHandler: ZSurfaceViewEventHandler?
         get() = viewDelegate.eventHandler
         set(value) {
             viewDelegate.eventHandler = value
-            value?.onResize(width, height)
+            value?.onResize(surfaceWidth, surfaceHeight)
         }
 
     init {

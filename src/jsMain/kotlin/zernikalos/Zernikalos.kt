@@ -10,6 +10,7 @@ package zernikalos
 
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.context.createDefaultContextCreator
+import zernikalos.ui.ZJsSurfaceView
 import zernikalos.ui.ZSurfaceView
 
 @JsExport
@@ -17,7 +18,7 @@ class Zernikalos: ZernikalosBase() {
 
     @JsName("initializeWithCanvas")
     fun initialize(canvas: HTMLCanvasElement, stateHandler: ZSceneStateHandler) {
-        val surfaceView = ZSurfaceView(canvas)
+        val surfaceView = ZJsSurfaceView(canvas)
         initialize(surfaceView, stateHandler)
     }
 

@@ -11,6 +11,7 @@ package zernikalos.context
 import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.components.material.ZBitmap
+import zernikalos.ui.ZJsSurfaceView
 import zernikalos.ui.ZSurfaceView
 
 abstract external class WebGLVertexArrayObject: WebGLObject
@@ -28,16 +29,18 @@ abstract external class WebGL2RenderingContext: WebGLRenderingContext {
 }
 
 @JsExport
-actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
+actual class ZGLRenderingContext actual constructor(surfaceView: ZSurfaceView): ZRenderingContext {
+
+    private val surfaceView: ZJsSurfaceView = surfaceView as ZJsSurfaceView
 
     private lateinit var gl: WebGL2RenderingContext
 
-    actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
-        setContext(surfaceView.canvas)
+    init {
+        setContext(this.surfaceView.canvas)
     }
 
-    init {
-        initWithSurfaceView(surfaceView)
+    actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
+        setContext((surfaceView as ZJsSurfaceView).canvas)
     }
 
     fun setContext(canvas: HTMLCanvasElement) {

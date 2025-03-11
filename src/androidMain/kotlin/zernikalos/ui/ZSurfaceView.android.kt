@@ -12,16 +12,18 @@ import android.opengl.GLSurfaceView
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-actual class ZSurfaceView(view: GLSurfaceView) {
+class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
 
     var nativeSurfaceView: GLSurfaceView
     private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
 
-    actual val width: Int
+    override val surfaceWidth: Int
         get() = nativeSurfaceView.width
-    actual val height: Int
+
+    override val surfaceHeight: Int
         get() = nativeSurfaceView.height
-    actual var eventHandler: ZSurfaceViewEventHandler?
+
+    override var eventHandler: ZSurfaceViewEventHandler?
         get() = nativeRenderer.eventHandler
         set(value) {
             nativeRenderer.eventHandler = value
