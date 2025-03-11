@@ -8,10 +8,10 @@
 
 package zernikalos.ui
 
-expect class ZSurfaceView {
+interface ZSurfaceView {
 
-    val width: Int
-    val height: Int
+    val surfaceWidth: Int
+    val surfaceHeight: Int
 
     var eventHandler: ZSurfaceViewEventHandler?
 }

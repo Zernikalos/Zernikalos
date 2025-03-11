@@ -13,30 +13,30 @@ import org.w3c.dom.HTMLCanvasElement
 
 @JsExport
 @ExperimentalJsExport
-actual class ZSurfaceView(val canvas: HTMLCanvasElement) {
+class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
 
     var _eventHandler: ZSurfaceViewEventHandler? = null
-    actual var eventHandler: ZSurfaceViewEventHandler?
+    override var eventHandler: ZSurfaceViewEventHandler?
         get() = _eventHandler
         set(value) {
             _eventHandler = value
             onReady()
         }
 
-    actual val width: Int
+    override val surfaceWidth: Int
         get() = canvas.width
-    actual val height: Int
+    override val surfaceHeight: Int
         get() = canvas.height
 
     init {
         canvas.onresize = { _ ->
-            eventHandler?.onResize(width, height)
+            eventHandler?.onResize(surfaceWidth, surfaceHeight)
         }
     }
 
     private fun onReady() {
         eventHandler?.onReady()
-        eventHandler?.onResize(width, height)
+        eventHandler?.onResize(surfaceWidth, surfaceHeight)
         renderLoop()
     }
 
