@@ -13,8 +13,8 @@ import zernikalos.context.ZContextCreator
 import zernikalos.logger.ZLoggable
 import zernikalos.logger.logger
 import zernikalos.scenestatehandler.ZSceneStateHandler
-import zernikalos.scenestatehandler.createSurfaceViewEventHandler
 import zernikalos.settings.ZSettings
+import zernikalos.statehandler.createSurfaceViewEventHandler
 import zernikalos.stats.ZStats
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport

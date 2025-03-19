@@ -6,93 +6,222 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.scenestatehandler
+package zernikalos.statehandler
 
 import zernikalos.context.ZContext
 import zernikalos.renderer.ZRenderer
+import zernikalos.scenestatehandler.ZSceneStateHandler
 import zernikalos.ui.ZSurfaceViewEventHandler
 
-enum class ZSurfaceViewEventHandlerState {
-    READY,
-    INITIALIZING,
-    HANDLER_INITIALIZED,
-    SCENE_INITIALIZED
-}
+/**
+ * Implementation of the surface view event handler that coordinates
+ * the initialization, rendering, and resizing of the view.
+ */
+private class ZSurfaceViewEventHandlerImpl(
+    private val context: ZContext,
+    private val stateHandler: ZSceneStateHandler
+): ZSurfaceViewEventHandler {
 
-fun createSurfaceViewEventHandler(context: ZContext, stateHandler: ZSceneStateHandler): ZSurfaceViewEventHandler {
-    return object: ZSurfaceViewEventHandler {
+    private val renderer: ZRenderer = ZRenderer(context)
+    private val initProcess = InitializationProcess()
 
-        private val mainRenderer: ZRenderer = ZRenderer(context)
+    private var isRendering = false
+    private var pendingRender = false
 
-        var initializationState: ZSurfaceViewEventHandlerState = ZSurfaceViewEventHandlerState.READY
 
-        private fun doneInitialize() {
-            initializationState = ZSurfaceViewEventHandlerState.HANDLER_INITIALIZED
-        }
+    override fun onReady() {
+        progressInitialization()
+    }
 
-        private var requiresResizing = false
-
-        // TODO: Review these functions
-        private fun doneRender() {
-        }
-
-        private fun doneResize() {
-        }
-
-        private fun ready() {
-            if (initializationState == ZSurfaceViewEventHandlerState.READY) {
-                initializationState = ZSurfaceViewEventHandlerState.INITIALIZING
-                stateHandler.onReady(context, ::doneInitialize)
-            }
-        }
-
-        private fun initialize() {
-            if (initializationState == ZSurfaceViewEventHandlerState.HANDLER_INITIALIZED) {
-                initializationState = ZSurfaceViewEventHandlerState.SCENE_INITIALIZED
-                mainRenderer.initialize()
-            }
-        }
-
-        private fun render() {
-            if (initializationState == ZSurfaceViewEventHandlerState.SCENE_INITIALIZED) {
-                stateHandler.onRender(context, ::doneRender)
-                mainRenderer.render()
-            }
-        }
-
-        private fun resize(width: Int, height: Int) {
-            context.screenWidth = width
-            context.screenHeight = height
-            if (initializationState == ZSurfaceViewEventHandlerState.SCENE_INITIALIZED) {
-                stateHandler.onResize(context, width, height, ::doneResize)
-                mainRenderer.onViewportResize(width, height)
-                requiresResizing = false
-            } else {
-                requiresResizing = true
-            }
-        }
-
-        override fun onReady() {
-            ready()
-            initialize()
-            if (requiresResizing) {
-                resize(context.screenWidth, context.screenHeight)
-            }
-        }
-
-        override fun onRender() {
-            ready()
-            initialize()
-            if (requiresResizing) {
-                resize(context.screenWidth, context.screenHeight)
-            }
-            render()
-        }
-
-        override fun onResize(width: Int, height: Int) {
-            ready()
-            initialize()
-            resize(width, height)
+    override fun onRender() {
+        progressInitialization()
+        if (initProcess.isReady) {
+            performRender()
         }
     }
+
+    override fun onResize(width: Int, height: Int) {
+        updateScreenDimensions(width, height)
+
+        if (initProcess.isReady) {
+            applyResize(width, height)
+        } else {
+            initProcess.requestResize()
+        }
+    }
+
+    /**
+     * Advances the initialization process according to the current state.
+     */
+    private fun progressInitialization() {
+        when {
+            initProcess.shouldStartSceneHandler -> {
+                initProcess.goToStateSceneHandlerInitialization() // Move to SCENE_HANDLER_INITIALIZING
+                stateHandler.onReady(context) {
+                    initProcess.goToStateRendererInitialization() // Move to RENDERER_INITIALIZING
+                }
+            }
+            initProcess.shouldInitializeRenderer -> {
+                renderer.initialize()
+                initProcess.goToStateReady() // Move to READY
+
+                // Apply resize if requested during initialization
+                if (initProcess.hasResizeRequest) {
+                    applyResize(context.screenWidth, context.screenHeight)
+                    initProcess.clearResizeRequest()
+                }
+            }
+            // No actions needed for other states
+        }
+    }
+
+    /**
+     * Executes the rendering process.
+     */
+    private fun performRender() {
+        if (isRendering) {
+            pendingRender = true
+            return
+        }
+
+        isRendering = true
+        pendingRender = false
+
+        stateHandler.onRender(context) {
+            renderer.render()
+            isRendering = false
+
+            if (pendingRender) {
+                performRender()
+            }
+        }
+    }
+
+    /**
+     * Updates the context dimensions.
+     */
+    private fun updateScreenDimensions(width: Int, height: Int) {
+        context.screenWidth = width
+        context.screenHeight = height
+    }
+
+    /**
+     * Applies the resize to the renderer and notifies the state handler.
+     */
+    private fun applyResize(width: Int, height: Int) {
+        stateHandler.onResize(context, width, height) {
+            renderer.onViewportResize(width, height)
+        }
+    }
+
 }
+
+/**
+ * A process manager that handles the sequential initialization steps
+ * and keeps track of resize requests that need to be applied once
+ * initialization is complete.
+ */
+private class InitializationProcess {
+    /**
+     * The possible initialization states, in sequential order.
+     */
+    private enum class State {
+        NOT_STARTED,
+        SCENE_HANDLER_INITIALIZING,
+        RENDERER_INITIALIZING,
+        READY
+    }
+
+    private var currentState = State.NOT_STARTED
+
+    /**
+     * Tracks whether there is a pending resize request that needs
+     * to be applied once initialization completes.
+     */
+    private var resizeRequest = false
+
+    fun goToStateSceneHandlerInitialization() {
+        if (currentState == State.NOT_STARTED) {
+            nextState()
+        }
+    }
+
+    fun goToStateRendererInitialization() {
+        if (currentState == State.SCENE_HANDLER_INITIALIZING) {
+            nextState()
+        }
+    }
+
+    fun goToStateReady() {
+        if (currentState == State.RENDERER_INITIALIZING) {
+            nextState()
+        }
+    }
+
+    /**
+     * Advances to the next state in the initialization sequence.
+     * States can only progress forward, never backward.
+     */
+    private fun nextState() {
+        currentState = when (currentState) {
+            State.NOT_STARTED -> State.SCENE_HANDLER_INITIALIZING
+            State.SCENE_HANDLER_INITIALIZING -> State.RENDERER_INITIALIZING
+            State.RENDERER_INITIALIZING -> State.READY
+            State.READY -> throw IllegalStateException("Already at final state, cannot progress further")
+        }
+    }
+
+    /**
+     * Records that a resize request has been made during initialization.
+     */
+    fun requestResize() {
+        if (!isReady) {
+            resizeRequest = true
+        }
+    }
+
+    /**
+     * Clears any pending resize request, typically after it has been applied.
+     */
+    fun clearResizeRequest() {
+        resizeRequest = false
+    }
+
+    /* State query getters */
+
+    /**
+     * Whether we should begin initializing the scene handler.
+     */
+    val shouldStartSceneHandler: Boolean
+        get() = currentState == State.NOT_STARTED
+
+    /**
+     * Whether we should initialize the renderer.
+     */
+    val shouldInitializeRenderer: Boolean
+        get() = currentState == State.RENDERER_INITIALIZING
+
+    /**
+     * Whether the initialization process is complete and system is ready.
+     */
+    val isReady: Boolean
+        get() = currentState == State.READY
+
+    /**
+     * Whether there is a pending resize request to be applied.
+     */
+    val hasResizeRequest: Boolean
+        get() = resizeRequest
+}
+
+/**
+ * Creates a new instance of the surface view event handler.
+ *
+ * @param context The application context
+ * @param stateHandler The scene state handler
+ * @return An implementation of ZSurfaceViewEventHandler
+ */
+fun createSurfaceViewEventHandler(
+    context: ZContext,
+    stateHandler: ZSceneStateHandler
+): ZSurfaceViewEventHandler = ZSurfaceViewEventHandlerImpl(context, stateHandler)
