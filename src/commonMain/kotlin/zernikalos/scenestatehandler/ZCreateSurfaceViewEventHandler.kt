@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos
+package zernikalos.scenestatehandler
 
 import zernikalos.context.ZContext
 import zernikalos.renderer.ZRenderer

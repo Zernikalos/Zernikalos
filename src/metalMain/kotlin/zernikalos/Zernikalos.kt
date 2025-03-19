@@ -10,6 +10,7 @@ package zernikalos
 
 import platform.MetalKit.MTKView
 import zernikalos.context.createDefaultContextCreator
+import zernikalos.scenestatehandler.ZSceneStateHandler
 import zernikalos.ui.ZMtlSurfaceView
 import zernikalos.ui.ZSurfaceView
 import kotlin.experimental.ExperimentalObjCName
@@ -25,8 +26,7 @@ class Zernikalos: ZernikalosBase() {
 
     fun initializeWithDefaults(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
         val contextCreator = createDefaultContextCreator()
-
-        initialize(view, contextCreator, stateHandler)
+        internalInitialize(view, contextCreator, stateHandler)
     }
 
 }
