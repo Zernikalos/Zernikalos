@@ -10,25 +10,21 @@ package zernikalos
 
 import android.opengl.GLSurfaceView
 import zernikalos.context.createDefaultContextCreator
+import zernikalos.scenestatehandler.ZSceneStateHandler
 import zernikalos.ui.ZAndroidSurfaceView
-import zernikalos.ui.ZSurfaceView
 import zernikalos.ui.ZernikalosView
 
 class Zernikalos: ZernikalosBase() {
 
-    fun initializeWithNativeView(view: GLSurfaceView, stateHandler: ZSceneStateHandler) {
+    fun initialize(view: GLSurfaceView, stateHandler: ZSceneStateHandler) {
         val surfaceView = ZAndroidSurfaceView(view)
-        setupContext(surfaceView, stateHandler)
+        val contextCreator = createDefaultContextCreator()
+        internalInitialize(surfaceView, contextCreator, stateHandler)
     }
 
     fun initialize(view: ZernikalosView, stateHandler: ZSceneStateHandler) {
-        setupContext(view as ZSurfaceView, stateHandler)
-    }
-
-    private fun setupContext(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
         val contextCreator = createDefaultContextCreator()
-
-        initialize(view, contextCreator, stateHandler)
+        internalInitialize(view, contextCreator, stateHandler)
     }
 
 }

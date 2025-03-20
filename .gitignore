@@ -68,3 +68,4 @@ outTmp/
 /kotlin-native/dist
 kotlin-ide/
 .kotlin/
+*.log

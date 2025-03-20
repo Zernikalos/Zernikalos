@@ -10,6 +10,7 @@ package zernikalos
 
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.context.createDefaultContextCreator
+import zernikalos.scenestatehandler.ZSceneStateHandler
 import zernikalos.ui.ZJsSurfaceView
 import zernikalos.ui.ZSurfaceView
 
@@ -25,8 +26,7 @@ class Zernikalos: ZernikalosBase() {
     @JsName("initializeWithDefaults")
     fun initialize(view: ZSurfaceView, stateHandler: ZSceneStateHandler) {
         val contextCreator = createDefaultContextCreator()
-
-        initialize(view, contextCreator, stateHandler)
+        internalInitialize(view, contextCreator, stateHandler)
     }
 
 }

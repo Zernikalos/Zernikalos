@@ -15,7 +15,7 @@ val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
-val zernikalosVersion = "0.0.1"
+val zernikalosVersion = "0.0.2"
 val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
@@ -90,6 +90,9 @@ kotlin {
 
     targets.configureEach {
         compilations.configureEach {
+            compileTaskProvider.configure {
+                dependsOn("generateVersionConstants")
+            }
             compilerOptions.configure {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
@@ -121,10 +124,6 @@ kotlin {
         }
         browser {
             binaries.executable()
-//            @OptIn(ExperimentalDistributionDsl::class)
-//            distribution {
-//                outputDirectory = File("$projectDir/output/")
-//            }
             commonWebpackConfig {
                 output?.libraryTarget = "umd"
                 output?.library = zernikalosName
@@ -151,6 +150,7 @@ kotlin {
             debuggable = buildType.name != "RELEASE"
             xcf.add(this)
         }
+        it.compilerOptions.freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
     }
 
     cocoapods {
@@ -167,9 +167,6 @@ kotlin {
     
     sourceSets {
         all {
-//            languageSettings {
-//                languageVersion = "2.0"
-//            }
             languageSettings.optIn("zernikalos.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
@@ -262,7 +259,3 @@ tasks.register("generateVersionConstants") {
         """.trimIndent())
     }
 }
-
-//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-//    dependsOn("generateVersionConstants")
-//}
