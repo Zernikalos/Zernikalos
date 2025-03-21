@@ -1,24 +1,34 @@
-image: mobiledevops/android-sdk-image:34.0.0
-
 stages:
   - build
   - publish
 
 build:
+  image: mobiledevops/android-sdk-image:34.0.0
   stage: build
   script:
     - ./gradlew build
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-publish:
+.publish-template:
   stage: publish
-  script:
-    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
-    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
-    - ./gradlew publishJsToGitlab -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
   variables:
     GITLAB_TOKEN: $GITLAB_TOKEN
     GITLAB_NAME: $GITLAB_NAME
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^release/'
+
+
+# TODO: - ./gradlew podspec
+publish-android:
+  extends: .publish-template
+  image: mobiledevops/android-sdk-image:34.0.0
+  script:
+    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+
+publish-js:
+  extends: .publish-template
+  image: node:lts
+  script:
+    - ./gradlew publishJsToGitlab -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
