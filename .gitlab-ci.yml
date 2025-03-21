@@ -14,9 +14,11 @@ build:
 publish:
   stage: publish
   script:
-    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN
-    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN
+    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+    - ./gradlew publishJsToGitlab -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
   variables:
     GITLAB_TOKEN: $GITLAB_TOKEN
+    GITLAB_NAME: $GITLAB_NAME
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^release/'

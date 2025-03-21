@@ -69,3 +69,4 @@ outTmp/
 kotlin-ide/
 .kotlin/
 *.log
+.npmrc
