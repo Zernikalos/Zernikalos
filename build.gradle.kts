@@ -90,9 +90,6 @@ kotlin {
 
     targets.configureEach {
         compilations.configureEach {
-//            compileTaskProvider.configure {
-//                //dependsOn("generateVersionConstants")
-//            }
             compilerOptions.configure {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
@@ -113,6 +110,13 @@ kotlin {
             customField("author", zernikalosAuthorName)
             customField("description", zernikalosDescription)
             customField("license", zernikalosLicense)
+            customField("repository", mapOf(
+                "type" to "git",
+                "url" to "https://gitlab.com/zernikalos/zernikalos"
+            ))
+            customField("publishConfig", mapOf(
+                "registry" to "https://gitlab.com/api/v4/projects/$gitlabProjectId/packages/npm/"
+            ))
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
@@ -269,4 +273,22 @@ tasks.configureEach {
         name.endsWith("Jar")) {
         dependsOn("generateVersionConstants")
     }
+}
+
+tasks.register<Copy>("generateNpmrc") {
+    from(".npmrc.template")
+    into(layout.buildDirectory.dir("js").get().toString())
+    rename(".npmrc.template", ".npmrc")
+    filter { line ->
+        line.replace("\${GITLAB_PROJECT_ID}", gitlabProjectId.toString())
+            .replace("\${GITLAB_ACCESS_TOKEN}", gitlabAccessToken)
+    }
+}
+
+tasks.register<Exec>("publishJsToGitlab") {
+    dependsOn("generateNpmrc")
+
+    workingDir = layout.buildDirectory.dir("js/packages/@zernikalos/zernikalos").get().asFile
+
+    commandLine("npm", "publish")
 }
