@@ -90,9 +90,9 @@ kotlin {
 
     targets.configureEach {
         compilations.configureEach {
-            compileTaskProvider.configure {
-                dependsOn("generateVersionConstants")
-            }
+//            compileTaskProvider.configure {
+//                //dependsOn("generateVersionConstants")
+//            }
             compilerOptions.configure {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
@@ -239,7 +239,9 @@ dokka {
     }
 }
 
-// Custom tasks
+// Custom Tasks
+
+// Generate a ZVersion.kt file with the current version number.
 tasks.register("generateVersionConstants") {
     val outputDir = file("src/commonMain/kotlin/zernikalos")
     val outputFile = file("$outputDir/ZVersion.kt")
@@ -257,5 +259,14 @@ tasks.register("generateVersionConstants") {
                 const val VERSION = "${project.version}"
             }
         """.trimIndent())
+    }
+}
+
+// Make sure that the version constants are generated before any compilation task.
+tasks.configureEach {
+    if (name.startsWith("compile") ||
+        name.endsWith("SourcesJar") ||
+        name.endsWith("Jar")) {
+        dependsOn("generateVersionConstants")
     }
 }
