@@ -251,10 +251,17 @@ class ZVector3(): ZAlgebraObject {
             result.z = op1.x * op2.y - op1.y * op2.x
         }
 
+        @JsName("lerpIp")
         fun lerp(result: ZVector3, t: Float, op1: ZVector3, op2: ZVector3) {
             result.x = (1 - t) * op1.x + t * op2.x
             result.y = (1 - t) * op1.y + t * op2.y
             result.z = (1 - t) * op1.z + t * op2.z
+        }
+
+        fun lerp(t: Float, op1: ZVector3, op2: ZVector3): ZVector3 {
+            val result = ZVector3()
+            lerp(result, t, op1, op2)
+            return result
         }
 
         fun rotateVector(result: ZVector3, quat: ZQuaternion, v: ZVector3) {

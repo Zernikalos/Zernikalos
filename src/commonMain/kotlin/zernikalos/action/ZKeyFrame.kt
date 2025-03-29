@@ -14,6 +14,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.math.ZQuaternion
+import zernikalos.math.ZVector3
 import kotlin.js.JsExport
 
 @JsExport
@@ -64,3 +66,35 @@ class ZKeyFrame(@ProtoNumber(1) var time: Float) {
     }
 
 }
+
+@JsExport
+interface ZTimeFrame {
+    val time: Float
+}
+
+@JsExport
+@Serializable
+data class ZPositionFrame(
+    @ProtoNumber(1)
+    override val time: Float,
+    @ProtoNumber(10)
+    val position: ZVector3
+): ZTimeFrame
+
+@JsExport
+@Serializable
+data class ZRotationFrame(
+    @ProtoNumber(1)
+    override val time: Float,
+    @ProtoNumber(10)
+    val rotation: ZQuaternion
+): ZTimeFrame
+
+@JsExport
+@Serializable
+data class ZScaleFrame(
+    @ProtoNumber(1)
+    override val time: Float,
+    @ProtoNumber(10)
+    val scale: ZVector3
+): ZTimeFrame

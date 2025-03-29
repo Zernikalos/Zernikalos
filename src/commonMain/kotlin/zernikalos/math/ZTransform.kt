@@ -136,8 +136,8 @@ class ZTransform() {
      */
     val matrix: ZMatrix4
         get() {
-            ZMatrix4.scale(_matrix, _scale)
             ZMatrix4.identity(_matrix)
+            ZMatrix4.scale(_matrix, _scale)
             ZMatrix4.rotate(_matrix, rotation)
             ZMatrix4.setTranslation(_matrix, _position)
             return _matrix
