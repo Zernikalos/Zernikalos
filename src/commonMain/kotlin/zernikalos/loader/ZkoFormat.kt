@@ -16,7 +16,7 @@ import zernikalos.action.ZSkeletalAction
 import zernikalos.utils.ZSemVer
 import kotlin.js.JsExport
 
-const val ZKO_VERSION = "0.5.0"
+const val ZKO_VERSION = "0.6.0"
 
 val ZkoVersion = ZSemVer.parse(ZKO_VERSION)
 

@@ -393,12 +393,19 @@ class ZQuaternion(): ZAlgebraObject {
             return result
         }
 
+        @JsName("slerpIp")
         fun slerp(result: ZQuaternion, t: Float, q1: ZQuaternion, q2: ZQuaternion) {
             result.w = (1 - t) * q1.w + t * q2.w
             result.x = (1 - t) * q1.x + t * q2.x
             result.y = (1 - t) * q1.y + t * q2.y
             result.z = (1 - t) * q1.z + t * q2.z
             normalize(result, result)
+        }
+
+        fun slerp(t: Float, q1: ZQuaternion, q2: ZQuaternion): ZQuaternion {
+            val result = ZQuaternion()
+            slerp(result, t, q1, q2)
+            return result
         }
 
     }
