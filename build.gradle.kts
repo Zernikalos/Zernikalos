@@ -36,6 +36,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
     id("maven-publish")
     id("org.jetbrains.dokka") version libs.versions.dokka.get()
+    id("com.github.ben-manes.versions") version libs.versions.versionsPlugin.get()
     // id("org.lwjgl.plugin") apply true
     // id("org.jlleitschuh.gradle.ktlint")
 }
@@ -105,7 +106,7 @@ kotlin {
     }
 
     js(IR) {
-        moduleName = "@zernikalos/zernikalos"
+        outputModuleName.set("@zernikalos/zernikalos")
         compilations["main"].packageJson {
             customField("author", zernikalosAuthorName)
             customField("description", zernikalosDescription)
