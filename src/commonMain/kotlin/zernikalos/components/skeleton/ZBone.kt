@@ -34,8 +34,6 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
 
     var name: String by data::name
 
-    var idx: Int by data::idx
-
     var transform: ZTransform by data::transform
 
     var inverseBindTransform: ZTransform? by data::inverseBindTransform
@@ -109,8 +107,6 @@ data class ZBoneData(
     var id: String = "",
     @ProtoNumber(2)
     var name: String = "",
-    @ProtoNumber(3)
-    var idx: Int = -1,
     @ProtoNumber(4)
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)

@@ -26,7 +26,7 @@ class ZBoneMatrixGenerator: ZUniformGenerator {
         val skeleton = obj.skeleton!!
         val bones = skeleton.bones
 
-        bones.sortBy { it.idx }
+        //bones.sortBy { it.idx }
         val boneMatrices= bones.map { it ->
             if (it.name == "mixamorig_Head") {
                 val poseMat = ZMatrix4()

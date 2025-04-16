@@ -20,6 +20,7 @@ import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.shader.*
+import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZShaderProgramParameters
@@ -42,6 +43,8 @@ class ZModel: ZObject() {
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null
+    @Contextual @ProtoNumber(8)
+    var skinning: ZSkinning? = null
 
     val hasTextures: Boolean
         get() = material?.texture != null && mesh.hasBuffer(ZAttributeId.UV)
