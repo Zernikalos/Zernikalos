@@ -9,13 +9,10 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.action.ZSkeletalAction
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
@@ -43,7 +40,7 @@ class ZModel: ZObject() {
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null
-    @Contextual @ProtoNumber(8)
+    @ProtoNumber(8)
     var skinning: ZSkinning? = null
 
     val hasTextures: Boolean
@@ -60,6 +57,8 @@ class ZModel: ZObject() {
 
     @Transient
     private lateinit var renderer: ZModelRenderer
+
+    var action: ZSkeletalAction? = null
 
     override fun internalInitialize(ctx: ZContext) {
         renderer = ZModelRenderer(ctx.renderingContext, this)
