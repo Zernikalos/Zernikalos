@@ -1,0 +1,35 @@
+workflows:
+  create-commit-push-mr:
+    description: "Create commit, push to gitlab and return MR URL"
+    triggers:
+      - "create commit and push"
+    steps:
+      - name: "Create commit"
+        command: "git commit -m '{type}: {emoji} {message}'"
+        args:
+          type: "{{commit_type}}"
+          emoji: "{{commit_emoji}}"
+          message: "{{commit_message}}"
+      - name: "Push to gitlab"
+        command: "git push gitlab {{current_branch}}"
+      - name: "Get MR URL"
+        command: "git remote get-url gitlab"
+        output: "mr_url"
+        transform: "https://gitlab.com/{{repo_path}}/-/merge_requests/new?merge_request%5Bsource_branch%5D={{current_branch}}"
+    variables:
+      - name: "commit_type"
+        description: "Type of the commit (feat, fix, docs, style, refactor, test, chore)"
+        required: true
+      - name: "commit_message"
+        description: "Message for the commit"
+        required: true
+      - name: "current_branch"
+        description: "Current git branch"
+        default: "$(git rev-parse --abbrev-ref HEAD)"
+    validation:
+      - rule: "valid_commit_type"
+        description: "Commit type must be one of the allowed types"
+        pattern: "^(feat|fix|docs|style|refactor|test|chore)$"
+      - rule: "non_empty_message"
+        description: "Commit message cannot be empty"
+        pattern: ".+"

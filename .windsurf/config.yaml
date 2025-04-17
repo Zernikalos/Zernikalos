@@ -1,0 +1,16 @@
+# Windsurf Configuration
+
+# Import rules from individual files
+includes:
+  - .windsurf/rules/commit-format.yaml
+  - .windsurf/rules/workflow.yaml
+  - .windsurf/rules/templates.yaml
+  - .windsurf/rules/zernikalos_components.yaml
+
+# Global settings
+global:
+  editor:
+    theme: dark
+    font_size: 14
+    line_numbers: true
+    word_wrap: true

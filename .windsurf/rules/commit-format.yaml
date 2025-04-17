@@ -1,11 +1,10 @@
-# Commit format
-- Type: fix, feat, docs, style, refactor, test, chore
-- Scope: (optional)
-- Subject: description
-- Body: (optional)
-- Footer: (optional)# Windsurf Rules Configuration
+# Windsurf Rules Configuration
 rules:
-  # Allowed commit types
+  # Commit format trigger
+  commit_format:
+    trigger: "create {type} commit with message {message}"
+    
+  # Commit types with their corresponding emojis
   commit_types:
     - type: "feat"
       emoji: "🎸"

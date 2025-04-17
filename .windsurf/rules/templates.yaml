@@ -1,0 +1,33 @@
+rules:
+  create-from-template:
+    description: "Create a new file from a template"
+    triggers:
+      - "create file from template"
+    steps:
+      - name: "Select template"
+        command: "echo 'Available templates:' && ls .windsurf/templates/"
+        output: "available_templates"
+      - name: "Create file"
+        command: "cat .windsurf/templates/{{template_name}} | sed -e 's/{{author}}/{{author_name}}/g' -e 's/{{year}}/{{current_year}}/g' -e 's/{{file_name}}/{{output_file}}/g' > {{output_file}}"
+    variables:
+      - name: "template_name"
+        description: "Name of the template file to use"
+        required: true
+      - name: "output_file"
+        description: "Name of the output file to create"
+        required: true
+      - name: "author_name"
+        description: "Author name"
+        default: "{{git_user_name}}"
+      - name: "current_year"
+        description: "Current year"
+        default: "$(date +%Y)"
+    validation:
+      - rule: "template_exists"
+        description: "Template file must exist"
+        pattern: "^.*$"
+        validate: "test -f .windsurf/templates/{{template_name}}"
+      - rule: "output_file_not_exists"
+        description: "Output file must not exist"
+        pattern: "^.*$"
+        validate: "test ! -f {{output_file}}"
