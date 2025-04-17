@@ -299,6 +299,13 @@ class ZQuaternion(): ZAlgebraObject {
             normalize(result, result)
         }
 
+        @JsName("fromMatrix4Ip")
+        fun fromMatrix4(m: ZMatrix4): ZQuaternion {
+            val result = ZQuaternion()
+            ZQuaternion.fromMatrix4(result, m)
+            return result
+        }
+
         //TODO: Optimize this method
         fun fromMatrix4(result: ZQuaternion, m: ZMatrix4) {
             val v = m.floatArray

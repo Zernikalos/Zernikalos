@@ -24,8 +24,10 @@ class ZInverseBindMatrixGenerator: ZUniformGenerator {
         val skeleton = obj.skeleton!!
         val bones = skeleton.bones
 
-        // bones.sortBy { it.idx }
-        val boneMatrices = bones.map {
+        // Sort bones according to the order defined in the skinning's boneIds array
+        val boneIdsList = obj.skinning!!.boneIds.toList()
+        val sortedBones = bones.sortedBy { bone -> boneIdsList.indexOf(bone.id) }
+        val boneMatrices = sortedBones.map {
             it.inverseBindMatrix
         }
 

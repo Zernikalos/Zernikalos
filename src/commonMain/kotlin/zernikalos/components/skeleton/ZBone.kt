@@ -80,12 +80,20 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         }
         val globalPoseMatrix =  ZMatrix4()
         ZMatrix4.mult(globalPoseMatrix, inverseBindMatrix, currentPoseMatrix)
-        poseMatrix = globalPoseMatrix
     }
 
     fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
-        val poseMat = keyFrame.getBoneTransform(name)!!.toTransform().matrix
-        ZMatrix4.mult(poseMatrix, parentPoseMatrix, poseMat)
+        val boneTransform = keyFrame.getBoneTransform(name)
+
+        val localPoseMat = if (boneTransform != null) {
+            val animationTransform = boneTransform.toTransform()
+            animationTransform.matrix
+        } else {
+            bindMatrix
+        }
+
+        ZMatrix4.mult(poseMatrix, parentPoseMatrix, localPoseMat)
+
         for (child in children) {
             child.computePoseFromKeyFrame(keyFrame, poseMatrix)
         }

@@ -44,22 +44,24 @@ in vec3 a_position;
 #ifdef USE_SKINNING
 vec4 calcSkinnedPosition() {
     vec4 skinnedPosition = vec4(0.0);
+    float totalWeight = 0.0;
      
      // Sum the transformations from each influencing bone
     for (int i = 0; i < 4; ++i) {
         if (a_boneWeight[i] > 0.0) {
             int boneID = int(a_boneIndices[i]);
-            mat4 boneMatrix = u_bones[boneID];
-            mat4 boneInverseMatrix = u_invBindMatrix[boneID];
-
+            mat4 skinMatrix = u_bones[boneID] * u_invBindMatrix[boneID];
+            vec4 posedPosition = skinMatrix * vec4(a_position, 1.0);
+            
             // Apply the bone transformation
-            vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
+            // vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
 
-            skinnedPosition += a_boneWeight[i] * (boneMatrix * localPosition);
+            skinnedPosition += a_boneWeight[i] * posedPosition;
+            totalWeight += a_boneWeight[i];
         }
     }
     
-    return skinnedPosition;
+    return totalWeight > 0.0 ? skinnedPosition / totalWeight : vec4(a_position, 1.0);
 }
 #endif
 
