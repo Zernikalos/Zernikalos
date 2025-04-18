@@ -1,0 +1,41 @@
+# Windsurf Rules Configuration
+rules:
+  # Commit format trigger
+  commit_format:
+    trigger: "create {type} commit with message {message}"
+    
+  # Commit types with their corresponding emojis
+  commit_types:
+    - type: "feat"
+      emoji: "🎸"
+      description: "New feature"
+    - type: "fix"
+      emoji: "🐛"
+      description: "Bug fix"
+    - type: "docs"
+      emoji: "📚"
+      description: "Documentation"
+    - type: "style"
+      emoji: "🎨"
+      description: "Style changes"
+    - type: "refactor"
+      emoji: "💡"
+      description: "Code refactoring"
+    - type: "test"
+      emoji: "✅"
+      description: "Tests addition or correction"
+    - type: "chore"
+      emoji: "🤖"
+      description: "Maintenance tasks"
+
+  # Commit message format
+  message_format: "{type}: {emoji} {message}"
+
+  # Validation rules
+  validation:
+    - rule: "type_required"
+      description: "Commit type is required"
+      pattern: "^[a-z]+$"
+    - rule: "message_required"
+      description: "Message is required"
+      pattern: ".+"

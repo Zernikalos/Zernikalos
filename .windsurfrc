@@ -1,0 +1,31 @@
+{
+  "formatting": {
+    "indent_size": 4,
+    "tab_width": 4,
+    "use_spaces": true,
+    "max_line_length": 100,
+    "insert_final_newline": true,
+    "trim_trailing_whitespace": true
+  },
+  "editor": {
+    "theme": "dark",
+    "font_size": 14,
+    "line_numbers": true,
+    "word_wrap": true
+  },
+  "templates": {
+    "kotlin": {
+      "renderable_component": {
+        "description": "Template for renderable and serializable component",
+        "content": "@Serializable\n@JsExport\ninternal class Z{{ComponentName}}Data internal constructor(\n): ZComponentData()\n\n/**\n * @suppress\n */\nexpect class Z{{ComponentName}}Renderer internal constructor(\n    ctx: ZRenderingContext,\n    data: Z{{ComponentName}}Data\n): ZBaseComponentRender {\n    override fun initialize() {\n    }\n\n    override fun render() {\n    }\n}\n\n/**\n * @suppress\n */\ninternal class Z{{ComponentName}}Serializer: ZComponentSerializer<Z{{ComponentName}}, ZRaw{{ComponentName}}Data>() {\n    override val kSerializer: KSerializer<ZRaw{{ComponentName}}Data>\n        get() = ZRaw{{ComponentName}}Data.serializer()\n\n    override fun createComponentInstance(data: ZRaw{{ComponentName}}Data): Z{{ComponentName}} {\n        val componentData = Z{{ComponentName}}Data()\n        return Z{{ComponentName}}(componentData)\n    }\n}",
+        "variables": {
+          "ComponentName": {
+            "description": "Component name (e.g. Mesh, Bone, etc.)",
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    }
+  }
+}

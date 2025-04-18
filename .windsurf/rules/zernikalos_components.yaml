@@ -1,0 +1,42 @@
+rules:
+  create-zernikalos-renderizable-component:
+    description: "Create a new Zernikalos renderizable component"
+    triggers:
+      - "create zernikalos renderizable component"
+    steps:
+      - name: "Create component directory"
+        command: "mkdir -p src/commonMain/kotlin/zernikalos/components/{{type}}"
+      - name: "Create component file"
+        command: "cat .windsurf/templates/zernikalos_renderizable_component_template.kt | \
+            sed -e 's/{{author}}/{{author_name}}/g' \
+            -e 's/{{year}}/{{current_year}}/g' \
+            -e 's/{{component_name}}/{{name}}/g' \
+            -e 's/{{component_type}}/{{type}}/g' > src/commonMain/kotlin/zernikalos/components/{{type}}/Z{{name}}.kt"
+    variables:
+      - name: "name"
+        description: "Name of the component (e.g. Mesh, Bone, etc.)"
+        required: true
+      - name: "type"
+        description: "Type of component (e.g. mesh, bone, etc.)"
+        required: true
+      - name: "author_name"
+        description: "Author name"
+        default: "{{git_user_name}}"
+      - name: "current_year"
+        description: "Current year"
+        default: "$(date +%Y)"
+    validation:
+      - rule: "valid_name"
+        description: "Component name must be a valid Kotlin class name"
+        pattern: "^[A-Z][a-zA-Z0-9]*$"
+      - rule: "valid_type"
+        description: "Component type must be a valid Kotlin package name"
+        pattern: "^[a-z][a-z0-9]*$"
+      - rule: "component_directory_not_exists"
+        description: "Component directory must not exist"
+        pattern: "^.*$"
+        validate: "test ! -d src/commonMain/kotlin/zernikalos/components/{{component_type}}"
+      - rule: "component_file_not_exists"
+        description: "Component file must not exist"
+        pattern: "^.*$"
+        validate: "test ! -f src/commonMain/kotlin/zernikalos/components/{{component_type}}/Z{{component_name}}.kt"
