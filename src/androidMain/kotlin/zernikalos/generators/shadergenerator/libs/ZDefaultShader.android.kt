@@ -52,9 +52,6 @@ vec4 calcSkinnedPosition() {
             int boneID = int(a_boneIndices[i]);
             mat4 skinMatrix = u_bones[boneID] * u_invBindMatrix[boneID];
             vec4 posedPosition = skinMatrix * vec4(a_position, 1.0);
-            
-            // Apply the bone transformation
-            // vec4 localPosition = boneInverseMatrix * vec4(a_position, 1.0);
 
             skinnedPosition += a_boneWeight[i] * posedPosition;
             totalWeight += a_boneWeight[i];
