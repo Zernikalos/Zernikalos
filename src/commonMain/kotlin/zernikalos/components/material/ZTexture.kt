@@ -9,6 +9,7 @@
 package zernikalos.components.material
 
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
@@ -30,11 +31,6 @@ class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<
 
     @JsName("initWithArgs")
     constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(ZTextureData(id, width, height, flipX, flipY, dataArray))
-
-    /**
-     * Represents the unique identifier for an instance of a ZTexture object.
-     */
-    var id: String by data::id
 
     /**
      * Represents the width of the texture image
@@ -91,7 +87,7 @@ internal data class ZTextureDataWrapper(
 @Serializable
 data class ZTextureData(
     @ProtoNumber(1)
-    var id: String = "",
+    override var refId: String = "",
     @ProtoNumber(2)
     var width: Int = 0,
     @ProtoNumber(3)
@@ -118,12 +114,17 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 /**
  * @suppress
  */
-internal class ZTextureSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZTexture, ZTextureData, ZTextureDataWrapper>(loaderContext) {
+internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZTexture, ZTextureData>() {
 
-    override val deserializationStrategy: DeserializationStrategy<ZTextureDataWrapper> = ZTextureDataWrapper.serializer()
+    override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
 
     override fun createComponentInstance(data: ZTextureData): ZTexture {
-        return ZTexture(data)
+        if (loaderContext.hasComponent(data.refId)) {
+            return loaderContext.getComponent(data.refId) as ZTexture
+        }
+        val texture = ZTexture(data)
+        loaderContext.addComponent(texture.refId, texture)
+        return texture
     }
 
 }
