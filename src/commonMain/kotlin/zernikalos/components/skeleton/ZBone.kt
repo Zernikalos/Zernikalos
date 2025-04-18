@@ -30,16 +30,37 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     @JsName("init")
     constructor(): this(ZBoneData())
 
+    /**
+     * Returns the unique identifier of this bone.
+     */
     var id: String by data::id
 
+    /**
+     * Returns the name of this bone.
+     */
     var name: String by data::name
 
+    /**
+     * Returns the transform of this bone.
+     */
     var transform: ZTransform by data::transform
 
-    var inverseBindTransform: ZTransform? by data::inverseBindTransform
-
+    /**
+     * Returns the inverse bind transform of this bone.
+     */
+    /**
+     * Returns the bind matrix of this bone.
+     */
     var bindMatrix: ZMatrix4 = ZMatrix4.Identity
+
+    /**
+     * Returns the inverse bind matrix of this bone.
+     */
     var inverseBindMatrix: ZMatrix4 = ZMatrix4.Identity
+
+    /**
+     * Returns the pose matrix of this bone.
+     */
     var poseMatrix: ZMatrix4 = ZMatrix4.Identity
 
     @Transient
@@ -47,9 +68,15 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     override val parent: ZBone?
         get() = _parent
 
+    /**
+     * Returns true if this bone has a parent, false otherwise.
+     */
     override val hasParent: Boolean
         get() = parent != null
 
+    /**
+     * Returns the children of this bone.
+     */
     override val children: Array<ZBone>
         get() = data.children.toTypedArray()
 
@@ -59,6 +86,10 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         }
     }
 
+    /**
+     * Add a child bone to this bone.
+     * @param bone the bone to add
+     */
     fun addChild(bone: ZBone) {
         data.children.add(bone)
         bone._parent = this
@@ -67,21 +98,14 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     override fun internalInitialize(ctx: ZRenderingContext) {
         if (isRoot) {
             computeInverseBindMatrix(ZMatrix4.Identity)
-            computePose(ZMatrix4.Identity)
         }
     }
 
-    fun computePose(parentPoseMatrix: ZMatrix4) {
-        val currentLocalPoseMatrix = ZMatrix4()
-        val currentPoseMatrix = ZMatrix4()
-        ZMatrix4.mult(currentPoseMatrix, parentPoseMatrix, currentLocalPoseMatrix)
-        for (child in children) {
-            child.computePose(currentPoseMatrix)
-        }
-        val globalPoseMatrix =  ZMatrix4()
-        ZMatrix4.mult(globalPoseMatrix, inverseBindMatrix, currentPoseMatrix)
-    }
-
+    /**
+     * Compute the pose matrix for this bone and its children from the given keyframe.
+     * @param keyFrame the keyframe to compute the pose from
+     * @param parentPoseMatrix the pose matrix of the parent bone
+     */
     fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
         val boneTransform = keyFrame.getBoneTransform(name)
 
@@ -99,6 +123,11 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         }
     }
 
+    /**
+     * Compute the inverse bind matrix for this bone and its children.
+     * Should be called after all the bones have been added to the skeleton.
+     * @param parentBindMatrix the bind matrix of the parent bone
+     */
     private fun computeInverseBindMatrix(parentBindMatrix: ZMatrix4) {
         bindMatrix = ZMatrix4()
         ZMatrix4.mult(bindMatrix, parentBindMatrix, transform.matrix)
@@ -118,10 +147,7 @@ data class ZBoneData(
     @ProtoNumber(4)
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)
-    val children: ArrayList<ZBone> = arrayListOf(),
-
-    @ProtoNumber(6)
-    var inverseBindTransform: ZTransform? = ZTransform(),
+    val children: ArrayList<ZBone> = arrayListOf()
 ): ZComponentData()
 
 
