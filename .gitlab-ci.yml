@@ -2,33 +2,50 @@ stages:
   - build
   - publish
 
+variables:
+  CACHE_KEY: "main"
+
 build:
   image: mobiledevops/android-sdk-image:34.0.0
   stage: build
   script:
     - ./gradlew build
+  cache:
+    key: "main"
+    paths:
+      - build/
+      - .gradle/
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 .publish-template:
   stage: publish
   variables:
-    GITLAB_TOKEN: $GITLAB_TOKEN
-    GITLAB_NAME: $GITLAB_NAME
+    GITLAB_TOKEN: $CI_JOB_TOKEN
+    GITLAB_NAME: "Job-Token"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^release/'
 
-
-# TODO: - ./gradlew podspec
 publish-android:
   extends: .publish-template
   image: mobiledevops/android-sdk-image:34.0.0
   script:
-    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
-    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+    - ./gradlew publishAndroidDebugPublicationToMavenRepository -Pgitlab_access_token=$CI_JOB_TOKEN -Pgitlab_name="Job-Token"
+    - ./gradlew publishAndroidReleasePublicationToMavenRepository -Pgitlab_access_token=$CI_JOB_TOKEN -Pgitlab_name="Job-Token"
 
 publish-js:
   extends: .publish-template
-  image: node:lts
+  image: node:22-alpine
+  before_script:
+    - npm install -g npm
+    - npm config set registry https://gitlab.com/api/v4/projects/67293086/packages/npm/
+    - npm config set //gitlab.com/api/v4/projects/67293086/packages/npm/:_authToken $CI_JOB_TOKEN
   script:
-    - ./gradlew publishJsToGitlab -Pgitlab_access_token=$GITLAB_TOKEN -Pgitlab_name=$GITLAB_NAME
+    - cd build/js
+    - npm publish --workspace=@zernikalos/zernikalos
+  cache:
+    key: "main"
+    paths:
+      - build/
+      - .gradle/
+      - node_modules/
