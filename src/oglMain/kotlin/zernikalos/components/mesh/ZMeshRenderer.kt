@@ -24,13 +24,10 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
     val vao: ZVertexArray = ZVertexArray()
 
     actual override fun initialize() {
-        // TODO: This change was required to make it work with WebGL
-        data.indexBuffer?.initialize(ctx)
         vao.initialize(ctx)
 
         data.buffers.values.filter {buff ->
-            // TODO: This change was required to make it work with WebGL
-            buff.enabled && !buff.isIndexBuffer
+            buff.enabled
         }.forEach { buff ->
             buff.initialize(ctx)
             buff.bind()
@@ -44,10 +41,7 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
         vao.bind()
         if (data.hasIndexBuffer) {
             logger.debugOnce("Using indexed buffer rendering")
-            // If we have the index buffer for sure this will not be null
             val indexBuffer = data.indexBuffer!!
-            // TODO: This change was required to make it work with WebGL
-            indexBuffer.bind()
             val count = indexBuffer.count
             ctx.drawElements(drawMode.value, count, toOglBaseType(indexBuffer.dataType), 0)
         } else {
@@ -63,8 +57,8 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
 
 fun convertDrawMode(drawMode: ZDrawMode): DrawModes {
     return when (drawMode) {
-        ZDrawMode.LINES -> return DrawModes.LINES
-        ZDrawMode.TRIANGLES -> return DrawModes.TRIANGLES
-        else -> return DrawModes.TRIANGLES
+        ZDrawMode.LINES -> DrawModes.LINES
+        ZDrawMode.TRIANGLES -> DrawModes.TRIANGLES
+        else -> DrawModes.TRIANGLES
     }
 }
