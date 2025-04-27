@@ -109,12 +109,14 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
         val boneTransform = keyFrame.getBoneTransform(name)
 
-        val localPoseMat = if (boneTransform != null) {
-            val animationTransform = boneTransform.toTransform()
-            animationTransform.matrix
-        } else {
-            bindMatrix
+        // Merge rest transform with any animated components
+        val merged = ZTransform(transform.position, transform.rotation, transform.scale)
+        if (boneTransform != null) {
+            boneTransform.position?.let { merged.position = it }
+            boneTransform.rotation?.let { merged.rotation = it }
+            boneTransform.scale   ?.let { merged.scale    = it }
         }
+        val localPoseMat = merged.matrix
 
         ZMatrix4.mult(poseMatrix, parentPoseMatrix, localPoseMat)
 
