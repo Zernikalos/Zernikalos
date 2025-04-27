@@ -57,7 +57,9 @@ class ZSkeletalAction(
                 scale = scale?.scale
             )
 
-            kf.setBoneTransform(track.boneName, zBoneTransform)
+            if (zBoneTransform.hasPosition || zBoneTransform.hasRotation || zBoneTransform.hasScale) {
+                kf.setBoneTransform(track.boneName, zBoneTransform)
+            }
         }
 
         return kf

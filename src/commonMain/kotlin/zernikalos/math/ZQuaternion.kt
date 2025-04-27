@@ -20,6 +20,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -402,11 +403,35 @@ class ZQuaternion(): ZAlgebraObject {
 
         @JsName("slerpIp")
         fun slerp(result: ZQuaternion, t: Float, q1: ZQuaternion, q2: ZQuaternion) {
-            result.w = (1 - t) * q1.w + t * q2.w
-            result.x = (1 - t) * q1.x + t * q2.x
-            result.y = (1 - t) * q1.y + t * q2.y
-            result.z = (1 - t) * q1.z + t * q2.z
-            normalize(result, result)
+            // Dot product
+            var dot = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z
+            // Invert q2 if dot < 0 to take the shortest path
+            var q3 = q2
+            if (dot < 0f) {
+              dot = -dot
+              q3 = ZQuaternion(-q2.x, -q2.y, -q2.z, -q2.w)
+            }
+            // Close to 1, fallback to NLERP to avoid division by 0
+            if (dot > 0.9995f) {
+              result.w = q1.w + t*(q3.w - q1.w)
+              result.x = q1.x + t*(q3.x - q1.x)
+              result.y = q1.y + t*(q3.y - q1.y)
+              result.z = q1.z + t*(q3.z - q1.z)
+              normalize(result, result)
+              return
+            }
+            // Angle between quaternions
+            val theta0 = acos(dot)
+            val theta = theta0 * t
+            val sinTheta = sin(theta)
+            val sinTheta0 = sin(theta0)
+            val s0 = cos(theta) - dot * sinTheta / sinTheta0
+            val s1 = sinTheta / sinTheta0
+          
+            result.w = q1.w * s0 + q3.w * s1
+            result.x = q1.x * s0 + q3.x * s1
+            result.y = q1.y * s0 + q3.y * s1
+            result.z = q1.z * s0 + q3.z * s1
         }
 
         fun slerp(t: Float, q1: ZQuaternion, q2: ZQuaternion): ZQuaternion {
