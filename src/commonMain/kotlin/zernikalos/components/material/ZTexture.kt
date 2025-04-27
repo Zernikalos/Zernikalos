@@ -32,6 +32,8 @@ class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<
     @JsName("initWithArgs")
     constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(ZTextureData(id, width, height, flipX, flipY, dataArray))
 
+    var id: String by data::id
+
     /**
      * Represents the width of the texture image
      */
@@ -87,7 +89,7 @@ internal data class ZTextureDataWrapper(
 @Serializable
 data class ZTextureData(
     @ProtoNumber(1)
-    override var refId: String = "",
+    var id: String = "",
     @ProtoNumber(2)
     var width: Int = 0,
     @ProtoNumber(3)
@@ -119,11 +121,11 @@ internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZC
     override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
 
     override fun createComponentInstance(data: ZTextureData): ZTexture {
-        if (loaderContext.hasComponent(data.refId)) {
-            return loaderContext.getComponent(data.refId) as ZTexture
+        if (loaderContext.hasComponent(data.id)) {
+            return loaderContext.getComponent(data.id) as ZTexture
         }
         val texture = ZTexture(data)
-        loaderContext.addComponent(texture.refId, texture)
+        loaderContext.addComponent(texture.id, texture)
         return texture
     }
 

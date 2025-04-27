@@ -55,10 +55,8 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
 
 }
 
-fun convertDrawMode(drawMode: ZDrawMode): DrawModes {
-    return when (drawMode) {
+fun convertDrawMode(drawMode: ZDrawMode): DrawModes = when (drawMode) {
         ZDrawMode.LINES -> DrawModes.LINES
         ZDrawMode.TRIANGLES -> DrawModes.TRIANGLES
         else -> DrawModes.TRIANGLES
     }
-}
