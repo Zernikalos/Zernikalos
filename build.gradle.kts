@@ -15,7 +15,8 @@ val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
-val zernikalosVersion = "0.0.4"
+val zernikalosVersion: String
+    get() = file("VERSION.txt").readText().trim()
 val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
@@ -91,17 +92,22 @@ kotlin {
 
     targets.configureEach {
         compilations.configureEach {
-            compilerOptions.configure {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
             }
         }
     }
 
     androidTarget("android") {
         publishLibraryVariants("release", "debug")
-
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+                }
+            }
         }
     }
 
@@ -288,8 +294,24 @@ tasks.register<Copy>("generateNpmrc") {
 
 tasks.register<Exec>("publishJsToGitlab") {
     dependsOn("generateNpmrc")
+}
 
-    workingDir = layout.buildDirectory.dir("js/packages/@zernikalos/zernikalos").get().asFile
+tasks.register("updateVersion") {
+    description = "Update project version. Usage: ./gradlew updateVersion -PnewVersion=X.Y.Z"
+    group = "versioning"
 
-    commandLine("npm", "publish")
+    doLast {
+        val newVersion = project.findProperty("newVersion") as String? 
+            ?: zernikalosVersion
+            ?: throw GradleException("Could not determine version. Please provide -PnewVersion=X.Y.Z or define zernikalosVersion")
+
+        println("Updating Zernikalos version to $newVersion")
+
+        // Update project version
+        project.version = newVersion
+
+        // Write version to file
+        file("VERSION.txt").writeText(newVersion)
+    }
+    finalizedBy("generateVersionConstants", "podspec", "jsBrowserDistribution")
 }
