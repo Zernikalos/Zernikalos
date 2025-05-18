@@ -86,6 +86,7 @@ class ZModel: ZObject() {
     }
 
     private fun enableRequiredBuffers(shaderParameters: ZShaderProgramParameters) {
+        // TODO: This might fail when the mesh is shared
         mesh.indexBuffer?.enabled = true
         mesh.position?.enabled = shaderParameters.usePosition
         mesh.normal?.enabled = shaderParameters.useNormals

@@ -12,7 +12,7 @@ import platform.Metal.*
 import zernikalos.ui.ZMtlSurfaceView
 import zernikalos.ui.ZSurfaceView
 
-class ZMtlRenderingContext constructor(view: ZSurfaceView): ZRenderingContext {
+class ZMtlRenderingContext(view: ZSurfaceView): ZRenderingContext {
 
     val surfaceView: ZMtlSurfaceView = view as ZMtlSurfaceView
 
