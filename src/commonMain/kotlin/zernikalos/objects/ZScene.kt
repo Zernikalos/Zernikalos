@@ -28,10 +28,10 @@ class ZScene(): ZObject() {
     }
 
     override fun internalRender(ctx: ZContext) {
-        viewport.render()
+        viewport.render(ctx.renderingContext)
     }
 
     override fun internalOnViewportResize(ctx: ZContext, width: Int, height: Int) {
-        viewport.onViewportResize(width, height)
+        viewport.onViewportResize(ctx.renderingContext, width, height)
     }
 }

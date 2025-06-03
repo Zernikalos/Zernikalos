@@ -8,9 +8,7 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
-import zernikalos.components.ZRenderizableComponent
+import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -44,42 +42,52 @@ val ZAttrBoneIndices: ZAttribute
     get() = ZAttribute(ZAttributeId.BONE_INDEX)
 
 @JsExport
-class ZAttribute internal constructor(data: ZAttributeData): ZRenderizableComponent<ZAttributeData, ZAttributeRenderer>(data) {
+abstract class ZBaseAttribute: ZComponent2 {
+
+    override val isRenderizable: Boolean = true
 
     @JsName("init")
-    constructor(): this(ZAttributeData())
+    constructor(): this(-1, "")
 
     @JsName("initWithArgs")
-    constructor(id: Int, attributeName: String): this(ZAttributeData(id, attributeName))
+    constructor(id: Int, attributeName: String) {
+        this.id = id
+        this.attributeName = attributeName
+    }
 
     @JsName("initWithAttrId")
-    constructor(attrId: ZAttributeId): this(ZAttributeData(attrId.id, attrId.attrName))
+    constructor(attrId: ZAttributeId): this(attrId.id, attrId.attrName)
 
-    var id: Int by data::id
+    var id: Int
 
-    var attributeName: String by data::attributeName
+    var attributeName: String
 
     val attrId: ZAttributeId
         get() = ZAttributeId.entries.find { it.id == id } ?: ZAttributeId.CUSTOM
 
-    override fun createRenderer(ctx: ZRenderingContext): ZAttributeRenderer {
-        return ZAttributeRenderer(ctx, data)
-    }
 
     override fun equals(other: Any?): Boolean {
-        if (other !is ZAttribute) {
+        if (other !is ZBaseAttribute) {
             return false
         }
-        return data == other.data
+        return id == other.id && attributeName == other.attributeName
     }
 }
 
-data class ZAttributeData(
-    var id: Int = -1,
-    var attributeName: String = ""
-): ZComponentData()
+expect open class ZAttributeRender: ZBaseAttribute {
+    constructor()
+    constructor(id: Int, attributeName: String)
+    constructor(attrId: ZAttributeId)
+}
 
-expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRender<ZAttributeData> {
-    override fun initialize()
+@JsExport
+class ZAttribute: ZAttributeRender {
+    @JsName("init")
+    constructor(): super()
+    @JsName("initWithArgs")
+    constructor(id: Int, attributeName: String): super(id, attributeName)
+    @JsName("initWithAttrId")
+    constructor(attrId: ZAttributeId): super(attrId)
 
 }
+

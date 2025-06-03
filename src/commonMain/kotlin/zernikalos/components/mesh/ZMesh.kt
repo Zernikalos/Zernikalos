@@ -24,40 +24,48 @@ import kotlin.js.JsName
  * Mesh will provide:
  * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
  */
-@Serializable(with = ZMeshSerializer::class)
+@Serializable
 @JsExport
-class ZMesh internal constructor(data: ZMeshData):
-    ZRenderizableComponent<ZMeshData, ZMeshRenderer>(data),
-    ZBindeable,
-    ZRenderizable {
+abstract class ZBaseMesh: ZComponent2, ZBindeable2, ZRenderizable2 {
+
+    override val isRenderizable: Boolean = true
+
+    @Transient
+    private val _buffers: HashMap<String, ZBuffer> = hashMapOf()
 
     /**
      * The buffers expressed in a more cohesive way providing key + buffer data in one place
      */
-    val buffers: Map<String, ZBuffer> by data::buffers
+    val buffers: Map<String, ZBuffer>
+        get() = _buffers
 
     /**
      * Represents an index buffer for a ZMesh.
      *
      * @property indexBuffer The index buffer.
      */
-    val indexBuffer: ZBuffer? by data::indexBuffer
+    val indexBuffer: ZBuffer?
+        get() = buffers.values.find { it.isIndexBuffer }
 
     /**
      * Indicates whether the given `ZMesh` has an index buffer or not.
      *
      * @return `true` if the `ZMesh` has an index buffer, `false` otherwise.
      */
-    val hasIndexBuffer: Boolean by data::hasIndexBuffer
+    val hasIndexBuffer: Boolean
+        get() = indexBuffer != null
 
-    var drawMode: ZDrawMode by data::drawMode
-
+    var drawMode: ZDrawMode = ZDrawMode.TRIANGLES
 
     @JsName("init")
-    constructor(): this(ZMeshData())
+    constructor() {
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
-        return ZMeshRenderer(ctx, data)
+    }
+
+    @JsName("initWithData")
+    constructor(data: ZMeshData) {
+        _buffers.putAll(data.buffers)
+        drawMode = data.drawMode
     }
 
     operator fun get(attrId: ZAttributeId): ZBuffer? {
@@ -69,7 +77,7 @@ class ZMesh internal constructor(data: ZMeshData):
     }
 
     val attributeIds: Set<ZAttributeId>
-        get() = data.buffers.values.map { it.attributeId }.toSet()
+        get() = buffers.values.map { it.attributeId }.toSet()
 
     val position: ZBuffer?
         get() = getBufferById(ZAttributeId.POSITION)
@@ -95,7 +103,7 @@ class ZMesh internal constructor(data: ZMeshData):
      * @return The requested buffer if it exists, null otherwise.
      */
     fun getBufferByName(name: String): ZBuffer? {
-        return data.buffers[name]
+        return buffers[name]
     }
 
     /**
@@ -106,7 +114,7 @@ class ZMesh internal constructor(data: ZMeshData):
      */
     @JsExport.Ignore
     fun getBufferById(attrId: ZAttributeId): ZBuffer? {
-        return data.buffers.values.find {
+        return buffers.values.find {
             attrId == it.attributeId
         }
     }
@@ -118,7 +126,7 @@ class ZMesh internal constructor(data: ZMeshData):
      * @return true if a buffer with the given name exists, false otherwise.
      */
     fun hasBuffer(name: String): Boolean {
-        return data.hasBuffer(name)
+        return hasBuffer(name)
     }
 
     /**
@@ -138,7 +146,7 @@ class ZMesh internal constructor(data: ZMeshData):
      * @param buffer The buffer to be added.
      */
     fun addBuffer(buffer: ZBuffer) {
-        data.buffers[buffer.name] = buffer
+        _buffers[buffer.name] = buffer
     }
 
 }
@@ -248,14 +256,31 @@ internal data class ZRawMeshData(
     }
 }
 
-/**
- * @suppress
- */
-expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZBaseComponentRender {
+expect open class ZMeshRender: ZBaseMesh {
 
-    override fun initialize()
+    @JsName("init")
+    constructor()
 
-    override fun render()
+    @JsName("initWithData")
+    constructor(data: ZMeshData)
+
+    override fun bind(ctx: ZRenderingContext)
+
+    override fun unbind(ctx: ZRenderingContext)
+
+    override fun render(ctx: ZRenderingContext)
+}
+
+@Serializable(with = ZMeshSerializer::class)
+@JsExport
+class ZMesh: ZMeshRender {
+
+    @JsName("init")
+    constructor(): super()
+
+    @JsName("initWithData")
+    constructor(data: ZMeshData): super(data)
+
 }
 
 /**

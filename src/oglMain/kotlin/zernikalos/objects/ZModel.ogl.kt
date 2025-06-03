@@ -21,15 +21,15 @@ actual class ZModelRenderer actual constructor(
     }
 
     actual fun render() {
-        model.shaderProgram.bind()
+        model.shaderProgram.bind(ctx)
         model.material?.bind()
 
-        model.mesh.bind()
-        model.mesh.render()
-        model.mesh.unbind()
+        model.mesh.bind(ctx)
+        model.mesh.render(ctx)
+        model.mesh.unbind(ctx)
 
         model.material?.unbind()
-        model.shaderProgram.unbind()
+        model.shaderProgram.unbind(ctx)
     }
 
 }

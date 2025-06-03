@@ -10,6 +10,7 @@ package zernikalos.components
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZBox2D
 import zernikalos.math.ZColor
@@ -20,14 +21,11 @@ import kotlin.js.JsName
  * Represents a viewport box for rendering objects in Zernikalos.
  */
 @JsExport
-@Serializable(with = ZViewportSerializer::class)
-class ZViewport
-internal constructor(data: ZViewportData):
-    ZRenderizableComponent<ZViewportData, ZViewportRenderer>(data),
-    ZRenderizable, ZResizable {
+@Serializable
+abstract class ZBaseViewport: ZComponent2, ZRenderizable2, ZResizable2 {
 
-    @JsName("init")
-    constructor(): this(ZViewportData())
+    override val isRenderizable: Boolean = true
+
 
     /**
      * Represents the clear color used for rendering in a viewport.
@@ -37,7 +35,8 @@ internal constructor(data: ZViewportData):
      * @property z The blue component of the clear color.
      * @property w The alpha component of the clear color.
      */
-    var clearColor: ZColor by data::clearColor
+    @ProtoNumber(4)
+    var clearColor: ZColor = ZColor(.2f, .2f, .2f, 1.0f)
 
     /**
      * Represents the view box used as viewport for rendering objects.
@@ -48,44 +47,42 @@ internal constructor(data: ZViewportData):
      * @property width The width of the view box.
      * @property height The height of the view box.
      */
-    var viewBox: ZBox2D by data::viewBox
-
-    override fun createRenderer(ctx: ZRenderingContext): ZViewportRenderer {
-        return ZViewportRenderer(ctx, data)
-    }
-
-    override fun onViewportResize(width: Int, height: Int) {
-        data.viewBox.width = width
-        data.viewBox.height = height
-        renderer.onViewportResize(width, height)
-    }
-
-
-}
-
-@Serializable
-data class ZViewportData(
-    var clearColor: ZColor = ZColor(.2f, .2f, .2f, 1.0f),
-//    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
-): ZComponentData() {
     var viewBox: ZBox2D = ZBox2D(0, 0, 0, 0)
-}
 
-expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {
-    override fun initialize()
+    @JsName("initWithArgs")
+    constructor(
+        clearColor: ZColor,
+        viewBox: ZBox2D
+    ) {
+        this.clearColor = clearColor
+        this.viewBox = viewBox
+    }
 
-    override fun render()
+    @JsName("init")
+    constructor(): this(ZColor(.2f, .2f, .2f, 1.0f), ZBox2D(0, 0, 0, 0))
 
-    fun onViewportResize(width: Int, height: Int)
-
-}
-
-class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData>() {
-    override val kSerializer: KSerializer<ZViewportData>
-        get() = ZViewportData.serializer()
-
-    override fun createComponentInstance(data: ZViewportData): ZViewport {
-        return ZViewport(data)
+    override fun onViewportResize(ctx: ZRenderingContext, width: Int, height: Int) {
+        viewBox.width = width
+        viewBox.height = height
     }
 
 }
+
+expect open class ZViewportRender: ZBaseViewport {
+    constructor()
+    constructor(clearColor: ZColor, viewBox: ZBox2D)
+
+    override fun render(ctx: ZRenderingContext)
+    override fun onViewportResize(ctx: ZRenderingContext, width: Int, height: Int)
+}
+
+@JsExport
+@Serializable
+class ZViewport: ZViewportRender {
+    @JsName("init")
+    constructor(): super()
+
+    @JsName("initWithArgs")
+    constructor(clearColor: ZColor, viewBox: ZBox2D): super(clearColor, viewBox)
+}
+

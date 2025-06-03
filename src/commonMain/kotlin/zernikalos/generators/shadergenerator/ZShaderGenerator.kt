@@ -28,7 +28,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
      * @param shaderProgram An instance of ZShaderProgram that will be configured with the necessary
      *                      attributes and uniforms as defined by the enabler.
      */
-    fun generate(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
+    fun generate(enabler: ZShaderProgramParameters, shaderProgram: ZShaderProgramRender) {
         shaderProgram.clearAttributes()
         addRequiredAttributes(enabler, shaderProgram)
 
@@ -38,7 +38,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         buildShaderSource(enabler, shaderProgram.shaderSource)
     }
 
-    private fun addRequiredAttributes(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
+    private fun addRequiredAttributes(params: ZShaderProgramParameters, shaderProgram: ZShaderProgramRender) {
         shaderProgram.addAttribute(ZAttrIndices)
         if (params.usePosition) shaderProgram.addAttribute(ZAttrPosition)
         if (params.useNormals) shaderProgram.addAttribute(ZAttrNormal)
@@ -50,7 +50,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         }
     }
 
-    private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
+    private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgramRender) {
         shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
         shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
         shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)

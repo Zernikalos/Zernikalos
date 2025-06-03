@@ -194,14 +194,17 @@ actual class ZGLRenderingContext actual constructor(surfaceView: ZSurfaceView): 
     }
 
     actual fun texImage2D(bitmap: ZBitmap) {
-        gl.texImage2D(
-            WebGLRenderingContext.TEXTURE_2D,
-            0,
-            WebGL2RenderingContext.SRGB8_ALPHA8,
-            WebGLRenderingContext.RGBA,
-            WebGLRenderingContext.UNSIGNED_BYTE,
-            bitmap.imageBitmap
-        )
+        bitmap.isLoading.then {
+            gl.texImage2D(
+                WebGLRenderingContext.TEXTURE_2D,
+                0,
+                WebGL2RenderingContext.SRGB8_ALPHA8,
+                WebGLRenderingContext.RGBA,
+                WebGLRenderingContext.UNSIGNED_BYTE,
+                bitmap.imageBitmap
+            )
+        }
+
     }
 
     actual fun getUniformBlockIndex(

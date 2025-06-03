@@ -137,6 +137,40 @@ abstract class ZBaseComponent(
 
 }
 
+@JsExport
+abstract class ZComponent2: ZComponent, ZLoggable {
+    private var _uuid: Uuid? = null
+    final override val refId: String
+        get() {
+            _uuid = _uuid ?: Uuid.random()
+            return _uuid.toString()
+        }
+
+    private var initialized: Boolean = false
+    final override val isInitialized: Boolean
+        get() = initialized
+
+    final override fun initialize(ctx: ZRenderingContext) {
+        if (initialized) {
+            return
+        }
+        initialized = true
+
+        if (isRenderizable) {
+            internalRenderInitialize(ctx)
+        }
+        internalInitialize(ctx)
+    }
+
+    protected open fun internalInitialize(ctx: ZRenderingContext) {
+
+    }
+
+    protected open fun internalRenderInitialize(ctx: ZRenderingContext) {
+
+    }
+}
+
 abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponent(data) {
     @Suppress("UNCHECKED_CAST")
     internal val data: D
@@ -254,6 +288,33 @@ abstract class ZComponentSerializer<
 
 }
 
+@JsExport
+interface ZBindeable2 {
+
+    /**
+     * Binds the renderer.
+     * This method is called to prepare the renderer for drawing.
+     */
+    fun bind(ctx: ZRenderingContext)
+
+    /**
+     * Unbinds the renderer.
+     * This method is called after drawing to clean up.
+     */
+    fun unbind(ctx: ZRenderingContext)
+
+}
+
+@JsExport
+interface ZRenderizable2 {
+
+    /**
+     * Draws the mesh on the screen using its renderer.
+     */
+    fun render(ctx: ZRenderingContext)
+
+}
+
 interface ZBindeable {
 
     val renderer: ZBaseComponentRender
@@ -287,6 +348,20 @@ interface ZRenderizable {
         renderer.render()
     }
 
+}
+
+/**
+ * An interface for objects that will listen to changes on the viewport dimensions.
+ */
+interface ZResizable2 {
+
+    /**
+     * Notifies the listener when the viewport dimensions change.
+     *
+     * @param width The new width of the viewport.
+     * @param height The new height of the viewport.
+     */
+    fun onViewportResize(ctx: ZRenderingContext, width: Int, height: Int)
 }
 
 /**

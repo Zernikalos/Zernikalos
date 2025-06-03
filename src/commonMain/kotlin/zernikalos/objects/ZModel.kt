@@ -34,8 +34,10 @@ class ZModel: ZObject() {
 
     @ProtoNumber(4)
     lateinit var mesh: ZMesh
+
     @Transient
-    var shaderProgram: ZShaderProgram =  ZShaderProgram()
+    var shaderProgram: ZShaderProgramRender = ZShaderProgramRender()
+
     @Contextual @ProtoNumber(6)
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)

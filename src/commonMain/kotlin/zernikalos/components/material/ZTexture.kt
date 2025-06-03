@@ -8,80 +8,75 @@
 
 package zernikalos.components.material
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
-import zernikalos.logger.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-/**
- * Represents a texture component in the Zernikalos framework.
- *
- */
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+@Serializable
+abstract class ZBaseTexture: ZComponent2, ZBindeable2 {
+
+    @ProtoNumber(1)
+    var id: String = ""
+
+    @ProtoNumber(2)
+    var width: Int = 0
+
+    @ProtoNumber(3)
+    var height: Int = 0
+
+    @ProtoNumber(4)
+    var flipX: Boolean = false
+
+    @ProtoNumber(5)
+    var flipY: Boolean = false
+
+    @ProtoNumber(10)
+    var dataArray: ByteArray = byteArrayOf()
+
+    override val isRenderizable: Boolean = true
 
     @JsName("init")
-    constructor(): this(ZTextureData())
+    constructor() {
+
+    }
 
     @JsName("initWithArgs")
-    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(ZTextureData(id, width, height, flipX, flipY, dataArray))
-
-    var id: String by data::id
-
-    /**
-     * Represents the width of the texture image
-     */
-    var width: Int by data::width
-
-    /**
-     * Represents the height of the texture image
-     */
-    var height: Int by data::height
-
-    /**
-     * Represents whether the texture should be flipped horizontally.
-     */
-    var flipX: Boolean by data::flipX
-
-    /**
-     * Represents whether the texture should be flipped vertically.
-     */
-    var flipY: Boolean by data::flipY
-
-    /**
-     * Represents an array of bytes used for storing the image data.
-     *
-     * @property dataArray The byte array containing the data.
-     */
-    var dataArray: ByteArray by data::dataArray
-
-    override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
-        return ZTextureRenderer(ctx, data)
+    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray) {
+        this.id = id
+        this.dataArray = dataArray
+        this.width = width
+        this.height = height
+        this.flipX = flipX
+        this.flipY = flipY
     }
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
-        logger.debug("Initializing texture $refId")
-    }
+
 }
 
-/**
- * @suppress
- */
 @Serializable
-internal data class ZTextureDataWrapper(
-    @ProtoNumber(1)
-    override var refId: String = "",
-    @ProtoNumber(2)
-    override var isReference: Boolean = false,
-    @ProtoNumber(100)
-    override var data: ZTextureData? = null
-): ZRefComponentWrapper<ZTextureData>
+expect open class ZTextureRender: ZBaseTexture {
+    constructor()
+    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray)
+
+    override fun bind(ctx: ZRenderingContext)
+    override fun unbind(ctx: ZRenderingContext)
+}
+
+@Serializable
+@JsExport
+class ZTexture: ZTextureRender {
+    @JsName("init")
+    constructor(): super()
+    @JsName("initWithArgs")
+    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): super(id, width, height, flipX, flipY, dataArray)
+}
+
 
 /**
  * @suppress
@@ -102,16 +97,6 @@ data class ZTextureData(
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData()
 
-/**
- * @suppress
- */
-expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
-
-    override fun initialize()
-
-    override fun render()
-
-}
 
 /**
  * @suppress
@@ -124,7 +109,7 @@ internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZC
         if (loaderContext.hasComponent(data.id)) {
             return loaderContext.getComponent(data.id) as ZTexture
         }
-        val texture = ZTexture(data)
+        val texture = ZTexture(data.id, data.width, data.height, data.flipX, data.flipY, data.dataArray)
         loaderContext.addComponent(texture.id, texture)
         return texture
     }

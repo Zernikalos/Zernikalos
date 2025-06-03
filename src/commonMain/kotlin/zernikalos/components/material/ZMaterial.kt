@@ -56,11 +56,11 @@ class ZMaterialRenderer(ctx: ZRenderingContext, data: ZMaterialData): ZComponent
     }
 
     override fun bind() {
-        data.texture?.bind()
+        data.texture?.bind(ctx)
     }
 
     override fun unbind() {
-        data.texture?.unbind()
+        data.texture?.unbind(ctx)
     }
 
 }

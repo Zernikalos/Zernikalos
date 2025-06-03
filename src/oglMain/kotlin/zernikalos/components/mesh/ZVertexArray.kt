@@ -8,35 +8,20 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.ZBaseComponentRender
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZLightComponent
+import zernikalos.components.ZBindeable2
+import zernikalos.components.ZComponent2
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-class ZVertexArray(): ZLightComponent<ZVertexArrayRenderer>(), ZBindeable {
-
-    override fun createRenderer(ctx: ZRenderingContext): ZVertexArrayRenderer {
-        return ZVertexArrayRenderer(ctx)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
-    }
-
-}
-
-class ZVertexArrayRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
+class ZVertexArray(): ZComponent2(), ZBindeable2 {
 
     private lateinit var vao: GLWrap
 
-    override fun initialize() {
+    override val isRenderizable: Boolean = true
+
+    override fun internalRenderInitialize(ctx: ZRenderingContext) {
         ctx as ZGLRenderingContext
 
         val auxVao = ctx.createVertexArray()
@@ -46,14 +31,14 @@ class ZVertexArrayRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
         logger.debug("Creating and binding VAO with id ${vao.id}")
     }
 
-    override fun bind() {
+    override fun bind(ctx: ZRenderingContext) {
         ctx as ZGLRenderingContext
 
         logger.debugOnce("Binding VAO with id ${vao.id}")
         ctx.bindVertexArray(vao)
     }
 
-    override fun unbind() {
+    override fun unbind(ctx: ZRenderingContext) {
     }
 
 }
