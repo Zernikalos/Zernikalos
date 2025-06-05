@@ -14,8 +14,8 @@ class ZWebGPURenderingContext(val surfaceView: ZSurfaceView): ZRenderingContext 
     private var swapChain: GPUSwapChain? = null
     private var depthTexture: GPUTexture? = null
     private var depthTextureView: GPUTextureView? = null
-    private var commandEncoder: GPUCommandEncoder? = null
-    private var renderPassEncoder: GPURenderPassEncoder? = null
+    var commandEncoder: GPUCommandEncoder? = null
+    var renderPass: GPURenderPassEncoder? = null
     private var adapter: GPUAdapter? = null
 
     val device: ZWebGPUDevice
@@ -72,6 +72,16 @@ class ZWebGPURenderingContext(val surfaceView: ZSurfaceView): ZRenderingContext 
 
     private fun requestDevice(): Promise<GPUDevice?> {
         return adapter!!.requestDevice()
+    }
+
+    fun createCommandEncoder(): GPUCommandEncoder? {
+        this.commandEncoder = device.createCommandEncoder()
+        return commandEncoder
+    }
+
+    fun createRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder? {
+        this.renderPass = commandEncoder?.beginRenderPass(descriptor)
+        return renderPass
     }
 //
 //    fun makeCommandBuffer(): ZCommandBuffer {

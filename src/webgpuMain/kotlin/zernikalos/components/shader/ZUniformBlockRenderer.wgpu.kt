@@ -1,9 +1,9 @@
 package zernikalos.components.shader
 
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 
-actual class ZUniformBlockRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRender<ZUniformBlockData>(ctx, data) {
+actual class ZUniformBlockRenderer actual constructor(ctx: ZRenderingContext, private val data: ZUniformBlockData): ZComponentRenderer(ctx) {
     actual override fun initialize() {
         // TODO: Implement uniform block initialization
     }

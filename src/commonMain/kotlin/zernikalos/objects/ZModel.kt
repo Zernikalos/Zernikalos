@@ -33,9 +33,9 @@ class ZModel: ZObject() {
     override val type = ZObjectType.MODEL
 
     @ProtoNumber(4)
-    lateinit var mesh: ZMesh
+    var mesh: ZMesh = ZMesh()
     @Transient
-    var shaderProgram: ZShaderProgram =  ZShaderProgram()
+    var shaderProgram: ZShaderProgram = ZShaderProgram()
     @Contextual @ProtoNumber(6)
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)

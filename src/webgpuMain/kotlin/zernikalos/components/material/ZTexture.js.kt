@@ -8,7 +8,7 @@
 
 package zernikalos.components.material
 
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 
 actual class ZTextureRenderer actual constructor(

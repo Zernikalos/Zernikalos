@@ -1,45 +1,35 @@
 package zernikalos.components.mesh
 
-import zernikalos.components.ZComponentRender
 import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZWebGPUDevice
 import zernikalos.context.webgpu.GPUBuffer
-import zernikalos.context.webgpu.GPUBufferDescriptor
 import zernikalos.context.webgpu.GPUBufferUsage
-import zernikalos.logger.logger
 import kotlinx.serialization.Transient
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZWebGPURenderingContext
 
-actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
+actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
     @Transient
-    lateinit var buffer: GPUBuffer
+    lateinit var wgpuBuffer: GPUBuffer
+
+    val usage: Int
+    get() {
+        return if (data.isIndexBuffer)
+            GPUBufferUsage.INDEX or GPUBufferUsage.COPY_DST
+        else
+            GPUBufferUsage.VERTEX or GPUBufferUsage.COPY_DST
+    }
 
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
 
-        // if (!data.hasData) {
-        //     return
-        // }
-
-        // val usage = if (data.isIndexBuffer)
-        //     GPUBufferUsage.INDEX or GPUBufferUsage.COPY_DST
-        // else
-        //     GPUBufferUsage.VERTEX or GPUBufferUsage.COPY_DST
-
-        // buffer = ctx.device.createBuffer(
-        //     data.dataArray.size.toLong(),
-        //      usage,
-        //     false,
-        //     data.name
-        // )
-
-        // ctx.queue.writeBuffer(
-        //     buffer,
-        //     0,
-        //     data.dataArray
-        // )
-
-        // logger.debug("Initializing WebGPU Buffer ${data.name}=[${data.id}]")
+        // Buffer de vértices
+        wgpuBuffer = ctx.device.createBuffer(
+            data.dataArray.size * data.dataType.byteSize,
+            usage,
+            false,
+            "${data.name}Buffer"
+        )
+        ctx.queue.writeBuffer(wgpuBuffer, 0, data.dataArray)
     }
 
     actual override fun bind() {

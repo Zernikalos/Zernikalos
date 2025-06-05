@@ -270,13 +270,13 @@ data class GPUVertexState(
     @JsName("entryPoint")
     var entryPoint: String,
     @JsName("buffers")
-    var buffers: Array<GPUVertexBufferLayout>? = emptyArray<GPUVertexBufferLayout>()
+    var buffers: Array<GPUVertexBufferLayout?>? = emptyArray<GPUVertexBufferLayout?>()
 ) {
     fun toGpu(): dynamic {
         val o = js("{}")
         o["module"] = module
         o["entryPoint"] = entryPoint
-        if (buffers != null) o["buffers"] = buffers!!.map { it.toGpu() }.toTypedArray()
+        if (buffers != null) o["buffers"] = buffers!!.map { it?.toGpu() }.toTypedArray()
         return o
     }
 }
