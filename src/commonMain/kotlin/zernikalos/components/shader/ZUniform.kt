@@ -8,15 +8,10 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -38,7 +33,6 @@ fun ZInverseBindMatrixArray(count: Int): ZUniform {
     return ZUniform(6, "u_invBindMatrix", count, ZTypes.MAT4F)
 }
 
-@Serializable(with = ZUniformSerializer::class)
 @JsExport
 class ZUniform internal constructor(data: ZUniformData):
     ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data), ZBaseUniform {
@@ -85,33 +79,16 @@ class ZUniform internal constructor(data: ZUniformData):
 
 }
 
-@Serializable
 data class ZUniformData(
-    @ProtoNumber(4)
     var id: Int = -1,
-    @ProtoNumber(1)
     var uniformName: String = "",
-    @ProtoNumber(2)
     var count: Int = -1,
-    @ProtoNumber(3)
     var dataType: ZDataType = ZTypes.NONE,
 ): ZComponentData() {
-
-    @Transient
     var value: ZAlgebraObject? = null
 }
 
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
 
     override fun initialize()
-}
-
-class ZUniformSerializer: ZComponentSerializer<ZUniform, ZUniformData>() {
-    override val kSerializer: KSerializer<ZUniformData>
-        get() = ZUniformData.serializer()
-
-    override fun createComponentInstance(data: ZUniformData): ZUniform {
-        return ZUniform(data)
-    }
-
 }

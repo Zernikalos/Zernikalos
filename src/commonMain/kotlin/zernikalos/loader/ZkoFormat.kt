@@ -18,9 +18,6 @@ import zernikalos.utils.ZSemVer
 import kotlin.js.JsExport
 
 /** Current ZKO format version */
-const val ZKO_VERSION = "0.8.0"
-
-/** Current ZKO format version */
 val ZkoVersion = ZSemVer.parse(ZKO_VERSION)
 
 @JsExport

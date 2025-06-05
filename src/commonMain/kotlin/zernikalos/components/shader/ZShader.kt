@@ -8,11 +8,8 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRender
-import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -25,7 +22,6 @@ enum class ZShaderType {
 }
 
 @JsExport
-@Serializable(with = ZShaderSerializer::class)
 class ZShader
 internal constructor (data: ZShaderData): ZRenderizableComponent<ZShaderData, ZShaderRenderer>(data) {
 
@@ -48,7 +44,6 @@ internal constructor (data: ZShaderData): ZRenderizableComponent<ZShaderData, ZS
 
 }
 
-@Serializable
 data class ZShaderData(
     var type: ZShaderType = ZShaderType.VERTEX_SHADER
 ): ZComponentData()
@@ -58,15 +53,5 @@ expect class ZShaderRenderer(ctx: ZRenderingContext, data: ZShaderData): ZCompon
     override fun initialize()
 
     fun initialize(source: ZShaderSource)
-
-}
-
-class ZShaderSerializer: ZComponentSerializer<ZShader, ZShaderData>() {
-    override val kSerializer: KSerializer<ZShaderData>
-        get() = ZShaderData.serializer()
-
-    override fun createComponentInstance(data: ZShaderData): ZShader {
-        return ZShader(data)
-    }
 
 }
