@@ -8,17 +8,12 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZShaderProgramSerializer::class)
 class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
 
     @JsName("init")
@@ -75,17 +70,11 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizab
 
 }
 
-@Serializable
 data class ZShaderProgramData(
-    @Transient
     var vertexShader: ZShader = ZShader(ZShaderType.VERTEX_SHADER),
-    @Transient
     var fragmentShader: ZShader = ZShader(ZShaderType.FRAGMENT_SHADER),
-    @Transient
     var shaderSource: ZShaderSource = ZShaderSource(),
-    @ProtoNumber(3)
     val attributes: LinkedHashMap<String, ZAttribute> = LinkedHashMap(),
-    @Transient
     var uniforms: ZUniformCollection = ZUniformCollection()
 ): ZComponentData()
 
@@ -94,15 +83,5 @@ expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgram
     override fun initialize()
     override fun bind()
     override fun unbind()
-
-}
-
-class ZShaderProgramSerializer: ZComponentSerializer<ZShaderProgram, ZShaderProgramData>() {
-    override val kSerializer: KSerializer<ZShaderProgramData>
-        get() = ZShaderProgramData.serializer()
-
-    override fun createComponentInstance(data: ZShaderProgramData): ZShaderProgram {
-        return ZShaderProgram(data)
-    }
 
 }

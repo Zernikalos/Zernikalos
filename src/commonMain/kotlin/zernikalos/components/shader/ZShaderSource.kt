@@ -8,16 +8,12 @@
 
 package zernikalos.components.shader
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZSerializableComponent
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZShaderSourceSerializer::class)
 class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializableComponent<ZShaderSourceData>(data) {
 
     @JsName("init")
@@ -36,31 +32,18 @@ class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializable
 }
 
 @JsExport
-@Serializable
 data class ZGlSLShaderSource(
     var vertexShaderSource: String = "",
     var fragmentShaderSource: String = ""
 )
 
 @JsExport
-@Serializable
 data class ZMetalShaderSource(
     var shaderSource: String = ""
 )
 
 @JsExport
-@Serializable
 data class ZShaderSourceData(
     var glsl: ZGlSLShaderSource = ZGlSLShaderSource(),
     var metal: ZMetalShaderSource = ZMetalShaderSource()
 ): ZComponentData()
-
-class ZShaderSourceSerializer: ZComponentSerializer<ZShaderSource, ZShaderSourceData>() {
-    override val kSerializer: KSerializer<ZShaderSourceData>
-        get() = ZShaderSourceData.serializer()
-
-    override fun createComponentInstance(data: ZShaderSourceData): ZShaderSource {
-        return ZShaderSource(data)
-    }
-
-}
