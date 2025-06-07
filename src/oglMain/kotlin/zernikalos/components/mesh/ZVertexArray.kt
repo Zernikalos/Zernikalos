@@ -8,7 +8,7 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZLightComponent
 import zernikalos.context.GLWrap
@@ -32,7 +32,7 @@ class ZVertexArray(): ZLightComponent<ZVertexArrayRenderer>(), ZBindeable {
 
 }
 
-class ZVertexArrayRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
+class ZVertexArrayRenderer(ctx: ZRenderingContext): ZRenderer(ctx) {
 
     private lateinit var vao: GLWrap
 

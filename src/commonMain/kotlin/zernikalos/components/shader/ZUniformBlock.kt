@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
@@ -38,7 +38,7 @@ class ZUniformBlock internal constructor(data: ZUniformBlockData):
         data.uniforms[uniformName]?.value = value
     }
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
+    override fun createRenderer(ctx: ZRenderingContext): ZRenderer? {
         return ZUniformBlockRenderer(ctx, data)
     }
 
@@ -69,7 +69,7 @@ data class ZUniformBlockData(
         }
 }
 
-expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZBaseComponentRender {
+expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZRenderer {
 
     override fun initialize()
 

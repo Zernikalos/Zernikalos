@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZLightComponent
 import zernikalos.context.GLWrap
@@ -34,7 +34,7 @@ class ZProgram(): ZLightComponent<ZProgramRenderer>(), ZBindeable {
 
 }
 
-class ZProgramRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
+class ZProgramRenderer(ctx: ZRenderingContext): ZRenderer(ctx) {
 
     lateinit var programId: GLWrap
 

@@ -56,7 +56,7 @@ class ZMesh internal constructor(data: ZMeshData):
     @JsName("init")
     constructor(): this(ZMeshData())
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
+    override fun createRenderer(ctx: ZRenderingContext): ZRenderer {
         return ZMeshRenderer(ctx, data)
     }
 
@@ -251,7 +251,7 @@ internal data class ZRawMeshData(
 /**
  * @suppress
  */
-expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZBaseComponentRender {
+expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZRenderer {
 
     override fun initialize()
 

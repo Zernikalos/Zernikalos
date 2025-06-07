@@ -8,19 +8,17 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.context.ExpectShaderType
-import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.logger.logger
 
 enum class ZGlShaderType(val value: Int) {
     VERTEX_SHADER(ExpectShaderType.VERTEX_SHADER),
     FRAGMENT_SHADER(ExpectShaderType.FRAGMENT_SHADER)
 }
 
-actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData): ZBaseComponentRender(ctx) {
+actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData): ZRenderer(ctx) {
 
     val program: ZProgram = ZProgram()
 

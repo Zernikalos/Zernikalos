@@ -8,13 +8,13 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderData): ZBaseComponentRender(ctx) {
+actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderData): ZRenderer(ctx) {
 
     var shader: GLWrap = GLWrap()
 

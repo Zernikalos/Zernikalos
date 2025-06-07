@@ -8,14 +8,14 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZRenderer
 import zernikalos.context.*
 import zernikalos.math.ZAlgebraObjectCollection
 
 actual class ZUniformBlockRenderer actual constructor(
     ctx: ZRenderingContext,
     private val data: ZUniformBlockData
-) : ZBaseComponentRender(ctx) {
+) : ZRenderer(ctx) {
 
     private var ubo: GLWrap? = null
 

@@ -91,7 +91,7 @@ data class ZTextureData(
 /**
  * @suppress
  */
-expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZBaseComponentRender {
+expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZRenderer {
 
     override fun initialize()
 

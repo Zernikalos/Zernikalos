@@ -98,8 +98,8 @@ abstract class ZBaseComponent(
             return _uuid.toString()
         }
 
-    private var _renderer: ZBaseComponentRender? = null
-    protected val internalRenderer: ZBaseComponentRender
+    private var _renderer: ZRenderer? = null
+    protected val internalRenderer: ZRenderer
         get() {
             if (!isInitialized || !isRenderizable || !hasRenderer) {
                 throw Error("The component has not been initialized prior to access the renderer")
@@ -127,7 +127,7 @@ abstract class ZBaseComponent(
         internalInitialize(ctx)
     }
 
-    internal open fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
+    internal open fun createRenderer(ctx: ZRenderingContext): ZRenderer? {
         return null
     }
 
@@ -145,7 +145,7 @@ abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponen
     override val isRenderizable: Boolean = false
 }
 
-abstract class ZLightComponent<R: ZBaseComponentRender>: ZBaseComponent() {
+abstract class ZLightComponent<R: ZRenderer>: ZBaseComponent() {
     @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
@@ -153,7 +153,7 @@ abstract class ZLightComponent<R: ZBaseComponentRender>: ZBaseComponent() {
     override val isRenderizable: Boolean = true
 }
 
-abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender>(data: D): ZBaseComponent(data) {
+abstract class ZRenderizableComponent<D: ZComponentData, R: ZRenderer>(data: D): ZBaseComponent(data) {
     @Suppress("UNCHECKED_CAST")
     internal val data: D
         get() = internalData as D
@@ -164,7 +164,7 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender
 
     override val isRenderizable: Boolean = true
 
-    abstract override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender?
+    abstract override fun createRenderer(ctx: ZRenderingContext): ZRenderer?
 }
 
 
@@ -205,7 +205,7 @@ abstract class ZComponentData: ZLoggable, ZRef {
  */
 
 @JsExport
-abstract class ZBaseComponentRender: ZLoggable {
+abstract class ZRenderer: ZLoggable {
 
     protected val ctx: ZRenderingContext
 
@@ -253,7 +253,7 @@ abstract class ZComponentSerializer<
 
 interface ZBindeable {
 
-    val renderer: ZBaseComponentRender
+    val renderer: ZRenderer
 
     /**
      * Binds the renderer.
@@ -275,7 +275,7 @@ interface ZBindeable {
 
 interface ZRenderizable {
 
-    val renderer: ZBaseComponentRender
+    val renderer: ZRenderer
 
     /**
      * Draws the mesh on the screen using its renderer.
