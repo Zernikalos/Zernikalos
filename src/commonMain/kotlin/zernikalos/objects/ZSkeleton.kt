@@ -14,7 +14,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZRefComponentSerializer
 import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext

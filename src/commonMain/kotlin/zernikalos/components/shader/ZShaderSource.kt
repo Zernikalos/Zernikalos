@@ -9,6 +9,7 @@
 package zernikalos.components.shader
 
 import zernikalos.components.ZComponentData
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.components.ZSerializableComponent
 import kotlin.js.JsExport
 import kotlin.js.JsName
