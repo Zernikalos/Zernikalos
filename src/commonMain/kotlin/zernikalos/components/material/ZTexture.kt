@@ -8,7 +8,6 @@
 
 package zernikalos.components.material
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -92,7 +91,7 @@ data class ZTextureData(
 /**
  * @suppress
  */
-expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
+expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZBaseComponentRender {
 
     override fun initialize()
 

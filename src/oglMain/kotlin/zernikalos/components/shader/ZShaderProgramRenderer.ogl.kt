@@ -8,7 +8,7 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZBaseComponentRender
 import zernikalos.context.ExpectShaderType
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
@@ -20,7 +20,7 @@ enum class ZGlShaderType(val value: Int) {
     FRAGMENT_SHADER(ExpectShaderType.FRAGMENT_SHADER)
 }
 
-actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData>(ctx, data) {
+actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData): ZBaseComponentRender(ctx) {
 
     val program: ZProgram = ZProgram()
 

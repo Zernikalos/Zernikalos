@@ -222,9 +222,6 @@ abstract class ZBaseComponentRender: ZLoggable {
     open fun render() {}
 }
 
-@JsExport
-abstract class ZComponentRender<D: ZComponentData>(ctx: ZRenderingContext, protected val data: D): ZBaseComponentRender(ctx)
-
 /**
  * SERIALIZATION SECTION
  */

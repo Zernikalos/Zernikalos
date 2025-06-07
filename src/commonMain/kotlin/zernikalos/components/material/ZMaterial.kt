@@ -50,7 +50,7 @@ data class ZMaterialData(
     var texture: ZTexture? = null
 ): ZComponentData()
 
-class ZMaterialRenderer(ctx: ZRenderingContext, data: ZMaterialData): ZComponentRender<ZMaterialData>(ctx, data) {
+class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData): ZBaseComponentRender(ctx) {
     override fun initialize() {
         data.texture?.initialize(ctx)
     }

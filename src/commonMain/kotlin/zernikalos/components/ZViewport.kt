@@ -71,7 +71,7 @@ data class ZViewportData(
     var viewBox: ZBox2D = ZBox2D(0, 0, 0, 0)
 }
 
-expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {
+expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZBaseComponentRender {
     override fun initialize()
 
     override fun render()

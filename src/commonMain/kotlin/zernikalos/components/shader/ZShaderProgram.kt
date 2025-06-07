@@ -78,10 +78,8 @@ data class ZShaderProgramData(
     var uniforms: ZUniformCollection = ZUniformCollection()
 ): ZComponentData()
 
-expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData> {
-
+expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZBaseComponentRender {
     override fun initialize()
     override fun bind()
     override fun unbind()
-
 }

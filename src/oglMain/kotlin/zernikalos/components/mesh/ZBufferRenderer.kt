@@ -8,13 +8,13 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZBaseComponentRender
 import zernikalos.context.*
 import zernikalos.logger.logger
 import zernikalos.toOglBaseType
 import kotlin.jvm.Transient
 
-actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
+actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZBaseComponentRender(ctx) {
 
     @Transient
     lateinit var buffer: GLWrap

@@ -10,7 +10,6 @@ package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
 import zernikalos.components.ZBaseComponentRender
-import zernikalos.components.ZComponentRender
 import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext

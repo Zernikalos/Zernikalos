@@ -8,8 +8,8 @@
 
 package zernikalos.components.shader
 
+import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -79,7 +79,6 @@ data class ZAttributeData(
     var attributeName: String = ""
 ): ZComponentData()
 
-expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRender<ZAttributeData> {
+expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZBaseComponentRender {
     override fun initialize()
-
 }

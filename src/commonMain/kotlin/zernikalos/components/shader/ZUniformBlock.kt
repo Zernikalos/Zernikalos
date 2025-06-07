@@ -10,7 +10,6 @@ package zernikalos.components.shader
 
 import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -70,7 +69,7 @@ data class ZUniformBlockData(
         }
 }
 
-expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRender<ZUniformBlockData> {
+expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZBaseComponentRender {
 
     override fun initialize()
 

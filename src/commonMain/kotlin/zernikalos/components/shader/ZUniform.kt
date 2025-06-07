@@ -10,8 +10,8 @@ package zernikalos.components.shader
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.components.ZBaseComponentRender
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -88,7 +88,7 @@ data class ZUniformData(
     var value: ZAlgebraObject? = null
 }
 
-expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
+expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZBaseComponentRender {
 
     override fun initialize()
 }
