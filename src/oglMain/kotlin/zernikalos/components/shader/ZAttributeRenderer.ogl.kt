@@ -8,13 +8,13 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZRenderer
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, private val data: ZAttributeData): ZRenderer(ctx) {
+actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, private val data: ZAttributeData): ZComponentRenderer(ctx) {
     actual override fun initialize() {
     }
 

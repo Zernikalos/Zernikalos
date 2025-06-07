@@ -15,11 +15,11 @@ import platform.Foundation.NSError
 import platform.Metal.MTLCompileOptions
 import platform.Metal.MTLFunctionProtocol
 import platform.Metal.MTLLibraryProtocol
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 
-actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderData) : ZComponentRender<ZShaderData>(ctx, data) {
+actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderData) : ZComponentRenderer(ctx) {
 
     lateinit var library: MTLLibraryProtocol
     lateinit var vertexShader: MTLFunctionProtocol

@@ -9,7 +9,7 @@
 package zernikalos.components.mesh
 
 import kotlinx.serialization.Transient
-import zernikalos.components.ZRenderer
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.DrawModes
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
@@ -17,7 +17,7 @@ import zernikalos.logger.logger
 import zernikalos.toOglBaseType
 
 actual class ZMeshRenderer
-internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData): ZRenderer(ctx) {
+internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData): ZComponentRenderer(ctx) {
 
     @Transient
     val vao: ZVertexArray = ZVertexArray()

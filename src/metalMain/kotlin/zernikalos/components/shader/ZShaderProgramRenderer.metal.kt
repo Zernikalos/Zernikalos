@@ -12,12 +12,12 @@ import kotlinx.cinterop.*
 import platform.Foundation.NSError
 import platform.Metal.*
 import platform.posix.memcpy
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, data: ZShaderProgramData) : ZComponentRender<ZShaderProgramData>(ctx, data) {
+actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData) : ZComponentRenderer(ctx) {
 
     var uniformBuffer: MTLBufferProtocol? = null
 

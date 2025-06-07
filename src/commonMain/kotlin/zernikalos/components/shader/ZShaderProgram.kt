@@ -78,7 +78,7 @@ data class ZShaderProgramData(
     var uniforms: ZUniformCollection = ZUniformCollection()
 ): ZComponentData()
 
-expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZRenderer {
+expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRenderer {
     override fun initialize()
     override fun bind()
     override fun unbind()

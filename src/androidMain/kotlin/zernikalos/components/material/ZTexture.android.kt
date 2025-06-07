@@ -8,7 +8,7 @@
 
 package zernikalos.components.material
 
-import zernikalos.components.ZRenderer
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
@@ -16,7 +16,7 @@ import zernikalos.context.ZRenderingContext
 actual class ZTextureRenderer actual constructor(
     ctx: ZRenderingContext,
     private val data: ZTextureData
-) : ZRenderer(ctx) {
+) : ZComponentRenderer(ctx) {
 
     lateinit var textureHandler: GLWrap
 

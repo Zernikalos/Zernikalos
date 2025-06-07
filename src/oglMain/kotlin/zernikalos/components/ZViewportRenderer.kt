@@ -10,7 +10,7 @@ package zernikalos.components
 
 import zernikalos.context.*
 
-actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, private val data: ZViewportData): ZRenderer(ctx) {
+actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, private val data: ZViewportData): ZComponentRenderer(ctx) {
     var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 
     actual override fun initialize() {

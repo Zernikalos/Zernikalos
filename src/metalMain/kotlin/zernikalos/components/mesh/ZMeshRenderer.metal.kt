@@ -15,11 +15,12 @@ import platform.Metal.MTLPrimitiveTypePoint
 import platform.Metal.MTLPrimitiveTypeTriangle
 import platform.Metal.MTLPrimitiveTypeTriangleStrip
 import platform.Metal.MTLVertexDescriptor
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 
-actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, data: ZMeshData) : ZComponentRender<ZMeshData>(ctx, data) {
+actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private val data: ZMeshData) : ZComponentRenderer(ctx
+) {
 
     lateinit var vertexDescriptor: MTLVertexDescriptor
 

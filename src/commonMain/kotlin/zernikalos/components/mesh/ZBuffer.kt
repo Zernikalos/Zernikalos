@@ -10,7 +10,7 @@ package zernikalos.components.mesh
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZRenderer
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZRenderizableComponent
@@ -166,7 +166,7 @@ data class ZBufferData(
 
 }
 
-expect class ZBufferRenderer(ctx: ZRenderingContext, data: ZBufferData): ZRenderer {
+expect class ZBufferRenderer(ctx: ZRenderingContext, data: ZBufferData): ZComponentRenderer {
     override fun initialize()
 
     override fun bind()
