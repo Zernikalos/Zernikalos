@@ -83,19 +83,13 @@ interface ZComponent: ZRef {
  * @property isRenderizable Indicates whether the component is renderizable
  *
  */
-abstract class ZBaseComponent(
-    protected val internalData: ZComponentData? = null
-): ZComponent, ZLoggable {
+abstract class ZBaseComponent(): ZComponent, ZLoggable {
 
-    private var _uuid: Uuid? = null
+    protected var uuid: Uuid? = null
     final override val refId: String
         get() {
-            _uuid = if (_uuid == null && internalData == null) {
-                Uuid.random()
-            } else {
-                Uuid.parseHexDash(internalData!!.refId)
-            }
-            return _uuid.toString()
+            uuid = uuid ?: Uuid.random()
+            return uuid.toString()
         }
 
     private var _renderer: ZComponentRenderer? = null
@@ -137,12 +131,11 @@ abstract class ZBaseComponent(
 
 }
 
-abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponent(data) {
-    @Suppress("UNCHECKED_CAST")
-    internal val data: D
-        get() = internalData as D
-
+abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): ZBaseComponent() {
     override val isRenderizable: Boolean = false
+    init {
+        uuid = data.uuid
+    }
 }
 
 abstract class ZLightComponent<R: ZComponentRenderer>: ZBaseComponent() {
@@ -153,11 +146,7 @@ abstract class ZLightComponent<R: ZComponentRenderer>: ZBaseComponent() {
     override val isRenderizable: Boolean = true
 }
 
-abstract class ZRenderizableComponent<D: ZComponentData, R: ZComponentRenderer>(data: D): ZBaseComponent(data) {
-    @Suppress("UNCHECKED_CAST")
-    internal val data: D
-        get() = internalData as D
-
+abstract class ZRenderizableComponent<D: ZComponentData, R: ZComponentRenderer>(internal val data: D): ZBaseComponent() {
     @Suppress("UNCHECKED_CAST")
     val renderer: R
         get() = internalRenderer as R
@@ -185,15 +174,13 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZComponentRenderer>(
 @JsExport
 abstract class ZComponentData: ZLoggable, ZRef {
 
-    private var _uuid: Uuid? = null
+    internal var uuid: Uuid? = null
 
     @Transient
     override val refId: String
         get() {
-            if (_uuid == null) {
-                _uuid = Uuid.random()
-            }
-            return _uuid.toString()
+            uuid = uuid ?: Uuid.random()
+            return uuid.toString()
         }
 
     abstract override fun toString(): String
