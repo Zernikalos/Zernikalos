@@ -23,7 +23,7 @@ import kotlin.js.JsName
  *
  */
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+class ZTexture internal constructor(private val data: ZTextureData): ZRenderizableComponent<ZTextureRenderer>(), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())

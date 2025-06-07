@@ -92,37 +92,20 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
             return uuid.toString()
         }
 
-    private var _renderer: ZComponentRenderer? = null
-    protected val internalRenderer: ZComponentRenderer
-        get() {
-            if (!isInitialized || !isRenderizable || !hasRenderer) {
-                throw Error("The component has not been initialized prior to access the renderer")
-            }
-            return _renderer!!
-        }
-
     private var initialized: Boolean = false
     final override val isInitialized: Boolean
         get() = initialized
 
-    val hasRenderer: Boolean
-        get() = _renderer != null
-
-    final override fun initialize(ctx: ZRenderingContext) {
+    protected fun setupInitialize() {
         if (initialized) {
             return
         }
         initialized = true
-
-        if (isRenderizable) {
-            _renderer = createRenderer(ctx)
-            internalRenderer.initialize()
-        }
-        internalInitialize(ctx)
     }
 
-    internal open fun createRenderer(ctx: ZRenderingContext): ZComponentRenderer? {
-        return null
+    override fun initialize(ctx: ZRenderingContext) {
+        setupInitialize()
+        internalInitialize(ctx)
     }
 
     protected open fun internalInitialize(ctx: ZRenderingContext) {
@@ -138,22 +121,28 @@ abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): 
     }
 }
 
-abstract class ZLightComponent<R: ZComponentRenderer>: ZBaseComponent() {
-    @Suppress("UNCHECKED_CAST")
-    val renderer: R
-        get() = internalRenderer as R
-
-    override val isRenderizable: Boolean = true
-}
-
-abstract class ZRenderizableComponent<D: ZComponentData, R: ZComponentRenderer>(internal val data: D): ZBaseComponent() {
-    @Suppress("UNCHECKED_CAST")
-    val renderer: R
-        get() = internalRenderer as R
-
+abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent() {
     override val isRenderizable: Boolean = true
 
-    abstract override fun createRenderer(ctx: ZRenderingContext): ZComponentRenderer?
+    private var _renderer: R? = null
+    val renderer: R
+        get() {
+            if (!isInitialized || !isRenderizable) {
+                throw Error("The component has not been initialized prior to access the renderer")
+            }
+            return _renderer!!
+        }
+
+    override fun initialize(ctx: ZRenderingContext) {
+        setupInitialize()
+        if (isRenderizable) {
+            _renderer = createRenderer(ctx)
+            _renderer?.initialize()
+        }
+        internalInitialize(ctx)
+    }
+
+    abstract fun createRenderer(ctx: ZRenderingContext): R
 }
 
 

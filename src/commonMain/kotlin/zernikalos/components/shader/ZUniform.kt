@@ -34,8 +34,8 @@ fun ZInverseBindMatrixArray(count: Int): ZUniform {
 }
 
 @JsExport
-class ZUniform internal constructor(data: ZUniformData):
-    ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data), ZBaseUniform {
+class ZUniform internal constructor(private val data: ZUniformData):
+    ZRenderizableComponent<ZUniformRenderer>(), ZBaseUniform {
 
     @JsName("initWithArgs")
     constructor(id: Int, uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(id, uniformName, count, dataType))

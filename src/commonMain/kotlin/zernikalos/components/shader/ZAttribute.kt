@@ -44,7 +44,7 @@ val ZAttrBoneIndices: ZAttribute
     get() = ZAttribute(ZAttributeId.BONE_INDEX)
 
 @JsExport
-class ZAttribute internal constructor(data: ZAttributeData): ZRenderizableComponent<ZAttributeData, ZAttributeRenderer>(data) {
+class ZAttribute internal constructor(private val data: ZAttributeData): ZRenderizableComponent<ZAttributeRenderer>() {
 
     @JsName("init")
     constructor(): this(ZAttributeData())

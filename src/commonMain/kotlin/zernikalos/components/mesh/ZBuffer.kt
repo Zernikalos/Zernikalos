@@ -24,7 +24,7 @@ import kotlin.js.JsName
  * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
  */
 @JsExport
-class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
+class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizableComponent<ZBufferRenderer>(), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBuffer` class.

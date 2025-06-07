@@ -18,8 +18,8 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZUniformBlock internal constructor(data: ZUniformBlockData):
-    ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data), ZBaseUniform {
+class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
+    ZRenderizableComponent<ZUniformBlockRenderer>(), ZBaseUniform {
 
     val uniforms: MutableMap<String, ZBaseUniform> by data::uniforms
 
@@ -38,7 +38,7 @@ class ZUniformBlock internal constructor(data: ZUniformBlockData):
         data.uniforms[uniformName]?.value = value
     }
 
-    override fun createRenderer(ctx: ZRenderingContext): ZComponentRenderer? {
+    override fun createRenderer(ctx: ZRenderingContext): ZUniformBlockRenderer {
         return ZUniformBlockRenderer(ctx, data)
     }
 

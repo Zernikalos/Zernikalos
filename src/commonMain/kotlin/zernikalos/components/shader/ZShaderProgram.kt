@@ -14,7 +14,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
+class ZShaderProgram internal constructor(private val data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramRenderer>(), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZShaderProgramData())

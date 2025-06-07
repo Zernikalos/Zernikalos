@@ -10,12 +10,12 @@ package zernikalos.components.shader
 
 import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZLightComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 
-class ZProgram(): ZLightComponent<ZProgramRenderer>(), ZBindeable {
+class ZProgram(): ZRenderizableComponent<ZProgramRenderer>(), ZBindeable {
 
     override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
         return ZProgramRenderer(ctx)

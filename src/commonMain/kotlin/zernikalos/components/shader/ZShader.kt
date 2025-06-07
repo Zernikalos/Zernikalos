@@ -23,7 +23,7 @@ enum class ZShaderType {
 
 @JsExport
 class ZShader
-internal constructor (data: ZShaderData): ZRenderizableComponent<ZShaderData, ZShaderRenderer>(data) {
+internal constructor (private val data: ZShaderData): ZRenderizableComponent<ZShaderRenderer>() {
 
     @JsName("init")
     constructor(): this(ZShaderData())
