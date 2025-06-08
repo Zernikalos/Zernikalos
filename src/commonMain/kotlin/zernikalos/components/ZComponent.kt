@@ -18,26 +18,36 @@ import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.uuid.Uuid
 
+/**
+ * Represents a reference entity within the Zernikalos Engine.
+ *
+ * This interface serves as the foundation for referencing other components
+ * by their unique identifier. Components implementing this interface can be
+ * used within reference-based systems, enabling efficient retrieval and management.
+ *
+ * @see ZComponent
+ * @see ZComponentData
+ * @see ZRefComponentWrapper
+ */
 @JsExport
 interface ZRef {
 
     /**
-     * Represents the unique reference identifier for a component.
-     *
-     * @property refId The unique reference identifier for the component.
-     *
-     * @see ZComponent
-     * @see ZRefComponentSerializer
+     * Represents the unique identifier for a reference-based component.
+     * The `refId` is used as a distinctive key for retrieving or linking
+     * this component within reference-dependent systems.
      */
     val refId: String
 }
 
 /**
- * Represents a component in Zernikalos.
+ * Represents a component in the Zernikalos Engine that provides basic
+ * initialization and renderability functionalities. This interface is used
+ * as a foundation for defining components that interact with a
+ * `ZRenderingContext`.
  *
- * These will encapsulate two different types of components:
- * Basic components: For data storage and sharing
- * Renderizable components: Which will be able to interact with the graphics APIs
+ * @see ZRef
+ * @see ZRenderingContext
  */
 @JsExport
 interface ZComponent: ZRef {
@@ -74,14 +84,12 @@ interface ZComponent: ZRef {
 }
 
 /**
- * Represents a template for a basic component in Zernikalos.
- * These are used for storing and sharing data
+ * Represents the base class for components in the Zernikalos Engine.
  *
- * @param D The type of ZComponentData associated with the template
- *
- * @property data The ZComponentData associated with the template*
- * @property isRenderizable Indicates whether the component is renderizable
- *
+ * This abstract class provides foundational properties and methods for
+ * components, including initialization, unique identification, and
+ * extendable internal initialization logic. It serves as a common ancestor
+ * for both renderizable and non-renderizable components.
  */
 abstract class ZBaseComponent(): ZComponent, ZLoggable {
 
@@ -121,6 +129,16 @@ abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): 
     }
 }
 
+/**
+ * Represents an abstract component in the Zernikalos Engine that is renderizable,
+ * meaning it can produce a renderer to handle the rendering logic.
+ *
+ * Classes inheriting from this component must define how to create their specific
+ * renderer type and implement its rendering logic using a provided rendering context.
+ *
+ * @param R The type of the renderer associated with this component. It must inherit
+ *          from ZComponentRenderer.
+ */
 abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent() {
     override val isRenderizable: Boolean = true
 
@@ -156,9 +174,6 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
  * Implementations of this class are commonly used as data containers in component-based architectures
  * within the engine. These subclasses should define specific data structures and properties related
  * to their components.
- *
- * Subclasses must override the `toString` method to provide the string representation required for
- * computing the `refId`.
  */
 @JsExport
 abstract class ZComponentData: ZLoggable, ZRef {
@@ -180,6 +195,23 @@ abstract class ZComponentData: ZLoggable, ZRef {
  * RENDERER SECTION
  */
 
+/**
+ * Abstract base class responsible for rendering components in the Zernikalos engine.
+ * Serves as the foundation for implementing render-specific logic for components that
+ * require rendering capabilities.
+ *
+ * This class is associated with a rendering context, which provides the necessary tools
+ * and environment for rendering operations. It is designed to be used as a base for
+ * component-specific renderers, which must implement the abstract methods and may override
+ * existing ones to define custom behavior.
+ *
+ * @constructor Initializes the renderer with a given rendering context. The constructor
+ *              is accessible only within the engine to ensure proper setup and lifecycle
+ *              control of renderers.
+ *
+ * @property ctx The rendering context associated with this renderer. Provides rendering
+ *               surfaces and tools required for rendering operations.
+ */
 @JsExport
 abstract class ZComponentRenderer
 internal constructor(protected val ctx: ZRenderingContext): ZLoggable {
@@ -222,6 +254,11 @@ abstract class ZComponentSerializer<
 
 }
 
+/**
+ * Represents a bindable resource or component in the Zernikalos framework.
+ * Classes implementing this interface indicate that they require binding prior to usage
+ * and unbinding after usage, typically for rendering or resource management purposes.
+ */
 interface ZBindeable {
 
     /**
@@ -238,10 +275,20 @@ interface ZBindeable {
 
 }
 
+/**
+ * Defines a contract for objects that can be rendered on the screen using a rendering system.
+ * Implementing classes should provide the logic for drawing their visual representation.
+ */
 interface ZRenderizable {
 
     /**
-     * Draws the mesh on the screen using its renderer.
+     * Renders the object's visual representation on the screen.
+     *
+     * Classes implementing the `ZRenderizable` interface must provide
+     * their specific rendering logic through the implementation of this method.
+     *
+     * This method is typically called by the rendering system to draw the
+     * current state of the object onto a graphical context.
      */
     fun render()
 
