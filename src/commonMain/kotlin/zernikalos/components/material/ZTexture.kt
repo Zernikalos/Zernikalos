@@ -67,6 +67,9 @@ class ZTexture internal constructor(private val data: ZTextureData): ZRenderizab
     override fun internalInitialize(ctx: ZRenderingContext) {
         logger.debug("Initializing texture $refId")
     }
+
+    override fun bind() = renderer.bind()
+    override fun unbind() = renderer.unbind()
 }
 
 /**

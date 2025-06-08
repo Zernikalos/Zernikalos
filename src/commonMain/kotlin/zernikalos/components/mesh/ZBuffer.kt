@@ -140,6 +140,10 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
         return ZBufferRenderer(ctx, data)
     }
 
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
     override fun toString(): String {
         return "ZBuffer(attributeId=${this.attributeId}, bufferId=${data.bufferId})"
     }

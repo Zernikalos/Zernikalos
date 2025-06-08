@@ -60,6 +60,7 @@ internal constructor(private val data: ZViewportData):
         renderer.onViewportResize(width, height)
     }
 
+    override fun render() = renderer.render()
 
 }
 

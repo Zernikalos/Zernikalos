@@ -64,6 +64,10 @@ class ZShaderProgram internal constructor(private val data: ZShaderProgramData):
         data.attributes.clear()
     }
 
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
     override fun createRenderer(ctx: ZRenderingContext): ZShaderProgramRenderer {
         return ZShaderProgramRenderer(ctx, data)
     }

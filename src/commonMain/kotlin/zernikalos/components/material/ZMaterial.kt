@@ -31,6 +31,9 @@ internal constructor(private val data: ZMaterialData):
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
     }
+
+    override fun bind() = renderer.bind()
+    override fun unbind() = renderer.unbind()
 }
 
 @Serializable

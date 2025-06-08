@@ -181,13 +181,8 @@ abstract class ZComponentData: ZLoggable, ZRef {
  */
 
 @JsExport
-abstract class ZComponentRenderer: ZLoggable {
-
-    protected val ctx: ZRenderingContext
-
-    internal constructor(ctx: ZRenderingContext) {
-        this.ctx = ctx
-    }
+abstract class ZComponentRenderer
+internal constructor(protected val ctx: ZRenderingContext): ZLoggable {
 
     abstract fun initialize()
 
@@ -229,36 +224,26 @@ abstract class ZComponentSerializer<
 
 interface ZBindeable {
 
-    val renderer: ZComponentRenderer
-
     /**
      * Binds the renderer.
      * This method is called to prepare the renderer for drawing.
      */
-    fun bind() {
-        renderer.bind()
-    }
+    fun bind()
 
     /**
      * Unbinds the renderer.
      * This method is called after drawing to clean up.
      */
-    fun unbind() {
-        renderer.unbind()
-    }
+    fun unbind()
 
 }
 
 interface ZRenderizable {
 
-    val renderer: ZComponentRenderer
-
     /**
      * Draws the mesh on the screen using its renderer.
      */
-    fun render() {
-        renderer.render()
-    }
+    fun render()
 
 }
 

@@ -141,6 +141,12 @@ class ZMesh internal constructor(private val data: ZMeshData):
         data.buffers[buffer.name] = buffer
     }
 
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
+    override fun render() = renderer.render()
+
 }
 
 /**
