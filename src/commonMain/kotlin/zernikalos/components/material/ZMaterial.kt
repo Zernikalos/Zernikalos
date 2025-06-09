@@ -20,8 +20,8 @@ import kotlin.js.JsName
 
 @JsExport
 class ZMaterial
-internal constructor(data: ZMaterialData):
-    ZRenderizableComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
+internal constructor(private val data: ZMaterialData):
+    ZRenderizableComponent<ZMaterialRenderer>(), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZMaterialData())
@@ -31,6 +31,9 @@ internal constructor(data: ZMaterialData):
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
     }
+
+    override fun bind() = renderer.bind()
+    override fun unbind() = renderer.unbind()
 }
 
 @Serializable
@@ -50,7 +53,7 @@ data class ZMaterialData(
     var texture: ZTexture? = null
 ): ZComponentData()
 
-class ZMaterialRenderer(ctx: ZRenderingContext, data: ZMaterialData): ZComponentRender<ZMaterialData>(ctx, data) {
+class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData): ZComponentRenderer(ctx) {
     override fun initialize() {
         data.texture?.initialize(ctx)
     }

@@ -18,26 +18,36 @@ import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.uuid.Uuid
 
+/**
+ * Represents a reference entity within the Zernikalos Engine.
+ *
+ * This interface serves as the foundation for referencing other components
+ * by their unique identifier. Components implementing this interface can be
+ * used within reference-based systems, enabling efficient retrieval and management.
+ *
+ * @see ZComponent
+ * @see ZComponentData
+ * @see ZRefComponentWrapper
+ */
 @JsExport
 interface ZRef {
 
     /**
-     * Represents the unique reference identifier for a component.
-     *
-     * @property refId The unique reference identifier for the component.
-     *
-     * @see ZComponent
-     * @see ZRefComponentSerializer
+     * Represents the unique identifier for a reference-based component.
+     * The `refId` is used as a distinctive key for retrieving or linking
+     * this component within reference-dependent systems.
      */
     val refId: String
 }
 
 /**
- * Represents a component in Zernikalos.
+ * Represents a component in the Zernikalos Engine that provides basic
+ * initialization and renderability functionalities. This interface is used
+ * as a foundation for defining components that interact with a
+ * `ZRenderingContext`.
  *
- * These will encapsulate two different types of components:
- * Basic components: For data storage and sharing
- * Renderizable components: Which will be able to interact with the graphics APIs
+ * @see ZRef
+ * @see ZRenderingContext
  */
 @JsExport
 interface ZComponent: ZRef {
@@ -74,61 +84,36 @@ interface ZComponent: ZRef {
 }
 
 /**
- * Represents a template for a basic component in Zernikalos.
- * These are used for storing and sharing data
+ * Represents the base class for components in the Zernikalos Engine.
  *
- * @param D The type of ZComponentData associated with the template
- *
- * @property data The ZComponentData associated with the template*
- * @property isRenderizable Indicates whether the component is renderizable
- *
+ * This abstract class provides foundational properties and methods for
+ * components, including initialization, unique identification, and
+ * extendable internal initialization logic. It serves as a common ancestor
+ * for both renderizable and non-renderizable components.
  */
-abstract class ZBaseComponent(
-    protected val internalData: ZComponentData? = null
-): ZComponent, ZLoggable {
+abstract class ZBaseComponent(): ZComponent, ZLoggable {
 
-    private var _uuid: Uuid? = null
+    protected var uuid: Uuid? = null
     final override val refId: String
         get() {
-            _uuid = if (_uuid == null && internalData == null) {
-                Uuid.random()
-            } else {
-                Uuid.parseHexDash(internalData!!.refId)
-            }
-            return _uuid.toString()
-        }
-
-    private var _renderer: ZBaseComponentRender? = null
-    protected val internalRenderer: ZBaseComponentRender
-        get() {
-            if (!isInitialized || !isRenderizable || !hasRenderer) {
-                throw Error("The component has not been initialized prior to access the renderer")
-            }
-            return _renderer!!
+            uuid = uuid ?: Uuid.random()
+            return uuid.toString()
         }
 
     private var initialized: Boolean = false
     final override val isInitialized: Boolean
         get() = initialized
 
-    val hasRenderer: Boolean
-        get() = _renderer != null
-
-    final override fun initialize(ctx: ZRenderingContext) {
+    protected fun setupInitialize() {
         if (initialized) {
             return
         }
         initialized = true
-
-        if (isRenderizable) {
-            _renderer = createRenderer(ctx)
-            internalRenderer.initialize()
-        }
-        internalInitialize(ctx)
     }
 
-    internal open fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
-        return null
+    override fun initialize(ctx: ZRenderingContext) {
+        setupInitialize()
+        internalInitialize(ctx)
     }
 
     protected open fun internalInitialize(ctx: ZRenderingContext) {
@@ -137,34 +122,45 @@ abstract class ZBaseComponent(
 
 }
 
-abstract class ZSerializableComponent<D: ZComponentData>(data: D): ZBaseComponent(data) {
-    @Suppress("UNCHECKED_CAST")
-    internal val data: D
-        get() = internalData as D
-
+abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): ZBaseComponent() {
     override val isRenderizable: Boolean = false
+    init {
+        uuid = data.uuid
+    }
 }
 
-abstract class ZLightComponent<R: ZBaseComponentRender>: ZBaseComponent() {
-    @Suppress("UNCHECKED_CAST")
-    val renderer: R
-        get() = internalRenderer as R
-
-    override val isRenderizable: Boolean = true
-}
-
-abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender>(data: D): ZBaseComponent(data) {
-    @Suppress("UNCHECKED_CAST")
-    internal val data: D
-        get() = internalData as D
-
-    @Suppress("UNCHECKED_CAST")
-    val renderer: R
-        get() = internalRenderer as R
-
+/**
+ * Represents an abstract component in the Zernikalos Engine that is renderizable,
+ * meaning it can produce a renderer to handle the rendering logic.
+ *
+ * Classes inheriting from this component must define how to create their specific
+ * renderer type and implement its rendering logic using a provided rendering context.
+ *
+ * @param R The type of the renderer associated with this component. It must inherit
+ *          from ZComponentRenderer.
+ */
+abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent() {
     override val isRenderizable: Boolean = true
 
-    abstract override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender?
+    private var _renderer: R? = null
+    val renderer: R
+        get() {
+            if (!isInitialized || !isRenderizable) {
+                throw Error("The component has not been initialized prior to access the renderer")
+            }
+            return _renderer!!
+        }
+
+    override fun initialize(ctx: ZRenderingContext) {
+        setupInitialize()
+        if (isRenderizable) {
+            _renderer = createRenderer(ctx)
+            _renderer?.initialize()
+        }
+        internalInitialize(ctx)
+    }
+
+    abstract fun createRenderer(ctx: ZRenderingContext): R
 }
 
 
@@ -178,22 +174,17 @@ abstract class ZRenderizableComponent<D: ZComponentData, R: ZBaseComponentRender
  * Implementations of this class are commonly used as data containers in component-based architectures
  * within the engine. These subclasses should define specific data structures and properties related
  * to their components.
- *
- * Subclasses must override the `toString` method to provide the string representation required for
- * computing the `refId`.
  */
 @JsExport
 abstract class ZComponentData: ZLoggable, ZRef {
 
-    private var _uuid: Uuid? = null
+    internal var uuid: Uuid? = null
 
     @Transient
     override val refId: String
         get() {
-            if (_uuid == null) {
-                _uuid = Uuid.random()
-            }
-            return _uuid.toString()
+            uuid = uuid ?: Uuid.random()
+            return uuid.toString()
         }
 
     abstract override fun toString(): String
@@ -204,14 +195,26 @@ abstract class ZComponentData: ZLoggable, ZRef {
  * RENDERER SECTION
  */
 
+/**
+ * Abstract base class responsible for rendering components in the Zernikalos engine.
+ * Serves as the foundation for implementing render-specific logic for components that
+ * require rendering capabilities.
+ *
+ * This class is associated with a rendering context, which provides the necessary tools
+ * and environment for rendering operations. It is designed to be used as a base for
+ * component-specific renderers, which must implement the abstract methods and may override
+ * existing ones to define custom behavior.
+ *
+ * @constructor Initializes the renderer with a given rendering context. The constructor
+ *              is accessible only within the engine to ensure proper setup and lifecycle
+ *              control of renderers.
+ *
+ * @property ctx The rendering context associated with this renderer. Provides rendering
+ *               surfaces and tools required for rendering operations.
+ */
 @JsExport
-abstract class ZBaseComponentRender: ZLoggable {
-
-    protected val ctx: ZRenderingContext
-
-    internal constructor(ctx: ZRenderingContext) {
-        this.ctx = ctx
-    }
+abstract class ZComponentRenderer
+internal constructor(protected val ctx: ZRenderingContext): ZLoggable {
 
     abstract fun initialize()
 
@@ -221,9 +224,6 @@ abstract class ZBaseComponentRender: ZLoggable {
 
     open fun render() {}
 }
-
-@JsExport
-abstract class ZComponentRender<D: ZComponentData>(ctx: ZRenderingContext, protected val data: D): ZBaseComponentRender(ctx)
 
 /**
  * SERIALIZATION SECTION
@@ -254,38 +254,43 @@ abstract class ZComponentSerializer<
 
 }
 
+/**
+ * Represents a bindable resource or component in the Zernikalos framework.
+ * Classes implementing this interface indicate that they require binding prior to usage
+ * and unbinding after usage, typically for rendering or resource management purposes.
+ */
 interface ZBindeable {
-
-    val renderer: ZBaseComponentRender
 
     /**
      * Binds the renderer.
      * This method is called to prepare the renderer for drawing.
      */
-    fun bind() {
-        renderer.bind()
-    }
+    fun bind()
 
     /**
      * Unbinds the renderer.
      * This method is called after drawing to clean up.
      */
-    fun unbind() {
-        renderer.unbind()
-    }
+    fun unbind()
 
 }
 
+/**
+ * Defines a contract for objects that can be rendered on the screen using a rendering system.
+ * Implementing classes should provide the logic for drawing their visual representation.
+ */
 interface ZRenderizable {
 
-    val renderer: ZBaseComponentRender
-
     /**
-     * Draws the mesh on the screen using its renderer.
+     * Renders the object's visual representation on the screen.
+     *
+     * Classes implementing the `ZRenderizable` interface must provide
+     * their specific rendering logic through the implementation of this method.
+     *
+     * This method is typically called by the rendering system to draw the
+     * current state of the object onto a graphical context.
      */
-    fun render() {
-        renderer.render()
-    }
+    fun render()
 
 }
 

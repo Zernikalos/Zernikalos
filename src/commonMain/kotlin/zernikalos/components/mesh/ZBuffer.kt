@@ -10,9 +10,9 @@ package zernikalos.components.mesh
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
@@ -24,7 +24,7 @@ import kotlin.js.JsName
  * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
  */
 @JsExport
-class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
+class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizableComponent<ZBufferRenderer>(), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBuffer` class.
@@ -140,6 +140,10 @@ class ZBuffer internal constructor(data: ZBufferData): ZRenderizableComponent<ZB
         return ZBufferRenderer(ctx, data)
     }
 
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
     override fun toString(): String {
         return "ZBuffer(attributeId=${this.attributeId}, bufferId=${data.bufferId})"
     }
@@ -166,7 +170,7 @@ data class ZBufferData(
 
 }
 
-expect class ZBufferRenderer(ctx: ZRenderingContext, data: ZBufferData): ZComponentRender<ZBufferData> {
+expect class ZBufferRenderer(ctx: ZRenderingContext, data: ZBufferData): ZComponentRenderer {
     override fun initialize()
 
     override fun bind()

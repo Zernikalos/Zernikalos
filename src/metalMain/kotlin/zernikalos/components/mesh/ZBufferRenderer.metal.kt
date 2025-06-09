@@ -14,12 +14,12 @@ import kotlinx.cinterop.usePinned
 import platform.Metal.*
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, data: ZBufferData) : ZComponentRender<ZBufferData>(ctx, data) {
+actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
     var buffer: MTLBufferProtocol? = null
     lateinit var attributeDescriptor: MTLVertexAttributeDescriptor

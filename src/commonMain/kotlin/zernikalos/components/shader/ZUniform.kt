@@ -10,8 +10,8 @@ package zernikalos.components.shader
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -34,8 +34,8 @@ fun ZInverseBindMatrixArray(count: Int): ZUniform {
 }
 
 @JsExport
-class ZUniform internal constructor(data: ZUniformData):
-    ZRenderizableComponent<ZUniformData, ZUniformRenderer>(data), ZBaseUniform {
+class ZUniform internal constructor(private val data: ZUniformData):
+    ZRenderizableComponent<ZUniformRenderer>(), ZBaseUniform {
 
     @JsName("initWithArgs")
     constructor(id: Int, uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(id, uniformName, count, dataType))
@@ -88,7 +88,7 @@ data class ZUniformData(
     var value: ZAlgebraObject? = null
 }
 
-expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData> {
+expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRenderer {
 
     override fun initialize()
 }

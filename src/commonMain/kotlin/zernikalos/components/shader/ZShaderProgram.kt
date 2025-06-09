@@ -14,7 +14,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramData, ZShaderProgramRenderer>(data), ZBindeable {
+class ZShaderProgram internal constructor(private val data: ZShaderProgramData): ZRenderizableComponent<ZShaderProgramRenderer>(), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZShaderProgramData())
@@ -64,6 +64,10 @@ class ZShaderProgram internal constructor(data: ZShaderProgramData): ZRenderizab
         data.attributes.clear()
     }
 
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
     override fun createRenderer(ctx: ZRenderingContext): ZShaderProgramRenderer {
         return ZShaderProgramRenderer(ctx, data)
     }
@@ -78,10 +82,8 @@ data class ZShaderProgramData(
     var uniforms: ZUniformCollection = ZUniformCollection()
 ): ZComponentData()
 
-expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRender<ZShaderProgramData> {
-
+expect class ZShaderProgramRenderer(ctx: ZRenderingContext, data: ZShaderProgramData): ZComponentRenderer {
     override fun initialize()
     override fun bind()
     override fun unbind()
-
 }

@@ -8,9 +8,8 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -19,8 +18,8 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZUniformBlock internal constructor(data: ZUniformBlockData):
-    ZRenderizableComponent<ZUniformBlockData, ZUniformBlockRenderer>(data), ZBaseUniform {
+class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
+    ZRenderizableComponent<ZUniformBlockRenderer>(), ZBaseUniform {
 
     val uniforms: MutableMap<String, ZBaseUniform> by data::uniforms
 
@@ -39,7 +38,7 @@ class ZUniformBlock internal constructor(data: ZUniformBlockData):
         data.uniforms[uniformName]?.value = value
     }
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender? {
+    override fun createRenderer(ctx: ZRenderingContext): ZUniformBlockRenderer {
         return ZUniformBlockRenderer(ctx, data)
     }
 
@@ -70,7 +69,7 @@ data class ZUniformBlockData(
         }
 }
 
-expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRender<ZUniformBlockData> {
+expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRenderer {
 
     override fun initialize()
 

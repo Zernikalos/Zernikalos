@@ -18,11 +18,11 @@ import platform.Metal.MTLTextureUsageShaderRead
 import platform.MetalKit.MTKTextureLoader
 import platform.MetalKit.MTKTextureLoaderOptionTextureStorageMode
 import platform.MetalKit.MTKTextureLoaderOptionTextureUsage
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
 
-actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, data: ZTextureData) : ZComponentRender<ZTextureData>(ctx, data) {
+actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private val data: ZTextureData) : ZComponentRenderer(ctx) {
 
     var texture: MTLTextureProtocol? = null
 

@@ -9,13 +9,13 @@
 package zernikalos.components.shader
 
 import zernikalos.ZTypes
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, data: ZUniformData): ZComponentRender<ZUniformData>(ctx, data) {
+actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, private val data: ZUniformData): ZComponentRenderer(ctx) {
 
     lateinit private var _uniformId: GLWrap
 

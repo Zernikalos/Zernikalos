@@ -10,7 +10,7 @@ package zernikalos.components
 
 import zernikalos.context.ZRenderingContext
 
-actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, data: ZViewportData) : ZComponentRender<ZViewportData>(ctx, data) {
+actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, private val data: ZViewportData) : ZComponentRenderer(ctx) {
     actual override fun initialize() {
     }
 

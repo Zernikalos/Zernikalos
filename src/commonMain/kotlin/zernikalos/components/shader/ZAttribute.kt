@@ -8,8 +8,8 @@
 
 package zernikalos.components.shader
 
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentRender
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -44,7 +44,7 @@ val ZAttrBoneIndices: ZAttribute
     get() = ZAttribute(ZAttributeId.BONE_INDEX)
 
 @JsExport
-class ZAttribute internal constructor(data: ZAttributeData): ZRenderizableComponent<ZAttributeData, ZAttributeRenderer>(data) {
+class ZAttribute internal constructor(private val data: ZAttributeData): ZRenderizableComponent<ZAttributeRenderer>() {
 
     @JsName("init")
     constructor(): this(ZAttributeData())
@@ -79,7 +79,6 @@ data class ZAttributeData(
     var attributeName: String = ""
 ): ZComponentData()
 
-expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRender<ZAttributeData> {
+expect class ZAttributeRenderer(ctx: ZRenderingContext, data: ZAttributeData): ZComponentRenderer {
     override fun initialize()
-
 }

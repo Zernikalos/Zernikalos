@@ -8,7 +8,6 @@
 
 package zernikalos.components.material
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -24,7 +23,7 @@ import kotlin.js.JsName
  *
  */
 @JsExport
-class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
+class ZTexture internal constructor(private val data: ZTextureData): ZRenderizableComponent<ZTextureRenderer>(), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())
@@ -68,20 +67,10 @@ class ZTexture internal constructor(data: ZTextureData): ZRenderizableComponent<
     override fun internalInitialize(ctx: ZRenderingContext) {
         logger.debug("Initializing texture $refId")
     }
-}
 
-/**
- * @suppress
- */
-@Serializable
-internal data class ZTextureDataWrapper(
-    @ProtoNumber(1)
-    override var refId: String = "",
-    @ProtoNumber(2)
-    override var isReference: Boolean = false,
-    @ProtoNumber(100)
-    override var data: ZTextureData? = null
-): ZRefComponentWrapper<ZTextureData>
+    override fun bind() = renderer.bind()
+    override fun unbind() = renderer.unbind()
+}
 
 /**
  * @suppress
@@ -105,7 +94,7 @@ data class ZTextureData(
 /**
  * @suppress
  */
-expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRender<ZTextureData> {
+expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComponentRenderer {
 
     override fun initialize()
 

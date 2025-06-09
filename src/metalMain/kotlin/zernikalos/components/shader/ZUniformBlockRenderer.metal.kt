@@ -8,13 +8,13 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.ZComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 
 actual class ZUniformBlockRenderer actual constructor(
     ctx: ZRenderingContext,
     data: ZUniformBlockData
-) : ZComponentRender<ZUniformBlockData>(ctx, data) {
+) : ZComponentRenderer(ctx) {
     actual override fun initialize() {
     }
 

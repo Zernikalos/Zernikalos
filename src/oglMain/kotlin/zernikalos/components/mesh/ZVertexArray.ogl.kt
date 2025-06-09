@@ -8,15 +8,15 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.ZBaseComponentRender
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZLightComponent
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.logger.logger
 
-class ZVertexArray(): ZLightComponent<ZVertexArrayRenderer>(), ZBindeable {
+class ZVertexArray(): ZRenderizableComponent<ZVertexArrayRenderer>(), ZBindeable {
 
     override fun createRenderer(ctx: ZRenderingContext): ZVertexArrayRenderer {
         return ZVertexArrayRenderer(ctx)
@@ -32,7 +32,7 @@ class ZVertexArray(): ZLightComponent<ZVertexArrayRenderer>(), ZBindeable {
 
 }
 
-class ZVertexArrayRenderer(ctx: ZRenderingContext): ZBaseComponentRender(ctx) {
+class ZVertexArrayRenderer(ctx: ZRenderingContext): ZComponentRenderer(ctx) {
 
     private lateinit var vao: GLWrap
 

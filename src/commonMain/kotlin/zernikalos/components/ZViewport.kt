@@ -22,8 +22,8 @@ import kotlin.js.JsName
 @JsExport
 @Serializable(with = ZViewportSerializer::class)
 class ZViewport
-internal constructor(data: ZViewportData):
-    ZRenderizableComponent<ZViewportData, ZViewportRenderer>(data),
+internal constructor(private val data: ZViewportData):
+    ZRenderizableComponent<ZViewportRenderer>(),
     ZRenderizable, ZResizable {
 
     @JsName("init")
@@ -60,6 +60,7 @@ internal constructor(data: ZViewportData):
         renderer.onViewportResize(width, height)
     }
 
+    override fun render() = renderer.render()
 
 }
 
@@ -71,7 +72,7 @@ data class ZViewportData(
     var viewBox: ZBox2D = ZBox2D(0, 0, 0, 0)
 }
 
-expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRender<ZViewportData> {
+expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZComponentRenderer {
     override fun initialize()
 
     override fun render()

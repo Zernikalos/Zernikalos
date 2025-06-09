@@ -26,8 +26,8 @@ import kotlin.js.JsName
  */
 @Serializable(with = ZMeshSerializer::class)
 @JsExport
-class ZMesh internal constructor(data: ZMeshData):
-    ZRenderizableComponent<ZMeshData, ZMeshRenderer>(data),
+class ZMesh internal constructor(private val data: ZMeshData):
+    ZRenderizableComponent<ZMeshRenderer>(),
     ZBindeable,
     ZRenderizable {
 
@@ -56,7 +56,7 @@ class ZMesh internal constructor(data: ZMeshData):
     @JsName("init")
     constructor(): this(ZMeshData())
 
-    override fun createRenderer(ctx: ZRenderingContext): ZBaseComponentRender {
+    override fun createRenderer(ctx: ZRenderingContext): ZMeshRenderer {
         return ZMeshRenderer(ctx, data)
     }
 
@@ -140,6 +140,12 @@ class ZMesh internal constructor(data: ZMeshData):
     fun addBuffer(buffer: ZBuffer) {
         data.buffers[buffer.name] = buffer
     }
+
+    override fun bind() = renderer.bind()
+
+    override fun unbind() = renderer.unbind()
+
+    override fun render() = renderer.render()
 
 }
 
@@ -251,7 +257,7 @@ internal data class ZRawMeshData(
 /**
  * @suppress
  */
-expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZBaseComponentRender {
+expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZMeshData): ZComponentRenderer {
 
     override fun initialize()
 
