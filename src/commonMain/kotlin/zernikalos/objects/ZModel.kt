@@ -78,6 +78,10 @@ class ZModel: ZObject() {
             mesh.buffers.values.filter { it.enabled }.joinToString(separator = ",\n") { it.toString() }
         }")
 
+        shaderProgram.initialize(ctx.renderingContext)
+        mesh.initialize(ctx.renderingContext)
+        material?.initialize(ctx.renderingContext)
+
         renderer.initialize()
     }
 

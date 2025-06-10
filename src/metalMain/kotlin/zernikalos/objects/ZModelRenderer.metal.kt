@@ -23,10 +23,6 @@ actual class ZModelRenderer actual constructor(
     private var pipelineState: MTLRenderPipelineStateProtocol? = null
 
     actual fun initialize() {
-        model.shaderProgram.initialize(ctx)
-        model.mesh.initialize(ctx)
-        model.material?.initialize(ctx)
-
         pipelineState = createPipelineDescriptor()
     }
 
