@@ -71,7 +71,7 @@ publishing {
 
 android {
     namespace=zernikalosGroup
-    compileSdk=33
+    compileSdk=35
 
     defaultConfig {
         minSdk=24

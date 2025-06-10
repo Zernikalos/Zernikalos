@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.0-RC"
+kotlin = "2.2.0-RC2"
 androidGradlePlugin = "8.7.0"
 coroutines = "1.10.2"
 serialization = "1.8.1"
