@@ -1,50 +1,18 @@
-build
-.gradle
-local.properties
-kotlin-js-store
-output
-*.hprof
-.idea/workspace.xml
-
-.DS_Store
-.idea/shelf
-/confluence/target
-/dependencies/repo
-/android.tests.dependencies
-/dependencies/android.tests.dependencies
-/dist
-/local
-/gh-pages
-/ideaSDK
-/clionSDK
-/android-studio/sdk
-out/
-/tmp
-/intellij
-workspace.xml
-*.versionsBackup
-/idea/testData/debugger/tinyApp/classes*
-/jps-plugin/testData/kannotator
-/js/js.translator/testData/out/
-/js/js.translator/testData/out-min/
-/js/js.translator/testData/out-pir/
-.gradle/
-build/
-!**/src/**/build
-!**/test/**/build
+# =========================
+# IDEA related folders/files
+# =========================
+.idea/
 *.iml
-!**/testData/**/*.iml
+*.iws
+.idea/artifacts/
+.idea/shelf/
+.idea/workspace.xml
+.idea/.name
+.idea/runConfigurations.xml
+.idea/AndroidProjectSystem.xml
 .idea/codeStyles/
 .idea/remote-targets.xml
-.idea/libraries/Gradle*.xml
-.idea/libraries/Maven*.xml
-.idea/modules
-.idea/runConfigurations/JPS_*.xml
-.idea/runConfigurations/_JPS_*.xml
-.idea/runConfigurations/PILL_*.xml
-.idea/runConfigurations/_FP_*.xml
-.idea/runConfigurations/_MT_*.xml
-.idea/libraries
+.idea/libraries/
 .idea/modules.xml
 .idea/gradle.xml
 .idea/compiler.xml
@@ -55,18 +23,76 @@ build/
 .idea/protoeditor.xml
 .idea/copyright/
 .idea/material_theme_*
-.idea/artifacts
-.idea/inspectionProfiles
-node_modules/
-.rpt2_cache/
-libraries/tools/kotlin-test-js-runner/lib/
-local.properties
+.idea/inspectionProfiles/
+.idea/runConfigurations/
+
+# =========================
+# System/OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Build output
+# =========================
+build/
 buildSrcTmp/
-distTmp/
+out/
 outTmp/
+dist/
+distTmp/
+output/
 /test.output
+
+# =========================
+# Gradle
+# =========================
+.gradle/
+.gradle
+.gradle/
+.gradle/*
+*.hprof
+*.versionsBackup
+local.properties
+
+# =========================
+# Kotlin/Java
+# =========================
+kotlin-js-store
 /kotlin-native/dist
 kotlin-ide/
 .kotlin/
-*.log
+
+# =========================
+# Node.js / JS
+# =========================
+node_modules/
+.rpt2_cache/
 .npmrc
+libraries/tools/kotlin-test-js-runner/lib/
+
+# =========================
+# Project-specific
+# =========================
+/confluence/target
+/dependencies/repo
+/android.tests.dependencies
+/dependencies/android.tests.dependencies
+/gh-pages
+/ideaSDK
+/clionSDK
+/android-studio/sdk
+/intellij
+/jps-plugin/testData/kannotator
+/idea/testData/debugger/tinyApp/classes*
+/js/js.translator/testData/out/
+/js/js.translator/testData/out-min/
+/js/js.translator/testData/out-pir/
+!**/src/**/build
+!**/test/**/build
+!**/testData/**/*.iml
+
+# =========================
+# Logs
+# =========================
+*.log

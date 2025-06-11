@@ -1,0 +1,7 @@
+# Import rules from individual files
+includes:
+  - .llm/rules/commit-format.yaml
+  - .llm/rules/workflow.yaml
+  - .llm/rules/templates.yaml
+  - .llm/rules/zernikalos_components.yaml
+

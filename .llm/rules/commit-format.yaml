@@ -1,4 +1,3 @@
-# Windsurf Rules Configuration
 rules:
   # Commit format trigger
   commit_format:
