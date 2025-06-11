@@ -7,7 +7,7 @@ rules:
       - name: "Create component directory"
         command: "mkdir -p src/commonMain/kotlin/zernikalos/components/{{type}}"
       - name: "Create component file"
-        command: "cat .windsurf/templates/zernikalos_renderizable_component_template.kt | \
+        command: "cat .llm/templates/zernikalos_renderizable_component_template.kt | \
             sed -e 's/{{author}}/{{author_name}}/g' \
             -e 's/{{year}}/{{current_year}}/g' \
             -e 's/{{component_name}}/{{name}}/g' \
