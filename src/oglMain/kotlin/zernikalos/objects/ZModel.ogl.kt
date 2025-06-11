@@ -15,9 +15,6 @@ actual class ZModelRenderer actual constructor(
     val model: ZModel
 ) {
     actual fun initialize() {
-        model.shaderProgram.initialize(ctx)
-        model.mesh.initialize(ctx)
-        model.material?.initialize(ctx)
     }
 
     actual fun render() {

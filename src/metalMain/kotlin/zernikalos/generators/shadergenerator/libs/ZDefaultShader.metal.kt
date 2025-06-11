@@ -8,6 +8,8 @@
 
 package zernikalos.generators.shadergenerator.libs
 
+import zernikalos.components.shader.ZAttributeId
+
 const val shaderCommonHeaders = """
 #include <metal_stdlib>
 #include <simd/simd.h>
@@ -24,21 +26,21 @@ typedef struct
 } Uniforms;
 """
 
-const val shaderVertexDefinitions = """
+val shaderVertexDefinitions = """
 typedef struct
 {
     #ifdef USE_POSITION
-        float3 position [[attribute(1)]];
+        float3 position [[attribute(${ZAttributeId.POSITION.id})]];
     #endif
     #ifdef USE_COLOR
-        float3 color [[attribute(3)]];
+        float3 color [[attribute(${ZAttributeId.COLOR.id})]];
     #endif
     #ifdef USE_TEXTURE
-        float2 texCoord [[attribute(4)]];
+        float2 texCoord [[attribute(${ZAttributeId.UV.id})]];
     #endif
     #ifdef USE_SKINNING
-        float4 boneWeights [[attribute(5)]];
-        float4 boneIndices [[attribute(6)]];
+        float4 boneWeights [[attribute(${ZAttributeId.BONE_WEIGHT.id})]];
+        float4 boneIndices [[attribute(${ZAttributeId.BONE_INDEX.id})]];
     #endif
 } Vertex;
 """

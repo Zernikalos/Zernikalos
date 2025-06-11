@@ -18,6 +18,7 @@ import platform.Metal.MTLVertexDescriptor
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private val data: ZMeshData) : ZComponentRenderer(ctx
 ) {

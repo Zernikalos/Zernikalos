@@ -146,16 +146,35 @@ object ZTypes {
     val NONE = ZDataType(ZBaseType.NONE, ZFormatType.NONE)
 
     val BYTE = ZDataType(ZBaseType.BYTE, ZFormatType.SCALAR)
+    val BYTE2 = ZDataType(ZBaseType.BYTE, ZFormatType.VEC2)
+    val BYTE3 = ZDataType(ZBaseType.BYTE, ZFormatType.VEC3)
+    val BYTE4 = ZDataType(ZBaseType.BYTE, ZFormatType.VEC4)
 
     val UBYTE = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.SCALAR)
     val UBYTE2 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC2)
     val UBYTE3 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC3)
     val UBYTE4 = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.VEC4)
 
-    val INT = ZDataType(ZBaseType.INT, ZFormatType.SCALAR)
-    val UINT = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.SCALAR)
     val SHORT = ZDataType(ZBaseType.SHORT, ZFormatType.SCALAR)
+    val SHORT2 = ZDataType(ZBaseType.SHORT, ZFormatType.VEC2)
+    val SHORT3 = ZDataType(ZBaseType.SHORT, ZFormatType.VEC3)
+    val SHORT4 = ZDataType(ZBaseType.SHORT, ZFormatType.VEC4)
+
     val USHORT = ZDataType(ZBaseType.UNSIGNED_SHORT, ZFormatType.SCALAR)
+    val USHORT2 = ZDataType(ZBaseType.UNSIGNED_SHORT, ZFormatType.VEC2)
+    val USHORT3 = ZDataType(ZBaseType.UNSIGNED_SHORT, ZFormatType.VEC3)
+    val USHORT4 = ZDataType(ZBaseType.UNSIGNED_SHORT, ZFormatType.VEC4)
+
+    val INT = ZDataType(ZBaseType.INT, ZFormatType.SCALAR)
+    val INT2 = ZDataType(ZBaseType.INT, ZFormatType.VEC2)
+    val INT3 = ZDataType(ZBaseType.INT, ZFormatType.VEC3)
+    val INT4 = ZDataType(ZBaseType.INT, ZFormatType.VEC4)
+
+    val UINT = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.SCALAR)
+    val UINT2 = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.VEC2)
+    val UINT3 = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.VEC3)
+    val UINT4 = ZDataType(ZBaseType.UNSIGNED_INT, ZFormatType.VEC4)
+
     val FLOAT = ZDataType(ZBaseType.FLOAT, ZFormatType.SCALAR)
     val DOUBLE = ZDataType(ZBaseType.DOUBLE, ZFormatType.SCALAR)
 
