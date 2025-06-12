@@ -12,17 +12,15 @@ const val defaultVertexShaderSource = """
     
 uniform MatrixBlock
 {
-  mat4 projection;
-  mat4 modelview;
-} matrices;
+  mat4 projMatrix;
+  mat4 viewMatrix;
+  mat4 mvpMatrix;
+} u_sceneMatrix;
 
 #ifdef USE_SKINNING
     uniform mat4 u_bones[100];
     uniform mat4 u_invBindMatrix[100];
 #endif
-uniform mat4 u_projMatrix;
-uniform mat4 u_viewMatrix;
-uniform mat4 u_mvpMatrix;
 
 #ifdef USE_SKINNING
     in vec4 a_boneIndices;
@@ -64,9 +62,9 @@ vec4 calcSkinnedPosition() {
 
 void main() {
     #ifdef USE_SKINNING
-        gl_Position = u_mvpMatrix * calcSkinnedPosition();
+        gl_Position = u_sceneMatrix.mvpMatrix * calcSkinnedPosition();
     #else
-        gl_Position = u_mvpMatrix * vec4(a_position,1);
+        gl_Position = u_sceneMatrix.mvpMatrix * vec4(a_position,1);
     #endif
 
 #ifdef USE_TEXTURES

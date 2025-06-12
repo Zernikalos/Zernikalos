@@ -1,6 +1,7 @@
 package zernikalos.components.shader
 
 import zernikalos.ZDataType
+import zernikalos.components.ZComponentRenderer
 import zernikalos.math.ZAlgebraObject
 import kotlin.js.JsExport
 
@@ -18,4 +19,6 @@ interface ZBaseUniform {
     val uniformName: String
 
     var value: ZAlgebraObject
+
+    val renderer: ZComponentRenderer
 }

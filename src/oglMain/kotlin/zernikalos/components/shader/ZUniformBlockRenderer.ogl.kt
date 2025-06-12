@@ -47,8 +47,4 @@ actual class ZUniformBlockRenderer actual constructor(
 
     actual override fun unbind() {
     }
-
-    actual override fun render() {
-    }
-
 }

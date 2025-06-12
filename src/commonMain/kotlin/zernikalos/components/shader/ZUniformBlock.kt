@@ -21,6 +21,8 @@ import kotlin.js.JsName
 class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockRenderer>(), ZBaseUniform {
 
+    constructor(uniformBlockName: String): this(ZUniformBlockData(uniformBlockName))
+
     val uniforms: MutableMap<String, ZBaseUniform> by data::uniforms
 
     override val id: Int = 0
@@ -28,6 +30,10 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     override val uniformName: String by data::uniformBlockName
 
     override var value: ZAlgebraObject by data::value
+
+    fun addUniform(uniformName: String, uniform: ZBaseUniform) {
+        this[uniformName] = uniform
+    }
 
     operator fun set(uniformName: String, value: ZBaseUniform) {
         data.uniforms[uniformName] = value
@@ -45,8 +51,8 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
 }
 
 data class ZUniformBlockData(
-    val uniformBlockName: String,
-    val uniforms: HashMap<String, ZBaseUniform>
+    val uniformBlockName: String = "",
+    val uniforms: HashMap<String, ZBaseUniform> = HashMap()
 ): ZComponentData() {
 
     val count: Int = uniforms.size
@@ -76,7 +82,5 @@ expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockDa
     override fun bind()
 
     override fun unbind()
-
-    override fun render()
 
 }

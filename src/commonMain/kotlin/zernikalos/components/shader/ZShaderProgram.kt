@@ -39,7 +39,11 @@ class ZShaderProgram internal constructor(private val data: ZShaderProgramData):
         return attributes.values.any { it.id == attrId.id }
     }
 
-    fun addUniform(name: String, uniform: ZUniform) {
+    fun addUniformBlock(name: String, uniformBlock: ZUniformBlock) {
+        data.uniforms[name] = uniformBlock
+    }
+
+    fun addUniform(name: String, uniform: ZBaseUniform) {
         data.uniforms[name] = uniform
     }
 
