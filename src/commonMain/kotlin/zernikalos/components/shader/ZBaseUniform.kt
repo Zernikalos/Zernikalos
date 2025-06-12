@@ -19,6 +19,4 @@ interface ZBaseUniform {
     val uniformName: String
 
     var value: ZAlgebraObject
-
-    val renderer: ZComponentRenderer
 }

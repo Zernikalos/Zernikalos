@@ -9,8 +9,8 @@
 package zernikalos.generators.shadergenerator.libs
 
 const val defaultVertexShaderSource = """
-    
-uniform MatrixBlock
+
+uniform u_sceneMatrixBlock
 {
   mat4 projMatrix;
   mat4 viewMatrix;
@@ -43,7 +43,7 @@ in vec3 a_position;
 vec4 calcSkinnedPosition() {
     vec4 skinnedPosition = vec4(0.0);
     float totalWeight = 0.0;
-     
+
      // Sum the transformations from each influencing bone
     for (int i = 0; i < 4; ++i) {
         if (a_boneWeight[i] > 0.0) {
@@ -55,7 +55,7 @@ vec4 calcSkinnedPosition() {
             totalWeight += a_boneWeight[i];
         }
     }
-    
+
     return totalWeight > 0.0 ? skinnedPosition / totalWeight : vec4(a_position, 1.0);
 }
 #endif

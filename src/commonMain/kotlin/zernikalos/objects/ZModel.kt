@@ -117,7 +117,7 @@ class ZModel: ZObject() {
     }
 
     override fun internalRender(ctx: ZContext) {
-        shaderProgram.uniforms.forEach { (name, uniform) ->
+        shaderProgram.uniforms.entries.forEach { (name, uniform) ->
             val uniformGenerator = ctx.sceneContext.getUniform(name)
             if (uniformGenerator != null) {
                 uniform.value = uniformGenerator.compute(ctx.sceneContext, this)

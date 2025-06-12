@@ -50,13 +50,17 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         }
         data.uniforms.blocks.forEach { uniform ->
             uniform.initialize(ctx)
+            uniform.renderer.bindLocation(program.renderer.programId)
         }
     }
 
     actual override fun bind() {
         program.bind()
-        data.uniforms.values.forEach { uniform ->
-            uniform.renderer.bind()
+        data.uniforms.singles.forEach { uniform ->
+            uniform.bind()
+        }
+        data.uniforms.blocks.forEach { uniform ->
+            uniform.bind()
         }
     }
 
