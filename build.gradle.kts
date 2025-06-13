@@ -243,6 +243,11 @@ kotlin {
             dependsOn(commonMain.get())
         }
 
+        val vulkanMain by creating {
+            kotlin.srcDir("src/vulkanMain/kotlin")
+            dependsOn(commonMain.get())
+        }
+
         androidMain {
             kotlin.srcDir("src/androidMain/kotlin")
             dependsOn(oglMain)
@@ -279,7 +284,7 @@ kotlin {
         }
 
         val linuxMain by getting {
-            dependsOn(oglMain)
+            dependsOn(vulkanMain)
             kotlin.srcDir("src/linuxMain/kotlin")
         }
 

@@ -1,19 +1,15 @@
-package zernikalos.components.material
+package zernikalos.components.mesh
 
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 
-/**
- * @suppress
- */
-actual class ZTextureRenderer actual constructor(
+actual class ZMeshRenderer actual constructor(
     ctx: ZRenderingContext,
-    data: ZTextureData
+    data: ZMeshData
 ) : ZComponentRenderer(ctx) {
     actual override fun initialize() {
     }
 
     actual override fun render() {
     }
-
 }

@@ -1,14 +1,12 @@
-package zernikalos.components.material
+package zernikalos.components
 
-import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
+import libvulkan.*
 
-/**
- * @suppress
- */
-actual class ZTextureRenderer actual constructor(
+
+actual class ZViewportRenderer actual constructor(
     ctx: ZRenderingContext,
-    data: ZTextureData
+    data: ZViewportData
 ) : ZComponentRenderer(ctx) {
     actual override fun initialize() {
     }
@@ -16,4 +14,6 @@ actual class ZTextureRenderer actual constructor(
     actual override fun render() {
     }
 
+    actual fun onViewportResize(width: Int, height: Int) {
+    }
 }

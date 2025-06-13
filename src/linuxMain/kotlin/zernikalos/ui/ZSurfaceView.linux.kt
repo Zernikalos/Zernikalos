@@ -1,11 +1,11 @@
 package zernikalos.ui
 
-actual class ZSurfaceView {
-    actual val width: Int
+class ZVkSurfaceView: ZSurfaceView {
+    override val surfaceWidth: Int
         get() = TODO("Not yet implemented")
-    actual val height: Int
+    override val surfaceHeight: Int
         get() = TODO("Not yet implemented")
-    actual var eventHandler: ZSurfaceViewEventHandler?
+    override var eventHandler: ZSurfaceViewEventHandler?
         get() = TODO("Not yet implemented")
         set(value) {}
 
