@@ -199,7 +199,7 @@ actual object ExpectEnabler {
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER
-    actual val UNIFORM_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
+    actual val UNIFORM_BUFFER: Int = GLES30.GL_UNIFORM_BUFFER
 }
 
 actual object ExpectBufferUsageType {
