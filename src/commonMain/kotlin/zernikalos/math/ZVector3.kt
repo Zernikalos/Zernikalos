@@ -74,14 +74,14 @@ class ZVector3(): ZAlgebraObject {
     val norm2: Float
         get() = sqrt(dot(this, this))
 
-    override val size: Int
-        get() = 3
+    override val size: Int = 3
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
 
-    override val dataType: ZDataType
-        get() = ZTypes.VEC3F
+    override val byteSize: Int
+        get() = dataType.byteSize
+
+    override val dataType: ZDataType = ZTypes.VEC3F
 
     val normalized: ZVector3
         get() {

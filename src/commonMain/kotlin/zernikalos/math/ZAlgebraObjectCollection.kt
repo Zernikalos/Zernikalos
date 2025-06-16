@@ -23,10 +23,10 @@ import kotlin.js.JsName
  *
  * @constructor Initializes a new instance of `ZAlgebraObjectCollection` with a specified data size.
  *
- * @property byteDataSize The total number of elements allocated in the collection.
+ * byteDataSize The total number of elements allocated in the collection.
  */
 @JsExport
-class ZAlgebraObjectCollection(val byteDataSize: Int): ZAlgebraObject {
+class ZAlgebraObjectCollection(byteDataSize: Int): ZAlgebraObject {
 
     private var _dataType: ZDataType = ZTypes.FLOAT
 
@@ -44,10 +44,10 @@ class ZAlgebraObjectCollection(val byteDataSize: Int): ZAlgebraObject {
         get() = _count
 
     override val size: Int
-        get() = dataType.size
+        get() = floatArray.size
 
-    val byteSize: Int
-        get() = dataType.byteSize * count
+    override val byteSize: Int
+        get() = byteArray.size
 
     /**
      * Secondary constructor for the `ZAlgebraObjectCollection` class that initializes the collection

@@ -10,8 +10,7 @@ class ZEuler(): ZAlgebraObject {
 
     private val _values: FloatArray = FloatArray(3)
 
-    override val dataType: ZDataType
-        get() = ZTypes.EULER
+    override val dataType: ZDataType = ZTypes.EULER
 
     override val floatArray: FloatArray
         get() = _values
@@ -19,11 +18,12 @@ class ZEuler(): ZAlgebraObject {
     override val byteArray: ByteArray
         get() = floatArray.toByteArray()
 
-    override val size: Int
-        get() = 3
+    override val size: Int = 3
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
+
+    override val byteSize: Int
+        get() = dataType.byteSize
 
     constructor(roll: Float, pitch: Float, yaw: Float) : this() {
         _values[0] = roll

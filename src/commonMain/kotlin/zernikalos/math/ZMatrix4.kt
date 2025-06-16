@@ -32,11 +32,13 @@ class ZMatrix4(): ZAlgebraObject {
     override val byteArray: ByteArray
         get() = floatArray.toByteArray()
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
 
     override val size: Int
-        get() = floatArray.size
+        get() = 16
+
+    override val byteSize: Int
+        get() = dataType.byteSize
 
     init {
         identity()

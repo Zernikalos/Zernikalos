@@ -71,14 +71,14 @@ class ZQuaternion(): ZAlgebraObject {
     override val byteArray: ByteArray
         get() = floatArray.toByteArray()
 
-    override val size: Int
-        get() = 4
+    override val size: Int = 4
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
 
-    override val dataType: ZDataType
-        get() = ZTypes.QUATERNION
+    override val byteSize: Int
+        get() = dataType.byteSize
+
+    override val dataType: ZDataType = ZTypes.QUATERNION
 
     val norm2: Float
         get() = sqrt(dot(this, this))

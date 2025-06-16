@@ -26,8 +26,7 @@ class ZColor(): ZAlgebraObject {
 
     private val _values: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
 
-    override val dataType: ZDataType
-        get() = ZTypes.RGBA
+    override val dataType: ZDataType = ZTypes.RGBA
 
     override val floatArray: FloatArray
         get() = _values
@@ -35,11 +34,11 @@ class ZColor(): ZAlgebraObject {
     override val byteArray: ByteArray
         get() = floatArray.toByteArray()
 
-    override val size: Int
-        get() = dataType.size
+    override val size: Int = 4
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
+
+    override val byteSize: Int = dataType.byteSize
 
     var red: Float
         get() = _values[0]
