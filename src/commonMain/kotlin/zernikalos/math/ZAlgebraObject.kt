@@ -20,7 +20,11 @@ interface ZAlgebraObject {
     val dataType: ZDataType
 
     val floatArray: FloatArray
-    
+
+    val byteArray: ByteArray
+
+    val byteSize: Int
+
     /**
      * Number of elements contained within the values array with the specific type
      * defined in dataType

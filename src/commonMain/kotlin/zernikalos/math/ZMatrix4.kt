@@ -11,6 +11,7 @@ package zernikalos.math
 import kotlinx.serialization.Serializable
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
@@ -28,11 +29,16 @@ class ZMatrix4(): ZAlgebraObject {
 
     override val floatArray: FloatArray = FloatArray(16)
 
-    override val count: Int
-        get() = 1
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
+
+    override val count: Int = 1
 
     override val size: Int
-        get() = floatArray.size
+        get() = 16
+
+    override val byteSize: Int
+        get() = dataType.byteSize
 
     init {
         identity()

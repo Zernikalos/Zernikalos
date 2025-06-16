@@ -52,13 +52,13 @@ data class ZUniformBlockData(
     val count: Int = uniforms.size
 
     private val requiredDataSize: Int
-        get() = uniforms.values.sumOf { it.value.size }
+        get() = uniforms.values.sumOf { it.value.byteSize }
 
     private var _value = ZAlgebraObjectCollection(requiredDataSize)
 
     var value: ZAlgebraObject
         get() {
-            if (_value.dataSize != requiredDataSize) {
+            if (_value.byteSize != requiredDataSize) {
                 _value = ZAlgebraObjectCollection(requiredDataSize)
             }
             _value.copyAll(uniforms.values.sortedBy { it.id }.map { it.value })

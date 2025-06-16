@@ -16,6 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.abs
@@ -54,17 +55,21 @@ class ZVector2(): ZAlgebraObject {
     override val floatArray: FloatArray
         get() = floatArrayOf(x, y)
 
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
+
     val norm2: Float
         get() = sqrt(dot(this, this))
 
     override val size: Int
         get() = dataType.size
 
-    override val count: Int
-        get() = 1
+    override val byteSize: Int
+        get() = dataType.byteSize
 
-    override val dataType: ZDataType
-        get() = ZTypes.VEC2F
+    override val count: Int = 1
+
+    override val dataType: ZDataType = ZTypes.VEC2F
 
     val normalized: ZVector2
         get() {

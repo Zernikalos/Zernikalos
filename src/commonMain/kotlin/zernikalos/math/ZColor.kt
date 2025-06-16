@@ -16,6 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -25,22 +26,24 @@ class ZColor(): ZAlgebraObject {
 
     private val _values: FloatArray = floatArrayOf(0f, 0f, 0f, 0f)
 
-    override val dataType: ZDataType
-        get() = ZTypes.RGBA
+    override val dataType: ZDataType = ZTypes.RGBA
 
     override val floatArray: FloatArray
         get() = _values
 
-    override val size: Int
-        get() = dataType.size
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
 
-    override val count: Int
-        get() = 1
-    
+    override val size: Int = 4
+
+    override val count: Int = 1
+
+    override val byteSize: Int = dataType.byteSize
+
     var red: Float
         get() = _values[0]
-        set(value) { 
-            _values[0] = value 
+        set(value) {
+            _values[0] = value
         }
 
     var green: Float

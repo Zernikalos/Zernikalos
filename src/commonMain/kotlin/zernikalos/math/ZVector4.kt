@@ -17,6 +17,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.sqrt
@@ -65,17 +66,20 @@ class ZVector4(): ZAlgebraObject {
     override val floatArray: FloatArray
         get() = _values
 
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
+
     val norm2: Float
         get() = sqrt(dot(this, this))
 
-    override val size: Int
-        get() = 4
+    override val size: Int = 4
 
-    override val count: Int
-        get() = 1
+    override val count: Int = 1
 
-    override val dataType: ZDataType
-        get() = ZTypes.VEC4F
+    override val byteSize: Int
+        get() = dataType.byteSize
+
+    override val dataType: ZDataType = ZTypes.VEC4F
 
     fun setValues(x: Float, y: Float, z: Float, w: Float) {
         this.x = x

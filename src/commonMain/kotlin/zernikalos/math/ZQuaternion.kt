@@ -16,6 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
@@ -67,14 +68,17 @@ class ZQuaternion(): ZAlgebraObject {
     override val floatArray: FloatArray
         get() = _values
 
-    override val size: Int
-        get() = 4
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
 
-    override val count: Int
-        get() = 1
+    override val size: Int = 4
 
-    override val dataType: ZDataType
-        get() = ZTypes.QUATERNION
+    override val count: Int = 1
+
+    override val byteSize: Int
+        get() = dataType.byteSize
+
+    override val dataType: ZDataType = ZTypes.QUATERNION
 
     val norm2: Float
         get() = sqrt(dot(this, this))
@@ -427,7 +431,7 @@ class ZQuaternion(): ZAlgebraObject {
             val sinTheta0 = sin(theta0)
             val s0 = cos(theta) - dot * sinTheta / sinTheta0
             val s1 = sinTheta / sinTheta0
-          
+
             result.w = q1.w * s0 + q3.w * s1
             result.x = q1.x * s0 + q3.x * s1
             result.y = q1.y * s0 + q3.y * s1

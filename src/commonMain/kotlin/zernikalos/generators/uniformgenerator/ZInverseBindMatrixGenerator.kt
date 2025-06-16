@@ -32,7 +32,7 @@ class ZInverseBindMatrixGenerator: ZUniformGenerator {
         }
 
         val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)
-        boneCollection.copyAllFromIndex(0, boneMatrices)
+        boneCollection.copyAll(boneMatrices)
 
         return boneCollection
     }
