@@ -10,7 +10,7 @@ package zernikalos.math
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.utils.copyFloatArrayIntoByteArray
+import zernikalos.utils.toFloatArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -23,18 +23,19 @@ import kotlin.js.JsName
  *
  * @constructor Initializes a new instance of `ZAlgebraObjectCollection` with a specified data size.
  *
- * @property dataSize The total number of elements allocated in the collection.
+ * @property byteDataSize The total number of elements allocated in the collection.
  */
 @JsExport
-class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
+class ZAlgebraObjectCollection(val byteDataSize: Int): ZAlgebraObject {
 
     private var _dataType: ZDataType = ZTypes.FLOAT
 
     private var _count: Int = 1
 
-    override val floatArray: FloatArray = FloatArray(dataSize)
+    override val byteArray: ByteArray = ByteArray(byteDataSize)
 
-    val byteArray: ByteArray = ByteArray(dataSize * ZTypes.FLOAT.byteSize)
+    override val floatArray: FloatArray
+        get() = byteArray.toFloatArray()
 
     override val dataType: ZDataType
         get() = _dataType
@@ -59,7 +60,7 @@ class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
      * @param count The number of instances of the algebraic object to be managed by the collection.
      */
     @JsName("initWithDataTypeAndCount")
-    constructor(dataType: ZDataType, count: Int): this(dataType.size * count) {
+    constructor(dataType: ZDataType, count: Int): this(dataType.byteSize * count) {
         _dataType = dataType
         _count = count
     }
@@ -72,54 +73,30 @@ class ZAlgebraObjectCollection(val dataSize: Int): ZAlgebraObject {
      * @param value the `ZAlgebraObject` containing the values to be copied into the collection.
      * @throws Error if the data type of the `ZAlgebraObject` does not match the collection's data type.
      */
-    fun copyInto(index: Int, value: ZAlgebraObject) {
+    private fun copyInto(offset: Int, value: ZAlgebraObject): Int {
         if (value.dataType.type != dataType.type) {
             throw Error("Unable to add object of type ${value.dataType.type} into a collection of ${dataType.type}")
         }
 
-        value.floatArray.copyInto(floatArray, index * size)
-        copyFloatArrayIntoByteArray(value.floatArray, byteArray, index * size)
+        value.byteArray.copyInto(byteArray, offset)
+
+        return value.byteArray.size
     }
 
-    /**
-     * Copies all values from the specified array of `ZAlgebraObject` starting at the given index
-     * into this collection. Each object in the array is copied sequentially into the collection.
-     *
-     * @param index the starting position in the collection from where the values should be copied.
-     * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
-     */
-    @JsName("copyAllFromIndexAndArray")
-    fun copyAllFromIndex(index: Int, values: Array<ZAlgebraObject>) {
-        var auxIndex = index
-        values.forEach {
-            copyInto(auxIndex, it)
-            auxIndex++
-        }
-    }
 
     /**
      * Copies all values from the specified list of `ZAlgebraObject` starting at the given index
      * into this collection. Each object in the list is copied sequentially into the collection.
      *
-     * @param index the starting position in the collection from where the values should be copied.
+     * @param offset the starting position in the collection from where the values should be copied.
      * @param values a list of `ZAlgebraObject` that contains the values to be copied into the collection.
      */
-    fun copyAllFromIndex(index: Int, values: List<ZAlgebraObject>) {
-        var auxIndex = index
+    private fun copyAllFromIndex(offset: Int, values: List<ZAlgebraObject>) {
+        var auxOffset = offset
         values.forEach {
-            copyInto(auxIndex, it)
-            auxIndex++
+            val writtenBytes = copyInto(auxOffset, it)
+            auxOffset += writtenBytes
         }
-    }
-
-    /**
-     * Copies all values from the specified array of `ZAlgebraObject` into this collection.
-     *
-     * @param values an array of `ZAlgebraObject` that contains the values to be copied into the collection.
-     */
-    @JsName("copyAllFromArray")
-    fun copyAll(values: Array<ZAlgebraObject>) {
-        copyAllFromIndex(0, values)
     }
 
     /**

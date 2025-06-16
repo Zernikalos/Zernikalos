@@ -2,6 +2,7 @@ package zernikalos.math
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.utils.toByteArray
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -14,6 +15,9 @@ class ZEuler(): ZAlgebraObject {
 
     override val floatArray: FloatArray
         get() = _values
+
+    override val byteArray: ByteArray
+        get() = floatArray.toByteArray()
 
     override val size: Int
         get() = 3
