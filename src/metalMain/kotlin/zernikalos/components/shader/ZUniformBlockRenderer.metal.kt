@@ -51,9 +51,8 @@ actual class ZUniformBlockRenderer actual constructor(
             )
         }
 
-        // TODO: This location is still hardcoded
-        ctx.renderEncoder?.setVertexBuffer(uniformBuffer, 0u, 7u)
-        ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, 7u)
+        ctx.renderEncoder?.setVertexBuffer(uniformBuffer, 0u, data.id.toULong())
+        ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, data.id.toULong())
     }
 
     actual override fun unbind() {

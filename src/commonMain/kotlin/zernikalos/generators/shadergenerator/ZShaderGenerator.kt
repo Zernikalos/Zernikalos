@@ -51,7 +51,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
     }
 
     private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
-        val mainBlock = ZUniformBlock("u_sceneMatrixBlock")
+        val mainBlock = ZUniformBlock(10, "u_sceneMatrixBlock")
 
         mainBlock.addUniform(UNIFORM_NAMES.PROJECTION_MATRIX, ZUniformProjectionMatrix)
         mainBlock.addUniform(UNIFORM_NAMES.VIEW_MATRIX, ZUniformViewMatrix)

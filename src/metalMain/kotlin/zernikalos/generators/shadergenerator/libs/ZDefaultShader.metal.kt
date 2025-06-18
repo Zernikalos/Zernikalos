@@ -67,7 +67,7 @@ ColorInOut computeOutColor(Vertex in) {
 }
 
 vertex ColorInOut vertexShader(Vertex in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(7) ]])
+                               constant Uniforms & uniforms [[ buffer(10) ]])
 {
 
     ColorInOut out = computeOutColor(in);
@@ -113,7 +113,7 @@ float4 fragmentComputeColorOut(ColorInOut in) {
 }
 
 fragment float4 fragmentShader(ColorInOut in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(7) ]],
+                               constant Uniforms & uniforms [[ buffer(10) ]],
                                texture2d<half> colorMap     [[ texture(0) ]])
 {
     #if defined(USE_TEXTURE)

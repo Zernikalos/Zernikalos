@@ -23,11 +23,11 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockRenderer>(), ZBindeable, ZBaseUniform {
 
     @JsName("initWithName")
-    constructor(uniformBlockName: String): this(ZUniformBlockData(uniformBlockName))
+    constructor(id: Int, uniformBlockName: String): this(ZUniformBlockData(id, uniformBlockName))
 
     val uniforms: MutableMap<String, ZUniformData> by data::uniforms
 
-    override val id: Int = 0
+    override val id: Int by data::id
 
     override val uniformName: String by data::uniformBlockName
 
@@ -57,6 +57,7 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
 }
 
 data class ZUniformBlockData(
+    val id: Int = -1,
     val uniformBlockName: String = "",
     val uniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
 ): ZComponentData() {
