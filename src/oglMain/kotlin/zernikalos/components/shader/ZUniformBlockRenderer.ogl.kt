@@ -27,9 +27,11 @@ actual class ZUniformBlockRenderer actual constructor(
 
         val uniformBlockIndex = ctx.getUniformBlockIndex(programId, data.uniformBlockName)
 
+        if (!uniformBlockIndex.isValid || uniformBlockIndex.id == -1) {
+            throw Error("Uniform block index is not valid")
+        }
         ubo = ctx.createBuffer()
 
-        bind()
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
 
         val algObj = data.value as ZAlgebraObjectCollection
@@ -47,8 +49,4 @@ actual class ZUniformBlockRenderer actual constructor(
 
     actual override fun unbind() {
     }
-
-    actual override fun render() {
-    }
-
 }

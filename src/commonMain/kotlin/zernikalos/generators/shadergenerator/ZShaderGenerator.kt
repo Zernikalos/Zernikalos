@@ -51,12 +51,16 @@ internal abstract class ZShaderGenerator(): ZLoggable {
     }
 
     private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
-        shaderProgram.addUniform("ModelViewProjectionMatrix", ZUniformModelViewProjectionMatrix)
-        shaderProgram.addUniform("ViewMatrix", ZUniformViewMatrix)
-        shaderProgram.addUniform("ProjectionMatrix", ZUniformProjectionMatrix)
+        val mainBlock = ZUniformBlock(10, "u_sceneMatrixBlock")
+
+        mainBlock.addUniform(UNIFORM_NAMES.PROJECTION_MATRIX, ZUniformProjectionMatrix)
+        mainBlock.addUniform(UNIFORM_NAMES.VIEW_MATRIX, ZUniformViewMatrix)
+        mainBlock.addUniform(UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX, ZUniformModelViewProjectionMatrix)
+        shaderProgram.addUniformBlock("SceneMatrix", mainBlock)
+
         if (params.useSkinning) {
-            shaderProgram.addUniform("Bones", ZBonesMatrixArray(params.maxBones))
-            shaderProgram.addUniform("InverseBindMatrix", ZInverseBindMatrixArray(params.maxBones))
+            shaderProgram.addUniform(UNIFORM_NAMES.BONES, ZUniform(ZBonesMatrixArray(params.maxBones)))
+            shaderProgram.addUniform(UNIFORM_NAMES.INVERSE_BIND_MATRIX, ZUniform(ZInverseBindMatrixArray(params.maxBones)))
         }
     }
 

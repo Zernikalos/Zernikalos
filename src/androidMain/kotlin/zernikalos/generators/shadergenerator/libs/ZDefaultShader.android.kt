@@ -9,20 +9,18 @@
 package zernikalos.generators.shadergenerator.libs
 
 const val defaultVertexShaderSource = """
-    
-uniform MatrixBlock
+
+uniform u_sceneMatrixBlock
 {
-  mat4 projection;
-  mat4 modelview;
-} matrices;
+  mat4 projMatrix;
+  mat4 viewMatrix;
+  mat4 mvpMatrix;
+} u_sceneMatrix;
 
 #ifdef USE_SKINNING
     uniform mat4 u_bones[100];
     uniform mat4 u_invBindMatrix[100];
 #endif
-uniform mat4 u_projMatrix;
-uniform mat4 u_viewMatrix;
-uniform mat4 u_mvpMatrix;
 
 #ifdef USE_SKINNING
     in vec4 a_boneIndices;
@@ -45,7 +43,7 @@ in vec3 a_position;
 vec4 calcSkinnedPosition() {
     vec4 skinnedPosition = vec4(0.0);
     float totalWeight = 0.0;
-     
+
      // Sum the transformations from each influencing bone
     for (int i = 0; i < 4; ++i) {
         if (a_boneWeight[i] > 0.0) {
@@ -57,16 +55,16 @@ vec4 calcSkinnedPosition() {
             totalWeight += a_boneWeight[i];
         }
     }
-    
+
     return totalWeight > 0.0 ? skinnedPosition / totalWeight : vec4(a_position, 1.0);
 }
 #endif
 
 void main() {
     #ifdef USE_SKINNING
-        gl_Position = u_mvpMatrix * calcSkinnedPosition();
+        gl_Position = u_sceneMatrix.mvpMatrix * calcSkinnedPosition();
     #else
-        gl_Position = u_mvpMatrix * vec4(a_position,1);
+        gl_Position = u_sceneMatrix.mvpMatrix * vec4(a_position,1);
     #endif
 
 #ifdef USE_TEXTURES

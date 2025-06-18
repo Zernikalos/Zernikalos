@@ -19,14 +19,9 @@ import zernikalos.logger.logger
 
 actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData) : ZComponentRenderer(ctx) {
 
-    var uniformBuffer: MTLBufferProtocol? = null
-
     var library: MTLLibraryProtocol? = null
     lateinit var vertexShader: MTLFunctionProtocol
     lateinit var fragmentShader: MTLFunctionProtocol
-
-    private val uniformsSize: Int
-        get() = data.uniforms.singles.asSequence().fold(0) { acc, zUniform -> acc + zUniform.dataType.byteSize }
 
     actual override fun initialize() {
         initializeShader()
@@ -36,12 +31,12 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     private fun initializeUniformBuffer() {
         ctx as ZMtlRenderingContext
 
-        data.uniforms.singles.forEach { uniform ->
+        data.uniforms.blocks.forEach { uniform ->
+            logger.debug("Initializing uniformBlock: ${uniform.uniformName}")
+
             uniform.initialize(ctx)
         }
 
-        uniformBuffer = ctx.device.newBufferWithLength(uniformsSize.toULong(), MTLResourceStorageModeShared)
-        uniformBuffer?.label = "UniformBuffer"
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -71,24 +66,9 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     actual override fun bind() {
         ctx as ZMtlRenderingContext
 
-        var offset: Long = 0
-        data.uniforms.singles.forEach { uniform ->
-            // Memory pointer where to copy the content from uniform pinned data
-            val contentPointer = uniformBuffer?.contents().rawValue + offset
-            uniform.value?.byteArray?.usePinned { pinned ->
-                // Dest, Src and how many bytes
-                memcpy(
-                    interpretCPointer<CPointed>(contentPointer),
-                    pinned.addressOf(0),
-                    uniform.dataType.byteSize.toULong()
-                )
-            }
-            offset += uniform.dataType.byteSize
+        data.uniforms.blocks.forEach { uniformBlock ->
+            uniformBlock.bind()
         }
-
-        // TODO: This location is still hardcoded
-        ctx.renderEncoder?.setVertexBuffer(uniformBuffer, 0u, 7u)
-        ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, 7u)
     }
 
     actual override fun unbind() {

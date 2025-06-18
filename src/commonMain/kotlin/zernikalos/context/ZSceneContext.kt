@@ -8,6 +8,7 @@
 
 package zernikalos.context
 
+import zernikalos.components.shader.UNIFORM_NAMES
 import zernikalos.generators.uniformgenerator.*
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
@@ -45,13 +46,13 @@ open class ZSceneContext {
 
 class ZSceneContextDefault(): ZSceneContext() {
     init {
-        addUniformGenerator("ModelViewProjectionMatrix", ZModelViewProjectionMatrixGenerator())
-        addUniformGenerator("ViewMatrix", ZViewMatrixGenerator())
-        addUniformGenerator("ProjectionMatrix", ZProjectionMatrixGenerator())
-        addUniformGenerator("ModelMatrix", ZModelMatrixGenerator())
-        addUniformGenerator("Bones", ZBoneMatrixGenerator())
-        addUniformGenerator("BindMatrix", ZBindMatrixGenerator())
-        addUniformGenerator("InverseBindMatrix", ZInverseBindMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX, ZModelViewProjectionMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.VIEW_MATRIX, ZViewMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PROJECTION_MATRIX, ZProjectionMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.MODEL_MATRIX, ZModelMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.BONES, ZBoneMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.BIND_MATRIX, ZBindMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.INVERSE_BIND_MATRIX, ZInverseBindMatrixGenerator())
     }
 }
 

@@ -175,7 +175,7 @@ kotlin {
             baseName = zernikalosNameCapital
         }
     }
-    
+
     sourceSets {
         all {
             languageSettings.optIn("zernikalos.OptInAnnotation")
@@ -301,7 +301,7 @@ tasks.register("updateVersion") {
     group = "versioning"
 
     doLast {
-        val newVersion = project.findProperty("newVersion") as String? 
+        val newVersion = project.findProperty("newVersion") as String?
             ?: zernikalosVersion
             ?: throw GradleException("Could not determine version. Please provide -PnewVersion=X.Y.Z or define zernikalosVersion")
 

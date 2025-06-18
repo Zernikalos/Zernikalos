@@ -99,6 +99,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         return GLWrap(idx)
     }
 
+//    actual fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int) {
+//        GLES30.glUniformBlockBinding(program.id as Int, uniformBlockIndex.id as Int, uniformBlockBinding)
+//    }
+
     actual fun bindBufferBase(targetType: BufferTargetType, uniformBlockIndex: GLWrap, uniformBufferObject: GLWrap) {
         GLES30.glBindBufferBase(targetType.value, uniformBlockIndex.id as Int, uniformBufferObject.id as Int)
     }
@@ -195,7 +199,7 @@ actual object ExpectEnabler {
 actual object ExpectBufferTargetType {
     actual val ARRAY_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
     actual val ELEMENT_ARRAY_BUFFER: Int = GLES30.GL_ELEMENT_ARRAY_BUFFER
-    actual val UNIFORM_BUFFER: Int = GLES30.GL_ARRAY_BUFFER
+    actual val UNIFORM_BUFFER: Int = GLES30.GL_UNIFORM_BUFFER
 }
 
 actual object ExpectBufferUsageType {
