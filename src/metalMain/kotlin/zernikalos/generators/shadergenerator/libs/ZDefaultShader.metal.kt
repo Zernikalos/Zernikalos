@@ -20,9 +20,9 @@ using namespace metal;
 const val shaderUniforms = """
 typedef struct
 {
-    matrix_float4x4 mvpMatrix;
-    matrix_float4x4 viewMatrix;
     matrix_float4x4 projectionMatrix;
+    matrix_float4x4 viewMatrix;
+    matrix_float4x4 mvpMatrix;
 } Uniforms;
 """
 
@@ -61,8 +61,8 @@ ColorInOut computeOutColor(Vertex in) {
         out.color = in.color;
     #else
         out.color = float3(1.0, 0.0, 0.0);
-    #endif 
-    
+    #endif
+
     return out;
 }
 
@@ -101,9 +101,9 @@ const val shaderFragmentMain = """
                                        mag_filter::linear,
                                        min_filter::linear,
                                        address::repeat);
-    
+
         half4 colorSample = colorMap.sample(colorSampler, in.texCoord.xy);
-    
+
         return float4(colorSample);
     }
 #endif
