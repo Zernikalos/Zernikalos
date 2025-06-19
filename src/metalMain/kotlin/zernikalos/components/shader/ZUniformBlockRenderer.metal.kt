@@ -32,7 +32,7 @@ actual class ZUniformBlockRenderer actual constructor(
     actual override fun initialize() {
         ctx as ZMtlRenderingContext
 
-        uniformBuffer = ctx.device.newBufferWithLength(data.value.byteSize.toULong(), MTLResourceStorageModeShared)
+        uniformBuffer = ctx.device.newBufferWithLength(data.byteSize.toULong(), MTLResourceStorageModeShared)
         uniformBuffer?.label = "UniformBuffer-${data.uniformBlockName}"
     }
 

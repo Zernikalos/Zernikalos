@@ -40,19 +40,6 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
 
     override var value: ZAlgebraObject by data::value
 
-    fun addUniform(uniformName: String, uniform: ZUniformData) {
-        this[uniformName] = uniform
-    }
-
-    operator fun set(uniformName: String, value: ZUniformData) {
-        data.uniforms[uniformName] = value
-    }
-
-    @JsName("bindValue")
-    operator fun set(uniformName: String, value: ZAlgebraObject) {
-        data.uniforms[uniformName]?.value = value
-    }
-
     override fun createRenderer(ctx: ZRenderingContext): ZUniformBlockRenderer {
         return ZUniformBlockRenderer(ctx, data)
     }
@@ -71,10 +58,10 @@ data class ZUniformBlockData(
 
     val count: Int = uniforms.size
 
-    val requiredDataSize: Int
+    val byteSize: Int
         get() = uniforms.values.sumOf { it.byteSize }
 
-    private var _value = ZAlgebraObjectCollection(requiredDataSize)
+    private var _value = ZAlgebraObjectCollection(byteSize)
 
     var value: ZAlgebraObject
         get() {
@@ -83,7 +70,6 @@ data class ZUniformBlockData(
                 _value.copyInto(offset, uniform.value)
                 offset += uniform.byteSize
             }
-            // _value.copyAll(uniforms.values.map { it.value!! })
             return _value
         }
         set(value) {

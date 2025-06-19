@@ -33,7 +33,7 @@ actual class ZUniformBlockRenderer actual constructor(
         ubo = ctx.createBuffer()
 
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
-        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.requiredDataSize, BufferUsageType.DYNAMIC_DRAW)
+        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.byteSize, BufferUsageType.DYNAMIC_DRAW)
 
         val bindingPoint = data.id
         ctx.uniformBlockBinding(programId, uniformBlockIndex, bindingPoint)

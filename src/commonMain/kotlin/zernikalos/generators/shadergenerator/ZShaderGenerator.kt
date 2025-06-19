@@ -56,6 +56,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         mainBlockUniforms[UNIFORM_NAMES.VIEW_MATRIX] = ZUniformViewMatrix
         mainBlockUniforms[UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX] = ZUniformModelViewProjectionMatrix
 
+        // TODO: These IDs needs to be removed as well as the names
         val mainBlock = ZUniformBlock(10, "u_sceneMatrixBlock", mainBlockUniforms)
 
         shaderProgram.addUniformBlock("SceneMatrix", mainBlock)
