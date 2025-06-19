@@ -23,7 +23,14 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockRenderer>(), ZBindeable, ZBaseUniform {
 
     @JsName("initWithName")
-    constructor(id: Int, uniformBlockName: String): this(ZUniformBlockData(id, uniformBlockName))
+    // TODO: Review this LinkedHashMap
+    constructor(id: Int, uniformBlockName: String, uniforms: LinkedHashMap<String, ZUniformData>): this(
+        ZUniformBlockData(
+            id,
+            uniformBlockName,
+            uniforms
+        )
+    )
 
     val uniforms: MutableMap<String, ZUniformData> by data::uniforms
 
@@ -59,22 +66,24 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
 data class ZUniformBlockData(
     val id: Int = -1,
     val uniformBlockName: String = "",
-    val uniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
+    val uniforms: LinkedHashMap<String, ZUniformData>
 ): ZComponentData() {
 
     val count: Int = uniforms.size
 
     private val requiredDataSize: Int
-        get() = uniforms.values.sumOf { it.value?.byteSize ?: 0 }
+        get() = uniforms.values.sumOf { it.byteSize }
 
     private var _value = ZAlgebraObjectCollection(requiredDataSize)
 
     var value: ZAlgebraObject
         get() {
-            if (_value.byteSize != requiredDataSize) {
-                _value = ZAlgebraObjectCollection(requiredDataSize)
+            var offset = 0
+            uniforms.values.forEach { uniform ->
+                _value.copyInto(offset, uniform.value)
+                offset += uniform.byteSize
             }
-            _value.copyAll(uniforms.values.map { it.value!! })
+            // _value.copyAll(uniforms.values.map { it.value!! })
             return _value
         }
         set(value) {
@@ -91,3 +100,4 @@ expect class ZUniformBlockRenderer(ctx: ZRenderingContext, data: ZUniformBlockDa
     override fun unbind()
 
 }
+

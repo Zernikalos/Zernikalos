@@ -18,6 +18,7 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZVector2
+import zernikalos.math.ZVoidAlgebraObject
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -77,11 +78,22 @@ data class ZUniformData(
     var count: Int = -1,
     var dataType: ZDataType = ZTypes.NONE,
 ): ZComponentData(), ZBaseUniform {
-    // TODO: This is not ok must be changed before finalized
-    override var value: ZAlgebraObject = ZMatrix4()
+    val byteSize: Int
+        get() = dataType.byteSize * count
+
+    override var value: ZAlgebraObject = algebraObjectByType(dataType)
 }
 
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRenderer {
 
     override fun initialize()
+}
+
+// TODO: This need to be reimplemented somehow
+private fun algebraObjectByType(type: ZDataType): ZAlgebraObject {
+    return when (type) {
+        ZTypes.MAT4F -> return ZMatrix4()
+        ZTypes.VEC2F -> return ZVector2()
+        else -> ZVoidAlgebraObject()
+    }
 }

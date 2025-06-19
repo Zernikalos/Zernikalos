@@ -73,7 +73,7 @@ class ZAlgebraObjectCollection(byteDataSize: Int): ZAlgebraObject {
      * @param value the `ZAlgebraObject` containing the values to be copied into the collection.
      * @throws Error if the data type of the `ZAlgebraObject` does not match the collection's data type.
      */
-    private fun copyInto(offset: Int, value: ZAlgebraObject): Int {
+    fun copyInto(offset: Int, value: ZAlgebraObject): Int {
         if (value.dataType.type != dataType.type) {
             throw Error("Unable to add object of type ${value.dataType.type} into a collection of ${dataType.type}")
         }
