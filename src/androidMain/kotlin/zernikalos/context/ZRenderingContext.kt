@@ -99,12 +99,12 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         return GLWrap(idx)
     }
 
-//    actual fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int) {
-//        GLES30.glUniformBlockBinding(program.id as Int, uniformBlockIndex.id as Int, uniformBlockBinding)
-//    }
+    actual fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int) {
+        GLES30.glUniformBlockBinding(program.id as Int, uniformBlockIndex.id as Int, uniformBlockBinding)
+    }
 
-    actual fun bindBufferBase(targetType: BufferTargetType, uniformBlockIndex: GLWrap, uniformBufferObject: GLWrap) {
-        GLES30.glBindBufferBase(targetType.value, uniformBlockIndex.id as Int, uniformBufferObject.id as Int)
+    actual fun bindBufferBase(targetType: BufferTargetType, uniformBlockBinding: Int, uniformBufferObject: GLWrap) {
+        GLES30.glBindBufferBase(targetType.value, uniformBlockBinding, uniformBufferObject.id as Int)
     }
 
     actual fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray) {

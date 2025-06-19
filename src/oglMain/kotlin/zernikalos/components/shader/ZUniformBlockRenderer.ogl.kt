@@ -33,10 +33,11 @@ actual class ZUniformBlockRenderer actual constructor(
         ubo = ctx.createBuffer()
 
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
+        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.byteSize, BufferUsageType.DYNAMIC_DRAW)
 
-        val algObj = data.value as ZAlgebraObjectCollection
-        ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, algObj.byteSize, BufferUsageType.DYNAMIC_DRAW)
-        ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, uniformBlockIndex, ubo!!)
+        val bindingPoint = data.id
+        ctx.uniformBlockBinding(programId, uniformBlockIndex, bindingPoint)
+        ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, ubo!!)
     }
 
     actual override fun bind() {

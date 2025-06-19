@@ -24,6 +24,12 @@ typedef struct
     matrix_float4x4 viewMatrix;
     matrix_float4x4 mvpMatrix;
 } Uniforms;
+
+typedef struct
+{
+    matrix_float4x4 bones[100];
+    matrix_float4x4 invBindMatrix[100];;
+} SkinningUniforms;
 """
 
 val shaderVertexDefinitions = """
@@ -60,20 +66,59 @@ ColorInOut computeOutColor(Vertex in) {
     #elif defined(USE_COLOR)
         out.color = in.color;
     #else
-        out.color = float3(1.0, 0.0, 0.0);
+        out.color = float3(1.0, 1.0, 1.0); // Default to white if no color/texture
     #endif
 
     return out;
 }
 
-vertex ColorInOut vertexShader(Vertex in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(10) ]])
-{
+#ifdef USE_SKINNING
+float4 calculateSkinnedPosition(
+    float3 basePosition,
+    float4 boneIndices,
+    float4 boneWeights,
+    constant SkinningUniforms &skinUniforms
+) {
+    float4 skinnedPosition = float4(0.0);
+    float totalWeight = 0.0;
 
+    for (int i = 0; i < 4; ++i) {
+        if (boneWeights[i] > 0.0) {
+            int boneID = int(boneIndices[i]);
+            // It's good practice to ensure boneID is within valid range if possible,
+            // but for a direct port, we'll assume valid indices as in GLSL.
+            matrix_float4x4 skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
+            float4 posedPosition = skinMatrix * float4(basePosition, 1.0);
+
+            skinnedPosition += boneWeights[i] * posedPosition;
+            totalWeight += boneWeights[i];
+        }
+    }
+
+    if (totalWeight > 0.0) {
+        return skinnedPosition / totalWeight;
+    } else {
+        return float4(basePosition, 1.0);
+    }
+}
+#endif
+
+vertex ColorInOut vertexShader(Vertex in [[stage_in]],
+                               constant Uniforms &uniforms [[buffer(10)]]
+                               #ifdef USE_SKINNING
+                               , constant SkinningUniforms &skinUniforms [[buffer(11)]]
+                               #endif
+                              )
+{
     ColorInOut out = computeOutColor(in);
 
-    float4 position = float4(in.position, 1.0);
-    out.position = uniforms.mvpMatrix * position;
+    #ifdef USE_SKINNING
+        float4 finalPosition = calculateSkinnedPosition(in.position, in.boneIndices, in.boneWeights, skinUniforms);
+        out.position = uniforms.mvpMatrix * finalPosition;
+    #else
+        float4 position = float4(in.position, 1.0);
+        out.position = uniforms.mvpMatrix * position;
+    #endif
 
     return out;
 }
