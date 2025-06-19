@@ -18,8 +18,11 @@ uniform u_sceneMatrixBlock
 } u_sceneMatrix;
 
 #ifdef USE_SKINNING
-    uniform mat4 u_bones[100];
-    uniform mat4 u_invBindMatrix[100];
+    uniform u_skinningMatrixBlock
+    {
+        mat4 bones[100];
+        mat4 invBindMatrix[100];
+    } skinUniforms;
 #endif
 
 #ifdef USE_SKINNING
@@ -48,7 +51,7 @@ vec4 calcSkinnedPosition() {
     for (int i = 0; i < 4; ++i) {
         if (a_boneWeight[i] > 0.0) {
             int boneID = int(a_boneIndices[i]);
-            mat4 skinMatrix = u_bones[boneID] * u_invBindMatrix[boneID];
+            mat4 skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
             vec4 posedPosition = skinMatrix * vec4(a_position, 1.0);
 
             skinnedPosition += a_boneWeight[i] * posedPosition;

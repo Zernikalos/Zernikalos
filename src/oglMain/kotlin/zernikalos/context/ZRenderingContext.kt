@@ -66,7 +66,9 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun getUniformBlockIndex(program: GLWrap, uniformBlockName: String): GLWrap
 
-    fun bindBufferBase(targetType: BufferTargetType, uniformBlockIndex: GLWrap, uniformBufferObject: GLWrap)
+    fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int)
+
+    fun bindBufferBase(targetType: BufferTargetType, uniformBlockBinding: Int, uniformBufferObject: GLWrap)
 
     /** VBO **/
 
