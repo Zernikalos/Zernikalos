@@ -71,7 +71,7 @@ data class ZUniformBlockData(
 
     val count: Int = uniforms.size
 
-    private val requiredDataSize: Int
+    val requiredDataSize: Int
         get() = uniforms.values.sumOf { it.byteSize }
 
     private var _value = ZAlgebraObjectCollection(requiredDataSize)

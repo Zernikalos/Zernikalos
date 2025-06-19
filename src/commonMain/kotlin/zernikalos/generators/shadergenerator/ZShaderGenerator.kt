@@ -61,8 +61,12 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         shaderProgram.addUniformBlock("SceneMatrix", mainBlock)
 
         if (params.useSkinning) {
-            shaderProgram.addUniform(UNIFORM_NAMES.BONES, ZUniform(ZBonesMatrixArray(params.maxBones)))
-            shaderProgram.addUniform(UNIFORM_NAMES.INVERSE_BIND_MATRIX, ZUniform(ZInverseBindMatrixArray(params.maxBones)))
+            val skinningUniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
+            skinningUniforms[UNIFORM_NAMES.BONES] = ZBonesMatrixArray(100)
+            skinningUniforms[UNIFORM_NAMES.INVERSE_BIND_MATRIX] = ZInverseBindMatrixArray(100)
+            val skinningBlock = ZUniformBlock(11, "u_skinningMatrixBlock", skinningUniforms)
+
+            shaderProgram.addUniformBlock("SkinningUniforms", skinningBlock)
         }
     }
 
