@@ -12,13 +12,12 @@ import zernikalos.utils.toByteArray
 actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
     private var currentWidth: Int = 0
     private var currentHeight: Int = 0
-//    private val renderxPassDescriptor: GPURenderPassDescriptor
 
     // TODO: Delete
     var uniformBuffer: GPUBuffer? = null
     var pipeline: GPURenderPipeline? = null
     var bindGroup: GPUBindGroup? = null
-    var depthTexture: GPUTexture? = null
+    //var depthTexture: GPUTexture? = null
 
 
     var initialized = false
@@ -130,17 +129,6 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         pipeline = ctx.device.createRenderPipeline(renderPipelineDescriptor.toGpu())
 
-        // Buffer para profundidad
-        depthTexture = ctx.device.createTexture(
-            GPUTextureDescriptor(
-                size = GPUExtent3D(
-                    width = ctx.surfaceView.surfaceWidth,
-                    height = ctx.surfaceView.surfaceHeight
-                ),
-                format = GPUTextureFormat.Depth24Plus,
-                usage = GPUTextureUsage.RENDER_ATTACHMENT
-            ).toGpu()
-        )
     }
 
     actual fun bind() {
@@ -178,31 +166,11 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         //val commandEncoder = gpuCtx.device.createCommandEncoder();
         gpuCtx.createCommandEncoder()
-        val textureView = gpuCtx.webGPUContext?.getCurrentTexture()?.createView();
-        val depthView = depthTexture?.createView();
-
-        val clearColor = ZColor(0.5f, 0.5f, 0.5f, 1.0f)
-        val colorAttachment = GPURenderPassColorAttachment(
-            view = textureView!!,
-            loadOp = "clear",
-            storeOp = "store",
-            clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
-        )
-
-        val depthAttachment = GPURenderPassDepthStencilAttachment(
-            view = depthView!!,
-            depthLoadOp = "clear",
-            depthStoreOp = "store",
-            depthClearValue = 1.0f
-        )
-
-        val renderPassDescriptor = GPURenderPassDescriptor(
-            colorAttachments = arrayOf(colorAttachment),
-            depthStencilAttachment = depthAttachment
-        )
 
         //val renderPass = commandEncoder.beginRenderPass(renderPassDescriptor)
-        gpuCtx.createRenderPass(renderPassDescriptor)
+        ctx.scene!!.viewport.render()
+
+        gpuCtx.createRenderPass(ctx.scene!!.viewport.renderer.renderPassDescriptor!!.toGpu())
         gpuCtx.renderPass?.setPipeline(pipeline!!)
         model.mesh.bind()
         gpuCtx.renderPass?.setBindGroup(0, bindGroup!!)
@@ -216,6 +184,7 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
         currentWidth = width
         currentHeight = height
         val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
+        ctx.scene?.viewport?.onViewportResize(width, height)
 //        gpuCtx.resizeCanvas(width, height)
     }
 }
