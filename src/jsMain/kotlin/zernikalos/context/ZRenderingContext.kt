@@ -213,7 +213,7 @@ actual class ZGLRenderingContext actual constructor(surfaceView: ZSurfaceView): 
 
     actual fun bindBufferBase(
         targetType: BufferTargetType,
-        uniformBlockIndex: GLWrap,
+        uniformBlockBinding: Int,
         uniformBufferObject: GLWrap
     ) {
     }
@@ -223,6 +223,13 @@ actual class ZGLRenderingContext actual constructor(surfaceView: ZSurfaceView): 
         targetType: BufferTargetType,
         byteSize: Int,
         usageType: BufferUsageType
+    ) {
+    }
+
+    actual fun uniformBlockBinding(
+        program: GLWrap,
+        uniformBlockIndex: GLWrap,
+        uniformBlockBinding: Int
     ) {
     }
 
