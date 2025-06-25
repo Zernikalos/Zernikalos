@@ -4,14 +4,7 @@ import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.GPUBindGroup
 import zernikalos.context.webgpu.GPUBindGroupDescriptor
-import zernikalos.context.webgpu.GPUBindGroupEntry
 import zernikalos.context.webgpu.GPUBindGroupLayoutDescriptor
-import zernikalos.context.webgpu.GPUBindGroupLayoutEntry
-import zernikalos.context.webgpu.GPUBindGroupResource
-import zernikalos.context.webgpu.GPUBuffer
-import zernikalos.context.webgpu.GPUBufferBindingLayout
-import zernikalos.context.webgpu.GPUBufferBindingType
-import zernikalos.context.webgpu.GPUBufferUsage
 import zernikalos.context.webgpu.GPUColorTargetState
 import zernikalos.context.webgpu.GPUCompareFunction
 import zernikalos.context.webgpu.GPUCullMode
@@ -22,51 +15,36 @@ import zernikalos.context.webgpu.GPUPrimitiveState
 import zernikalos.context.webgpu.GPUPrimitiveTopology
 import zernikalos.context.webgpu.GPURenderPipeline
 import zernikalos.context.webgpu.GPURenderPipelineDescriptor
-import zernikalos.context.webgpu.GPUShaderStage
 import zernikalos.context.webgpu.GPUTextureFormat
 import zernikalos.context.webgpu.GPUVertexState
 
 actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContext, private val model: ZModel) {
 
-    var uniformBuffer: GPUBuffer? = null
     var pipeline: GPURenderPipeline? = null
     var bindGroup: GPUBindGroup? = null
 
     actual fun initialize() {
         ctx as ZWebGPURenderingContext
 
-        val uniformBufferSize = 64 // 4x4 matriz de 4 bytes cada uno
-        uniformBuffer = ctx.device.createBuffer(
-            uniformBufferSize,
-            GPUBufferUsage.UNIFORM or GPUBufferUsage.COPY_DST,
-            false,
-            "uniformBuffer"
-        )
+        val bindGroupLayoutEntries = model.shaderProgram.uniforms.blocks.asSequence().map { block ->
+            block.renderer.bindGroupLayoutEntry!!
+        }.toList()
 
         val bindGroupLayout = ctx.device.createBindGroupLayout(
             GPUBindGroupLayoutDescriptor(
-                entries = arrayOf(GPUBindGroupLayoutEntry(
-                    binding = 0,
-                    visibility = GPUShaderStage.VERTEX,
-                    buffer = GPUBufferBindingLayout(
-                        type = GPUBufferBindingType.UNIFORM
-                    ),
-                )),
+                entries = bindGroupLayoutEntries.toTypedArray(),
                 label = "bindGroupLayout"
             ).toGpu()
         )
 
+        val bindGroupEntries = model.shaderProgram.uniforms.blocks.asSequence().map { block ->
+            block.renderer.bindGroupEntry!!
+        }.toList()
+
         bindGroup = ctx.device.createBindGroup(
             GPUBindGroupDescriptor(
                 layout = bindGroupLayout,
-                entries = arrayOf(
-                    GPUBindGroupEntry(
-                        binding = 0,
-                        resource = GPUBindGroupResource(
-                            buffer = uniformBuffer!!
-                        )
-                    )
-                )
+                entries = bindGroupEntries.toTypedArray()
             ).toGpu()
         )
 
@@ -107,12 +85,14 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
     actual fun render() {
         ctx as ZWebGPURenderingContext
 
-        if (uniformBuffer == null || pipeline == null) {
+        if (pipeline == null) {
             return
         }
         ctx.renderPass?.setPipeline(pipeline!!)
-        model.mesh.bind()
         ctx.renderPass?.setBindGroup(0, bindGroup!!)
+
+        model.shaderProgram.bind()
+        model.mesh.bind()
         model.mesh.render()
         ctx.renderPass?.end()
     }

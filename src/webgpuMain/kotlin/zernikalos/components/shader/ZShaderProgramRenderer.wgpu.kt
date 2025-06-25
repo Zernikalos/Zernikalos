@@ -16,9 +16,16 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         logger.info("Initializing shader program...")
         shaderModule = ctx.device.createShaderModule(data.shaderSource.wgpuShaderSource)
         logger.debug(data.shaderSource.wgpuShaderSource)
+
+        data.uniforms.blocks.forEach { block ->
+            block.initialize(ctx)
+        }
     }
 
     actual override fun bind() {
+        data.uniforms.blocks.forEach { block ->
+            block.bind()
+        }
     }
 
     actual override fun unbind() {

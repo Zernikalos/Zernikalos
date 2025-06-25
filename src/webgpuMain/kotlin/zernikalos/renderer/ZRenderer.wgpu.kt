@@ -69,7 +69,6 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         val mvp = ctx.activeCamera!!.viewProjectionMatrix * model.transform.matrix
 
-        gpuCtx.queue.writeBuffer(model.renderer.uniformBuffer!!, 0, mvp.floatArray.toByteArray(true));
 
         //val commandEncoder = gpuCtx.device.createCommandEncoder();
         gpuCtx.createCommandEncoder()
@@ -77,6 +76,8 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
         ctx.scene!!.viewport.render()
 
         gpuCtx.createRenderPass(ctx.scene!!.viewport.renderer.renderPassDescriptor!!.toGpu())
+        //gpuCtx.queue.writeBuffer(model.renderer.uniformBuffer!!, 0, mvp.floatArray.toByteArray(true));
+
         model.render(ctx)
         gpuCtx.queue.submit(arrayOf(gpuCtx.commandEncoder!!.finish()))
     }

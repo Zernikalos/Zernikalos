@@ -10,9 +10,11 @@ package zernikalos.generators.shadergenerator.libs
 
 const val defaultShaderSource = """
 struct Uniforms {
+    projectionMatrix : mat4x4<f32>,
+    viewMatrix : mat4x4<f32>,
     modelViewProjectionMatrix : mat4x4<f32>
 }
-@binding(0) @group(0) var<uniform> uniforms : Uniforms;
+@binding(10) @group(0) var<uniform> uniforms : Uniforms;
 
 struct VertexOutput {
     @builtin(position) Position : vec4<f32>,
