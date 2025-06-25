@@ -8,11 +8,7 @@
 
 package zernikalos.action
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.math.ZQuaternion
 import zernikalos.math.ZVector3
@@ -32,12 +28,12 @@ class ZKeyFrame(@ProtoNumber(1) var time: Float) {
         return pose.containsKey(boneName)
     }
 
-    fun getBoneTransform(boneName: String): ZBoneFrameTransform? {
-        return pose[boneName]
+    fun getBoneTransform(boneId: String): ZBoneFrameTransform? {
+        return pose[boneId]
     }
 
-    fun setBoneTransform(boneName: String, transform: ZBoneFrameTransform) {
-        _pose[boneName] = transform
+    fun setBoneTransform(boneId: String, transform: ZBoneFrameTransform) {
+        _pose[boneId] = transform
     }
 
     companion object {
@@ -46,17 +42,17 @@ class ZKeyFrame(@ProtoNumber(1) var time: Float) {
             val interpolatedKeyFrame = ZKeyFrame(time)
 
             val allBones = prev.pose.keys.union(next.pose.keys)
-            for (boneName in allBones) {
-                val prevTransform = prev.getBoneTransform(boneName)
-                val nextTransform = next.getBoneTransform(boneName)
+            for (boneId in allBones) {
+                val prevTransform = prev.getBoneTransform(boneId)
+                val nextTransform = next.getBoneTransform(boneId)
 
                 if (prevTransform != null && nextTransform != null) {
                     val interpolatedTransform = ZBoneFrameTransform.interpolate(time, prevTransform, nextTransform)
-                    interpolatedKeyFrame.setBoneTransform(boneName, interpolatedTransform)
+                    interpolatedKeyFrame.setBoneTransform(boneId, interpolatedTransform)
                 } else if (prevTransform != null) {
-                    interpolatedKeyFrame.setBoneTransform(boneName, prevTransform)
+                    interpolatedKeyFrame.setBoneTransform(boneId, prevTransform)
                 } else if (nextTransform != null) {
-                    interpolatedKeyFrame.setBoneTransform(boneName, nextTransform)
+                    interpolatedKeyFrame.setBoneTransform(boneId, nextTransform)
                 }
             }
 

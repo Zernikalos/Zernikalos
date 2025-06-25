@@ -107,7 +107,7 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
      * @param parentPoseMatrix the pose matrix of the parent bone
      */
     fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
-        val boneTransform = keyFrame.getBoneTransform(name)
+        val boneTransform = keyFrame.getBoneTransform(id)
 
         // Merge rest transform with any animated components
         val merged = ZTransform(transform.position, transform.rotation, transform.scale)
