@@ -10,6 +10,11 @@ package zernikalos
 
 import zernikalos.objects.ZObject
 
+/**
+ * Returns an iterator over the tree nodes from the parameter [obj] to the root node.
+ * The first node returned from the iterator will be the parameter [obj] itself.
+ * @param obj some node in the tree.
+ */
 fun upToRoot(obj: ZObject): Iterator<ZObject> {
     var current: ZObject = obj
     return object : Iterator<ZObject> {

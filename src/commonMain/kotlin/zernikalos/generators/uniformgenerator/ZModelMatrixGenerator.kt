@@ -14,9 +14,14 @@ import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZObject
 import zernikalos.upToRoot
 
+/*
+ * This generator computes the model matrix of an object.
+ * The model matrix is the matrix that transforms from model space to world space.
+ */
 class ZModelMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
         var m = ZMatrix4.Identity
+        // the first parentObj will be obj itself
         for (parentObj in upToRoot(obj)) {
             val parentMatrix = parentObj.transform.matrix
             m = parentMatrix * m
