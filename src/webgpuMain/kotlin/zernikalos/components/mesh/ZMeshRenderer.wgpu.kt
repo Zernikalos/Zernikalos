@@ -23,37 +23,44 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
             buff.initialize(ctx)
         }
 
-        vertexBuffersLayout = arrayOf<GPUVertexBufferLayout?>(
-            null,
-            *buildVertexBuffersLayout()
-        )
+        vertexBuffersLayout = buildVertexBuffersLayout() 
     }
 
-    private fun buildVertexBuffersLayout(): Array<GPUVertexBufferLayout> {
-        val attributes = data.buffers.values
-            // TODO: Remove this, this is hardcoded just for testing
-            .filter { buff -> buff.name == "position" }
-            .filter {buff -> buff.enabled && !buff.isIndexBuffer }.map { buff ->
-            GPUVertexBufferLayout(
-                attributes = arrayOf<GPUVertexAttribute>(GPUVertexAttribute(
-                    format = typeToWebGpuType(buff.dataType),
-                    offset = buff.offset,
-                    shaderLocation = buff.attributeId.id
-                )),
+    private fun buildVertexBuffersLayout(): Array<GPUVertexBufferLayout?> {
+        val enabledVertexBuffers = data.buffers.values
+            .filter { buff -> buff.enabled && !buff.isIndexBuffer }
+
+        // Determine the highest attribute index to size the array correctly
+        val maxIndex = enabledVertexBuffers.maxOf { it.attributeId.id }
+        val attributes: Array<GPUVertexBufferLayout?> = arrayOfNulls(maxIndex + 1)
+
+        // Populate the array so that attributes[i] corresponds to attributeId == i
+        enabledVertexBuffers.forEach { buff ->
+            attributes[buff.attributeId.id] = GPUVertexBufferLayout(
+                attributes = arrayOf(
+                    GPUVertexAttribute(
+                        format = typeToWebGpuType(buff.dataType),
+                        offset = buff.offset,
+                        shaderLocation = buff.attributeId.id
+                    )
+                ),
                 arrayStride = buff.dataType.byteSize,
                 stepMode = GPUVertexStepMode.VERTEX
             )
-
         }
-        return attributes.toTypedArray()
+
+        return attributes
     }
 
     override fun bind() {
         ctx as ZWebGPURenderingContext
-        val position = data.buffers["position"]!!
         val indices = data.indexBuffer!!
 
-        ctx.renderPass?.setVertexBuffer(position.id, position.renderer.wgpuBuffer)
+        data.buffers.values.filter {buff -> buff.enabled && !buff.isIndexBuffer }
+        .sortedBy { it.id } // Use the same consistent order
+        .forEachIndexed { index, buff -> // Use index for the slot
+            ctx.renderPass?.setVertexBuffer(buff.attributeId.id, buff.renderer.wgpuBuffer)
+        }
         ctx.renderPass?.setIndexBuffer(indices.renderer.wgpuBuffer, "uint16")
     }
 

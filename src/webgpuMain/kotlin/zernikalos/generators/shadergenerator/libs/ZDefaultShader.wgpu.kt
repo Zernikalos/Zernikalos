@@ -16,16 +16,23 @@ struct Uniforms {
 }
 @binding(10) @group(0) var<uniform> uniforms : Uniforms;
 
+struct VertexInput {
+    @location(1) position: vec3<f32>,
+    @location(4) uv : vec2<f32>,
+    @location(5) boneWeights : vec4<f32>,
+    @location(6) boneIndices : vec4<u32>,
+}
+
 struct VertexOutput {
     @builtin(position) Position : vec4<f32>,
     @location(0) vColor : vec3<f32>
 }
 
 @vertex
-fn vs_main(@location(1) position : vec3<f32>) -> VertexOutput {
+fn vs_main(input: VertexInput) -> VertexOutput {
     var output : VertexOutput;
-    output.Position = uniforms.modelViewProjectionMatrix * vec4<f32>(position, 1.0);
-    output.vColor = position * 0.5 + vec3<f32>(0.5, 0.5, 0.5); // Color basado en posición
+    output.Position = uniforms.modelViewProjectionMatrix * vec4<f32>(input.position, 1.0);
+    output.vColor = input.position * 0.5 + vec3<f32>(0.5, 0.5, 0.5); // Color basado en posición
     return output;
 }
 
