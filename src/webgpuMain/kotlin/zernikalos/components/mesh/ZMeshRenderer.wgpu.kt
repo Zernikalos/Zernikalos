@@ -23,7 +23,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
             buff.initialize(ctx)
         }
 
-        vertexBuffersLayout = buildVertexBuffersLayout() 
+        vertexBuffersLayout = buildVertexBuffersLayout()
     }
 
     private fun buildVertexBuffersLayout(): Array<GPUVertexBufferLayout?> {
@@ -58,7 +58,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
 
         data.buffers.values.filter {buff -> buff.enabled && !buff.isIndexBuffer }
         .sortedBy { it.id } // Use the same consistent order
-        .forEachIndexed { index, buff -> // Use index for the slot
+        .forEach{ buff -> // Use index for the slot
             ctx.renderPass?.setVertexBuffer(buff.attributeId.id, buff.renderer.wgpuBuffer)
         }
         ctx.renderPass?.setIndexBuffer(indices.renderer.wgpuBuffer, "uint16")

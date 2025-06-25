@@ -29,6 +29,7 @@ actual class ZUniformBlockRenderer actual constructor(ctx: ZRenderingContext, pr
             "uniformBuffer-${data.uniformBlockName}"
         )
 
+        // TODO: Review options
         bindGroupLayoutEntry = GPUBindGroupLayoutEntry(
             binding = data.id,
             visibility = GPUShaderStage.VERTEX,
