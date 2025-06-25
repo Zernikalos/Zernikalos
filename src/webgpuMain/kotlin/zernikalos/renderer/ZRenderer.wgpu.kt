@@ -62,34 +62,6 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
     fun initializeCube(ctx: ZRenderingContext) {
         ctx as ZWebGPURenderingContext
 
-        // Shader WGSL (vertex y fragment)
-        val shaderCode = """
-            struct Uniforms {
-                modelViewProjectionMatrix : mat4x4<f32>
-            }
-            @binding(0) @group(0) var<uniform> uniforms : Uniforms;
-
-            struct VertexOutput {
-                @builtin(position) Position : vec4<f32>,
-                @location(0) vColor : vec3<f32>
-            }
-
-            @vertex
-            fn vs_main(@location(1) position : vec3<f32>) -> VertexOutput {
-                var output : VertexOutput;
-                output.Position = uniforms.modelViewProjectionMatrix * vec4<f32>(position, 1.0);
-                output.vColor = position * 0.5 + vec3<f32>(0.5, 0.5, 0.5); // Color basado en posición
-                return output;
-            }
-
-            @fragment
-            fn fs_main(@location(0) vColor : vec3<f32>) -> @location(0) vec4<f32> {
-                return vec4<f32>(vColor, 1.0);
-            }"""
-
-        // Compilamos shader
-        val shaderModule = ctx.device.createShaderModule(shaderCode)
-
         // Uniform buffer para la matriz MVP
         val uniformBufferSize = 64 // 4x4 matriz de 4 bytes cada uno
         uniformBuffer = ctx.device.createBuffer(
@@ -133,12 +105,12 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
                 )
             ),
             vertex = GPUVertexState(
-                module = shaderModule,
+                module = model?.shaderProgram?.renderer?.shaderModule!!,
                 entryPoint = "vs_main",
                 buffers = model?.mesh?.renderer?.vertexBuffersLayout
             ),
             fragment = GPUFragmentState(
-                module = shaderModule,
+                module = model?.shaderProgram?.renderer?.shaderModule!!,
                 entryPoint = "fs_main",
                 targets = arrayOf(GPUColorTargetState(
                     format = ctx.getPreferredCanvasFormat().toString()
