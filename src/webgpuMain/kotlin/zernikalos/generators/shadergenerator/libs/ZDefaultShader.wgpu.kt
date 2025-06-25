@@ -16,6 +16,9 @@ struct Uniforms {
 }
 @binding(10) @group(0) var<uniform> uniforms : Uniforms;
 
+@group(1) @binding(0) var t_diffuse: texture_2d<f32>;
+@group(1) @binding(1) var s_diffuse: sampler;
+
 struct VertexInput {
     @location(1) position: vec3<f32>,
     @location(4) uv : vec2<f32>,
@@ -25,19 +28,19 @@ struct VertexInput {
 
 struct VertexOutput {
     @builtin(position) Position : vec4<f32>,
-    @location(0) vColor : vec3<f32>
+    @location(0) v_uv : vec2<f32>
 }
 
 @vertex
 fn vs_main(input: VertexInput) -> VertexOutput {
     var output : VertexOutput;
     output.Position = uniforms.modelViewProjectionMatrix * vec4<f32>(input.position, 1.0);
-    output.vColor = input.position * 0.5 + vec3<f32>(0.5, 0.5, 0.5); // Color basado en posición
+    output.v_uv = input.uv;
     return output;
 }
 
 @fragment
-fn fs_main(@location(0) vColor : vec3<f32>) -> @location(0) vec4<f32> {
-    return vec4<f32>(vColor, 1.0);
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    return textureSample(t_diffuse, s_diffuse, in.v_uv);
 }
 """

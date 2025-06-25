@@ -41,6 +41,7 @@ external class GPUDevice {
     fun createBindGroup(descriptor: GPUBindGroupDescriptor): GPUBindGroup
     fun createPipelineLayout(descriptor: GPUPipelineLayoutDescriptor): GPUPipelineLayout
     fun createTexture(descriptor: GPUTextureDescriptor): GPUTexture
+    fun createSampler(descriptor: GPUSamplerDescriptor): GPUSampler
 }
 
 external class GPUBindGroup
@@ -82,12 +83,17 @@ data class GPUBindGroupEntry(
     @JsName("binding")
     var binding: Int,
     @JsName("resource")
-    var resource: GPUBindGroupResource
+    var resource: Any // GPUBufferBinding, GPUSampler, GPUTextureView, or GPUBindGroupResource for old code
 ) {
     fun toGpu(): dynamic {
         val o = js("{}")
         o["binding"] = binding
-        o["resource"] = resource.toGpu()
+        o["resource"] = when(resource) {
+            is GPUTextureView -> resource
+            is GPUBufferBinding -> (resource as GPUBufferBinding).toGpu()
+            is GPUBindGroupResource -> (resource as GPUBindGroupResource).toGpu() // for backwards compatibility
+            else -> resource // for GPUTextureView and GPUSampler
+        }
         return o
     }
 }
@@ -141,13 +147,19 @@ data class GPUBindGroupLayoutEntry(
     @JsName("visibility")
     var visibility: Int,
     @JsName("buffer")
-    var buffer: GPUBufferBindingLayout?
+    var buffer: GPUBufferBindingLayout? = undefined,
+    @JsName("sampler")
+    var sampler: GPUSamplerBindingLayout? = undefined,
+    @JsName("texture")
+    var texture: GPUTextureBindingLayout? = undefined
 ) {
     fun toGpu(): dynamic {
         val o = js("{}")
         o["binding"] = binding
         o["visibility"] = visibility
-        if (buffer != null) o["buffer"] = buffer
+        if (buffer != null) o["buffer"] = buffer?.toGpu()
+        if (sampler != null) o["sampler"] = sampler?.toGpu()
+        if (texture != null) o["texture"] = texture?.toGpu()
         return o
     }
 }
@@ -169,8 +181,32 @@ data class GPUBufferBindingLayout(
     }
 }
 
-external interface GPUSamplerBindingLayout {
-    var type: String?
+data class GPUSamplerBindingLayout(
+    @JsName("type")
+    var type: String? = undefined // GPUSamplerBindingType
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        if (type != null) o["type"] = type
+        return o
+    }
+}
+
+data class GPUTextureBindingLayout(
+    @JsName("sampleType")
+    var sampleType: String? = undefined, // GPUTextureSampleType
+    @JsName("viewDimension")
+    var viewDimension: String? = undefined, // GPUTextureViewDimension
+    @JsName("multisampled")
+    var multisampled: Boolean? = undefined
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        if (sampleType != null) o["sampleType"] = sampleType
+        if (viewDimension != null) o["viewDimension"] = viewDimension
+        if (multisampled != null) o["multisampled"] = multisampled
+        return o
+    }
 }
 
 typealias GPUShaderStageFlags = Int
@@ -181,18 +217,35 @@ external object GPUShaderStage {
     val COMPUTE: Int
 }
 
+object GPUSamplerBindingType {
+    const val FILTERING = "filtering"
+    const val NON_FILTERING = "non-filtering"
+    const val COMPARISON = "comparison"
+}
+
+object GPUTextureSampleType {
+    const val FLOAT = "float"
+    const val UNFILTERABLE_FLOAT = "unfilterable-float"
+    const val DEPTH = "depth"
+    const val SINT = "sint"
+    const val UINT = "uint"
+}
+
+object GPUTextureViewDimension {
+    const val D1 = "1d"
+    const val D2 = "2d"
+    const val D2_ARRAY = "2d-array"
+    const val CUBE = "cube"
+    const val CUBE_ARRAY = "cube-array"
+    const val D3 = "3d"
+}
+
 typealias GPUBufferBindingTypeFlags = String
 
 object GPUBufferBindingType {
     val UNIFORM = "uniform"
     val STORAGE = "storage"
     val READ_ONLY_STORAGE = "read-only-storage"
-}
-
-external interface GPUTextureBindingLayout {
-    var sampleType: String?
-    var viewDimension: String?
-    var multisampled: Boolean?
 }
 
 external interface GPUStorageTextureBindingLayout {
@@ -439,7 +492,41 @@ external class GPUBuffer
 external class GPUQueue {
     fun writeBuffer(buffer: GPUBuffer, offset: Int, data: Any)
     fun submit(commandBuffers: Array<GPUCommandBuffer>)
+    fun copyExternalImageToTexture(source: GPUImageCopyExternalImage, destination: GPUImageCopyTexture, copySize: GPUExtent3D)
 }
+
+/**
+ * Can be one of the following:
+ * - ImageBitmap
+ * - ImageData
+ * - HTMLImageElement
+ * - HTMLVideoElement
+ * - VideoFrame
+ * - HTMLCanvasElement
+ * - OffscreenCanvas
+ */
+//typealias GPUImageCopyExternalImageSource = dynamic
+
+data class GPUImageCopyExternalImage(
+    @JsName("source")
+    val source: dynamic,
+    @JsName("origin")
+    var origin: GPUOrigin2D? = undefined,
+    @JsName("flipY")
+    var flipY: Boolean? = undefined
+)
+
+data class GPUOrigin2D(
+    @JsName("x")
+    var x: Int? = undefined,
+    @JsName("y")
+    var y: Int? = undefined
+)
+
+data class GPUImageCopyTexture(
+    @JsName("texture")
+    val texture: GPUTexture
+)
 
 external class GPUShaderModule {
 
@@ -452,7 +539,7 @@ external interface GPUTexture {
 }
 
 
-external interface GPUTextureView
+external class GPUTextureView
 
 data class GPURenderPassDescriptor(
     @JsName("colorAttachments")
@@ -505,6 +592,48 @@ data class GPURenderPassDepthStencilAttachment(
         return o
     }
 }
+external interface GPUSampler
+
+object GPUAddressMode {
+    const val CLAMP_TO_EDGE = "clamp-to-edge"
+    const val REPEAT = "repeat"
+    const val MIRROR_REPEAT = "mirror-repeat"
+}
+
+object GPUFilterMode {
+    const val NEAREST = "nearest"
+    const val LINEAR = "linear"
+}
+
+object GPUMipmapFilterMode {
+    const val NEAREST = "nearest"
+    const val LINEAR = "linear"
+}
+
+data class GPUSamplerDescriptor(
+    @JsName("addressModeU")
+    var addressModeU: String? = undefined, // GPUAddressMode
+    @JsName("addressModeV")
+    var addressModeV: String? = undefined, // GPUAddressMode
+    @JsName("addressModeW")
+    var addressModeW: String? = undefined, // GPUAddressMode
+    @JsName("magFilter")
+    var magFilter: String? = undefined, // GPUFilterMode
+    @JsName("minFilter")
+    var minFilter: String? = undefined, // GPUFilterMode
+    @JsName("mipmapFilter")
+    var mipmapFilter: String? = undefined, // GPUMipmapFilterMode
+    @JsName("lodMinClamp")
+    var lodMinClamp: Float? = undefined,
+    @JsName("lodMaxClamp")
+    var lodMaxClamp: Float? = undefined,
+    @JsName("compare")
+    var compare: String? = undefined, // GPUCompareFunction
+    @JsName("maxAnisotropy")
+    var maxAnisotropy: Short? = undefined,
+    @JsName("label")
+    var label: String? = undefined
+)
 external interface GPUCommandEncoder {
     fun beginRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder
     fun finish(): GPUCommandBuffer

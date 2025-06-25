@@ -33,6 +33,15 @@ class ZWebGPUQueue(val queue: GPUQueue) {
         queue.writeBuffer(buffer, offset, dataArray)
     }
 
+
+    fun copyExternalImageToTexture(
+        source: GPUImageCopyExternalImage,
+        destination: GPUImageCopyTexture,
+        copySize: GPUExtent3D
+    ) {
+        queue.copyExternalImageToTexture(source, destination, copySize)
+    }
+
     /**
      * Copies the underlying native GPUQueue object.
      *

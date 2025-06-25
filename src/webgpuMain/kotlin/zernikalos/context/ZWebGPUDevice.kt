@@ -45,6 +45,10 @@ class ZWebGPUDevice(val nativeDevice: GPUDevice) {
         return nativeDevice.createCommandEncoder()
     }
 
+    fun createSampler(descriptor: GPUSamplerDescriptor): GPUSampler {
+        return nativeDevice.createSampler(descriptor)
+    }
+
 //    fun createCommandBuffer(): ZWebGPUCommandBuffer {
 //        return ZWebGPUCommandBuffer(nativeDevice.createCommandEncoder())
 //    }
