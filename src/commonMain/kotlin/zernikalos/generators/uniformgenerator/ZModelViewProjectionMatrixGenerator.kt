@@ -16,10 +16,8 @@ import zernikalos.objects.ZObject
 class ZModelViewProjectionMatrixGenerator: ZUniformGenerator {
     override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
         val modelMatrixGenerator = sceneContext.getUniform("ModelMatrix")
-        val viewProjectionMatrix = sceneContext.activeCamera?.viewProjectionMatrix
-        if (viewProjectionMatrix == null) {
-            return ZMatrix4.Identity
-        }
+        val viewProjectionMatrix = sceneContext.activeCamera?.viewProjectionMatrix ?: ZMatrix4.Identity
+
         if (modelMatrixGenerator == null) {
             return viewProjectionMatrix
         }

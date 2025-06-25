@@ -9,6 +9,8 @@ import kotlin.js.JsExport
 data class ZBoneTrack(
     @ProtoNumber(1)
     val boneName: String = "",
+    @ProtoNumber(2)
+    val boneId: String = "",
 ) {
     @ProtoNumber(100)
     private val _positionTrack: ArrayList<ZPositionFrame> = arrayListOf()

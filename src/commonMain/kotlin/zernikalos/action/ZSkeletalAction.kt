@@ -57,8 +57,9 @@ class ZSkeletalAction(
                 scale = scale?.scale
             )
 
+            // TODO: Check the relevance of ZBoneTransform
             if (zBoneTransform.hasPosition || zBoneTransform.hasRotation || zBoneTransform.hasScale) {
-                kf.setBoneTransform(track.boneName, zBoneTransform)
+                kf.setBoneTransform(track.boneId, zBoneTransform)
             }
         }
 

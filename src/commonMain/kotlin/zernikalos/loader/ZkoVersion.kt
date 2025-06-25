@@ -1,4 +1,4 @@
 package zernikalos.loader
 
 /** Current ZKO format version */
-const val ZKO_VERSION = "0.9.0"
+const val ZKO_VERSION = "0.10.0"
