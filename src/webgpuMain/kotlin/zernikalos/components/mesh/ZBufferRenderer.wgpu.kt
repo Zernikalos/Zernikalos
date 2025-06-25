@@ -22,7 +22,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
 
-        // Buffer de vértices
+        // Each buffer will create a different GPUBuffer instance
         wgpuBuffer = ctx.device.createBuffer(
             data.dataArray.size * data.dataType.byteSize,
             usage,

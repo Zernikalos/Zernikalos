@@ -4,7 +4,7 @@ import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.*
-import zernikalos.math.ZMatrix4
+import zernikalos.objects.ZModel
 import zernikalos.search.findFirstModel
 import zernikalos.utils.toByteArray
 
@@ -40,8 +40,14 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 //                depthStoreOp = GPUStoreOp.STORE
 //            )
 //        )
-
     }
+
+    val model: ZModel?
+        get() {
+            val scene = ctx.scene ?: return null
+            return findFirstModel(scene)
+        }
+
 
     override fun initialize() {
         val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
@@ -55,7 +61,6 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
     fun initializeCube(ctx: ZRenderingContext) {
         ctx as ZWebGPURenderingContext
-
 
         // Shader WGSL (vertex y fragment)
         val shaderCode = """
@@ -84,23 +89,6 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         // Compilamos shader
         val shaderModule = ctx.device.createShaderModule(shaderCode)
-
-        // Esto va dentro del mesh, en la lista de atributos debes agregar cada uno de ellos
-        // Podrias crear una property para exponer esos datos si fuera necesario creo desde el bufferobj
-        // Layout de los buffers
-
-        val vertexBuffers = arrayOf<GPUVertexBufferLayout?>(
-            null,
-            GPUVertexBufferLayout(
-                attributes = arrayOf<GPUVertexAttribute>(GPUVertexAttribute(
-                    format =GPUVertexFormat.FLOAT32X3,
-                    offset =0,
-                    shaderLocation = 1
-                )),
-                arrayStride = 12,
-                stepMode = GPUVertexStepMode.VERTEX
-            )
-        )
 
         // Uniform buffer para la matriz MVP
         val uniformBufferSize = 64 // 4x4 matriz de 4 bytes cada uno
@@ -147,7 +135,7 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
             vertex = GPUVertexState(
                 module = shaderModule,
                 entryPoint = "vs_main",
-                buffers = vertexBuffers
+                buffers = model?.mesh?.renderer?.vertexBuffersLayout
             ),
             fragment = GPUFragmentState(
                 module = shaderModule,
@@ -231,14 +219,14 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
             }
             override var storeOp = "store"
         }
-        
+
         val depthAttachment = object : GPURenderPassDepthStencilAttachment {
             override var view = depthView!!
             override var depthLoadOp = "clear"
             override var depthClearValue = 1.0f
             override var depthStoreOp = "store"
         }
-        
+
         val renderPassDescriptor = object : GPURenderPassDescriptor {
             override var colorAttachments: Array<GPURenderPassColorAttachment> = arrayOf(colorAttachment)
             override var depthStencilAttachment: GPURenderPassDepthStencilAttachment? = depthAttachment
