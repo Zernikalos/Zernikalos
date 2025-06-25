@@ -4,6 +4,7 @@ import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.*
+import zernikalos.math.ZColor
 import zernikalos.objects.ZModel
 import zernikalos.search.findFirstModel
 import zernikalos.utils.toByteArray
@@ -180,29 +181,25 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
         val textureView = gpuCtx.webGPUContext?.getCurrentTexture()?.createView();
         val depthView = depthTexture?.createView();
 
-        val colorAttachment = object : GPURenderPassColorAttachment {
-            override var view: GPUTextureView = textureView!!
-            override var loadOp = "clear"
-            override var clearValue: GPUColor = object : GPUColor {
-                override var r: Float = 0.13f
-                override var g: Float = 0.13f
-                override var b: Float = 0.15f
-                override var a: Float = 1.0f
-            }
-            override var storeOp = "store"
-        }
+        val clearColor = ZColor(0.5f, 0.5f, 0.5f, 1.0f)
+        val colorAttachment = GPURenderPassColorAttachment(
+            view = textureView!!,
+            loadOp = "clear",
+            storeOp = "store",
+            clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
+        )
 
-        val depthAttachment = object : GPURenderPassDepthStencilAttachment {
-            override var view = depthView!!
-            override var depthLoadOp = "clear"
-            override var depthClearValue = 1.0f
-            override var depthStoreOp = "store"
-        }
+        val depthAttachment = GPURenderPassDepthStencilAttachment(
+            view = depthView!!,
+            depthLoadOp = "clear",
+            depthStoreOp = "store",
+            depthClearValue = 1.0f
+        )
 
-        val renderPassDescriptor = object : GPURenderPassDescriptor {
-            override var colorAttachments: Array<GPURenderPassColorAttachment> = arrayOf(colorAttachment)
-            override var depthStencilAttachment: GPURenderPassDepthStencilAttachment? = depthAttachment
-        }
+        val renderPassDescriptor = GPURenderPassDescriptor(
+            colorAttachments = arrayOf(colorAttachment),
+            depthStencilAttachment = depthAttachment
+        )
 
         //val renderPass = commandEncoder.beginRenderPass(renderPassDescriptor)
         gpuCtx.createRenderPass(renderPassDescriptor)

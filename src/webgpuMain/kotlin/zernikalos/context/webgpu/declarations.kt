@@ -454,23 +454,56 @@ external interface GPUTexture {
 
 external interface GPUTextureView
 
-external interface GPURenderPassDescriptor {
-    var colorAttachments: Array<GPURenderPassColorAttachment>
-    var depthStencilAttachment: GPURenderPassDepthStencilAttachment?
-        get() = definedExternally
-        set(value) = definedExternally
+data class GPURenderPassDescriptor(
+    @JsName("colorAttachments")
+    var colorAttachments: Array<GPURenderPassColorAttachment>,
+    @JsName("depthStencilAttachment")
+    var depthStencilAttachment: GPURenderPassDepthStencilAttachment? = null
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        o["colorAttachments"] = colorAttachments.map { it.toGpu() }.toTypedArray()
+        if (depthStencilAttachment != null) o["depthStencilAttachment"] = depthStencilAttachment!!.toGpu()
+        return o
+    }
 }
-external interface GPURenderPassColorAttachment {
-    var view: GPUTextureView
-    var loadOp: String
-    var storeOp: String
+data class GPURenderPassColorAttachment(
+    @JsName("view")
+    var view: GPUTextureView,
+    @JsName("loadOp")
+    var loadOp: String,
+    @JsName("storeOp")
+    var storeOp: String,
+    @JsName("clearValue")
     var clearValue: GPUColor
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        o["view"] = view
+        o["loadOp"] = loadOp
+        o["storeOp"] = storeOp
+        o["clearValue"] = clearValue.toGpu()
+        return o
+    }
 }
-external interface GPURenderPassDepthStencilAttachment {
-    var view: GPUTextureView
-    var depthLoadOp: String
-    var depthStoreOp: String
+data class GPURenderPassDepthStencilAttachment(
+    @JsName("view")
+    var view: GPUTextureView,
+    @JsName("depthLoadOp")
+    var depthLoadOp: String,
+    @JsName("depthStoreOp")
+    var depthStoreOp: String,
+    @JsName("depthClearValue")
     var depthClearValue: Float
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        o["view"] = view
+        o["depthLoadOp"] = depthLoadOp
+        o["depthStoreOp"] = depthStoreOp
+        o["depthClearValue"] = depthClearValue
+        return o
+    }
 }
 external interface GPUCommandEncoder {
     fun beginRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder
@@ -601,11 +634,24 @@ external object GPUTextureDimension {
     val D3: String
 }
 
-external interface GPUColor {
-    var r: Float
-    var g: Float
-    var b: Float
+data class GPUColor(
+    @JsName("r")
+    var r: Float,
+    @JsName("g")
+    var g: Float,
+    @JsName("b")
+    var b: Float,
+    @JsName("a")
     var a: Float
+) {
+    fun toGpu(): dynamic {
+        val o = js("{}")
+        o["r"] = r
+        o["g"] = g
+        o["b"] = b
+        o["a"] = a
+        return o
+    }
 }
 
 object GPULoadOp {
