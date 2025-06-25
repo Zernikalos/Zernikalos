@@ -10,16 +10,6 @@ import zernikalos.search.findFirstModel
 import zernikalos.utils.toByteArray
 
 actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
-    private var currentWidth: Int = 0
-    private var currentHeight: Int = 0
-
-    // TODO: Delete
-    var uniformBuffer: GPUBuffer? = null
-    var pipeline: GPURenderPipeline? = null
-    var bindGroup: GPUBindGroup? = null
-    //var depthTexture: GPUTexture? = null
-
-
     var initialized = false
 
     init {
@@ -42,93 +32,13 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 //        )
     }
 
-    val model: ZModel?
-        get() {
-            val scene = ctx.scene ?: return null
-            return findFirstModel(scene)
-        }
-
-
     override fun initialize() {
         val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
         super.initialize()
 
         ctx.scene?.initialize(ctx)
 
-        initializeCube(gpuCtx)
         initialized = true
-    }
-
-    fun initializeCube(ctx: ZRenderingContext) {
-        ctx as ZWebGPURenderingContext
-
-        // Uniform buffer para la matriz MVP
-        val uniformBufferSize = 64 // 4x4 matriz de 4 bytes cada uno
-        uniformBuffer = ctx.device.createBuffer(
-            uniformBufferSize,
-            GPUBufferUsage.UNIFORM or GPUBufferUsage.COPY_DST,
-            false,
-            "uniformBuffer"
-        )
-
-        val bindGroupLayout = ctx.device.createBindGroupLayout(
-            GPUBindGroupLayoutDescriptor(
-                entries = arrayOf(GPUBindGroupLayoutEntry(
-                    binding = 0,
-                    visibility = GPUShaderStage.VERTEX,
-                    buffer = GPUBufferBindingLayout(
-                        type = GPUBufferBindingType.UNIFORM
-                    ),
-                )),
-                label = "bindGroupLayout"
-            ).toGpu()
-        )
-
-        bindGroup = ctx.device.createBindGroup(
-            GPUBindGroupDescriptor(
-                layout = bindGroupLayout,
-                entries = arrayOf(
-                    GPUBindGroupEntry(
-                        binding = 0,
-                        resource = GPUBindGroupResource(
-                            buffer = uniformBuffer!!
-                        )
-                    )
-                )
-            ).toGpu()
-        )
-
-        val renderPipelineDescriptor = GPURenderPipelineDescriptor(
-            layout = ctx.device.createPipelineLayout(
-                GPUPipelineLayoutDescriptor(
-                    bindGroupLayouts = arrayOf(bindGroupLayout)
-                )
-            ),
-            vertex = GPUVertexState(
-                module = model?.shaderProgram?.renderer?.shaderModule!!,
-                entryPoint = "vs_main",
-                buffers = model?.mesh?.renderer?.vertexBuffersLayout
-            ),
-            fragment = GPUFragmentState(
-                module = model?.shaderProgram?.renderer?.shaderModule!!,
-                entryPoint = "fs_main",
-                targets = arrayOf(GPUColorTargetState(
-                    format = ctx.getPreferredCanvasFormat().toString()
-                ))
-            ),
-            depthStencil = GPUDepthStencilState(
-                format = GPUTextureFormat.Depth24Plus,
-                depthWriteEnabled = true,
-                depthCompare = GPUCompareFunction.LESS
-            ),
-            primitive = GPUPrimitiveState(
-                cullMode = GPUCullMode.NONE,
-                topology = GPUPrimitiveTopology.TRIANGLE_LIST
-            )
-        )
-
-        pipeline = ctx.device.createRenderPipeline(renderPipelineDescriptor.toGpu())
-
     }
 
     actual fun bind() {
@@ -151,9 +61,7 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
     fun renderCube() {
         val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
-        if (uniformBuffer == null || pipeline == null) {
-            return
-        }
+
         val model = findFirstModel(ctx.scene!!) ?: return
         // ctx.scene?.render(ctx)
 
@@ -161,30 +69,19 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         val mvp = ctx.activeCamera!!.viewProjectionMatrix * model.transform.matrix
 
-        gpuCtx.queue.writeBuffer(uniformBuffer!!, 0, mvp.floatArray.toByteArray(true));
-
+        gpuCtx.queue.writeBuffer(model.renderer.uniformBuffer!!, 0, mvp.floatArray.toByteArray(true));
 
         //val commandEncoder = gpuCtx.device.createCommandEncoder();
         gpuCtx.createCommandEncoder()
 
-        //val renderPass = commandEncoder.beginRenderPass(renderPassDescriptor)
         ctx.scene!!.viewport.render()
 
         gpuCtx.createRenderPass(ctx.scene!!.viewport.renderer.renderPassDescriptor!!.toGpu())
-        gpuCtx.renderPass?.setPipeline(pipeline!!)
-        model.mesh.bind()
-        gpuCtx.renderPass?.setBindGroup(0, bindGroup!!)
-        model.mesh.render()
-        gpuCtx.renderPass?.end()
-
+        model.render(ctx)
         gpuCtx.queue.submit(arrayOf(gpuCtx.commandEncoder!!.finish()))
     }
 
     actual override fun onViewportResize(width: Int, height: Int) {
-        currentWidth = width
-        currentHeight = height
-        val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
         ctx.scene?.viewport?.onViewportResize(width, height)
-//        gpuCtx.resizeCanvas(width, height)
     }
 }

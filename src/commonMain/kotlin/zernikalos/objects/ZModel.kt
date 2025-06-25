@@ -56,7 +56,7 @@ class ZModel: ZObject() {
         }
 
     @Transient
-    private lateinit var renderer: ZModelRenderer
+    lateinit var renderer: ZModelRenderer
 
     var action: ZSkeletalAction? = null
 
