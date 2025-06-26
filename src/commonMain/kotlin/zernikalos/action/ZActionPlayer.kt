@@ -2,6 +2,7 @@ package zernikalos.action
 
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZModel
+import kotlin.js.JsExport
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
 
@@ -14,6 +15,7 @@ fun System.currentTimeMillis(): Long = System.now().toEpochMilliseconds()
  * of the animation at a specific moment.
  */
 @OptIn(ExperimentalTime::class)
+@JsExport
 class ZActionPlayer {
     private var currentAction: ZSkeletalAction? = null
     private var currentTime: Float = 0f

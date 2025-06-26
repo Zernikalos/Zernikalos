@@ -24,11 +24,15 @@ class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializable
 
     private var _metalShaderSource: ZMetalShaderSource by data::metal
 
+    private var _wgpuShaderSource: ZWebGpuShaderSource by data::wgpu
+
     var glslVertexShaderSource: String by glslShaderSource::vertexShaderSource
 
     var glslFragmentShaderSource: String by glslShaderSource::fragmentShaderSource
 
     var metalShaderSource: String by _metalShaderSource::shaderSource
+
+    var wgpuShaderSource: String by _wgpuShaderSource::shaderSource
 
 }
 
@@ -44,7 +48,13 @@ data class ZMetalShaderSource(
 )
 
 @JsExport
+data class ZWebGpuShaderSource(
+    var shaderSource: String = ""
+)
+
+@JsExport
 data class ZShaderSourceData(
     var glsl: ZGlSLShaderSource = ZGlSLShaderSource(),
-    var metal: ZMetalShaderSource = ZMetalShaderSource()
+    var metal: ZMetalShaderSource = ZMetalShaderSource(),
+    var wgpu: ZWebGpuShaderSource = ZWebGpuShaderSource()
 ): ZComponentData()

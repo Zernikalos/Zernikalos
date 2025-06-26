@@ -33,9 +33,9 @@ class ZModel: ZObject() {
     override val type = ZObjectType.MODEL
 
     @ProtoNumber(4)
-    lateinit var mesh: ZMesh
+    var mesh: ZMesh = ZMesh()
     @Transient
-    var shaderProgram: ZShaderProgram =  ZShaderProgram()
+    var shaderProgram: ZShaderProgram = ZShaderProgram()
     @Contextual @ProtoNumber(6)
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)
@@ -56,7 +56,7 @@ class ZModel: ZObject() {
         }
 
     @Transient
-    private lateinit var renderer: ZModelRenderer
+    lateinit var renderer: ZModelRenderer
 
     var action: ZSkeletalAction? = null
 
@@ -86,6 +86,7 @@ class ZModel: ZObject() {
     }
 
     private fun enableRequiredBuffers(shaderParameters: ZShaderProgramParameters) {
+        // TODO: This might fail when the mesh is shared
         mesh.indexBuffer?.enabled = true
         mesh.position?.enabled = shaderParameters.usePosition
         mesh.normal?.enabled = shaderParameters.useNormals

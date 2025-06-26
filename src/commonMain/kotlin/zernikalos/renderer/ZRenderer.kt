@@ -16,7 +16,7 @@ import zernikalos.logger.ZLoggable
 
 abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZResizable {
 
-    fun initialize() {
+    open fun initialize() {
         val scene = ctx.sceneContext.scene
         scene?.initialize(ctx)
     }

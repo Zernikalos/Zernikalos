@@ -202,6 +202,11 @@ kotlin {
             dependsOn(commonMain.get())
         }
 
+        val webgpuMain by creating {
+            kotlin.srcDir("src/webgpuMain/kotlin")
+            dependsOn(commonMain.get())
+        }
+
         androidMain {
             kotlin.srcDir("src/androidMain/kotlin")
             dependsOn(oglMain)
@@ -209,11 +214,12 @@ kotlin {
 
         jsMain {
             // Required for compatibility with zdebugger (see webpack file)
+            kotlin.srcDir("src/jsMain/kotlin")
             dependencies {
                 implementation(npm("ua-parser-js","1.0.37"))
                 implementation(devNpm("string-replace-loader", "3.1.0"))
             }
-            dependsOn(oglMain)
+            dependsOn(webgpuMain)
         }
 
         val macosArm64Main by getting {
