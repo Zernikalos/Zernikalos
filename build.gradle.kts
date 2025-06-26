@@ -15,8 +15,9 @@ val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
-val zernikalosVersion: String
+var zernikalosVersion: String
     get() = file("VERSION.txt").readText().trim()
+    set(value) { file("VERSION.txt").writeText(value) }
 val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
@@ -302,22 +303,38 @@ tasks.register<Exec>("publishJsToGitlab") {
     dependsOn("generateNpmrc")
 }
 
-tasks.register("updateVersion") {
-    description = "Update project version. Usage: ./gradlew updateVersion -PnewVersion=X.Y.Z"
+tasks.register("setVersion") {
+    description = "Sets the project version in VERSION.txt. Usage: ./gradlew setVersion -PnewVersion=X.Y.Z"
     group = "versioning"
 
     doLast {
         val newVersion = project.findProperty("newVersion") as String?
-            ?: zernikalosVersion
-            ?: throw GradleException("Could not determine version. Please provide -PnewVersion=X.Y.Z or define zernikalosVersion")
-
-        println("Updating Zernikalos version to $newVersion")
-
-        // Update project version
-        project.version = newVersion
-
-        // Write version to file
-        file("VERSION.txt").writeText(newVersion)
+            ?: throw GradleException("Please provide the version with -PnewVersion=X.Y.Z")
+        zernikalosVersion = newVersion
+        println("VERSION.txt has been updated to: $zernikalosVersion")
+        println("Now, run './gradlew updateVersion' to apply this version to generated files.")
     }
+}
+
+tasks.register("updateVersion") {
+    description = "Generates all version-dependent files (constants, podspec, etc.). Run setVersion first."
+    group = "versioning"
+
+    // This task acts as an aggregator. It will use the version currently in VERSION.txt.
     finalizedBy("generateVersionConstants", "podspec", "jsBrowserDistribution")
+}
+
+tasks.register<Exec>("releaseCommit") {
+    description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
+    group = "versioning"
+
+    // Ensure this runs after the version is updated and files are generated.
+    dependsOn("updateVersion")
+
+    workingDir = rootDir
+    commandLine(
+        "sh",
+        "-c",
+        "git add . && git commit -m \"release: 🚀 v$zernikalosVersion\" && git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\""
+    )
 }
