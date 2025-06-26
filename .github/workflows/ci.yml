@@ -3,6 +3,7 @@ name: Zernikalos CI
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 permissions:
   packages: write
   contents: read
@@ -13,61 +14,79 @@ jobs:
     name: Build (Gradle)
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    container: mobiledevops/android-sdk-image:34.0.0
+    container:
+      image: mobiledevops/android-sdk-image:34.0.0
+      options: -u root
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Gradle & build/
+      - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
-            build
             .gradle
-          key: build-${{ github.ref }}
+          key: gradle-${{ github.ref }}
 
       - name: Build
         run: ./gradlew build
 
-  # ----------- PUBLISH TEMPLATE (only "release…" commits on main) -----------
-  # Common publish settings
-  _publish_base: &publish_base
-    needs: build
-    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-dir
+          path: build
 
   publish-android:
-    <<: *publish_base
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
     name: Publish Android artifacts
     runs-on: ubuntu-latest
-    container: mobiledevops/android-sdk-image:34.0.0
+    container:
+      image: mobiledevops/android-sdk-image:34.0.0
+      options: -u root
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # → provide a PAT with write:packages
       GITHUB_ACTOR: ${{ github.actor }} # default GitHub Actions actor
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-dir
+          path: build
       - run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
                -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
       - run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
                -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
 
   publish-js:
-    <<: *publish_base
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
     name: Publish JS package
     runs-on: ubuntu-latest
-    container: node:22-alpine
+    container:
+      image: node:22-alpine
+      options: -u root
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache node_modules & Gradle & build/
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-dir
+          path: build
+
+      - name: Cache node_modules & Gradle
         uses: actions/cache@v4
         with:
           path: |
-            build
             .gradle
             node_modules
-          key: build-${{ github.ref }}
+          key: deps-${{ github.ref }}
 
       - name: Prepare npm
         run: |
