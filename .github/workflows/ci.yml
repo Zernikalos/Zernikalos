@@ -3,9 +3,16 @@ name: Zernikalos CI
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 permissions:
   packages: write
   contents: read
+
+# ----------- PUBLISH TEMPLATE (only "release…" commits on main) -----------
+# Common publish settings
+x-publish-base: &publish_base
+  needs: build
+  if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
 
 jobs:
   # ------------- BUILD -------------
@@ -28,12 +35,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build
-
-  # ----------- PUBLISH TEMPLATE (only "release…" commits on main) -----------
-  # Common publish settings
-  _publish_base: &publish_base
-    needs: build
-    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
 
   publish-android:
     <<: *publish_base
