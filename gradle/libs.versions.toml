@@ -1,6 +1,6 @@
 [versions]
-kotlin = "2.2.0-RC2"
-androidGradlePlugin = "8.7.0"
+kotlin = "2.2.0"
+androidGradlePlugin = "8.10.1"
 coroutines = "1.10.2"
 serialization = "1.8.1"
 ktlint = "11.0.0"
