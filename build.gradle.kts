@@ -24,11 +24,16 @@ val zernikalosAuthorName = "Aarón Negrín"
 val zernikalosLicense = "MPL v2.0"
 val zernikalosSiteUrl = "https://zernikalos.dev"
 
-val gitlabGroup = "io.gitlab"
-val zernikalosGitlabGroup = "$gitlabGroup.$zernikalosName"
-val gitlabProjectId = 67293086
-val gitlabName = project.findProperty("gitlab_name") as String? ?: "Deploy-Token"
-val gitlabAccessToken = project.findProperty("gitlab_access_token") as String? ?: ""
+// GitHub Packages configuration
+val githubOwner = "Zernikalos"
+val githubRepo = "Zernikalos"
+val githubPackagesMavenUrl = "https://maven.pkg.github.com/$githubOwner/$githubRepo"
+val githubPackagesNpmRegistry = "https://npm.pkg.github.com"
+
+val publishUser = project.findProperty("user") as String? ?: System.getenv("GITHUB_ACTOR") ?: ""
+val publishAccessToken = project.findProperty("access_token") as String? ?: System.getenv("GITHUB_TOKEN") ?: ""
+
+
 
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
@@ -58,13 +63,10 @@ repositories {
 publishing {
     repositories {
         maven {
-            url = uri("https://gitlab.com/api/v4/projects/${gitlabProjectId}/packages/maven")
-            credentials(HttpHeaderCredentials::class) {
-                name = gitlabName
-                value = gitlabAccessToken
-            }
-            authentication {
-                create("header", HttpHeaderAuthentication::class)
+            url = uri(githubPackagesMavenUrl)
+            credentials {
+                username = publishUser
+                password = publishAccessToken
             }
         }
     }
@@ -120,10 +122,10 @@ kotlin {
             customField("license", zernikalosLicense)
             customField("repository", mapOf(
                 "type" to "git",
-                "url" to "https://gitlab.com/zernikalos/zernikalos"
+                "url" to "https://github.com/$githubOwner/$githubRepo"
             ))
             customField("publishConfig", mapOf(
-                "registry" to "https://gitlab.com/api/v4/projects/$gitlabProjectId/packages/npm/"
+                "registry" to githubPackagesNpmRegistry
             ))
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -245,7 +247,7 @@ dokka {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(projectDir.resolve("src"))
-            remoteUrl("https://gitlab.com/Zernikalos/Zernikalos/tree/main/src")
+            remoteUrl("https://github.com/$githubOwner/$githubRepo/tree/main/src")
             remoteLineSuffix.set("#L")
         }
     }
@@ -294,12 +296,12 @@ tasks.register<Copy>("generateNpmrc") {
     into(layout.buildDirectory.dir("js").get().toString())
     rename(".npmrc.template", ".npmrc")
     filter { line ->
-        line.replace("\${GITLAB_PROJECT_ID}", gitlabProjectId.toString())
-            .replace("\${GITLAB_ACCESS_TOKEN}", gitlabAccessToken)
+        line.replace("\${GITHUB_USER}", publishUser)
+            .replace("\${GITHUB_TOKEN}", publishAccessToken)
     }
 }
 
-tasks.register<Exec>("publishJsToGitlab") {
+tasks.register<Exec>("publishJsToGitHub") {
     dependsOn("generateNpmrc")
 }
 

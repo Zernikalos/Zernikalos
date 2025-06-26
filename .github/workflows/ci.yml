@@ -1,0 +1,80 @@
+name: Zernikalos CI
+
+on:
+  push:
+    branches: [ main ]
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  # ------------- BUILD -------------
+  build:
+    name: Build (Gradle)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container: mobiledevops/android-sdk-image:34.0.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Gradle & build/
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            .gradle
+          key: build-${{ github.ref }}
+
+      - name: Build
+        run: ./gradlew build
+
+  # ----------- PUBLISH TEMPLATE (only "release…" commits on main) -----------
+  # Common publish settings
+  _publish_base: &publish_base
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
+
+  publish-android:
+    <<: *publish_base
+    name: Publish Android artifacts
+    runs-on: ubuntu-latest
+    container: mobiledevops/android-sdk-image:34.0.0
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # → provide a PAT with write:packages
+      GITHUB_ACTOR: ${{ github.actor }} # default GitHub Actions actor
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
+               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+      - run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
+               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+
+  publish-js:
+    <<: *publish_base
+    name: Publish JS package
+    runs-on: ubuntu-latest
+    container: node:22-alpine
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache node_modules & Gradle & build/
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            .gradle
+            node_modules
+          key: build-${{ github.ref }}
+
+      - name: Prepare npm
+        run: |
+          npm install -g npm
+          npm config set registry https://npm.pkg.github.com/
+          npm config set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
+
+      - name: Publish
+        working-directory: build/js
+        run: npm publish --workspace=@zernikalos/zernikalos

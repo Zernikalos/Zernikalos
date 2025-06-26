@@ -1,4 +1,4 @@
-@zernikalos:registry=https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/packages/npm/
-//gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}/packages/npm/:_authToken=${GITLAB_ACCESS_TOKEN}
+@zernikalos:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 always-auth=true
 workspace-config=true
