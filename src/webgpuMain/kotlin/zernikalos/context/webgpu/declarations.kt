@@ -1,9 +1,19 @@
+/*
+ *
+ *  * Copyright (c) 2025. Aarón Negrín - Zernikalos Engine.
+ *  *
+ *  * This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ *
+ */
+
 package zernikalos.context.webgpu
 
 import kotlinx.browser.window
 import org.w3c.dom.Navigator
 import kotlin.js.Promise
-import kotlin.js.JsName
 
 val Navigator.gpu: GPU? get() = window.navigator.asDynamic().gpu
 

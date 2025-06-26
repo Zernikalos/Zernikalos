@@ -1,13 +1,18 @@
+/*
+ *
+ *  * Copyright (c) 2025. Aarón Negrín - Zernikalos Engine.
+ *  *
+ *  * This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ *
+ */
+
 package zernikalos.renderer
 
 import zernikalos.context.ZContext
-import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
-import zernikalos.context.webgpu.*
-import zernikalos.math.ZColor
-import zernikalos.objects.ZModel
-import zernikalos.search.findFirstModel
-import zernikalos.utils.toByteArray
 
 actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 

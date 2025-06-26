@@ -1,10 +1,21 @@
+/*
+ *
+ *  * Copyright (c) 2025. Aarón Negrín - Zernikalos Engine.
+ *  *
+ *  * This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ *
+ */
+
 package zernikalos.context
 
 import kotlinx.browser.window
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.context.webgpu.*
 import zernikalos.ui.ZJsSurfaceView
 import zernikalos.ui.ZSurfaceView
-import zernikalos.context.webgpu.*
 import kotlin.js.Promise
 
 class ZWebGPURenderingContext(val surfaceView: ZSurfaceView): ZRenderingContext {
