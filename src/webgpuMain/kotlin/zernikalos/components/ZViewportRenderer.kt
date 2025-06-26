@@ -11,9 +11,11 @@ package zernikalos.components
 import zernikalos.context.*
 import zernikalos.context.webgpu.GPUColor
 import zernikalos.context.webgpu.GPUExtent3D
+import zernikalos.context.webgpu.GPULoadOp
 import zernikalos.context.webgpu.GPURenderPassColorAttachment
 import zernikalos.context.webgpu.GPURenderPassDepthStencilAttachment
 import zernikalos.context.webgpu.GPURenderPassDescriptor
+import zernikalos.context.webgpu.GPUStoreOp
 import zernikalos.context.webgpu.GPUTexture
 import zernikalos.context.webgpu.GPUTextureDescriptor
 import zernikalos.context.webgpu.GPUTextureFormat
@@ -65,15 +67,15 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
         val clearColor = data.clearColor
         val colorAttachment = GPURenderPassColorAttachment(
             view = textureView!!,
-            loadOp = "clear",
-            storeOp = "store",
+            loadOp = GPULoadOp.CLEAR,
+            storeOp = GPUStoreOp.STORE,
             clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
         )
 
         val depthAttachment = GPURenderPassDepthStencilAttachment(
             view = depthView!!,
-            depthLoadOp = "clear",
-            depthStoreOp = "store",
+            depthLoadOp = GPULoadOp.CLEAR,
+            depthStoreOp = GPUStoreOp.STORE,
             depthClearValue = 1.0f
         )
 

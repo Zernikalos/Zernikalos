@@ -791,6 +791,7 @@ object GPULoadOp {
 typealias GPUVertexFormatFlags = String
 
 object GPUVertexFormat {
+    // 8-bit formats
     val UINT8 = "uint8"
     val UINT8X2 = "uint8x2"
     val UINT8X4 = "uint8x4"
@@ -803,6 +804,8 @@ object GPUVertexFormat {
     val SNORM8 = "snorm8"
     val SNORM8X2 = "snorm8x2"
     val SNORM8X4 = "snorm8x4"
+
+    // 16-bit formats
     val UINT16 = "uint16"
     val UINT16X2 = "uint16x2"
     val UINT16X4 = "uint16x4"
@@ -818,6 +821,8 @@ object GPUVertexFormat {
     val FLOAT16 = "float16"
     val FLOAT16X2 = "float16x2"
     val FLOAT16X4 = "float16x4"
+
+    // 32-bit formats
     val FLOAT32 = "float32"
     val FLOAT32X2 = "float32x2"
     val FLOAT32X3 = "float32x3"
@@ -830,6 +835,14 @@ object GPUVertexFormat {
     val SINT32X2 = "sint32x2"
     val SINT32X3 = "sint32x3"
     val SINT32X4 = "sint32x4"
+
+    // 64-bit formats (requires "vertex-attribute-64bit" feature)
+    val FLOAT64 = "float64"
+    val FLOAT64X2 = "float64x2"
+    val FLOAT64X3 = "float64x3"
+    val FLOAT64X4 = "float64x4"
+
+    // Packed formats
     val UNORM10_10_10_2 = "unorm10-10-10-2"
     val UNORM8X4_BGRA = "unorm8x4-bgra"
 }

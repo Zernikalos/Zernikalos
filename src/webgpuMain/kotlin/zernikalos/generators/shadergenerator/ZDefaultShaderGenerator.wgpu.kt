@@ -10,10 +10,11 @@ package zernikalos.generators.shadergenerator
 
 import zernikalos.components.shader.ZShaderSource
 import zernikalos.generators.shadergenerator.libs.defaultShaderSource
+import zernikalos.generators.shadergenerator.libs.skinningShaderSource
 
 internal class ZDefaultShaderGenerator: ZShaderGenerator() {
     override fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource) {
-        source.wgpuShaderSource = defaultShaderSource
+        source.wgpuShaderSource = skinningShaderSource
     }
 
 }
