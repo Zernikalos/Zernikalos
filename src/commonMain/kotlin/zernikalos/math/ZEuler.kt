@@ -73,6 +73,7 @@ class ZEuler(): ZAlgebraObject {
         }
 
         fun fromQuaternion(result: ZEuler, q: ZQuaternion) {
+            val radToDeg = (180.0 / kotlin.math.PI).toFloat()
             // Extract quaternion components
             val w = q.w
             val x = q.x
@@ -82,21 +83,21 @@ class ZEuler(): ZAlgebraObject {
             // Roll (x-axis rotation)
             val sinr_cosp = 2f * (w * x + y * z)
             val cosr_cosp = 1f - 2f * (x * x + y * y)
-            result.roll = kotlin.math.atan2(sinr_cosp, cosr_cosp)
+            result.roll = kotlin.math.atan2(sinr_cosp, cosr_cosp) * radToDeg
 
             // Pitch (y-axis rotation)
             val sinp = 2f * (w * y - z * x)
             // Replace copySign with simple sign check
             result.pitch = when {
                 kotlin.math.abs(sinp) >= 1f ->
-                    if (sinp > 0) kotlin.math.PI.toFloat() / 2f else -kotlin.math.PI.toFloat() / 2f
-                else -> kotlin.math.asin(sinp)
+                    if (sinp > 0) 90f else -90f
+                else -> kotlin.math.asin(sinp) * radToDeg
             }
 
             // Yaw (z-axis rotation)
             val siny_cosp = 2f * (w * z + x * y)
             val cosy_cosp = 1f - 2f * (y * y + z * z)
-            result.yaw = kotlin.math.atan2(siny_cosp, cosy_cosp)
+            result.yaw = kotlin.math.atan2(siny_cosp, cosy_cosp) * radToDeg
         }
 
         fun fromQuaternion(q: ZQuaternion): ZEuler {

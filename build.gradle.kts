@@ -147,6 +147,11 @@ kotlin {
                 sourceMaps = true
             }
             generateTypeScriptDefinitions()
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
         }
     }
 
@@ -183,7 +188,7 @@ kotlin {
 
     sourceSets {
         all {
-            languageSettings.optIn("zernikalos.OptInAnnotation")
+            //languageSettings.optIn("zernikalos.OptInAnnotation")
             languageSettings.optIn("kotlin.js.ExperimentalJsExport")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
             languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
@@ -194,6 +199,12 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.serialization.protobuf)
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
             }
         }
 
@@ -217,6 +228,12 @@ kotlin {
             dependsOn(oglMain)
         }
 
+        androidUnitTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+
         jsMain {
             // Required for compatibility with zdebugger (see webpack file)
             kotlin.srcDir("src/jsMain/kotlin")
@@ -225,6 +242,10 @@ kotlin {
                 implementation(devNpm("string-replace-loader", "3.1.0"))
             }
             dependsOn(webgpuMain)
+        }
+
+        jsTest {
+            dependsOn(commonTest)
         }
 
         val macosArm64Main by getting {
@@ -337,4 +358,10 @@ tasks.register<Exec>("releaseCommit") {
         "-c",
         "git add . && git commit -m \"release: 🚀 v$zernikalosVersion\" && git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\""
     )
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest>().configureEach {
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }

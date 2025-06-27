@@ -369,13 +369,14 @@ class ZQuaternion(): ZAlgebraObject {
          * @param euler The Euler angles to convert from
          */
         fun fromEuler(result: ZQuaternion, euler: ZEuler) {
+            val degToRad = (kotlin.math.PI / 180.0).toFloat()
             // Convert angles to radians and divide by 2 as we need half angles
-            val cr = cos(euler.roll * 0.5f)
-            val cp = cos(euler.pitch * 0.5f)
-            val cy = cos(euler.yaw * 0.5f)
-            val sr = sin(euler.roll * 0.5f)
-            val sp = sin(euler.pitch * 0.5f)
-            val sy = sin(euler.yaw * 0.5f)
+            val cr = cos(euler.roll * degToRad * 0.5f)
+            val cp = cos(euler.pitch * degToRad * 0.5f)
+            val cy = cos(euler.yaw * degToRad * 0.5f)
+            val sr = sin(euler.roll * degToRad * 0.5f)
+            val sp = sin(euler.pitch * degToRad * 0.5f)
+            val sy = sin(euler.yaw * degToRad * 0.5f)
 
             result.w = cr * cp * cy + sr * sp * sy
             result.x = sr * cp * cy - cr * sp * sy
