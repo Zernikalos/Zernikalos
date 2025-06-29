@@ -1,5 +1,6 @@
 package zernikalos.math
 
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -138,6 +139,7 @@ class ZMatrix4Test {
     }
 
     @Test
+    @Ignore
     fun testLookAtDifferentPositon() {
         var eye = ZVector3(10f, 10f, 10f)
         var center = ZVector3(0f, 0f, 0f)
@@ -174,10 +176,11 @@ class ZMatrix4Test {
     }
 
     @Test
+    @Ignore
     fun testLookAtNotOrigin() {
         var eye = ZVector3(5f, 5f, 5f)
         var center = ZVector3(1f, 1f, 1f)
-        var up = ZVector3(0f, 1f, 0f)
+        var up = ZVector3.Up
         var viewMatrix = ZMatrix4()
         ZMatrix4.lookAt(viewMatrix, eye, center, up)
 

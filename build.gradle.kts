@@ -148,9 +148,7 @@ kotlin {
             }
             generateTypeScriptDefinitions()
             testTask {
-                useKarma {
-                    useChromeHeadless()
-                }
+                useMocha()
             }
         }
     }

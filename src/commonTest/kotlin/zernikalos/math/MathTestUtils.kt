@@ -5,14 +5,21 @@ import kotlin.test.assertEquals
 const val epsilon = 1e-6f
 
 fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, message: String? = null) {
-    for (i in 0 until 16) {
-        assertEquals(expected[i], actual[i], epsilon, message)
-    }
+    assertMatrixEquals(expected, actual, epsilon, message)
 }
 
 fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, epsilon: Float, message: String? = null) {
     for (i in 0 until 16) {
-        assertEquals(expected[i], actual[i], epsilon, message)
+        val row = i % 4
+        val col = i / 4
+        val customMessage = buildString {
+            if (message != null) append("$message\n")
+            append("Failed at index [$i] (row $row, column $col)\n")
+            append("Expected value: ${expected[i]}, actual value: ${actual[i]}\n")
+            append("\nExpected matrix:\n${expected}\n")
+            append("Actual matrix:\n${actual}")
+        }
+        assertEquals(expected[i], actual[i], epsilon, customMessage)
     }
 }
 
