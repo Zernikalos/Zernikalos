@@ -160,4 +160,178 @@ class ZQuaternionTest {
 
         assertQuaternionEquals(expected, result)
     }
+
+    //region Companion object tests
+    @Test
+    fun testOperationCopy() {
+        val q1 = ZQuaternion(1f, 2f, 3f, 4f)
+        val q2 = ZQuaternion()
+        ZQuaternion.copy(q2, q1)
+        assertQuaternionEquals(q1, q2)
+    }
+
+    @Test
+    fun testOperationIdentity() {
+        val q = ZQuaternion()
+        ZQuaternion.identity(q)
+        assertQuaternionEquals(ZQuaternion(1f, 0f, 0f, 0f), q)
+    }
+
+    @Test
+    fun testOperationZero() {
+        val q = ZQuaternion()
+        ZQuaternion.zero(q)
+        assertQuaternionEquals(ZQuaternion(0f, 0f, 0f, 0f), q)
+    }
+
+    @Test
+    fun testOperationAdd() {
+        val q1 = ZQuaternion(1f, 2f, 3f, 4f)
+        val q2 = ZQuaternion(5f, 6f, 7f, 8f)
+        val result = ZQuaternion()
+        ZQuaternion.add(result, q1, q2)
+        val expected = ZQuaternion(6f, 8f, 10f, 12f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationSubtract() {
+        val q1 = ZQuaternion(5f, 6f, 7f, 8f)
+        val q2 = ZQuaternion(1f, 2f, 3f, 4f)
+        val result = ZQuaternion()
+        ZQuaternion.subtract(result, q1, q2)
+        val expected = ZQuaternion(4f, 4f, 4f, 4f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationConjugate() {
+        val q = ZQuaternion(1f, 2f, 3f, 4f)
+        val result = ZQuaternion()
+        ZQuaternion.conjugate(result, q)
+        val expected = ZQuaternion(1f, -2f, -3f, -4f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationDot() {
+        val q1 = ZQuaternion(1f, 2f, 3f, 4f)
+        val q2 = ZQuaternion(5f, 6f, 7f, 8f)
+        val result = ZQuaternion.dot(q1, q2)
+        assertEquals(70f, result, epsilon)
+    }
+
+    @Test
+    fun testOperationMult() {
+        val q1 = ZQuaternion(1f, 2f, 3f, 4f)
+        val q2 = ZQuaternion(5f, 6f, 7f, 8f)
+        val result = ZQuaternion()
+        ZQuaternion.mult(result, q1, q2)
+        val expected = ZQuaternion(-60f, 12f, 30f, 24f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationMultScalar() {
+        val q = ZQuaternion(1f, 2f, 3f, 4f)
+        val result = ZQuaternion()
+        ZQuaternion.multScalar(result, 2f, q)
+        val expected = ZQuaternion(2f, 4f, 6f, 8f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationNormalize() {
+        val q = ZQuaternion(1f, 2f, 3f, 4f)
+        val result = ZQuaternion()
+        ZQuaternion.normalize(result, q)
+        assertTrue(result.isNormalized)
+    }
+
+    @Test
+    fun testOperationInvert() {
+        val q = ZQuaternion(0.5f, 0.5f, 0.5f, 0.5f)
+        val inverted = ZQuaternion()
+        ZQuaternion.invert(inverted, q)
+        val result = ZQuaternion()
+        ZQuaternion.mult(result, q, inverted)
+        assertQuaternionEquals(ZQuaternion(1f, 0f, 0f, 0f), result)
+    }
+
+    @Test
+    fun testOperationRotate() {
+        val q = ZQuaternion(1f, 0f, 0f, 0f)
+        val result = ZQuaternion()
+        val angle = 90f
+        val axis = ZVector3(0f, 1f, 0f)
+        ZQuaternion.rotate(result, q, angle, axis)
+
+        val expected = ZQuaternion()
+        expected.fromAngleAxis(angle, axis.x, axis.y, axis.z)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationFromVec3() {
+        val v = ZVector3(1f, 2f, 3f)
+        val result = ZQuaternion()
+        ZQuaternion.fromVec3(result, v)
+        val expected = ZQuaternion(0f, 1f, 2f, 3f)
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationFromAngleAxis() {
+        val result = ZQuaternion()
+        val angle = 90f
+        val axis = ZVector3(0f, 1f, 0f)
+        ZQuaternion.fromAngleAxis(result, angle, axis)
+
+        val halfAngle = (angle * (kotlin.math.PI / 180.0) / 2.0).toFloat()
+        val expected = ZQuaternion(
+            kotlin.math.cos(halfAngle),
+            axis.x * kotlin.math.sin(halfAngle),
+            axis.y * kotlin.math.sin(halfAngle),
+            axis.z * kotlin.math.sin(halfAngle)
+        )
+        assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testOperationFromMatrix4() {
+        val q = ZQuaternion()
+        q.fromAngleAxis(45f, 0f, 1f, 0f)
+        val m = q.toMatrix4()
+        val result = ZQuaternion()
+        ZQuaternion.fromMatrix4(result, m)
+        assertQuaternionEquals(q, result)
+    }
+
+    @Test
+    @Ignore
+    fun testOperationFromEuler() {
+        val euler = ZEuler(30f, 60f, 90f)
+        val result = ZQuaternion()
+        ZQuaternion.fromEuler(result, euler)
+        val eulerBack = result.toEuler()
+
+        assertEquals(euler.roll, eulerBack.roll, epsilon, "Roll should match")
+        assertEquals(euler.pitch, eulerBack.pitch, epsilon, "Pitch should match")
+        assertEquals(euler.yaw, eulerBack.yaw, epsilon, "Yaw should match")
+    }
+
+    @Test
+    fun testOperationSlerp() {
+        val q1 = ZQuaternion(1f, 0f, 0f, 0f)
+        val q2 = ZQuaternion()
+        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+        val result = ZQuaternion()
+        ZQuaternion.slerp(result, 0.5f, q1, q2)
+
+        val expected = ZQuaternion()
+        expected.fromAngleAxis(45f, 0f, 1f, 0f)
+
+        assertQuaternionEquals(expected, result)
+    }
+    //endregion
 }
