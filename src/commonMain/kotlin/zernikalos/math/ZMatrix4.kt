@@ -640,14 +640,10 @@ class ZMatrix4(): ZAlgebraObject {
             result[10] = -f.z
             result[11] = 0.0f
 
-            result[12] = 0.0f
-            result[13] = 0.0f
-            result[14] = 0.0f
+            result[12] = -ZVector3.dot(s, eye)
+            result[13] = -ZVector3.dot(u, eye)
+            result[14] = ZVector3.dot(f, eye)
             result[15] = 1.0f
-
-            val negEye = ZVector3()
-            ZVector3.multScalar(negEye, -1.0f, eye)
-            translate(result, negEye)
         }
 
         @JsName("fromQuaternionIp")

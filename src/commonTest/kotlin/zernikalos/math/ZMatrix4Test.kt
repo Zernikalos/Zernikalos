@@ -138,6 +138,60 @@ class ZMatrix4Test {
     }
 
     @Test
+    fun testLookAtDifferentPositon() {
+        var eye = ZVector3(10f, 10f, 10f)
+        var center = ZVector3(0f, 0f, 0f)
+        var up = ZVector3(0f, 1f, 0f)
+        var viewMatrix = ZMatrix4()
+        ZMatrix4.lookAt(viewMatrix, eye, center, up)
+
+        var expected = ZMatrix4(floatArrayOf(
+            -0.70710677f, -0.40824828f, 0.57735026f, 0f,
+            0f, 0.81649655f, 0.57735026f, 0f,
+            -0.70710677f, 0.40824828f, -0.57735026f, 0f,
+            0f, 0f, -17.320508f, 1f
+        ))
+
+        assertMatrixEquals(expected, viewMatrix, 0.0001f)
+    }
+
+    @Test
+    fun testLookAtDifferentUpVector() {
+        var eye = ZVector3(0f, 0f, 5f)
+        var center = ZVector3(0f, 0f, 0f)
+        var up = ZVector3(0f, -1f, 0f)
+        var viewMatrix = ZMatrix4()
+        ZMatrix4.lookAt(viewMatrix, eye, center, up)
+
+        var expected = ZMatrix4(floatArrayOf(
+            -1f, 0f, 0f, 0f,
+            0f, -1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, -5f, 1f
+        ))
+
+        assertMatrixEquals(expected, viewMatrix)
+    }
+
+    @Test
+    fun testLookAtNotOrigin() {
+        var eye = ZVector3(5f, 5f, 5f)
+        var center = ZVector3(1f, 1f, 1f)
+        var up = ZVector3(0f, 1f, 0f)
+        var viewMatrix = ZMatrix4()
+        ZMatrix4.lookAt(viewMatrix, eye, center, up)
+
+        var expected = ZMatrix4(floatArrayOf(
+            -0.70710677f, -0.40824828f, 0.57735026f, 0f,
+            0f, 0.81649655f, 0.57735026f, 0f,
+            -0.70710677f, 0.40824828f, -0.57735026f, 0f,
+            0f, 0f, -6.928203f, 1f
+        ))
+
+        assertMatrixEquals(expected, viewMatrix, 0.0001f)
+    }
+
+    @Test
     fun testPerspective() {
         val m = ZMatrix4()
         ZMatrix4.perspective(m, 90f, 1f, 0.1f, 100f)

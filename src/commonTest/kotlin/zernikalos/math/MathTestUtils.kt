@@ -10,6 +10,12 @@ fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, message: String? = 
     }
 }
 
+fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, epsilon: Float, message: String? = null) {
+    for (i in 0 until 16) {
+        assertEquals(expected[i], actual[i], epsilon, message)
+    }
+}
+
 fun assertQuaternionEquals(expected: ZQuaternion, actual: ZQuaternion, message: String? = null) {
     assertEquals(expected.w, actual.w, epsilon, message)
     assertEquals(expected.x, actual.x, epsilon, message)
