@@ -2,19 +2,10 @@ package zernikalos.math
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertContentEquals
 
 class ZMatrix4Test {
-
-    private val epsilon = 1e-6f
-
-    private fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, message: String? = null) {
-        for (i in 0 until 16) {
-            assertEquals(expected[i], actual[i], epsilon, message)
-        }
-    }
 
     @Test
     fun testDefaultConstructorIsIdentity() {

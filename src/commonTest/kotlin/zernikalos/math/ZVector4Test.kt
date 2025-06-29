@@ -2,58 +2,40 @@ package zernikalos.math
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class ZVector4Test {
 
-    private val epsilon = 1e-6f
-
     @Test
     fun testDefaultConstructor() {
         val v = ZVector4()
-        assertEquals(0f, v.x)
-        assertEquals(0f, v.y)
-        assertEquals(0f, v.z)
-        assertEquals(0f, v.w)
+        assertVectorEquals(ZVector4(0f, 0f, 0f, 0f), v)
     }
 
     @Test
     fun testValuesConstructor() {
         val v = ZVector4(1f, 2f, 3f, 4f)
-        assertEquals(1f, v.x)
-        assertEquals(2f, v.y)
-        assertEquals(3f, v.z)
-        assertEquals(4f, v.w)
+        assertVectorEquals(ZVector4(1f, 2f, 3f, 4f), v)
     }
 
     @Test
     fun testValueConstructor() {
         val v = ZVector4(5f)
-        assertEquals(5f, v.x)
-        assertEquals(5f, v.y)
-        assertEquals(5f, v.z)
-        assertEquals(5f, v.w)
+        assertVectorEquals(ZVector4(5f, 5f, 5f, 5f), v)
     }
 
     @Test
     fun testVec3Constructor() {
         val v3 = ZVector3(1f, 2f, 3f)
         val v4 = ZVector4(v3)
-        assertEquals(1f, v4.x)
-        assertEquals(2f, v4.y)
-        assertEquals(3f, v4.z)
-        assertEquals(1f, v4.w)
+        assertVectorEquals(ZVector4(1f, 2f, 3f, 1f), v4)
     }
 
     @Test
     fun testSetValues() {
         val v = ZVector4()
         v.setValues(1f, 2f, 3f, 4f)
-        assertEquals(1f, v.x)
-        assertEquals(2f, v.y)
-        assertEquals(3f, v.z)
-        assertEquals(4f, v.w)
+        assertVectorEquals(ZVector4(1f, 2f, 3f, 4f), v)
     }
 
     @Test
@@ -63,10 +45,7 @@ class ZVector4Test {
         v[1] = 2f
         v[2] = 3f
         v[3] = 4f
-        assertEquals(1f, v.x)
-        assertEquals(2f, v.y)
-        assertEquals(3f, v.z)
-        assertEquals(4f, v.w)
+        assertVectorEquals(ZVector4(1f, 2f, 3f, 4f), v)
     }
 
     @Test
@@ -74,10 +53,7 @@ class ZVector4Test {
         val v1 = ZVector4(1f, 2f, 3f, 4f)
         val v2 = ZVector4(5f, 6f, 7f, 8f)
         val result = v1 + v2
-        assertEquals(6f, result.x)
-        assertEquals(8f, result.y)
-        assertEquals(10f, result.z)
-        assertEquals(12f, result.w)
+        assertVectorEquals(ZVector4(6f, 8f, 10f, 12f), result)
     }
 
     @Test
@@ -85,10 +61,7 @@ class ZVector4Test {
         val v1 = ZVector4(5f, 6f, 7f, 8f)
         val v2 = ZVector4(1f, 2f, 3f, 4f)
         val result = v1 - v2
-        assertEquals(4f, result.x)
-        assertEquals(4f, result.y)
-        assertEquals(4f, result.z)
-        assertEquals(4f, result.w)
+        assertVectorEquals(ZVector4(4f, 4f, 4f, 4f), result)
     }
 
     @Test
@@ -96,27 +69,21 @@ class ZVector4Test {
         val v1 = ZVector4(1f, 2f, 3f, 4f)
         val v2 = ZVector4(5f, 6f, 7f, 8f)
         val result = v1 * v2
-        assertEquals(70f, result)
+        assertEquals(70f, result, epsilon)
     }
 
     @Test
     fun testTimesScalar() {
         val v = ZVector4(1f, 2f, 3f, 4f)
         val result = v * 2f
-        assertEquals(2f, result.x)
-        assertEquals(4f, result.y)
-        assertEquals(6f, result.z)
-        assertEquals(8f, result.w)
+        assertVectorEquals(ZVector4(2f, 4f, 6f, 8f), result)
     }
 
     @Test
     fun testZero() {
         val v = ZVector4(1f, 2f, 3f, 4f)
         v.zero()
-        assertEquals(0f, v.x)
-        assertEquals(0f, v.y)
-        assertEquals(0f, v.z)
-        assertEquals(0f, v.w)
+        assertVectorEquals(ZVector4(0f, 0f, 0f, 0f), v)
     }
 
     @Test
@@ -124,10 +91,7 @@ class ZVector4Test {
         val v = ZVector4(3f, 4f, 0f, 0f)
         v.normalize()
         assertTrue(kotlin.math.abs(v.norm2 - 1f) < epsilon)
-        assertEquals(0.6f, v.x, epsilon)
-        assertEquals(0.8f, v.y, epsilon)
-        assertEquals(0f, v.z, epsilon)
-        assertEquals(0f, v.w, epsilon)
+        assertVectorEquals(ZVector4(0.6f, 0.8f, 0f, 0f), v)
     }
 
     @Test
@@ -135,7 +99,7 @@ class ZVector4Test {
         val v1 = ZVector4(1f, 2f, 3f, 4f)
         val v2 = ZVector4(5f, 6f, 7f, 8f)
         val result = ZVector4.dot(v1, v2)
-        assertEquals(70f, result)
+        assertEquals(70f, result, epsilon)
     }
 
     @Test
@@ -144,9 +108,6 @@ class ZVector4Test {
         val v2 = ZVector4(10f, 10f, 10f, 10f)
         val result = ZVector4()
         ZVector4.lerp(result, 0.5f, v1, v2)
-        assertEquals(5f, result.x)
-        assertEquals(5f, result.y)
-        assertEquals(5f, result.z)
-        assertEquals(5f, result.w)
+        assertVectorEquals(ZVector4(5f, 5f, 5f, 5f), result)
     }
 }

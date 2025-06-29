@@ -7,15 +7,6 @@ import kotlin.test.assertTrue
 
 class ZQuaternionTest {
 
-    private val epsilon = 1e-6f
-
-    private fun assertQuaternionEquals(expected: ZQuaternion, actual: ZQuaternion, message: String? = null) {
-        assertEquals(expected.w, actual.w, epsilon, message)
-        assertEquals(expected.x, actual.x, epsilon, message)
-        assertEquals(expected.y, actual.y, epsilon, message)
-        assertEquals(expected.z, actual.z, epsilon, message)
-    }
-
     @Test
     fun testDefaultConstructorIsIdentity() {
         val q = ZQuaternion()
