@@ -9,16 +9,16 @@
 package zernikalos.components.material
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
+@Serializable(with = ZMaterialSerializer::class)
 class ZMaterial
 internal constructor(private val data: ZMaterialData):
     ZRenderizableComponent<ZMaterialRenderer>(), ZBindeable {
@@ -37,19 +37,9 @@ internal constructor(private val data: ZMaterialData):
 }
 
 @Serializable
-data class ZMaterialDataWrapper(
-    @ProtoNumber(1)
-    override var refId: String = "",
-    @ProtoNumber(2)
-    override var isReference: Boolean = false,
-    @ProtoNumber(100)
-    override var data: ZMaterialData? = null
-): ZRefComponentWrapper<ZMaterialData>
-
-@Serializable
 @JsExport
 data class ZMaterialData(
-    @Contextual @ProtoNumber(1)
+    @Contextual @ProtoNumber(10)
     var texture: ZTexture? = null
 ): ZComponentData()
 
@@ -68,12 +58,10 @@ class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData)
 
 }
 
-class ZMaterialSerializer(loaderContext: ZLoaderContext): ZRefComponentSerializer<ZMaterial, ZMaterialData, ZMaterialDataWrapper>(loaderContext) {
-    override val deserializationStrategy: DeserializationStrategy<ZMaterialDataWrapper>
-        get() = ZMaterialDataWrapper.serializer()
+class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData>() {
+    override val kSerializer: KSerializer<ZMaterialData> = ZMaterialData.serializer()
 
     override fun createComponentInstance(data: ZMaterialData): ZMaterial {
         return ZMaterial(data)
     }
-
 }

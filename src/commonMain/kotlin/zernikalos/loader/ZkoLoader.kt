@@ -37,10 +37,8 @@ private fun createSerializersModule(): ProtoBuf {
         }
 
         contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}
-        contextual(ZMaterial::class) { _ -> ZMaterialSerializer(loaderContext)}
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
-
     }
 
     val protoFormat = ProtoBuf {
