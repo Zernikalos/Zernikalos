@@ -9,8 +9,8 @@
 package zernikalos.components.shader
 
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -23,12 +23,19 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockRenderer>(), ZBindeable, ZBaseUniform {
 
     @JsName("initWithName")
-    // TODO: Review this LinkedHashMap
     constructor(id: Int, uniformBlockName: String, uniforms: LinkedHashMap<String, ZUniformData>): this(
         ZUniformBlockData(
             id,
             uniformBlockName,
             uniforms
+        )
+    )
+
+    constructor(id: Int, uniformBlockName: String, uniforms: List<Pair<String, ZUniformData>>): this(
+        ZUniformBlockData(
+            id,
+            uniformBlockName,
+            LinkedHashMap(uniforms.toMap())
         )
     )
 
