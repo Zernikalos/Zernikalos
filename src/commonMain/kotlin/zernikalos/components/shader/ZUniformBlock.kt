@@ -31,7 +31,7 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
         )
     )
 
-    @JsName("initWithArgs")
+    @JsName("initWithUniforms")
     constructor(id: Int, uniformBlockName: String, uniforms: List<Pair<String, ZUniformData>>): this(
         ZUniformBlockData(
             id,
