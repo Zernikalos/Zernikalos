@@ -8,22 +8,25 @@
 
 package zernikalos.generators.shadergenerator.libs
 
-const val defaultShaderSource = """
+import zernikalos.components.shader.UNIFORM_IDS
+import zernikalos.components.shader.ZAttributeId
+
+val defaultShaderSource = """
 struct Uniforms {
     projectionMatrix : mat4x4<f32>,
     viewMatrix : mat4x4<f32>,
     modelViewProjectionMatrix : mat4x4<f32>
 }
-@binding(10) @group(0) var<uniform> uniforms : Uniforms;
+@binding(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) @group(0) var<uniform> uniforms : Uniforms;
 
 @group(1) @binding(0) var t_diffuse: texture_2d<f32>;
 @group(1) @binding(1) var s_diffuse: sampler;
 
 struct VertexInput {
-    @location(1) position: vec3<f32>,
-    @location(4) uv : vec2<f32>,
-    @location(5) boneWeights : vec4<f32>,
-    @location(6) boneIndices : vec4<u32>,
+    @location(${ZAttributeId.POSITION.id}) position: vec3<f32>,
+    @location(${ZAttributeId.UV.id}) uv : vec2<f32>,
+    @location(${ZAttributeId.BONE_WEIGHT.id}) boneWeights : vec4<f32>,
+    @location(${ZAttributeId.BONE_INDEX.id}) boneIndices : vec4<u32>,
 }
 
 struct VertexOutput {
