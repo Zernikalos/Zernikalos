@@ -17,11 +17,12 @@ internal class ZDefaultShaderGenerator : ZShaderGenerator() {
         var source = ""
 
         if (enabler.usePosition) source = "#define USE_POSITION\n$source"
-        if (enabler.useNormals) source = "#define USE_NORMAL\n$source"
+        if (enabler.useNormals) source = "#define USE_NORMALS\n$source"
         if (enabler.useColors) source = "#define USE_COLOR\n$source"
         if (enabler.useTextures) source = "#define USE_TEXTURE\n$source"
         if (enabler.flipTextureY) source = "#define FLIP_TEXTURE_Y\n$source"
         if (enabler.useSkinning) source = "#define USE_SKINNING\n$source"
+        if (enabler.usePbrMaterial) source = "#define USE_PBR_MATERIAL\n$source"
 
         return source
     }

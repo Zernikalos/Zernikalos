@@ -56,6 +56,8 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator(UNIFORM_NAMES.PBR_COLOR, ZPbrColorGenerator())
         addUniformGenerator(UNIFORM_NAMES.PBR_METALNESS, ZPbrMetalnessGenerator())
         addUniformGenerator(UNIFORM_NAMES.PBR_ROUGHNESS, ZPbrRoughnessGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PBR_EMISSIVE, ZPbrEmissiveGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY, ZPbrEmissiveIntensityGenerator())
     }
 }
 

@@ -13,6 +13,7 @@ import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZAlgebraObjectCollection
 import kotlin.js.JsExport
@@ -50,6 +51,11 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformBlockRenderer {
         return ZUniformBlockRenderer(ctx, data)
+    }
+
+    override fun initialize(ctx: ZRenderingContext) {
+        super.initialize(ctx)
+        logger.debug("Initialized uniformBlock: ${data.uniformBlockName} (${data.byteSize} bytes)")
     }
 
     override fun bind() = renderer.bind()
