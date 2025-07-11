@@ -53,6 +53,9 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator(UNIFORM_NAMES.BONES, ZBoneMatrixGenerator())
         addUniformGenerator(UNIFORM_NAMES.BIND_MATRIX, ZBindMatrixGenerator())
         addUniformGenerator(UNIFORM_NAMES.INVERSE_BIND_MATRIX, ZInverseBindMatrixGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PBR_COLOR, ZPbrColorGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PBR_METALNESS, ZPbrMetalnessGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PBR_ROUGHNESS, ZPbrRoughnessGenerator())
     }
 }
 

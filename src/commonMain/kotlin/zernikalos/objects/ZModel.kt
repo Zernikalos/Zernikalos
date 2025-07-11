@@ -16,12 +16,13 @@ import zernikalos.action.ZSkeletalAction
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
-import zernikalos.components.shader.*
+import zernikalos.components.shader.ZAttributeId
+import zernikalos.components.shader.ZShaderProgram
 import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.generators.shadergenerator.ZShaderProgramParameters
 import zernikalos.generators.shadergenerator.ZShaderGeneratorType
+import zernikalos.generators.shadergenerator.ZShaderProgramParameters
 import zernikalos.generators.shadergenerator.createShaderGenerator
 import zernikalos.logger.logger
 import kotlin.js.JsExport
@@ -113,6 +114,9 @@ class ZModel: ZObject() {
         if (hasSkeleton) {
             shaderParameters.useSkinning = true
             shaderParameters.maxBones = skeleton!!.bones.size
+        }
+        if (material?.usesPbr == true) {
+            shaderParameters.usePbrMaterial = true
         }
         return shaderParameters
     }
