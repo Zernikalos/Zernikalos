@@ -22,7 +22,7 @@ import kotlin.js.JsName
 class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformBlockRenderer>(), ZBindeable, ZBaseUniform {
 
-    @JsName("initWithName")
+    @JsExport.Ignore
     constructor(id: Int, uniformBlockName: String, uniforms: LinkedHashMap<String, ZUniformData>): this(
         ZUniformBlockData(
             id,
@@ -31,6 +31,7 @@ class ZUniformBlock internal constructor(private val data: ZUniformBlockData):
         )
     )
 
+    @JsName("initWithArgs")
     constructor(id: Int, uniformBlockName: String, uniforms: List<Pair<String, ZUniformData>>): this(
         ZUniformBlockData(
             id,
