@@ -1,17 +1,18 @@
-name: Zernikalos Build
+name: Zernikalos Fast Build
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build (Gradle)
+  fast-build:
+    name: Fast Build (Android Debug & JS Dev)
     runs-on: ubuntu-latest
     container:
       image: mobiledevops/android-sdk-image:34.0.0
@@ -27,11 +28,5 @@ jobs:
             .gradle
           key: gradle-${{ github.ref }}
 
-      - name: Build
-        run: ./gradlew build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-dir
-          path: build
+      - name: Build Android and JS
+        run: ./gradlew assembleDebug jsDevelopmentExecutableCompileSync
