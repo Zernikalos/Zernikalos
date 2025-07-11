@@ -10,8 +10,9 @@ package zernikalos.components.shader
 
 import kotlinx.cinterop.*
 import platform.Foundation.NSError
-import platform.Metal.*
-import platform.posix.memcpy
+import platform.Metal.MTLCompileOptions
+import platform.Metal.MTLFunctionProtocol
+import platform.Metal.MTLLibraryProtocol
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
@@ -43,23 +44,23 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     private fun initializeShader() {
         ctx as ZMtlRenderingContext
 
-        val err: CPointer<ObjCObjectVar<NSError?>>? = null
-
         logger.debug("Shader Source in use:")
         logger.debug("\n${data.shaderSource.metalShaderSource}")
 
-        try {
-            library = ctx.device.newLibraryWithSource(data.shaderSource.metalShaderSource, MTLCompileOptions(), err)!!
-        } catch (_: Error) {
-            throw Error("Error creating the shader library")
+        memScoped {
+            val errorVar = alloc<ObjCObjectVar<NSError?>>()
+            library = ctx.device.newLibraryWithSource(data.shaderSource.metalShaderSource, MTLCompileOptions(), errorVar.ptr)
+
+            if (library == null) {
+                val error = errorVar.value
+                throw Error("Error creating the shader library: \n${error?.localizedDescription}")
+            }
         }
 
-        if (library == null) {
-            throw Error("Error creating the shader library")
-        }
-
-        vertexShader = library?.newFunctionWithName("vertexShader")!!
-        fragmentShader = library?.newFunctionWithName("fragmentShader")!!
+        vertexShader = library?.newFunctionWithName("vertexShader")
+            ?: throw Error("Vertex shader function not found")
+        fragmentShader = library?.newFunctionWithName("fragmentShader")
+            ?: throw Error("Fragment shader function not found")
     }
 
     @OptIn(ExperimentalForeignApi::class)
