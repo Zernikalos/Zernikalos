@@ -16,5 +16,6 @@ enum class ZObjectType {
     MODEL,
     GROUP,
     CAMERA,
-    SKELETON;
+    SKELETON,
+    LIGHT
 }

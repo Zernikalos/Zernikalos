@@ -89,12 +89,12 @@ class ZColor(): ZAlgebraObject {
         }
 
     @JsName("initWithValues")
-    constructor(red: Float, green: Float, blue: Float, alpha: Float) : this() {
+    constructor(red: Float, green: Float, blue: Float, alpha: Float = 1.0f) : this() {
         colorFromFloats(red, green, blue, alpha)
     }
 
     @JsName("initWithByteValues")
-    constructor(red: Int, green: Int, blue: Int, alpha: Int) : this() {
+    constructor(red: Int, green: Int, blue: Int, alpha: Int = 255) : this() {
         colorFromBytes(red, green, blue, alpha)
     }
 

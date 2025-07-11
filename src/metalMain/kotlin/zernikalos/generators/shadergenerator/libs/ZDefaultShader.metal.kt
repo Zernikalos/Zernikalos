@@ -8,6 +8,7 @@
 
 package zernikalos.generators.shadergenerator.libs
 
+import zernikalos.components.shader.UNIFORM_IDS
 import zernikalos.components.shader.ZAttributeId
 
 const val shaderCommonHeaders = """
@@ -51,7 +52,7 @@ typedef struct
 } Vertex;
 """
 
-const val shaderVertexMain = """
+val shaderVertexMain = """
 ColorInOut computeOutColor(Vertex in) {
     ColorInOut out;
 
@@ -104,9 +105,9 @@ float4 calculateSkinnedPosition(
 #endif
 
 vertex ColorInOut vertexShader(Vertex in [[stage_in]],
-                               constant Uniforms &uniforms [[buffer(10)]]
+                               constant Uniforms &uniforms [[buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX})]]
                                #ifdef USE_SKINNING
-                               , constant SkinningUniforms &skinUniforms [[buffer(11)]]
+                               , constant SkinningUniforms &skinUniforms [[buffer(${UNIFORM_IDS.BLOCK_SKINNING_MATRIX})]]
                                #endif
                               )
 {
@@ -139,7 +140,7 @@ typedef struct
 } ColorInOut;
 """
 
-const val shaderFragmentMain = """
+val shaderFragmentMain = """
 #if defined(USE_TEXTURE)
     float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap) {
         constexpr sampler colorSampler(mip_filter::linear,
@@ -158,7 +159,7 @@ float4 fragmentComputeColorOut(ColorInOut in) {
 }
 
 fragment float4 fragmentShader(ColorInOut in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(10) ]],
+                               constant Uniforms & uniforms [[ buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) ]],
                                texture2d<half> colorMap     [[ texture(0) ]])
 {
     #if defined(USE_TEXTURE)

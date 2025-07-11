@@ -34,6 +34,7 @@ internal class ZDefaultShaderGenerator(): ZShaderGenerator() {
         if (enabler.useTextures) shaderSource = "#define USE_TEXTURES\n$shaderSource"
         if (enabler.flipTextureY) shaderSource = "#define FLIP_TEXTURE_Y\n$shaderSource"
         if (enabler.useSkinning) shaderSource = "#define USE_SKINNING\n$shaderSource"
+        if (enabler.usePbrMaterial) shaderSource = "#define USE_PBR_MATERIAL\n$shaderSource"
 
         shaderSource = "#version 300 es\n$shaderSource"
 

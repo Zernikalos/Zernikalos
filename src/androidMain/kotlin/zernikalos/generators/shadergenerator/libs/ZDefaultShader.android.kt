@@ -25,6 +25,17 @@ uniform u_sceneMatrixBlock
     } skinUniforms;
 #endif
 
+#ifdef USE_PBR_MATERIAL
+uniform u_pbrMaterialBlock
+{
+    vec3 color;
+    vec3 emissive;
+    float emissiveIntensity;
+    float metalness;
+    float roughness;
+} u_pbrMaterial;
+#endif
+
 #ifdef USE_SKINNING
     in vec4 a_boneIndices;
     in vec4 a_boneWeight;
@@ -86,6 +97,17 @@ void main() {
 const val defaultFragmentShaderSource = """
 precision mediump float;
 
+#ifdef USE_PBR_MATERIAL
+uniform u_pbrMaterialBlock
+{
+    vec3 color;
+    vec3 emissive;
+    float emissiveIntensity;
+    float metalness;
+    float roughness;
+} u_pbrMaterial;
+#endif
+
 #ifdef USE_TEXTURES
     uniform sampler2D u_texture;
     smooth in vec2 v_uv;
@@ -96,12 +118,21 @@ precision mediump float;
 out vec4 f_color;
 
 void main() {
+    vec4 baseColor = vec4(1.0);
+
     #if defined(USE_TEXTURES)
-        f_color = texture(u_texture, v_uv);
+        baseColor = texture(u_texture, v_uv);
     #elif defined(USE_COLORS)
-        f_color = vec4(v_color.xyz, 1);
+        baseColor = vec4(v_color.xyz, 1.0);
+    #endif
+
+    #ifdef USE_PBR_MATERIAL
+        // Placeholder for PBR lighting calculations
+        // For now, just use the PBR color.
+        vec3 pbrColor = u_pbrMaterial.color;
+        f_color = vec4(pbrColor, 1.0) * baseColor;
     #else
-        f_color = vec4(1, 1, 1, 1);
+        f_color = baseColor;
     #endif
 }
 """
