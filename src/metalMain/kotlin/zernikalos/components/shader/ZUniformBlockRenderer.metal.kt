@@ -8,12 +8,7 @@
 
 package zernikalos.components.shader
 
-import kotlinx.cinterop.CPointed
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.interpretCPointer
-import kotlinx.cinterop.rawValue
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.*
 import platform.Metal.MTLBufferProtocol
 import platform.Metal.MTLResourceStorageModeShared
 import platform.posix.memcpy
@@ -28,11 +23,25 @@ actual class ZUniformBlockRenderer actual constructor(
 
     var uniformBuffer: MTLBufferProtocol? = null
 
+    /**
+     * Calculates the byte size of the uniform data, aligned for Metal's requirements.
+     *
+     * Metal requires that the size of a buffer bound to a shader is a multiple of a certain value,
+     * typically 16 bytes for structures containing vector types like `float4`. This property ensures
+     * that the buffer allocated for this uniform block has a size that meets this alignment
+     * requirement by rounding up the actual data size.
+     */
+    private val alignedByteSize: Long
+        get() {
+            // The alignment requirement is typically 16 bytes for Metal.
+            val alignment = 16L
+            return (data.byteSize + alignment - 1) / alignment * alignment
+        }
 
     actual override fun initialize() {
         ctx as ZMtlRenderingContext
 
-        uniformBuffer = ctx.device.newBufferWithLength(data.byteSize.toULong(), MTLResourceStorageModeShared)
+        uniformBuffer = ctx.device.newBufferWithLength(alignedByteSize.toULong(), MTLResourceStorageModeShared)
         uniformBuffer?.label = "UniformBuffer-${data.uniformBlockName}"
     }
 
