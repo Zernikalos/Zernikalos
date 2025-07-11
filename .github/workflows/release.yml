@@ -1,70 +1,50 @@
-name: Zernikalos CI
+name: Zernikalos Release
 
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Zernikalos Build"]
+    types:
+      - completed
+    branches:
+      - main
   workflow_dispatch:
+
 permissions:
   packages: write
   contents: read
 
 jobs:
-  # ------------- BUILD -------------
-  build:
-    name: Build (Gradle)
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    container:
-      image: mobiledevops/android-sdk-image:34.0.0
-      options: -u root
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            .gradle
-          key: gradle-${{ github.ref }}
-
-      - name: Build
-        run: ./gradlew build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-dir
-          path: build
-
   publish-android:
-    needs: build
-    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
     name: Publish Android artifacts
+    if: ${{ (github.event_name == 'workflow_dispatch') || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'release')) }}
     runs-on: ubuntu-latest
     container:
       image: mobiledevops/android-sdk-image:34.0.0
       options: -u root
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # → provide a PAT with write:packages
-      GITHUB_ACTOR: ${{ github.actor }} # default GitHub Actions actor
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_ACTOR: ${{ github.actor }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-dir
           path: build
+          run-id: ${{ github.event.workflow_run.id }}
+
       - run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
                -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
       - run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
                -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
 
   publish-js:
-    needs: build
-    if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release') }}
     name: Publish JS package
+    if: ${{ (github.event_name == 'workflow_dispatch') || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_commit.message, 'release')) }}
     runs-on: ubuntu-latest
     container:
       image: node:22-alpine
@@ -72,13 +52,17 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-dir
           path: build
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Cache node_modules & Gradle
         uses: actions/cache@v4
