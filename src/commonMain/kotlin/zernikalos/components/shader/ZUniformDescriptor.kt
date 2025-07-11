@@ -73,15 +73,15 @@ val ZSkinningMatrixBlock: ZUniformBlock
 val ZUniformPBRColor: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_COLOR, "u_pbrColor", 1, ZTypes.VEC4F)
 
-val ZUniformPBRMetalness: ZUniformData
+val ZUniformPbrMetalness: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_METALNESS, "u_pbrMetalness", 1, ZTypes.FLOAT)
 
-val ZUniformPBRRoughness: ZUniformData
+val ZUniformPbrRoughness: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_ROUGHNESS, "u_pbrRoughness", 1, ZTypes.FLOAT)
 
-val ZPBRMaterialBlock: ZUniformBlock
+val ZPbrMaterialBlock: ZUniformBlock
     get() = ZUniformBlock(UNIFORM_IDS.BLOCK_PBR_MATERIAL, "u_pbrMaterialBlock", listOf(
         UNIFORM_NAMES.PBR_COLOR to ZUniformPBRColor,
-        UNIFORM_NAMES.PBR_METALNESS to ZUniformPBRMetalness,
-        UNIFORM_NAMES.PBR_ROUGHNESS to ZUniformPBRRoughness
+        UNIFORM_NAMES.PBR_METALNESS to ZUniformPbrMetalness,
+        UNIFORM_NAMES.PBR_ROUGHNESS to ZUniformPbrRoughness
     ))

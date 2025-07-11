@@ -32,6 +32,9 @@ internal constructor(private val data: ZMaterialData):
 
     var pbr: ZPbrMaterialData? by data::pbr
 
+    val usesPbr: Boolean
+        get() = pbr != null
+
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
     }
