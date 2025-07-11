@@ -28,8 +28,8 @@ uniform u_sceneMatrixBlock
 #ifdef USE_PBR_MATERIAL
 uniform u_pbrMaterialBlock
 {
-    vec3 color;
-    vec3 emissive;
+    vec4 color;
+    vec4 emissive;
     float emissiveIntensity;
     float metalness;
     float roughness;
@@ -115,8 +115,8 @@ uniform u_sceneMatrixBlock
 #ifdef USE_PBR_MATERIAL
 uniform u_pbrMaterialBlock
 {
-    vec3 color;
-    vec3 emissive;
+    vec4 color;
+    vec4 emissive;
     float emissiveIntensity;
     float metalness;
     float roughness;
@@ -177,7 +177,7 @@ vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
     vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
 
     // Material properties from uniform
-    vec3 albedo = u_pbrMaterial.color * baseColor.rgb;
+    vec3 albedo = u_pbrMaterial.color.rgb * baseColor.rgb;
     float metalness = u_pbrMaterial.metalness;
     float roughness = u_pbrMaterial.roughness;
 
@@ -212,9 +212,7 @@ vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
     vec3 ambient = vec3(0.03) * albedo;
     vec3 color = ambient + Lo;
 
-    // HDR Tonemapping
-    color = color / (color + vec3(1.0));
-    return pow(color, vec3(1.0/2.2));
+    return color;
 }
 
 void main() {
@@ -226,9 +224,21 @@ void main() {
         baseColor = vec4(v_color.xyz, 1.0);
     #endif
 
-    #if defined(USE_PBR_MATERIAL) && defined(USE_NORMALS)
-        vec3 pbrColor = calculatePBRColor(baseColor, v_normal);
-        f_color = vec4(pbrColor, baseColor.a);
+    #if defined(USE_PBR_MATERIAL)
+        // Emissive contribution
+        vec3 emissive = u_pbrMaterial.emissive.rgb * u_pbrMaterial.emissiveIntensity;
+
+        #if defined(USE_NORMALS)
+            vec3 pbrColor = calculatePBRColor(baseColor, v_normal);
+            vec3 finalColor = pbrColor + emissive;
+        #else
+            vec3 finalColor = baseColor.rgb + emissive;
+        #endif
+
+        // Tonemapping (ACES approximation) and gamma correction
+        finalColor = finalColor / (finalColor + vec3(1.0));
+        finalColor = pow(finalColor, vec3(1.0/2.2));
+        f_color = vec4(finalColor, baseColor.a);
     #else
         f_color = baseColor;
     #endif

@@ -189,5 +189,5 @@ object ZTypes {
     val TEXTURE = ZDataType(ZBaseType.TEXTURE, ZFormatType.TEXTURE)
     val QUATERNION = ZDataType(ZBaseType.FLOAT, ZFormatType.QUATERNION)
     val EULER = ZDataType(ZBaseType.FLOAT, ZFormatType.EULER)
-    val RGBA = ZDataType(ZBaseType.UNSIGNED_BYTE, ZFormatType.RGBA)
+    val RGBA = ZDataType(ZBaseType.FLOAT, ZFormatType.RGBA)
 }

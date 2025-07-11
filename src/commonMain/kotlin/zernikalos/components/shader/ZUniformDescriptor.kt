@@ -20,6 +20,8 @@ object UNIFORM_NAMES {
     const val INVERSE_BIND_MATRIX = "InverseBindMatrix"
 
     const val PBR_COLOR = "PBRColor"
+    const val PBR_EMISSIVE = "PBREmissive"
+    const val PBR_EMISSIVE_INTENSITY = "PBREmissiveIntensity"
     const val PBR_METALNESS = "PBRMetalness"
     const val PBR_ROUGHNESS = "PBRRoughness"
 }
@@ -37,6 +39,8 @@ object UNIFORM_IDS {
     const val INVERSE_BIND_MATRIX = 6
 
     const val PBR_COLOR = 7
+    const val PBR_EMISSIVE = 7
+    const val PBR_EMISSIVE_INTENSITY = 8
     const val PBR_METALNESS = 8
     const val PBR_ROUGHNESS = 9
 
@@ -70,8 +74,14 @@ val ZSkinningMatrixBlock: ZUniformBlock
         UNIFORM_NAMES.INVERSE_BIND_MATRIX to ZInverseBindMatrixArray(100)
     ))
 
-val ZUniformPBRColor: ZUniformData
+val ZUniformPbrColor: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_COLOR, "u_pbrColor", 1, ZTypes.VEC4F)
+
+val ZUniformPbrEmissive: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PBR_EMISSIVE, "u_pbrEmissive", 1, ZTypes.VEC4F)
+
+val ZUniformPbrEmissiveIntensity: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PBR_EMISSIVE_INTENSITY, "u_pbrEmissiveIntensity", 1, ZTypes.FLOAT)
 
 val ZUniformPbrMetalness: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_METALNESS, "u_pbrMetalness", 1, ZTypes.FLOAT)
@@ -81,7 +91,9 @@ val ZUniformPbrRoughness: ZUniformData
 
 val ZPbrMaterialBlock: ZUniformBlock
     get() = ZUniformBlock(UNIFORM_IDS.BLOCK_PBR_MATERIAL, "u_pbrMaterialBlock", listOf(
-        UNIFORM_NAMES.PBR_COLOR to ZUniformPBRColor,
+        UNIFORM_NAMES.PBR_COLOR to ZUniformPbrColor,
+        UNIFORM_NAMES.PBR_EMISSIVE to ZUniformPbrEmissive,
+        UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY to ZUniformPbrEmissiveIntensity,
         UNIFORM_NAMES.PBR_METALNESS to ZUniformPbrMetalness,
         UNIFORM_NAMES.PBR_ROUGHNESS to ZUniformPbrRoughness
     ))
