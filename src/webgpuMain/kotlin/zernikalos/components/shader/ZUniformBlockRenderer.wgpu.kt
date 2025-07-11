@@ -23,11 +23,23 @@ actual class ZUniformBlockRenderer actual constructor(ctx: ZRenderingContext, pr
     var bindGroupLayoutEntry: GPUBindGroupLayoutEntry? = null
     var bindGroupEntry: GPUBindGroupEntry? = null
 
+    /**
+     * Calculates the byte size of the uniform data, aligned for WebGPU's requirements.
+     *
+     * WebGPU, like Metal, requires uniform buffer sizes to be a multiple of 16.
+     * This ensures the buffer meets this alignment requirement.
+     */
+    private val alignedByteSize: Int
+        get() {
+            val alignment = 16
+            return (data.byteSize + alignment - 1) / alignment * alignment
+        }
+
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
 
         uniformBuffer = ctx.device.createBuffer(
-            data.byteSize,
+            alignedByteSize,
             GPUBufferUsage.UNIFORM or GPUBufferUsage.COPY_DST,
             false,
             "uniformBuffer-${data.uniformBlockName}"
@@ -36,7 +48,7 @@ actual class ZUniformBlockRenderer actual constructor(ctx: ZRenderingContext, pr
         // TODO: Review options
         bindGroupLayoutEntry = GPUBindGroupLayoutEntry(
             binding = data.id,
-            visibility = GPUShaderStage.VERTEX,
+            visibility = GPUShaderStage.VERTEX or GPUShaderStage.FRAGMENT,
             buffer = GPUBufferBindingLayout(
                 type = GPUBufferBindingType.UNIFORM
             )
