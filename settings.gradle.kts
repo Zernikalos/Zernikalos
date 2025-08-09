@@ -7,12 +7,19 @@
  */
 
 rootProject.name = "zernikalos"
-include(":zernikalos")
+include(":library")
 
 pluginManagement {
     repositories {
         google()
         gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
         mavenCentral()
     }
 }
