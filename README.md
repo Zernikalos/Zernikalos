@@ -3,58 +3,92 @@
 <div align="center">
 <img src="docsAssets/logo-icon.svg" alt="Logo" width="124" height="124">
 
-
   <p align="center">
     Zernikalos is a lightweight and fast game engine developed entirely in Kotlin for Android, iOS, and Web. Built with a simple yet powerful API, it facilitates efficient game development, ensuring a seamless experience across platforms.
-
   </p>
 </div>
 
-## Project description
+## 🚀 Quick Start
 
-Zernikalos is a lightweight and fast game engine developed entirely in Kotlin for Android, iOS, and Web. Built with a simple yet powerful API, it facilitates efficient game development, ensuring a seamless experience across platforms.
+### Building the Project
 
-## Building the project
+For building the project across all platforms:
+```bash
+./gradlew build
+```
 
-For building the project across all platforms, one simple command is needed: `gradle build`.
+### Platform-Specific Builds
 
-Just enter this command into your terminal at the project's root directory. The `gradle build` command compiles the source code, runs the tests, and produces the application JAR files.
+**Android:**
+```bash
+./gradlew assembleAndroidRelease
+```
 
-Make sure you have Gradle installed on your system and properly set up in your environment variables before running the command.
+**iOS:**
+```bash
+./gradlew assembleZernikalosXCFramework
+```
+*Note: Requires Xcode installed on macOS*
 
-For more information on how to use Gradle for building your projects, you can refer to its [official documentation](https://docs.gradle.org/current/userguide/userguide.html).
+**Web:**
+```bash
+./gradlew jsBrowserWebpack
+```
 
-### Build the project for Android
+## 📦 Release Process
+
+### Creating a New Version
+
+To upgrade to version X.Y.Z and publish:
+
+```bash
+# 1. Set new version
+./gradlew setVersion -PnewVersion=X.Y.Z
+
+# 2. Generate version files
+./gradlew updateVersion
+
+# 3. Create release commit and tag
+./gradlew releaseCommit
+
+# 4. Push to trigger automated build and publish
+git push origin main --tags
+```
+
+The system automatically:
+- Builds all platforms
+- Publishes to GitHub Packages (Maven + NPM)
+- Creates GitHub Release
 
 
+## 🛠️ Development
 
-### Build the project for iOS
+### Prerequisites
+- **Gradle**: Latest version
+- **Kotlin**: Multiplatform support
+- **Android**: Android SDK (for Android builds)
+- **iOS**: Xcode (for iOS builds)
+- **Web**: Node.js (for web builds)
 
-#### Generating a XCFramework
+### Available Gradle Tasks
+See [gradle/libs.versions.toml](gradle/libs.versions.toml) for all available tasks and dependencies.
 
-To assemble the project specifically for iOS, the `gradle assembleZernikalosXCFramework` command is used, which creates an XCFramework for the iOS platform. This command should be run in your terminal at the project's root directory.
+## 🤝 Contributing
 
-It's important to note that in order to build your project for iOS, you must have Xcode installed on your machine. Xcode contains the tools needed to compile your project for the iOS platform. It is recommended to use the latest version of Xcode, which can be downloaded from the [Apple Developer website](https://developer.apple.com/xcode/) or directly from the App Store.
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-### Build the project for Web
+### Contributors
 
-In order to assemble the project for web platforms, the `gradle jsBrowserWebpack` command is used. This command prepares the JavaScript and its dependencies to run in a browser. Again, this command should be run in your terminal at the project's root directory.
+- **Aarón Negrín** - Lead Developer & Creator
 
-Please note, this build relies on the configuration provided in your webpack.config.js file.
+## 📄 License
 
-[//]: # (## Contributors)
+This project is licensed under the Mozilla Public License 2.0 (MPL 2.0). See the [LICENSE](LICENSE) file for details.
 
-[//]: # ()
-[//]: # ([How others can contribute to your project, if applicable])
+## 🔗 Links
 
-## Getting started
-
-### For Android
-
-### For iOS
-
-### For Web
-
-## License
-
-This project is licensed under the Mozilla Public License 2.0 (MPL 2.0). For more details, please see the [LICENSE](LICENSE) file in this repository.
+- **Website**: [zernikalos.dev](https://zernikalos.dev)
+- **GitHub**: [Zernikalos/Zernikalos](https://github.com/Zernikalos/Zernikalos)
+- **Packages**: 
+  - Maven: `dev.zernikalos:zernikalos`
+  - NPM: `@zernikalos/zernikalos`
