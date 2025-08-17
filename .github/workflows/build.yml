@@ -29,9 +29,18 @@ jobs:
 
       - name: Build
         run: ./gradlew build
-
+        
+      - name: Verify build output
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Build directory contents:"
+          ls -la build/ || echo "Build directory does not exist!"
+          echo "Gradle build status: $?"
+          
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-dir
           path: build
+          retention-days: 1
+          if-no-files-found: error
