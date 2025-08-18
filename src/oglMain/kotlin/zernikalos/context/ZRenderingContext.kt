@@ -90,7 +90,7 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun createVertexArray(): GLWrap
 
-    fun bindVertexArray(vao: GLWrap)
+    fun bindVertexArray(vao: GLWrap?)
 
     /** Draw **/
 

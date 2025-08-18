@@ -8,8 +8,8 @@
 
 package zernikalos.components.mesh
 
-import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
@@ -54,6 +54,9 @@ class ZVertexArrayRenderer(ctx: ZRenderingContext): ZComponentRenderer(ctx) {
     }
 
     override fun unbind() {
+        ctx as ZGLRenderingContext
+
+        ctx.bindVertexArray(null)
     }
 
 }

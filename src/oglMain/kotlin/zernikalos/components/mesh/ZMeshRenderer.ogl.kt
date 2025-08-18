@@ -31,6 +31,8 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
             buff.initialize(ctx)
             buff.bind()
         }
+
+        vao.unbind()
     }
 
     actual override fun render() {

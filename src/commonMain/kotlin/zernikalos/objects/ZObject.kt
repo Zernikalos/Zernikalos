@@ -70,7 +70,13 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     var transform: ZTransform = ZTransform()
 
     @Transient
-    override var children: Array<@Polymorphic ZObject> = emptyArray()
+    override var children: Array<@Polymorphic ZObject>
+        get() = _children.toTypedArray()
+        set(value) {
+            _children = arrayListOf(*value)
+        }
+
+    private var _children: ArrayList<ZObject> = arrayListOf()
 
     abstract val type: ZObjectType
 
@@ -129,8 +135,19 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
      * @param child The child object to add.
      */
     fun addChild(child: ZObject) {
-        children += child
+        _children += child
         reparent(child)
+    }
+
+    fun removeChild(child: ZObject) {
+        _children.remove(child)
+        child._parent = null
+    }
+
+    @JsName("removeChildAt")
+    fun removeChild(idx: Int) {
+        _children.removeAt(idx)
+        _children[idx]._parent = null
     }
 
     private fun reparent(obj: ZObject) {

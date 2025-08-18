@@ -150,8 +150,12 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         return GLWrap(id)
     }
 
-    actual fun bindVertexArray(vao: GLWrap) {
-        GLES30.glBindVertexArray(vao.id as Int)
+    actual fun bindVertexArray(vao: GLWrap?) {
+        if (vao == null)
+            GLES30.glBindVertexArray(0)
+        else {
+            GLES30.glBindVertexArray(vao.id as Int)
+        }
     }
 
     actual fun drawArrays(mode: Int, first: Int, count: Int) {
