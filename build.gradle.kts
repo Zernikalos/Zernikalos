@@ -116,10 +116,12 @@ kotlin {
 
     js(IR) {
         outputModuleName.set("@zernikalos/zernikalos")
+        version = zernikalosVersion
         compilations["main"].packageJson {
             customField("author", zernikalosAuthorName)
             customField("description", zernikalosDescription)
             customField("license", zernikalosLicense)
+            customField("version", zernikalosVersion)
             customField("repository", mapOf(
                 "type" to "git",
                 "url" to "https://github.com/$githubOwner/$githubRepo"
@@ -299,10 +301,6 @@ tasks.register<Copy>("generateNpmrc") {
         line.replace("\${GITHUB_USER}", publishUser)
             .replace("\${GITHUB_TOKEN}", publishAccessToken)
     }
-}
-
-tasks.register<Exec>("publishJsToGitHub") {
-    dependsOn("generateNpmrc")
 }
 
 tasks.register("setVersion") {
