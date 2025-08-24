@@ -12,7 +12,6 @@ import zernikalos.components.ZComponentRenderer
 import zernikalos.context.*
 import zernikalos.logger.logger
 import zernikalos.toOglBaseType
-import kotlin.jvm.Transient
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
@@ -24,7 +23,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
 
     actual override fun initialize() {
         initializeBuffer(ctx, data)
-        initializeBufferKey(ctx, data)
+        if (!data.isIndexBuffer) {
+            initializeBufferKey(ctx, data)
+        }
         logger.debug("Initializing Buffer ${data.name}=[@${data.id}-${bufferTargetType.name}]")
     }
 
