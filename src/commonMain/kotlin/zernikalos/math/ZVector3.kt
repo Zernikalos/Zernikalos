@@ -144,11 +144,6 @@ class ZVector3(): ZAlgebraObject {
         normalize(this, this)
     }
 
-    fun cross(v: ZVector3) {
-        // TODO: This should not be working
-        cross(this, this, v)
-    }
-
     fun rotate(q: ZQuaternion) {
         rotateVector(this, q, this)
     }

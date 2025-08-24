@@ -6,26 +6,29 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-config.output.library = {
-    name: "zernikalos",
-    type: "umd",
-    export: "zernikalos"
-};
+// Only apply custom rules if config.output is defined (i.e., not a Karma test build)
+if (config.output) {
+    config.output.library = {
+        name: "zernikalos",
+        type: "umd",
+        export: "zernikalos"
+    };
 
-// config.devtool = 'source-map';
+    // config.devtool = 'source-map';
 
-// Related to this issue https://github.com/Kotlin/kotlinx.coroutines/issues/3874
-// Need to modify the naming on the window
-config.module = {
-    rules: [
-        {
-            test: /\.js$/,
-            loader: 'string-replace-loader',
-            options: {
-                search: 'coroutineDispatcher',
-                replace: 'zkCoroutineDispatcher',
-                flags: 'g'
+    // Related to this issue https://github.com/Kotlin/kotlinx.coroutines/issues/3874
+    // Need to modify the naming on the window
+    config.module = {
+        rules: [
+            {
+                test: /\.js$/,
+                loader: 'string-replace-loader',
+                options: {
+                    search: 'coroutineDispatcher',
+                    replace: 'zkCoroutineDispatcher',
+                    flags: 'g'
+                }
             }
-        }
-    ]
+        ]
+    };
 }

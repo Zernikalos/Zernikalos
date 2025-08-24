@@ -605,11 +605,9 @@ class ZMatrix4(): ZAlgebraObject {
          * @param up The up direction from the camera's point of view.
          */
         fun lookAt(result: ZMatrix4, eye: ZVector3, center: ZVector3, up: ZVector3) {
-            val f = ZVector3()
-
             // See the OpenGL GLUT documentation for gluLookAt for a description
             // of the algorithm. We implement it in a straightforward way:
-            ZVector3.subtract(f, center, eye)
+            val f = center - eye
 
             // Normalize f
             f.normalize()
@@ -626,28 +624,24 @@ class ZMatrix4(): ZAlgebraObject {
             ZVector3.cross(u, s, f)
 
             result[0] = s.x
-            result[1] = u.x
-            result[2] = -f.x
-            result[3] = 0.0f
-
             result[4] = s.y
-            result[5] = u.y
-            result[6] = -f.y
-            result[7] = 0.0f
-
             result[8] = s.z
+            result[12] = -ZVector3.dot(s, eye)
+
+            result[1] = u.x
+            result[5] = u.y
             result[9] = u.z
+            result[13] = -ZVector3.dot(u, eye)
+
+            result[2] = -f.x
+            result[6] = -f.y
             result[10] = -f.z
+            result[14] = ZVector3.dot(f, eye)
+
+            result[3] = 0.0f
+            result[7] = 0.0f
             result[11] = 0.0f
-
-            result[12] = 0.0f
-            result[13] = 0.0f
-            result[14] = 0.0f
             result[15] = 1.0f
-
-            val negEye = ZVector3()
-            ZVector3.multScalar(negEye, -1.0f, eye)
-            translate(result, negEye)
         }
 
         @JsName("fromQuaternionIp")
