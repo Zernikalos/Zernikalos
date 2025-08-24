@@ -139,6 +139,5 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
         model.shaderProgram.bind()
         model.mesh.bind()
         model.mesh.render()
-        ctx.renderPass?.end()
     }
 }

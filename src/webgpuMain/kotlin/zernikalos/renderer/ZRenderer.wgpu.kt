@@ -35,6 +35,8 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
 
         gpuCtx.createRenderPass(ctx.scene!!.viewport.renderer.renderPassDescriptor!!.toGpu())
         ctx.scene!!.render(ctx)
+        gpuCtx.renderPass?.end()
+
         gpuCtx.queue.submit(arrayOf(gpuCtx.commandEncoder!!.finish()))
     }
 
