@@ -19,6 +19,13 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
     }
 
+    actual val maxUniformBuffersBinding: Int by lazy {
+            val result = IntArray(1)
+            GLES30.glGetIntegerv(GLES30.GL_MAX_UNIFORM_BUFFER_BINDINGS, result, 0)
+            val maxBindings = result[0]
+            return@lazy maxBindings
+        }
+
     actual fun enable(feat: Int) {
         GLES30.glEnable(feat)
     }

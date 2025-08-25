@@ -19,6 +19,8 @@ actual class ZUniformBlockRenderer actual constructor(
 
     private var ubo: GLWrap? = null
 
+    private var bindingPoint: Int = -1
+
     actual override fun initialize() {
     }
 
@@ -35,11 +37,19 @@ actual class ZUniformBlockRenderer actual constructor(
         ctx.bindBuffer(BufferTargetType.UNIFORM_BUFFER, ubo!!)
         ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, data.byteSize, BufferUsageType.DYNAMIC_DRAW)
 
-        // Fix for OpenGL with multiple shader programs
-        // Calculate unique binding point to avoid conflicts between multiple shader programs
-        // Each shader gets its own range of 64 binding points (shader_id * 64 + uniform_block_id)
-        // This is because binding points are shared between all shader programs
-        val bindingPoint = data.id + (programId.id as Int * 64)
+        // Problem: OpenGL binding points are global across all shader programs.
+        // When multiple shaders use the same binding point, the last binding overwrites
+        // previous ones, causing uniform data corruption and rendering artifacts.
+        //
+        // Solution: Generate unique binding points using XOR hash for good distribution,
+        // then resolve any collisions with linear probing to ensure no conflicts.
+        val programIdAsInt = programId.id as Int
+        bindingPoint = (programIdAsInt xor data.id) % ctx.maxUniformBuffersBinding
+        while (ZUniformBlockRenderer.isBindingPointUsed(bindingPoint)) {
+            bindingPoint = (bindingPoint + 1) % ctx.maxUniformBuffersBinding
+        }
+        ZUniformBlockRenderer.addBindingPoint(bindingPoint)
+
         ctx.uniformBlockBinding(programId, uniformBlockIndex, bindingPoint)
         ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, ubo!!)
     }
@@ -55,5 +65,17 @@ actual class ZUniformBlockRenderer actual constructor(
     actual override fun unbind() {
         ctx as ZGLRenderingContext
         //ctx?.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, 0)
+    }
+
+    companion object {
+        private val usedBindingPoints = mutableSetOf<Int>()
+
+        fun isBindingPointUsed(bindingPoint: Int): Boolean {
+            return usedBindingPoints.contains(bindingPoint)
+        }
+
+        fun addBindingPoint(bindingPoint: Int) {
+            usedBindingPoints.add(bindingPoint)
+        }
     }
 }

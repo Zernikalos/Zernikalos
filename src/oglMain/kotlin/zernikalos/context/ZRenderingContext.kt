@@ -18,6 +18,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     override fun initWithSurfaceView(surfaceView: ZSurfaceView)
 
+    val maxUniformBuffersBinding: Int
+
     /** Commons **/
 
     fun enable(feat: Int)
