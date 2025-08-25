@@ -19,12 +19,7 @@ import zernikalos.ZTypes
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.acos
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @JsExport
 @Serializable(with = ZQuaternionSerializer::class)
@@ -406,37 +401,102 @@ class ZQuaternion(): ZAlgebraObject {
             return result
         }
 
-        @JsName("slerpIp")
-        fun slerp(result: ZQuaternion, t: Float, q1: ZQuaternion, q2: ZQuaternion) {
-            // Dot product
-            var dot = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z
-            // Invert q2 if dot < 0 to take the shortest path
-            var q3 = q2
-            if (dot < 0f) {
-              dot = -dot
-              q3 = ZQuaternion(-q2.x, -q2.y, -q2.z, -q2.w)
-            }
-            // Close to 1, fallback to NLERP to avoid division by 0
-            if (dot > 0.9995f) {
-              result.w = q1.w + t*(q3.w - q1.w)
-              result.x = q1.x + t*(q3.x - q1.x)
-              result.y = q1.y + t*(q3.y - q1.y)
-              result.z = q1.z + t*(q3.z - q1.z)
-              normalize(result, result)
-              return
-            }
-            // Angle between quaternions
-            val theta0 = acos(dot)
-            val theta = theta0 * t
-            val sinTheta = sin(theta)
-            val sinTheta0 = sin(theta0)
-            val s0 = cos(theta) - dot * sinTheta / sinTheta0
-            val s1 = sinTheta / sinTheta0
+        // Original slerp implementation
+        // fun slerp(result: ZQuaternion, t: Float, q1: ZQuaternion, q2: ZQuaternion) {
+        //     // Dot product
+        //     var dot = q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z
+        //     // Invert q2 if dot < 0 to take the shortest path
+        //     var q3 = q2
+        //     if (dot < 0f) {
+        //       dot = -dot
+        //       q3 = ZQuaternion(-q2.x, -q2.y, -q2.z, -q2.w)
+        //     }
+        //     // Close to 1, fallback to NLERP to avoid division by 0
+        //     if (dot > 0.9995f) {
+        //         val invT = 1f - t
+        //         result.w = invT * q1.w + t * q3.w
+        //         result.x = invT * q1.x + t * q3.x
+        //         result.y = invT * q1.y + t * q3.y
+        //         result.z = invT * q1.z + t * q3.z
+        //         normalize(result, result)
+        //         return
+        //     }
+        //     // Angle between quaternions
+        //     val theta0 = acos(dot)
+        //     val theta = theta0 * t
+        //     val sinTheta = sin(theta)
+        //     val sinTheta0 = sin(theta0)
+        //     val s0 = sin(theta0-theta)/sinTheta0 // sin((1-t)*theta0)/sin(theta0)
+        //     val s1 = sinTheta / sinTheta0 // sin(t*theta)/sin(theta0)
 
-            result.w = q1.w * s0 + q3.w * s1
-            result.x = q1.x * s0 + q3.x * s1
-            result.y = q1.y * s0 + q3.y * s1
-            result.z = q1.z * s0 + q3.z * s1
+        //     result.w = q1.w * s0 + q3.w * s1
+        //     result.x = q1.x * s0 + q3.x * s1
+        //     result.y = q1.y * s0 + q3.y * s1
+        //     result.z = q1.z * s0 + q3.z * s1
+        //     normalize(result, result)
+        // }
+
+        @JsName("slerpIp")
+        fun slerp(result: ZQuaternion, t: Float, qa: ZQuaternion, qb: ZQuaternion) {
+            // Extracted from https://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/index.htm
+
+            if ( abs(t) < 0.00001f ) {
+                ZQuaternion.copy(result, qa)
+                normalize(result, result)
+                return
+            }
+            if ( abs(t - 1) < 0.00001f ) {
+                ZQuaternion.copy(result, qb)
+                normalize(result, result)
+                return
+            }
+
+            // Calculate angle between them
+            var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z
+
+            var qc = ZQuaternion(qb.w, qb.x, qb.y, qb.z)
+            if (cosHalfTheta < 0) {
+                qc.w = -qb.w
+                qc.x = -qb.x
+                qc.y = -qb.y
+                qc.z = -qb.z
+                cosHalfTheta = -cosHalfTheta
+            }
+
+            // If qa=qb or qa=-qb then theta = 0 and we can return qa
+            if (cosHalfTheta >= 1.0f) {
+                result.w = qa.w
+                result.x = qa.x
+                result.y = qa.y
+                result.z = qa.z
+                normalize(result, result)
+                return
+            }
+
+            // Calculate temporary values
+            val sinHalfTheta = sqrt(1.0f - cosHalfTheta * cosHalfTheta)
+            val halfTheta = atan2(sinHalfTheta, cosHalfTheta)
+
+            // If theta = 180 degrees then result is not fully defined
+            // We could rotate around any axis normal to qa or qb
+            if (abs(sinHalfTheta) < 0.00001f) {
+                result.w = qa.w * 0.5f + qc.w * 0.5f
+                result.x = qa.x * 0.5f + qc.x * 0.5f
+                result.y = qa.y * 0.5f + qc.y * 0.5f
+                result.z = qa.z * 0.5f + qc.z * 0.5f
+                normalize(result, result)
+                return
+            }
+
+            val ratioA = sin((1.0f - t) * halfTheta) / sinHalfTheta
+            val ratioB = sin(t * halfTheta) / sinHalfTheta
+
+            // Calculate quaternion
+            result.w = qa.w * ratioA + qc.w * ratioB
+            result.x = qa.x * ratioA + qc.x * ratioB
+            result.y = qa.y * ratioA + qc.y * ratioB
+            result.z = qa.z * ratioA + qc.z * ratioB
+            normalize(result, result)
         }
 
         fun slerp(t: Float, q1: ZQuaternion, q2: ZQuaternion): ZQuaternion {
