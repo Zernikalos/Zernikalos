@@ -3,8 +3,6 @@ package zernikalos.math
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.utils.toByteArray
-import kotlin.math.cos
-import kotlin.math.sin
 
 class ZEuler(): ZAlgebraObject {
 
@@ -82,7 +80,7 @@ class ZEuler(): ZAlgebraObject {
 
             // Roll (x-axis rotation)
             val sinr_cosp = 2f * (w * x + y * z)
-            val cosr_cosp = 1f - 2f * (x * x + y * y)
+            val cosr_cosp = 1f - 2f * (y * y + z * z)
             result.roll = kotlin.math.atan2(sinr_cosp, cosr_cosp) * radToDeg
 
             // Pitch (y-axis rotation)

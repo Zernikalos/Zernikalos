@@ -138,6 +138,8 @@ class ZQuaternionTest {
         assertEquals(euler.yaw, eulerBack.yaw, epsilon, "Yaw should match")
     }
 
+    //region Slerp tests
+
     @Test
     fun testSlerp() {
         val q1 = ZQuaternion(1f, 0f, 0f, 0f)
@@ -150,6 +152,98 @@ class ZQuaternionTest {
         expected.fromAngleAxis(45f, 0f, 1f, 0f)
 
         assertQuaternionEquals(expected, result)
+    }
+
+    @Test
+    fun testSlerpOppositeQuaternions() {
+        val q1 = ZQuaternion(1f, 0f, 0f, 0f)
+        val q2 = ZQuaternion(-1f, 0f, 0f, 0f)  // Opposite quaternions
+
+        val result = ZQuaternion()
+        ZQuaternion.slerp(result, 0.5f, q1, q2)
+
+        // Since the quaternions are opposite, they represent the same rotation, so the result should be the same
+        // as any of both quaternions
+        assertQuaternionEquals(q1, result, epsilon = 0.01f)
+    }
+
+    @Test
+    fun testSlerpDifferentRotations() {
+        // q1: Identity rotation
+        val q1 = ZQuaternion(1f, 0f, 0f, 0f)
+        
+        // q2: 90° rotation around the Z axis
+        val q2 = ZQuaternion(0.707f, 0f, 0f, 0.707f)
+
+        val result = ZQuaternion()
+        
+        // Test t = 0.5 (punto medio)
+        ZQuaternion.slerp(result, 0.5f, q1, q2)
+        
+        // Expected result: 45° rotation around the Z axis
+        val expected = ZQuaternion(0.924f, 0f, 0f, 0.383f)
+        assertQuaternionEquals(expected, result, epsilon = 0.01f)
+        
+        // Test t = 0.25 (quarter of the way)
+        ZQuaternion.slerp(result, 0.25f, q1, q2)
+        val expected25 = ZQuaternion(0.981f, 0f, 0f, 0.195f)
+        assertQuaternionEquals(expected25, result, epsilon = 0.01f)
+        
+        // Test t = 0.75 (three quarters of the way)
+        ZQuaternion.slerp(result, 0.75f, q1, q2)
+        val expected75 = ZQuaternion(0.831f, 0f, 0f, 0.556f)
+        assertQuaternionEquals(expected75, result, epsilon = 0.01f)
+    }
+
+    @Test
+    fun testSlerpNonNormalizedQuaternions() {
+        val q1 = ZQuaternion(2f, 0f, 0f, 0f)  // Not normalized
+        val q2 = ZQuaternion(0f, 2f, 0f, 0f)  // Not normalized
+
+        val result = ZQuaternion()
+        ZQuaternion.slerp(result, 0.5f, q1, q2)
+
+        // Should normalize internally and give correct result
+        assertTrue(result.isNormalized)
+
+        val expected = ZQuaternion(0.707f, 0.707f, 0f, 0f)  // 45° between both
+        assertQuaternionEquals(expected, result, epsilon = 0.01f)
+    }
+
+    @Test
+    fun testSlerpSphericalInterpolation() {
+        val q1 = ZQuaternion()
+        q1.fromAngleAxis(30f, 1f, 0f, 0f)
+
+        val q2 = ZQuaternion()
+        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+
+        val result = ZQuaternion()
+        ZQuaternion.slerp(result, 0.5f, q1, q2)
+
+        // Check that the intermediate angle is correct
+        val dot1 = ZQuaternion.dot(q1, result)
+        val dot2 = ZQuaternion.dot(result, q2)
+
+        assertTrue(dot1 > 0.5f, "Result should be closer to q1")
+        assertTrue(dot2 > 0.5f, "Result should be closer to q2")
+    }
+
+    @Test
+    fun testSlerpEdgeCases() {
+        val q1 = ZQuaternion(1f, 0f, 0f, 0f)
+        val q2 = ZQuaternion()
+        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+
+        // t = 0 should give q1
+        val result0 = ZQuaternion()
+        ZQuaternion.slerp(result0, 0f, q1, q2)
+        assertQuaternionEquals(q1, result0)
+
+        // t = 1 should give q2
+        val result1 = ZQuaternion()
+        ZQuaternion.slerp(result1, 1f, q1, q2)
+        assertQuaternionEquals(q2, result1)
     }
 
     //region Companion object tests

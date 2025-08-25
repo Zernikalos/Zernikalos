@@ -1,10 +1,6 @@
 package zernikalos.math
 
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.assertContentEquals
+import kotlin.test.*
 
 class ZMatrix4Test {
 
@@ -118,6 +114,38 @@ class ZMatrix4Test {
         assertEquals(2f, m[0])
         assertEquals(3f, m[5])
         assertEquals(4f, m[10])
+    }
+
+    @Test
+    fun testScaleWithNonIdentityMatrix() {
+        val m = ZMatrix4()
+        m[0, 0] = 1f; m[0, 1] = 2f; m[0, 2] = 3f; m[0, 3] = 4f
+        m[1, 0] = 5f; m[1, 1] = 6f; m[1, 2] = 7f; m[1, 3] = 8f
+        m[2, 0] = 9f; m[2, 1] = 10f; m[2, 2] = 11f; m[2, 3] = 12f
+        m[3, 0] = 13f; m[3, 1] = 14f; m[3, 2] = 15f; m[3, 3] = 16f
+
+        val result = ZMatrix4()
+        ZMatrix4.scale(result, m, 2f, 3f, 4f)
+
+        assertEquals(1f * 2f, result[0, 0])
+        assertEquals(5f * 2f, result[1, 0])
+        assertEquals(9f * 2f, result[2, 0])
+        assertEquals(13f * 2f, result[3, 0])
+
+        assertEquals(2f * 3f, result[0, 1])
+        assertEquals(6f * 3f, result[1, 1])
+        assertEquals(10f * 3f, result[2, 1])
+        assertEquals(14f * 3f, result[3, 1])
+
+        assertEquals(3f * 4f, result[0, 2])
+        assertEquals(7f * 4f, result[1, 2])
+        assertEquals(11f * 4f, result[2, 2])
+        assertEquals(15f * 4f, result[3, 2])
+
+        assertEquals(4f, result[0, 3])
+        assertEquals(8f, result[1, 3])
+        assertEquals(12f, result[2, 3])
+        assertEquals(16f, result[3, 3])
     }
 
     @Test

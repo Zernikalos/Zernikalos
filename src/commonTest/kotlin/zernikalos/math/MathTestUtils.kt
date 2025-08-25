@@ -23,11 +23,11 @@ fun assertMatrixEquals(expected: ZMatrix4, actual: ZMatrix4, epsilon: Float, mes
     }
 }
 
-fun assertQuaternionEquals(expected: ZQuaternion, actual: ZQuaternion, message: String? = null) {
-    assertEquals(expected.w, actual.w, epsilon, message)
-    assertEquals(expected.x, actual.x, epsilon, message)
-    assertEquals(expected.y, actual.y, epsilon, message)
-    assertEquals(expected.z, actual.z, epsilon, message)
+fun assertQuaternionEquals(expected: ZQuaternion, actual: ZQuaternion, epsilon: Float = 0.0001f, message: String? = null) {
+    assertEquals(expected.w, actual.w, epsilon, "Error in w component")
+    assertEquals(expected.x, actual.x, epsilon, "Error in x component")
+    assertEquals(expected.y, actual.y, epsilon, "Error in y component")
+    assertEquals(expected.z, actual.z, epsilon, "Error in z component")
 }
 
 fun assertVectorEquals(expected: ZVector2, actual: ZVector2, message: String? = null) {
