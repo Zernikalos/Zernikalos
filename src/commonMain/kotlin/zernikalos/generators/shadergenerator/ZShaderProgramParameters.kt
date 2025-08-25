@@ -7,6 +7,7 @@ class ZShaderProgramParameters() {
     var useNormals: Boolean = false
     var useColors: Boolean = false
     var usePbrMaterial: Boolean = false
+    var usePhongMaterial: Boolean = false
     var useTextures: Boolean = false
     var useSkinning: Boolean = false
     var flipTextureY: Boolean = false

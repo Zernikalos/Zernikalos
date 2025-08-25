@@ -25,17 +25,6 @@ uniform u_sceneMatrixBlock
     } skinUniforms;
 #endif
 
-#ifdef USE_PBR_MATERIAL
-uniform u_pbrMaterialBlock
-{
-    vec4 color;
-    vec4 emissive;
-    float emissiveIntensity;
-    float metalness;
-    float roughness;
-} u_pbrMaterial;
-#endif
-
 #ifdef USE_SKINNING
     in vec4 a_boneIndices;
     in vec4 a_boneWeight;
@@ -121,6 +110,16 @@ uniform u_pbrMaterialBlock
     float metalness;
     float roughness;
 } u_pbrMaterial;
+#endif
+
+#ifdef USE_PHONG_MATERIAL
+uniform u_phongMaterialBlock
+{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    float shininess;
+} u_phongMaterial;
 #endif
 
 #ifdef USE_TEXTURES
@@ -215,6 +214,41 @@ vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
     return color;
 }
 
+// Blinn-Phong lighting calculation
+vec3 calculateBlinnPhongColor(vec4 baseColor, vec3 normal) {
+    // Basic lighting properties (hardcoded for now)
+    vec3 lightPos = vec3(5.0, 5.0, 5.0);
+    vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
+
+    // Material properties from uniform
+    vec3 ambient = u_phongMaterial.ambient.rgb;
+    vec3 diffuse = u_phongMaterial.diffuse.rgb * baseColor.rgb;
+    vec3 specular = u_phongMaterial.specular.rgb;
+    float shininess = u_phongMaterial.shininess;
+
+    // Vector calculations
+    vec3 N = normalize(normal);
+    vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
+    vec3 L = normalize(lightPos); // For a directional light
+    vec3 H = normalize(V + L); // Halfway vector for Blinn-Phong
+
+    // Ambient component
+    vec3 ambientComponent = ambient * baseColor.rgb;
+
+    // Diffuse component
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 diffuseComponent = diffuse * lightColor * NdotL;
+
+    // Specular component (Blinn-Phong)
+    float NdotH = max(dot(N, H), 0.0);
+    vec3 specularComponent = specular * lightColor * pow(NdotH, shininess);
+
+    // Combine all components
+    vec3 finalColor = ambientComponent + diffuseComponent + specularComponent;
+    
+    return finalColor;
+}
+
 void main() {
     vec4 baseColor = vec4(1.0);
 
@@ -239,6 +273,13 @@ void main() {
         finalColor = finalColor / (finalColor + vec3(1.0));
         finalColor = pow(finalColor, vec3(1.0/2.2));
         f_color = vec4(finalColor, baseColor.a);
+    #elif defined(USE_PHONG_MATERIAL)
+        #if defined(USE_NORMALS)
+            vec3 phongColor = calculateBlinnPhongColor(baseColor, v_normal);
+            f_color = vec4(phongColor, baseColor.a);
+        #else
+            f_color = baseColor;
+        #endif
     #else
         f_color = baseColor;
     #endif
