@@ -146,8 +146,8 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
 
     @JsName("removeChildAt")
     fun removeChild(idx: Int) {
-        _children.removeAt(idx)
-        _children[idx]._parent = null
+        val removed = _children.removeAt(idx)
+        removed._parent = null
     }
 
     private fun reparent(obj: ZObject) {
