@@ -53,8 +53,8 @@ class ZSkeletalAction(
 
             val zBoneTransform = ZBoneFrameTransform(
                 position = position?.position,
-                rotation = rotation?.rotation,
-                scale = scale?.scale
+                //rotation = rotation?.rotation,
+                //scale = scale?.scale
             )
 
             // TODO: Check the relevance of ZBoneTransform
@@ -103,12 +103,10 @@ private inline fun <T: ZTimeFrame> findNearestTransform(
             // Avoid division by zero
             if (timeDiff <= Float.MIN_VALUE) return prev
 
-            val t = (time - prev.time) / timeDiff
-            // Ensure t is in valid range [0,1]
-            val clampedT = t.coerceIn(0f, 1f)
+            val t = ((time - prev.time) / timeDiff)
 
             try {
-                interpolateFrames(clampedT, prev, next)
+                interpolateFrames(t, prev, next)
             } catch (e: Exception) {
                 // Fallback to previous frame if interpolation fails
                 prev

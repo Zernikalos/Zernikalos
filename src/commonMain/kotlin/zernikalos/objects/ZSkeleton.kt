@@ -38,7 +38,14 @@ class ZSkeleton: ZObject() {
     }
 
     override fun internalInitialize(ctx: ZContext) {
+//        var parent = this.parent
+//        var m = this.transform.matrix
+//        while (parent != null) {
+//            m = parent.transform.matrix * m
+//            parent = parent.parent
+//        }
         root.initialize(ctx.renderingContext)
+        root.setupMatrices(transform.matrix)
     }
 
     override fun internalRender(ctx: ZContext) {

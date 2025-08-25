@@ -100,6 +100,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int) {
+        val result = IntArray(1)
+        GLES30.glGetIntegerv(GLES30.GL_MAX_UNIFORM_BUFFER_BINDINGS, result, 0)
+        val maxBindings = result[0]
+        println(maxBindings)
         GLES30.glUniformBlockBinding(program.id as Int, uniformBlockIndex.id as Int, uniformBlockBinding)
     }
 

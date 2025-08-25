@@ -41,7 +41,7 @@ data class ZBoneFrameTransform(
             scale ?: ZVector3.Ones
         )
     }
-    
+
     companion object {
 
         fun interpolate(time: Float, prev: ZBoneFrameTransform, next: ZBoneFrameTransform): ZBoneFrameTransform {

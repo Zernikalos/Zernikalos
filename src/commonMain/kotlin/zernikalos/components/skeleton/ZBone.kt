@@ -95,10 +95,14 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         bone._parent = this
     }
 
-    override fun internalInitialize(ctx: ZRenderingContext) {
+    fun setupMatrices(m: ZMatrix4) {
         if (isRoot) {
-            computeInverseBindMatrix(ZMatrix4.Identity)
+            computeInverseBindMatrix(m)
         }
+    }
+
+    override fun internalInitialize(ctx: ZRenderingContext) {
+
     }
 
     /**

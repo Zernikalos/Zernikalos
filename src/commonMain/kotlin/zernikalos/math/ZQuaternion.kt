@@ -19,12 +19,7 @@ import zernikalos.ZTypes
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.acos
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @JsExport
 @Serializable(with = ZQuaternionSerializer::class)
@@ -418,12 +413,13 @@ class ZQuaternion(): ZAlgebraObject {
             }
             // Close to 1, fallback to NLERP to avoid division by 0
             if (dot > 0.9995f) {
-              result.w = q1.w + t*(q3.w - q1.w)
-              result.x = q1.x + t*(q3.x - q1.x)
-              result.y = q1.y + t*(q3.y - q1.y)
-              result.z = q1.z + t*(q3.z - q1.z)
-              normalize(result, result)
-              return
+                val invT = 1f - t
+                result.w = invT * q1.w + t * q3.w
+                result.x = invT * q1.x + t * q3.x
+                result.y = invT * q1.y + t * q3.y
+                result.z = invT * q1.z + t * q3.z
+                normalize(result, result)
+                return
             }
             // Angle between quaternions
             val theta0 = acos(dot)
@@ -437,6 +433,7 @@ class ZQuaternion(): ZAlgebraObject {
             result.x = q1.x * s0 + q3.x * s1
             result.y = q1.y * s0 + q3.y * s1
             result.z = q1.z * s0 + q3.z * s1
+            normalize(result, result)
         }
 
         fun slerp(t: Float, q1: ZQuaternion, q2: ZQuaternion): ZQuaternion {

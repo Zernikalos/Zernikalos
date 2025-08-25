@@ -39,7 +39,7 @@ actual class ZUniformBlockRenderer actual constructor(
         // Calculate unique binding point to avoid conflicts between multiple shader programs
         // Each shader gets its own range of 64 binding points (shader_id * 64 + uniform_block_id)
         // This is because binding points are shared between all shader programs
-        val bindingPoint = data.id + (programId.id as Int * 64)
+        val bindingPoint = (((programId.id as Int * 31) xor data.id) and 0xFF) % 80 //data.id + (programId.id as Int * 64)
         ctx.uniformBlockBinding(programId, uniformBlockIndex, bindingPoint)
         ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, ubo!!)
     }
