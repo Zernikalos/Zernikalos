@@ -33,8 +33,6 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         ctx as ZMtlRenderingContext
 
         data.uniforms.blocks.forEach { uniform ->
-            logger.debug("Initializing uniformBlock: ${uniform.uniformName}")
-
             uniform.initialize(ctx)
         }
 

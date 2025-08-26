@@ -37,10 +37,20 @@ typedef struct
 } PBRMaterialUniforms;
 #endif
 
+#ifdef USE_PHONG_MATERIAL
+typedef struct
+{
+    float4 ambient;
+    float4 diffuse;
+    float4 specular;
+    float shininess;
+} PhongMaterialUniforms;
+#endif
+
 typedef struct
 {
     matrix_float4x4 bones[100];
-    matrix_float4x4 invBindMatrix[100];;
+    matrix_float4x4 invBindMatrix[100];
 } SkinningUniforms;
 """
 
@@ -262,6 +272,48 @@ float3 calculatePBRColor(
 }
 #endif
 
+#if defined(USE_PHONG_MATERIAL) && defined(USE_NORMALS)
+// Blinn-Phong lighting calculation
+float3 calculateBlinnPhongColor(
+    float4 baseColor,
+    float3 normal,
+    float3 viewPosition,
+    constant PhongMaterialUniforms &phongMaterial
+) {
+    // Basic lighting properties (hardcoded for now)
+    float3 lightPos = float3(5.0, -5.0, 5.0);
+    float3 lightColor = float3(1.0, 1.0, 1.0) * 2.0; // Light intensity
+
+    // Material properties from uniform
+    float3 ambient = phongMaterial.ambient.rgb;
+    float3 diffuse = phongMaterial.diffuse.rgb * baseColor.rgb;
+    float3 specular = phongMaterial.specular.rgb;
+    float shininess = phongMaterial.shininess;
+
+    // Vector calculations
+    float3 N = normalize(normal);
+    float3 V = normalize(-viewPosition); // View direction
+    float3 L = normalize(lightPos); // For a directional light
+    float3 H = normalize(V + L); // Halfway vector for Blinn-Phong
+
+    // Ambient component
+    float3 ambientComponent = ambient * baseColor.rgb;
+
+    // Diffuse component
+    float NdotL = max(dot(N, L), 0.0);
+    float3 diffuseComponent = diffuse * lightColor * NdotL;
+
+    // Specular component (Blinn-Phong)
+    float NdotH = max(dot(N, H), 0.0);
+    float3 specularComponent = specular * lightColor * pow(NdotH, shininess);
+
+    // Combine all components
+    float3 finalColor = ambientComponent + diffuseComponent + specularComponent;
+    
+    return finalColor;
+}
+#endif
+
 #if defined(USE_TEXTURE)
     float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap) {
         constexpr sampler colorSampler(mip_filter::linear,
@@ -283,6 +335,9 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
                                constant Uniforms & uniforms [[ buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) ]],
                                #if defined(USE_PBR_MATERIAL)
                                constant PBRMaterialUniforms &pbrMaterial [[buffer(${UNIFORM_IDS.BLOCK_PBR_MATERIAL})]],
+                               #endif
+                               #if defined(USE_PHONG_MATERIAL)
+                               constant PhongMaterialUniforms &phongMaterial [[buffer(${UNIFORM_IDS.BLOCK_PHONG_MATERIAL})]],
                                #endif
                                texture2d<half> colorMap     [[ texture(0) ]])
 {
@@ -307,6 +362,13 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
         finalColor = finalColor / (finalColor + float3(1.0));
         finalColor = pow(finalColor, float3(1.0/2.2));
         return float4(finalColor, baseColor.a);
+    #elif defined(USE_PHONG_MATERIAL)
+        #if defined(USE_NORMALS)
+            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial);
+            return float4(phongColor, baseColor.a);
+        #else
+            return baseColor;
+        #endif
     #else
         return baseColor;
     #endif

@@ -32,10 +32,14 @@ object UNIFORM_NAMES {
 }
 
 object UNIFORM_IDS {
-    const val BLOCK_SCENE_MATRIX = 100
-    const val BLOCK_SKINNING_MATRIX = 101
-    const val BLOCK_PBR_MATERIAL = 102
-    const val BLOCK_PHONG_MATERIAL = 103
+    // Blocks have different binding so they can
+    // reuse IDs
+    // TODO: On Metal there could be a clash if using same ids as attributes
+    // So taking higher numbers for the time being is required
+    const val BLOCK_SCENE_MATRIX = 14
+    const val BLOCK_SKINNING_MATRIX = 15
+    const val BLOCK_PBR_MATERIAL = 16
+    const val BLOCK_PHONG_MATERIAL = 17
 
     const val PROJECTION_MATRIX = 0
     const val VIEW_MATRIX = 1
