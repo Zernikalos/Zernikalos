@@ -77,8 +77,27 @@ data class ZPhongMaterialData(
     @ProtoNumber(3)
     var specular: ZColor,
     @ProtoNumber(4)
+    var _shininess: Float
+) {
+    /**
+     * Controls the sharpness of specular highlights.
+     * 
+     * Range: 0.0 to 500.0
+     * - 0.0: Completely matte surface (no specular highlights)
+     * - 1-50: Matte materials (fabric, wood, plastic)
+     * - 50-200: Semi-glossy materials (ceramic, oxidized metal)
+     * - 200-500: Very glossy materials (polished metal, mirrors)
+     */
     var shininess: Float
-)
+        get() = _shininess
+        set(value) {
+            _shininess = value.coerceIn(0f, 500f)
+        }
+
+    init {
+        this.shininess = this._shininess
+    }
+}
 
 /**
  * Represents data describing a physically-based rendering (PBR) material.
@@ -164,7 +183,7 @@ data class ZPbrMaterialData(
 data class ZMaterialData(
     @ProtoNumber(10)
     var pbr: ZPbrMaterialData? = null,
-    @ProtoNumber(10)
+    @ProtoNumber(11)
     var phong: ZPhongMaterialData? = null,
     @Contextual @ProtoNumber(100)
     var texture: ZTexture? = null
