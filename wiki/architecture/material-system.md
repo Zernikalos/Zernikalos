@@ -68,8 +68,8 @@ vec3 specular = (NDF * G * F) / (4.0 * NdotV * NdotL + 0.0001);
 ### Current Shader Support
 
 - ✅ **Android/OpenGL**: Fully implemented
-- ⚠️ **Metal**: Partially implemented (needs Phong support)
-- ⚠️ **WebGPU**: Partially implemented (needs Phong support)
+- ✅ **Metal**: Fully implemented (PBR + Phong)
+- ⚠️ **WebGPU**: Partially implemented (PBR + partial Phong support)
 
 ## Phong Material System
 
@@ -121,8 +121,8 @@ vec3 finalColor = ambientComponent + diffuseComponent + specularComponent;
 ### Current Shader Support
 
 - ✅ **Android/OpenGL**: Fully implemented with Blinn-Phong
-- ❌ **Metal**: Not implemented (needs to be added)
-- ❌ **WebGPU**: Not implemented (needs to be added)
+- ✅ **Metal**: Fully implemented with Blinn-Phong
+- ⚠️ **WebGPU**: Partially implemented (needs complete Phong support)
 
 ## Material Integration
 
@@ -197,10 +197,9 @@ The shader system uses conditional compilation:
 
 ### Current Work Needed
 
-1. **Metal Shader Support**: Implement Phong materials in Metal shaders
-2. **WebGPU Shader Support**: Implement Phong materials in WebGPU shaders
-3. **Lighting System**: Design and implement dynamic lighting architecture
-4. **Performance Optimization**: Optimize shader performance across platforms
+1. **WebGPU Shader Support**: Complete Phong materials implementation in WebGPU shaders
+2. **Lighting System**: Design and implement dynamic lighting architecture
+3. **Performance Optimization**: Optimize shader performance across platforms
 
 ## Usage Examples
 
