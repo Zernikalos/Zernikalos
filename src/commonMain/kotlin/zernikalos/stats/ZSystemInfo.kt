@@ -9,9 +9,8 @@
 package zernikalos.stats
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import zernikalos.ZVersion
+import zernikalos.Version
 import kotlin.js.JsExport
 
 @JsExport
@@ -37,10 +36,12 @@ class ZStats {
     val platform: ZPlatformInfo
 
     val version: String
+    val zkoVersion: String
 
     init {
         platform = getZPlatformInfo()
-        version = ZVersion.VERSION
+        version = Version.VERSION
+        zkoVersion = Version.ZKO_VERSION
     }
 
     fun toJson(): String {

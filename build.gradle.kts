@@ -293,13 +293,10 @@ tasks.register("generateVersionConstants") {
 
     doLast {
         outputDir.mkdirs()
-        outputFile.writeText("""
-            package zernikalos
-
-            object ZVersion {
-                const val VERSION = "${project.version}"
-            }
-        """.trimIndent())
+        val templateFile = file(".zversion.kt.template")
+        val templateContent = templateFile.readText()
+        val processedContent = templateContent.replace("\${project.version}", project.version.toString())
+        outputFile.writeText(processedContent)
     }
 }
 
