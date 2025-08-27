@@ -58,6 +58,10 @@ class ZSceneContextDefault(): ZSceneContext() {
         addUniformGenerator(UNIFORM_NAMES.PBR_ROUGHNESS, ZPbrRoughnessGenerator())
         addUniformGenerator(UNIFORM_NAMES.PBR_EMISSIVE, ZPbrEmissiveGenerator())
         addUniformGenerator(UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY, ZPbrEmissiveIntensityGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PHONG_AMBIENT, ZPhongAmbientGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PHONG_DIFFUSE, ZPhongDiffuseGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PHONG_SPECULAR, ZPhongSpecularGenerator())
+        addUniformGenerator(UNIFORM_NAMES.PHONG_SHININESS, ZPhongShininessGenerator())
     }
 }
 

@@ -19,6 +19,16 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.max
 
+/**
+ * Represents a material component that can be applied to 3D objects for rendering.
+ *
+ * This class supports multiple material systems including Physically Based Rendering (PBR) and
+ * traditional Phong lighting models. Materials can also include textures and are automatically
+ * integrated with the shader generation system.
+ *
+ * @constructor Creates a material with the specified material data.
+ * @param data The material data containing PBR, Phong, and texture information.
+ */
 @JsExport
 @Serializable(with = ZMaterialSerializer::class)
 class ZMaterial
@@ -32,8 +42,13 @@ internal constructor(private val data: ZMaterialData):
 
     var pbr: ZPbrMaterialData? by data::pbr
 
+    var phong: ZPhongMaterialData? by data::phong
+
     val usesPbr: Boolean
         get() = pbr != null
+
+    val usesPhong: Boolean
+        get() = phong != null
 
     override fun createRenderer(ctx: ZRenderingContext): ZMaterialRenderer {
         return ZMaterialRenderer(ctx, data)
@@ -41,6 +56,47 @@ internal constructor(private val data: ZMaterialData):
 
     override fun bind() = renderer.bind()
     override fun unbind() = renderer.unbind()
+}
+
+/**
+ * Represents data describing a Phong lighting model material.
+ *
+ * These attributes are commonly used in rendering engines to achieve traditional lighting effects with
+ * ambient, diffuse, and specular components using the Blinn-Phong lighting model.
+ *
+ * @constructor Initializes a [ZPhongMaterialData] object with specified values for ambient, diffuse,
+ * specular colors and shininess factor.
+ */
+@Serializable
+@JsExport
+data class ZPhongMaterialData(
+    @ProtoNumber(1)
+    var diffuse: ZColor,
+    @ProtoNumber(2)
+    var ambient: ZColor,
+    @ProtoNumber(3)
+    var specular: ZColor,
+    @ProtoNumber(4)
+    var _shininess: Float
+) {
+    /**
+     * Controls the sharpness of specular highlights.
+     * 
+     * Range: 0.0 to 500.0
+     * - 0.0: Completely matte surface (no specular highlights)
+     * - 1-50: Matte materials (fabric, wood, plastic)
+     * - 50-200: Semi-glossy materials (ceramic, oxidized metal)
+     * - 200-500: Very glossy materials (polished metal, mirrors)
+     */
+    var shininess: Float
+        get() = _shininess
+        set(value) {
+            _shininess = value.coerceIn(0f, 500f)
+        }
+
+    init {
+        this.shininess = this._shininess
+    }
 }
 
 /**
@@ -127,6 +183,8 @@ data class ZPbrMaterialData(
 data class ZMaterialData(
     @ProtoNumber(10)
     var pbr: ZPbrMaterialData? = null,
+    @ProtoNumber(11)
+    var phong: ZPhongMaterialData? = null,
     @Contextual @ProtoNumber(100)
     var texture: ZTexture? = null
 ): ZComponentData()

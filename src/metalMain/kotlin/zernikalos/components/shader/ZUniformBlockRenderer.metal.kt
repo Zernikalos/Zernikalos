@@ -15,6 +15,7 @@ import platform.posix.memcpy
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.logger
 
 actual class ZUniformBlockRenderer actual constructor(
     ctx: ZRenderingContext,
@@ -43,6 +44,7 @@ actual class ZUniformBlockRenderer actual constructor(
 
         uniformBuffer = ctx.device.newBufferWithLength(alignedByteSize.toULong(), MTLResourceStorageModeShared)
         uniformBuffer?.label = "UniformBuffer-${data.uniformBlockName}"
+        logger.debug("Initializing uniformBlock: [(ID ${data.id})${data.uniformBlockName}] ($alignedByteSize)")
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -52,6 +54,7 @@ actual class ZUniformBlockRenderer actual constructor(
         // Memory pointer where to copy the content from uniform pinned data
         val contentPointer = uniformBuffer?.contents().rawValue
         data.value.byteArray.usePinned { pinned ->
+            logger.debugOnce("Binding uniform block [(ID ${data.id})${data.uniformBlockName}] (${data.value.byteSize}/$alignedByteSize)")
             // Dest, Src and how many bytes
             memcpy(
                 interpretCPointer<CPointed>(contentPointer),

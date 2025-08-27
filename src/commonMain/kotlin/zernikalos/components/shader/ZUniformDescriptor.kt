@@ -24,12 +24,22 @@ object UNIFORM_NAMES {
     const val PBR_EMISSIVE_INTENSITY = "PBREmissiveIntensity"
     const val PBR_METALNESS = "PBRMetalness"
     const val PBR_ROUGHNESS = "PBRRoughness"
+
+    const val PHONG_AMBIENT = "PhongAmbient"
+    const val PHONG_DIFFUSE = "PhongDiffuse"
+    const val PHONG_SPECULAR = "PhongSpecular"
+    const val PHONG_SHININESS = "PhongShininess"
 }
 
 object UNIFORM_IDS {
-    const val BLOCK_SCENE_MATRIX = 10
-    const val BLOCK_SKINNING_MATRIX = 11
-    const val BLOCK_PBR_MATERIAL = 12
+    // Blocks have different binding so they can
+    // reuse IDs
+    // TODO: On Metal there could be a clash if using same ids as attributes
+    // So taking higher numbers for the time being is required
+    const val BLOCK_SCENE_MATRIX = 14
+    const val BLOCK_SKINNING_MATRIX = 15
+    const val BLOCK_PBR_MATERIAL = 16
+    const val BLOCK_PHONG_MATERIAL = 17
 
     const val PROJECTION_MATRIX = 0
     const val VIEW_MATRIX = 1
@@ -44,6 +54,10 @@ object UNIFORM_IDS {
     const val PBR_METALNESS = 8
     const val PBR_ROUGHNESS = 9
 
+    const val PHONG_AMBIENT = 10
+    const val PHONG_DIFFUSE = 11
+    const val PHONG_SPECULAR = 12
+    const val PHONG_SHININESS = 13
 }
 
 val ZUniformProjectionMatrix: ZUniformData
@@ -96,4 +110,24 @@ val ZPbrMaterialBlock: ZUniformBlock
         UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY to ZUniformPbrEmissiveIntensity,
         UNIFORM_NAMES.PBR_METALNESS to ZUniformPbrMetalness,
         UNIFORM_NAMES.PBR_ROUGHNESS to ZUniformPbrRoughness
+    ))
+
+val ZUniformPhongAmbient: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PHONG_AMBIENT, "u_phongAmbient", 1, ZTypes.VEC4F)
+
+val ZUniformPhongDiffuse: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PHONG_DIFFUSE, "u_phongDiffuse", 1, ZTypes.VEC4F)
+
+val ZUniformPhongSpecular: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PHONG_SPECULAR, "u_phongSpecular", 1, ZTypes.VEC4F)
+
+val ZUniformPhongShininess: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.PHONG_SHININESS, "u_phongShininess", 1, ZTypes.FLOAT)
+
+val ZUniformPhongMaterialBlock: ZUniformBlock
+    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_PHONG_MATERIAL, "u_phongMaterialBlock", listOf(
+        UNIFORM_NAMES.PHONG_AMBIENT to ZUniformPhongAmbient,
+        UNIFORM_NAMES.PHONG_DIFFUSE to ZUniformPhongDiffuse,
+        UNIFORM_NAMES.PHONG_SPECULAR to ZUniformPhongSpecular,
+        UNIFORM_NAMES.PHONG_SHININESS to ZUniformPhongShininess
     ))

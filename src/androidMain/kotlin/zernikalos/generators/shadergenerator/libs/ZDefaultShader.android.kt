@@ -25,17 +25,6 @@ uniform u_sceneMatrixBlock
     } skinUniforms;
 #endif
 
-#ifdef USE_PBR_MATERIAL
-uniform u_pbrMaterialBlock
-{
-    vec4 color;
-    vec4 emissive;
-    float emissiveIntensity;
-    float metalness;
-    float roughness;
-} u_pbrMaterial;
-#endif
-
 #ifdef USE_SKINNING
     in vec4 a_boneIndices;
     in vec4 a_boneWeight;
@@ -123,6 +112,16 @@ uniform u_pbrMaterialBlock
 } u_pbrMaterial;
 #endif
 
+#ifdef USE_PHONG_MATERIAL
+uniform u_phongMaterialBlock
+{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    float shininess;
+} u_phongMaterial;
+#endif
+
 #ifdef USE_TEXTURES
     uniform sampler2D u_texture;
     smooth in vec2 v_uv;
@@ -132,88 +131,126 @@ uniform u_pbrMaterialBlock
 #endif
 out vec4 f_color;
 
-// Basic PBR calculation constants
 const float PI = 3.14159265359;
 
-// Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
-float DistributionGGX(vec3 N, vec3 H, float roughness) {
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
+#ifdef USE_PBR_MATERIAL
+    // Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
+    float DistributionGGX(vec3 N, vec3 H, float roughness) {
+        float a = roughness * roughness;
+        float a2 = a * a;
+        float NdotH = max(dot(N, H), 0.0);
+        float NdotH2 = NdotH * NdotH;
 
-    float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-    return nom / denom;
-}
+        float nom   = a2;
+        float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+        denom = PI * denom * denom;
+        return nom / denom;
+    }
 
-// Calculates the geometric obstruction of microfacets.
-float GeometrySchlickGGX(float NdotV, float roughness) {
-    float r = (roughness + 1.0);
-    float k = (r * r) / 8.0;
-    float nom = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-    return nom / denom;
-}
+    // Calculates the geometric obstruction of microfacets.
+    float GeometrySchlickGGX(float NdotV, float roughness) {
+        float r = (roughness + 1.0);
+        float k = (r * r) / 8.0;
+        float nom = NdotV;
+        float denom = NdotV * (1.0 - k) + k;
+        return nom / denom;
+    }
 
-// Calculates the geometry factor for both direct and view vectors.
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-    return ggx1 * ggx2;
-}
+    // Calculates the geometry factor for both direct and view vectors.
+    float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+        float NdotV = max(dot(N, V), 0.0);
+        float NdotL = max(dot(N, L), 0.0);
+        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+        return ggx1 * ggx2;
+    }
 
-// Calculates the Fresnel effect, which describes the ratio of reflected light.
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
+    // Calculates the Fresnel effect, which describes the ratio of reflected light.
+    vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+        return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    }
 
-vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
-    // Basic lighting properties (hardcoded for now)
-    vec3 lightPos = vec3(5.0, 5.0, 5.0);
-    vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
+    vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
+        // Basic lighting properties (hardcoded for now)
+        vec3 lightPos = vec3(5.0, 5.0, 5.0);
+        vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
 
-    // Material properties from uniform
-    vec3 albedo = u_pbrMaterial.color.rgb * baseColor.rgb;
-    float metalness = u_pbrMaterial.metalness;
-    float roughness = u_pbrMaterial.roughness;
+        // Material properties from uniform
+        vec3 albedo = u_pbrMaterial.color.rgb * baseColor.rgb;
+        float metalness = u_pbrMaterial.metalness;
+        float roughness = u_pbrMaterial.roughness;
 
-    // Vector calculations
-    vec3 N = normalize(normal);
-    vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
-    vec3 L = normalize(lightPos); // For a directional light
-    vec3 H = normalize(V + L);
+        // Vector calculations
+        vec3 N = normalize(normal);
+        vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
+        vec3 L = normalize(lightPos); // For a directional light
+        vec3 H = normalize(V + L);
 
-    // Fresnel at normal incidence (F0)
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metalness);
+        // Fresnel at normal incidence (F0)
+        vec3 F0 = vec3(0.04);
+        F0 = mix(F0, albedo, metalness);
 
-    // Cook-Torrance BRDF
-    float NDF = DistributionGGX(N, H, roughness);
-    float G = GeometrySmith(N, V, L, roughness);
-    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        // Cook-Torrance BRDF
+        float NDF = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metalness;
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metalness;
 
-    vec3 numerator = NDF * G * F;
-    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // Add epsilon to avoid division by zero
-    vec3 specular = numerator / denominator;
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // Add epsilon to avoid division by zero
+        vec3 specular = numerator / denominator;
 
-    // Add light contribution
-    float NdotL = max(dot(N, L), 0.0);
-    vec3 Lo = (kD * albedo / PI + specular) * lightColor * NdotL;
+        // Add light contribution
+        float NdotL = max(dot(N, L), 0.0);
+        vec3 Lo = (kD * albedo / PI + specular) * lightColor * NdotL;
 
-    // Ambient light (a simple approximation)
-    vec3 ambient = vec3(0.03) * albedo;
-    vec3 color = ambient + Lo;
+        // Ambient light (a simple approximation)
+        vec3 ambient = vec3(0.03) * albedo;
+        vec3 color = ambient + Lo;
 
-    return color;
-}
+        return color;
+    }
+#endif
+
+#ifdef USE_PHONG_MATERIAL
+    // Blinn-Phong lighting calculation
+    vec3 calculateBlinnPhongColor(vec4 baseColor, vec3 normal) {
+        // Basic lighting properties (hardcoded for now)
+        vec3 lightPos = vec3(5.0, -5.0, 5.0);
+        vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
+
+        // Material properties from uniform
+        vec3 ambient = u_phongMaterial.ambient.rgb;
+        vec3 diffuse = u_phongMaterial.diffuse.rgb * baseColor.rgb;
+        vec3 specular = u_phongMaterial.specular.rgb;
+        float shininess = u_phongMaterial.shininess;
+
+        // Vector calculations
+        vec3 N = normalize(normal);
+        vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
+        vec3 L = normalize(lightPos); // For a directional light
+        vec3 H = normalize(V + L); // Halfway vector for Blinn-Phong
+
+        // Ambient component
+        vec3 ambientComponent = ambient * baseColor.rgb;
+
+        // Diffuse component
+        float NdotL = max(dot(N, L), 0.0);
+        vec3 diffuseComponent = diffuse * lightColor * NdotL;
+
+        // Specular component (Blinn-Phong)
+        float NdotH = max(dot(N, H), 0.0);
+        vec3 specularComponent = specular * lightColor * pow(NdotH, shininess);
+
+        // Combine all components
+        vec3 finalColor = ambientComponent + diffuseComponent + specularComponent;
+        
+        return finalColor;
+    }
+#endif
 
 void main() {
     vec4 baseColor = vec4(1.0);
@@ -239,6 +276,13 @@ void main() {
         finalColor = finalColor / (finalColor + vec3(1.0));
         finalColor = pow(finalColor, vec3(1.0/2.2));
         f_color = vec4(finalColor, baseColor.a);
+    #elif defined(USE_PHONG_MATERIAL)
+        #if defined(USE_NORMALS)
+            vec3 phongColor = calculateBlinnPhongColor(baseColor, v_normal);
+            f_color = vec4(phongColor, baseColor.a);
+        #else
+            f_color = baseColor;
+        #endif
     #else
         f_color = baseColor;
     #endif

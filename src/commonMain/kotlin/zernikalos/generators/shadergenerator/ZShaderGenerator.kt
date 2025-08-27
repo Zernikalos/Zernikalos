@@ -59,6 +59,9 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         if (params.usePbrMaterial) {
             shaderProgram.addUniformBlock("PbrMaterial", ZPbrMaterialBlock)
         }
+        if (params.usePhongMaterial) {
+            shaderProgram.addUniformBlock("PhongMaterial", ZUniformPhongMaterialBlock)
+        }
     }
 
     /**
