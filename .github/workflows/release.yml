@@ -1,10 +1,9 @@
-name: Zernikalos Release
+name: Zernikalos Build and Release
 
 on:
-  workflow_run:
-    workflows: ["Zernikalos Build"]
-    types:
-      - completed
+  push:
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 
 permissions:
@@ -13,91 +12,83 @@ permissions:
   actions: read
 
 jobs:
-  publish-android:
-    name: Publish Android artifacts
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+  build-and-publish-android:
+    name: Build and Publish Android artifacts
     runs-on: ubuntu-latest
     container:
       image: mobiledevops/android-sdk-image:34.0.0
       options: -u root
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
       GITHUB_ACTOR: ${{ github.actor }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: Verify build workflow
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle
+          key: gradle-${{ github.ref }}
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Verify build output
         run: |
-          echo "Build workflow ID: ${{ github.event.workflow_run.id }}"
-          echo "Build conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Build status: ${{ github.event.workflow_run.status }}"
-          echo "Current workflow run ID: ${{ github.run_id }}"
-          echo "Current job ID: ${{ github.job }}"
-          echo "Event type: ${{ github.event_name }}"
-          
-      - name: Wait for artifacts
-        run: sleep 5
-        
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+          echo "Current directory: $(pwd)"
+          echo "Build directory contents:"
+          ls -la build/ || echo "Build directory does not exist!"
+          echo "Gradle build status: $?"
+
+      - name: Publish Android Debug
+        run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
+               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+
+      - name: Publish Android Release
+        run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
+               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+
+      - name: Upload build artifacts for JS job
+        uses: actions/upload-artifact@v4
         with:
           name: build-dir
           path: build
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
-               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
-      - run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
-               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+          retention-days: 1
 
   publish-js:
     name: Publish JS package
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    needs: build-and-publish-android
     runs-on: ubuntu-latest
     container:
       image: node:22-alpine
       options: -u root
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
-      - name: Verify build workflow
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+          key: deps-${{ github.ref }}
+
+      - name: Setup npm registry
         run: |
-          echo "Build workflow ID: ${{ github.event.workflow_run.id }}"
-          echo "Build conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Build status: ${{ github.event.workflow_run.status }}"
-          
-      - name: Wait for artifacts
-        run: sleep 5
-        
-      - name: Download build artifacts
+          npm config set registry https://npm.pkg.github.com/
+
+      - name: Download build artifacts from Android job
         uses: actions/download-artifact@v4
         with:
           name: build-dir
           path: build
-          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Cache node_modules & Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            .gradle
-            node_modules
-          key: deps-${{ github.ref }}
-
-      - name: Prepare npm
-        run: |
-          npm install -g npm
-          npm config set registry https://npm.pkg.github.com/
-          npm config set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
-
-      - name: Publish
+      - name: Publish JS package
         working-directory: build/js
         run: npm publish --workspace=@zernikalos/zernikalos
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
