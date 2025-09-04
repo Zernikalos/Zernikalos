@@ -9,7 +9,6 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import zernikalos.components.ZViewport
 import zernikalos.context.ZContext
 import kotlin.js.JsExport
@@ -20,7 +19,6 @@ class ZScene(): ZObject() {
 
     override val type = ZObjectType.SCENE
 
-    @Transient
     var viewport: ZViewport = ZViewport()
 
     override fun internalInitialize(ctx: ZContext) {

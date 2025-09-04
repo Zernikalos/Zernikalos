@@ -14,15 +14,13 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
 import zernikalos.action.ZSkeletalAction
-import zernikalos.components.material.ZMaterial
-import zernikalos.components.material.ZMaterialSerializer
 import zernikalos.components.material.ZTexture
 import zernikalos.components.material.ZTextureSerializer
 import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
-private fun createSerializersModule(): ProtoBuf {
+fun createZerializerModule(): SerializersModule {
     val loaderContext = ZLoaderContext()
 
     @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
@@ -40,6 +38,12 @@ private fun createSerializersModule(): ProtoBuf {
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
     }
+
+    return zObjectModule
+}
+
+private fun createProtoSerializersModule(): ProtoBuf {
+    val zObjectModule = createZerializerModule()
 
     val protoFormat = ProtoBuf {
         serializersModule = zObjectModule
@@ -68,7 +72,7 @@ data class ZKo(
  */
 @JsExport
 fun loadFromProto(byteArray: ByteArray): ZKo {
-    val protoFormat = createSerializersModule()
+    val protoFormat = createProtoSerializersModule()
     val zkoFormat = protoFormat.decodeFromByteArray(ZkoFormat.serializer(), byteArray)
     val header = zkoFormat.header
     val obj = ZkoHierarchyNode.transformHierarchy(zkoFormat.hierarchy, zkoFormat.objects)
