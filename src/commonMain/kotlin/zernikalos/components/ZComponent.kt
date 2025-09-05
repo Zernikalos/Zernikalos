@@ -84,12 +84,64 @@ interface ZComponent: ZRef {
 }
 
 /**
+ * Mixin interface for components that can be rendered.
+ *
+ * This interface provides the contract for rendering capabilities, allowing
+ * components to expose their renderer and rendering state. It is designed
+ * to be used as a mixin to add rendering functionality to components.
+ *
+ * @param R The type of the renderer associated with this component. It must inherit
+ *          from ZComponentRenderer.
+ */
+interface ZRenderizableMixin<R: ZComponentRenderer> {
+    /**
+     * Indicates whether this component is renderizable.
+     */
+    val isRenderizable: Boolean
+
+    /**
+     * Provides access to the component's renderer.
+     *
+     * @return The renderer instance for this component.
+     * @throws Error if the component has not been initialized.
+     */
+    val renderer: R
+
+    /**
+     * Creates a new renderer instance for this component.
+     *
+     * @param ctx The rendering context used for renderer creation.
+     * @return A new renderer instance.
+     */
+    fun createRenderer(ctx: ZRenderingContext): R
+}
+
+/**
+ * Mixin interface for components that can be serialized.
+ *
+ * This interface provides the contract for serialization capabilities, allowing
+ * components to expose their data for serialization and deserialization operations.
+ *
+ * @param D The type of the data associated with this component. It must inherit
+ *          from ZComponentData.
+ */
+interface ZSerializableMixin<D: ZComponentData> {
+    /**
+     * Provides access to the component's serializable data.
+     *
+     * @return The data instance for this component.
+     */
+    val data: D
+}
+
+/**
  * Represents the base class for components in the Zernikalos Engine.
  *
  * This abstract class provides foundational properties and methods for
  * components, including initialization, unique identification, and
  * extendable internal initialization logic. It serves as a common ancestor
- * for both renderizable and non-renderizable components.
+ * for all component types and implements a capability-based system to avoid
+ * code duplication.
  */
 abstract class ZBaseComponent(): ZComponent, ZLoggable {
 
@@ -100,10 +152,39 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
             return uuid.toString()
         }
 
+    /**
+     * Sets the UUID for this component.
+     * This method is used internally by mixins to synchronize UUIDs.
+     * 
+     * @param newUuid The UUID to set for this component.
+     */
+    internal fun setUuid(newUuid: Uuid?) {
+        uuid = newUuid
+    }
+
     private var initialized: Boolean = false
     final override val isInitialized: Boolean
         get() = initialized
 
+    // Capability flags
+    private var _isRenderizable: Boolean = false
+    private var _isSerializable: Boolean = false
+    
+    final override val isRenderizable: Boolean
+        get() = _isRenderizable
+    
+    /**
+     * Indicates whether this component can be serialized.
+     * 
+     * @return true if the component supports serialization, false otherwise.
+     */
+    val isSerializable: Boolean
+        get() = _isSerializable
+
+    /**
+     * Sets up the initialization state of the component.
+     * This method ensures that initialization only occurs once.
+     */
     protected fun setupInitialize() {
         if (initialized) {
             return
@@ -116,16 +197,67 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
         internalInitialize(ctx)
     }
 
+    /**
+     * Internal initialization method that can be overridden by subclasses
+     * to provide custom initialization logic.
+     *
+     * @param ctx The ZRenderingContext used for initialization.
+     */
     protected open fun internalInitialize(ctx: ZRenderingContext) {
 
     }
 
+    /**
+     * Flags this component as renderizable.
+     * This method should be called during component construction to indicate
+     * that the component supports rendering operations.
+     */
+    protected fun flagAsRenderizable() {
+        _isRenderizable = true
+    }
+
+    /**
+     * Flags this component as serializable.
+     * This method should be called during component construction to indicate
+     * that the component supports serialization operations.
+     */
+    protected fun flagAsSerializable() {
+        _isSerializable = true
+    }
 }
 
-abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): ZBaseComponent() {
-    override val isRenderizable: Boolean = false
-    init {
-        uuid = data.uuid
+/**
+ * Implementation of the ZRenderizableMixin interface that handles
+ * renderer creation and management for components.
+ *
+ * This class encapsulates the rendering logic and provides a clean
+ * separation of concerns, allowing components to delegate rendering
+ * responsibilities without code duplication.
+ *
+ * @param R The type of the renderer associated with this component.
+ * @param component The base component that owns this renderable implementation.
+ * @param rendererFactory A factory function that creates renderer instances.
+ */
+class ZRenderizableImpl<R: ZComponentRenderer>(
+    private val component: ZBaseComponent,
+    private val rendererFactory: (ZRenderingContext) -> R
+): ZRenderizableMixin<R> {
+
+    override val isRenderizable: Boolean = true
+    private var _renderer: R? = null
+
+    override val renderer: R
+        get() {
+            if (!component.isInitialized || !isRenderizable) {
+                throw Error("The component has not been initialized prior to access the renderer")
+            }
+            return _renderer!!
+        }
+
+    override fun createRenderer(ctx: ZRenderingContext): R {
+        _renderer = rendererFactory(ctx)
+        _renderer?.initialize()
+        return _renderer!!
     }
 }
 
@@ -135,31 +267,156 @@ abstract class ZSerializableComponent<D: ZComponentData>(internal val data: D): 
  *
  * Classes inheriting from this component must define how to create their specific
  * renderer type and implement its rendering logic using a provided rendering context.
+ * This component uses the ZRenderizableImpl mixin to avoid code duplication.
  *
  * @param R The type of the renderer associated with this component. It must inherit
  *          from ZComponentRenderer.
  */
 abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent() {
-    override val isRenderizable: Boolean = true
 
-    private var _renderer: R? = null
-    val renderer: R
-        get() {
-            if (!isInitialized || !isRenderizable) {
-                throw Error("The component has not been initialized prior to access the renderer")
-            }
-            return _renderer!!
-        }
+    private val renderizableImpl = ZRenderizableImpl(this) { createRenderer(it) }
 
-    override fun initialize(ctx: ZRenderingContext) {
-        setupInitialize()
-        if (isRenderizable) {
-            _renderer = createRenderer(ctx)
-            _renderer?.initialize()
-        }
-        internalInitialize(ctx)
+    init {
+        flagAsRenderizable()
     }
 
+    /**
+     * Provides access to the component's renderer.
+     *
+     * @return The renderer instance for this component.
+     * @throws Error if the component has not been initialized.
+     */
+    val renderer: R
+        get() = renderizableImpl.renderer
+
+    override fun initialize(ctx: ZRenderingContext) {
+        super.initialize(ctx)
+        if (isRenderizable) {
+            renderizableImpl.createRenderer(ctx)
+        }
+    }
+
+    /**
+     * Creates a new renderer instance for this component.
+     *
+     * @param ctx The rendering context used for renderer creation.
+     * @return A new renderer instance.
+     */
+    abstract fun createRenderer(ctx: ZRenderingContext): R
+}
+
+/**
+ * Implementation of the ZSerializableMixin interface that handles
+ * data management for serializable components.
+ *
+ * This class encapsulates the serialization logic and provides a clean
+ * separation of concerns, allowing components to delegate serialization
+ * responsibilities without code duplication.
+ *
+ * @param D The type of the data associated with this component.
+ * @param component The base component that owns this serializable implementation.
+ * @param data The data instance for this component.
+ */
+class ZSerializableImpl<D: ZComponentData>(
+    private val component: ZBaseComponent,
+    override val data: D
+): ZSerializableMixin<D> {
+    
+    init {
+        component.setUuid(data.uuid)
+    }
+}
+
+/**
+ * Represents an abstract component in the Zernikalos Engine that can be serialized,
+ * meaning it contains data that can be persisted and restored.
+ *
+ * Classes inheriting from this component must provide a data object that contains
+ * the serializable information. The component uses the ZSerializableImpl mixin
+ * to avoid code duplication.
+ *
+ * @param D The type of the data associated with this component. It must inherit
+ *          from ZComponentData.
+ */
+abstract class ZSerializableComponent<D: ZComponentData>(
+    data: D
+): ZBaseComponent() {
+    
+    private val serializableImpl = ZSerializableImpl(this, data)
+    
+    init {
+        flagAsSerializable()
+    }
+    
+    /**
+     * Provides access to the component's serializable data.
+     * 
+     * @return The data instance for this component.
+     */
+    val data: D
+        get() = serializableImpl.data
+}
+
+/**
+ * Represents an abstract component in the Zernikalos Engine that combines both
+ * rendering and serialization capabilities.
+ *
+ * This component can be both rendered on screen and serialized to persistent storage,
+ * making it ideal for complex objects that need to maintain their visual state
+ * across application sessions. The component uses both ZRenderizableImpl and
+ * ZSerializableImpl mixins to handle rendering and serialization logic without
+ * code duplication.
+ *
+ * Classes inheriting from this component must define how to create their specific
+ * renderer type and provide serializable data.
+ *
+ * @param D The type of the data associated with this component. It must inherit
+ *          from ZComponentData.
+ * @param R The type of the renderer associated with this component. It must inherit
+ *          from ZComponentRenderer.
+ */
+abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
+    data: D
+): ZBaseComponent() {
+    
+    private val renderizableImpl = ZRenderizableImpl(this) { createRenderer(it) }
+    private val serializableImpl = ZSerializableImpl(this, data)
+    
+    init {
+        flagAsRenderizable()
+        flagAsSerializable()
+    }
+
+    /**
+     * Provides access to the component's renderer.
+     * 
+     * @return The renderer instance for this component.
+     * @throws Error if the component has not been initialized.
+     */
+    val renderer: R
+        get() = renderizableImpl.renderer
+
+    /**
+     * Provides access to the component's serializable data.
+     * 
+     * @return The data instance for this component.
+     */
+    val data: D
+        get() = serializableImpl.data
+
+    override fun initialize(ctx: ZRenderingContext) {
+        super.initialize(ctx)
+        if (isRenderizable) {
+            renderizableImpl.createRenderer(ctx)
+        }
+    }
+
+    /**
+     * Creates a new renderer instance for this component.
+     * 
+     * @param ctx The rendering context used for renderer creation.
+     * @return A new renderer instance.
+     */
     abstract fun createRenderer(ctx: ZRenderingContext): R
 }
 
@@ -229,16 +486,36 @@ internal constructor(protected val ctx: ZRenderingContext): ZLoggable {
  * SERIALIZATION SECTION
  */
 
+/**
+ * Abstract base class for serializing ZComponent instances.
+ *
+ * This class provides a framework for converting components to and from
+ * serialized data formats. It handles the serialization logic for both
+ * ZSerializableComponent and ZOmniComponent instances, ensuring proper
+ * data persistence and restoration.
+ *
+ * @param T The type of the component being serialized. Must inherit from ZComponent.
+ * @param D The type of the data associated with the component.
+ */
 abstract class ZComponentSerializer<
     T: ZComponent,
     D: Any>
     : KSerializer<T> {
 
+    /**
+     * The serializer for the data type associated with this component.
+     */
     abstract val kSerializer: KSerializer<D>
 
     override val descriptor: SerialDescriptor
         get() = kSerializer.descriptor
 
+    /**
+     * Creates a component instance from the provided data.
+     *
+     * @param data The data to create the component from.
+     * @return A new component instance.
+     */
     protected abstract fun createComponentInstance(data: D): T
 
     override fun deserialize(decoder: Decoder): T {
@@ -247,9 +524,18 @@ abstract class ZComponentSerializer<
     }
 
     override fun serialize(encoder: Encoder, value: T) {
+        if (!(value as ZBaseComponent).isSerializable) {
+            throw Error("Component does not support serialization")
+        }
+        
         @Suppress("UNCHECKED_CAST")
-        value as ZSerializableComponent<D>
-        return encoder.encodeSerializableValue(kSerializer, value.data)
+        val data = when (value) {
+            is ZSerializableComponent<*> -> value.data
+            is ZOmniComponent<*, *> -> value.data
+            else -> throw Error("Component does not support serialization")
+        } as D
+        
+        encoder.encodeSerializableValue(kSerializer, data)
     }
 
 }
