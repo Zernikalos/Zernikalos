@@ -8,6 +8,7 @@
 
 package zernikalos.math
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -22,12 +23,15 @@ class ZTransform() {
     private val _matrix: ZMatrix4 = ZMatrix4.Identity
 
     @ProtoNumber(1)
+    @SerialName("position")
     private val _position: ZVector3 = ZVector3.Zero
 
     @ProtoNumber(2)
+    @SerialName("rotation")
     private val _rotation: ZQuaternion = ZQuaternion.Identity
 
     @ProtoNumber(3)
+    @SerialName("scale")
     private val _scale: ZVector3 = ZVector3.Ones
 
     @Transient

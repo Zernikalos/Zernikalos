@@ -9,6 +9,7 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -53,29 +54,28 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     override val refId: String = genRefId()
 
     @ProtoNumber(2)
-    private var _name: String = ""
-
-    var name: String
+    @SerialName("name")
+    var name: String = ""
         get() {
-            if (_name == "") {
-                return "${type.name.lowercase()}_${refId.substring(0, 6)}"
+            if (field.isBlank() || field.isEmpty()) {
+                field = "${type.name.lowercase()}_${refId.substring(0, 6)}"
             }
-            return _name
+            return field
         }
         set(value) {
-            _name = value
+            field = value
         }
 
     @ProtoNumber(3)
     var transform: ZTransform = ZTransform()
 
-    @Transient
     override var children: Array<@Polymorphic ZObject>
         get() = _children.toTypedArray()
         set(value) {
             _children = arrayListOf(*value)
         }
 
+    @Transient
     private var _children: ArrayList<ZObject> = arrayListOf()
 
     abstract val type: ZObjectType

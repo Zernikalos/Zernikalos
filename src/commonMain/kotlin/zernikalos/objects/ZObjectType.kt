@@ -8,9 +8,11 @@
 
 package zernikalos.objects
 
+import kotlinx.serialization.Serializable
 import kotlin.js.JsExport
 
 @JsExport
+@Serializable
 enum class ZObjectType {
     SCENE,
     MODEL,
