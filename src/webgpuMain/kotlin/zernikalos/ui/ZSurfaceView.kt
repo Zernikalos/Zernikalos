@@ -11,6 +11,10 @@ package zernikalos.ui
 import kotlinx.browser.window
 import org.w3c.dom.HTMLCanvasElement
 
+external class ResizeObserver(callback: (Array<dynamic>) -> Unit) {
+    fun observe(target: dynamic)
+}
+
 @JsExport
 @ExperimentalJsExport
 class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
@@ -29,9 +33,34 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         get() = canvas.height
 
     init {
-        canvas.onresize = { _ ->
-            eventHandler?.onResize(surfaceWidth, surfaceHeight)
+        var pendingResize = false
+
+        val resizeObserver = ResizeObserver { entries ->
+            for (entry in entries) {
+                if (entry.target == canvas) {
+                    window.requestAnimationFrame {
+                        try {
+                            val contentRect = entry.contentRect
+                            val dpr = window.devicePixelRatio
+
+                            val width: Int = (contentRect.width as Double * dpr).toInt()
+                            val height: Int = (contentRect.height as Double * dpr).toInt()
+
+                            canvas.width = width
+                            canvas.height = height
+
+                            // canvas.style.width = "${contentRect.width}px"
+                            // canvas.style.height = "${contentRect.height}px"
+
+                            eventHandler?.onResize(width, height)
+                        } finally {
+                        }
+                    }
+                }
+            }
         }
+
+        resizeObserver.observe(canvas)
     }
 
     private fun onReady() {
