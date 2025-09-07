@@ -28,15 +28,16 @@ class VersionManager(BaseScript):
         print()
         self.print_warning("This will:")
         print(f"  1. Update VERSION.txt to {version}")
-        print("  2. Generate version constants")
-        print("  3. Create release commit")
-        print(f"  4. Create git tag v{version}")
+        print("  2. Upgrade Kotlin package lock")
+        print("  3. Generate version constants")
+        print("  4. Create release commit")
+        print(f"  5. Create git tag v{version}")
         
         if no_push:
-            print("  5. [SKIP] Push changes (--no-push flag detected)")
+            print("  6. [SKIP] Push changes (--no-push flag detected)")
             self.print_warning("This is a LOCAL release only. No CI/CD will be triggered.")
         else:
-            print("  5. Push changes and tag to trigger CI/CD")
+            print("  6. Push changes and tag to trigger CI/CD")
         print()
         
         return self.confirm_action("Proceed with release?", default=False)
@@ -50,12 +51,17 @@ class VersionManager(BaseScript):
         if not self.run_gradle_command('setVersion', f'-PnewVersion={version}'):
             return False
         
-        # Step 2: Generate version files
+        # Step 2: Upgrade Kotlin package lock (fixes common lock file issues)
+        self.print_status("Upgrading Kotlin package lock...")
+        if not self.run_gradle_command('kotlinUpgradePackageLock'):
+            return False
+        
+        # Step 3: Generate version files
         self.print_status("Generating version-dependent files...")
         if not self.run_gradle_command('updateVersion'):
             return False
         
-        # Step 3: Create release commit and tag
+        # Step 4: Create release commit and tag
         self.print_status("Creating release commit and tag...")
         if not self.run_gradle_command('releaseCommit'):
             return False
