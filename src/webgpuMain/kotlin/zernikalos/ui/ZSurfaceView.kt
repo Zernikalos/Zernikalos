@@ -9,10 +9,17 @@
 package zernikalos.ui
 
 import kotlinx.browser.window
+import org.w3c.dom.DOMRectReadOnly
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 
 external class ResizeObserver(callback: (Array<dynamic>) -> Unit) {
-    fun observe(target: dynamic)
+    fun observe(target: Element)
+}
+
+external class ResizeObserverEntry {
+    val target: Element
+    val contentRect: DOMRectReadOnly
 }
 
 @JsExport
@@ -32,34 +39,37 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
     override val surfaceHeight: Int
         get() = canvas.height
 
+    private var pendingResize = false
+    private val resizeObserver = ResizeObserver { entries ->
+        handleResize(entries)
+    }
+
     init {
-        var pendingResize = false
+        resizeObserver.observe(canvas)
+    }
 
-        val resizeObserver = ResizeObserver { entries ->
-            for (entry in entries) {
-                if (entry.target == canvas && !pendingResize) {
-                    pendingResize = true
-                    window.requestAnimationFrame {
-                        try {
-                            val contentRect = entry.contentRect
-                            val dpr = window.devicePixelRatio
+    private fun handleResize(entries: Array<ResizeObserverEntry>) {
+        for (entry in entries) {
+            if (entry.target == canvas && !pendingResize) {
+                pendingResize = true
+                window.requestAnimationFrame {
+                    try {
+                        val contentRect = entry.contentRect
+                        val dpr = window.devicePixelRatio
 
-                            val width: Int = (contentRect.width as Double * dpr).toInt()
-                            val height: Int = (contentRect.height as Double * dpr).toInt()
+                        val width: Int = (contentRect.width as Double * dpr).toInt()
+                        val height: Int = (contentRect.height as Double * dpr).toInt()
 
-                            canvas.width = width
-                            canvas.height = height
+                        canvas.width = width
+                        canvas.height = height
 
-                            eventHandler?.onResize(width, height)
-                        } finally {
-                            pendingResize = false
-                        }
+                        eventHandler?.onResize(width, height)
+                    } finally {
+                        pendingResize = false
                     }
                 }
             }
         }
-
-        resizeObserver.observe(canvas)
     }
 
     private fun onReady() {
