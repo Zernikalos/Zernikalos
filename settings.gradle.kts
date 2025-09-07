@@ -7,7 +7,7 @@
  */
 
 rootProject.name = "zernikalos"
-include(":zernikalos")
+//include(":zernikalos")
 
 pluginManagement {
     repositories {

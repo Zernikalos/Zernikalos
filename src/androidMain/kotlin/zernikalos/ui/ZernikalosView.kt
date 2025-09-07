@@ -4,7 +4,7 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 
-class ZernikalosView: GLSurfaceView, ZSurfaceView {
+open class ZernikalosView: GLSurfaceView, ZSurfaceView {
 
     private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
 

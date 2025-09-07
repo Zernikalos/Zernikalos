@@ -10,11 +10,14 @@ package zernikalos.context
 
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
+import zernikalos.utils.genRefId
 import kotlin.js.JsExport
 
 // TODO: sceneContext and renderingContext must be internal
 @JsExport
 class ZContext(val sceneContext: ZSceneContext, val renderingContext: ZRenderingContext) {
+
+    val refId: String = genRefId()
 
     var screenWidth: Int = 0
     var screenHeight: Int = 0
