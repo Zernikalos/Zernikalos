@@ -9,18 +9,29 @@ Combined script for publishing all Zernikalos artifacts
 import os
 import sys
 import argparse
-import getpass
 from pathlib import Path
 from typing import Optional, List, Tuple
+from common import BaseScript, add_common_arguments
 
 # Import the publish functions from other scripts
 try:
-    from publish_npm import run_npm_publish
-    from publish_android import run_android_publish
+    import importlib.util
+    scripts_dir = Path(__file__).parent
+    
+    # Load publish-npm module
+    npm_spec = importlib.util.spec_from_file_location("publish_npm", scripts_dir / "publish-npm.py")
+    npm_module = importlib.util.module_from_spec(npm_spec)
+    npm_spec.loader.exec_module(npm_module)
+    run_npm_publish = npm_module.run_npm_publish
+    
+    # Load publish-android module
+    android_spec = importlib.util.spec_from_file_location("publish_android", scripts_dir / "publish-android.py")
+    android_module = importlib.util.module_from_spec(android_spec)
+    android_spec.loader.exec_module(android_module)
+    run_android_publish = android_module.run_android_publish
+    
 except ImportError:
     # Fallback if direct import fails (when running from different directory)
-    import importlib.util
-    
     def load_module_from_path(script_path: str):
         """Load a Python module from a file path"""
         spec = importlib.util.spec_from_file_location("module", script_path)
@@ -38,80 +49,11 @@ except ImportError:
     run_npm_publish, run_android_publish = get_publish_functions()
 
 
-class Colors:
-    """ANSI color codes for terminal output"""
-    RED = '\033[0;31m'
-    GREEN = '\033[0;32m'
-    YELLOW = '\033[1;33m'
-    BLUE = '\033[0;34m'
-    NC = '\033[0m'  # No Color
-
-
-class AllPublisher:
+class AllPublisher(BaseScript):
     """Main class for publishing all Zernikalos artifacts"""
     
     def __init__(self):
-        self.github_user = os.environ.get('GITHUB_ACTOR') or os.environ.get('GITHUB_USER', 'Zernikalos')
-        self.github_token = os.environ.get('GITHUB_TOKEN')
-        self.project_root = Path.cwd()
-        
-    def print_status(self, message: str):
-        """Print status message with blue color"""
-        print(f"{Colors.BLUE}[INFO]{Colors.NC} {message}")
-        
-    def print_success(self, message: str):
-        """Print success message with green color"""
-        print(f"{Colors.GREEN}[SUCCESS]{Colors.NC} {message}")
-        
-    def print_warning(self, message: str):
-        """Print warning message with yellow color"""
-        print(f"{Colors.YELLOW}[WARNING]{Colors.NC} {message}")
-        
-    def print_error(self, message: str):
-        """Print error message with red color"""
-        print(f"{Colors.RED}[ERROR]{Colors.NC} {message}")
-        
-    def print_header(self, message: str):
-        """Print header message with emphasis"""
-        print(f"\n{Colors.BLUE}{'='*60}{Colors.NC}")
-        print(f"{Colors.BLUE}{message:^60}{Colors.NC}")
-        print(f"{Colors.BLUE}{'='*60}{Colors.NC}")
-        
-    def check_directory(self) -> bool:
-        """Check if we're in the right directory"""
-        if not (self.project_root / "build.gradle.kts").exists():
-            self.print_error("This script must be run from the Zernikalos project root directory")
-            return False
-        return True
-        
-    def get_github_credentials(self) -> bool:
-        """Get GitHub credentials from various sources"""
-        # Check if credentials are already set
-        if self.github_user and self.github_token:
-            self.print_success("Using credentials from environment variables")
-            return True
-            
-        # Set default user if not provided
-        if not self.github_user:
-            self.github_user = "Zernikalos"
-            self.print_status(f"Using default GitHub organization: {self.github_user}")
-            
-        # Prompt for token if not provided
-        if not self.github_token:
-            self.print_status("GitHub credentials required for publishing")
-            self.print_status(f"Organization: {self.github_user} (default)")
-            
-            try:
-                self.github_token = getpass.getpass("Enter GitHub access token: ")
-                if not self.github_token:
-                    self.print_error("GitHub access token is required")
-                    return False
-            except KeyboardInterrupt:
-                print()
-                self.print_error("Operation cancelled by user")
-                return False
-                
-        return True
+        super().__init__("Zernikalos All Publisher")
         
     def publish_npm_packages(self) -> bool:
         """Publish NPM packages using the publish-npm.py script"""
@@ -250,6 +192,9 @@ class AllPublisher:
         
     def run(self, args):
         """Main execution method"""
+        # Set credentials from command line if provided
+        self.set_credentials_from_args(args)
+        
         # Check prerequisites
         if not self.check_directory():
             return 1
@@ -344,20 +289,14 @@ Published artifacts:
                        help='Publish Android artifacts only')
     parser.add_argument('--all', action='store_true',
                        help='Publish all artifacts (NPM + Android)')
-    parser.add_argument('-u', '--user', 
-                       help='GitHub organization/user')
-    parser.add_argument('-t', '--token',
-                       help='GitHub access token')
+    
+    # Add common arguments
+    add_common_arguments(parser)
     
     args = parser.parse_args()
     
-    # Set credentials from command line if provided
+    # Create publisher and run
     publisher = AllPublisher()
-    if args.user:
-        publisher.github_user = args.user
-    if args.token:
-        publisher.github_token = args.token
-        
     return publisher.run(args)
 
 
