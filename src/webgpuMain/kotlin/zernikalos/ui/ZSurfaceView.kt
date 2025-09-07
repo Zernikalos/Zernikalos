@@ -9,13 +9,42 @@
 package zernikalos.ui
 
 import kotlinx.browser.window
+import org.w3c.dom.DOMRectReadOnly
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 
+external class ResizeObserver(callback: (Array<dynamic>) -> Unit) {
+    fun observe(target: Element)
+}
+
+external class ResizeObserverEntry {
+    val target: Element
+    val contentRect: DOMRectReadOnly
+}
+
+/**
+ * JavaScript implementation of ZSurfaceView for WebGPU rendering.
+ * 
+ * This class provides a surface view that automatically handles canvas resizing
+ * using ResizeObserver and maintains proper aspect ratio and device pixel ratio.
+ * 
+ * @param canvas The HTML canvas element to render to
+ * 
+ * @see ZSurfaceView
+ */
 @JsExport
 @ExperimentalJsExport
 class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
 
+    /**
+     * Internal event handler storage
+     */
     var _eventHandler: ZSurfaceViewEventHandler? = null
+    
+    /**
+     * Event handler for surface view events (ready, resize, render).
+     * When set, automatically calls onReady() to initialize the surface.
+     */
     override var eventHandler: ZSurfaceViewEventHandler?
         get() = _eventHandler
         set(value) {
@@ -23,23 +52,79 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
             onReady()
         }
 
+    /**
+     * Current surface width in pixels
+     */
     override val surfaceWidth: Int
         get() = canvas.width
+        
+    /**
+     * Current surface height in pixels
+     */
     override val surfaceHeight: Int
         get() = canvas.height
 
+    /**
+     * Flag to prevent multiple resize events from being processed simultaneously
+     */
+    private var pendingResize = false
+    
+    /**
+     * ResizeObserver instance that monitors canvas size changes
+     */
+    private val resizeObserver = ResizeObserver { entries ->
+        handleResize(entries)
+    }
+
     init {
-        canvas.onresize = { _ ->
-            eventHandler?.onResize(surfaceWidth, surfaceHeight)
+        resizeObserver.observe(canvas)
+    }
+
+    /**
+     * Handles resize events from ResizeObserver.
+     * Updates canvas dimensions with proper device pixel ratio scaling
+     * and notifies the event handler.
+     * 
+     * @param entries Array of ResizeObserverEntry objects containing resize information
+     */
+    private fun handleResize(entries: Array<ResizeObserverEntry>) {
+        for (entry in entries) {
+            if (entry.target == canvas && !pendingResize) {
+                pendingResize = true
+                window.requestAnimationFrame {
+                    try {
+                        val contentRect = entry.contentRect
+                        val dpr = window.devicePixelRatio
+
+                        val width: Int = (contentRect.width as Double * dpr).toInt()
+                        val height: Int = (contentRect.height as Double * dpr).toInt()
+
+                        canvas.width = width
+                        canvas.height = height
+
+                        eventHandler?.onResize(width, height)
+                    } finally {
+                        pendingResize = false
+                    }
+                }
+            }
         }
     }
 
+    /**
+     * Initializes the surface view when an event handler is set.
+     * Calls onReady() and onResize() on the event handler, then starts the render loop.
+     */
     private fun onReady() {
         eventHandler?.onReady()
         eventHandler?.onResize(surfaceWidth, surfaceHeight)
         renderLoop()
     }
 
+    /**
+     * Starts the render loop at 60 FPS.
+     * Calls the event handler's onRender() method on each frame.
+     */
     private fun renderLoop() {
         window.setInterval({eventHandler?.onRender()}, 1000/60)
     }
