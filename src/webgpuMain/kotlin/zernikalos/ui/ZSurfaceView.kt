@@ -22,11 +22,29 @@ external class ResizeObserverEntry {
     val contentRect: DOMRectReadOnly
 }
 
+/**
+ * JavaScript implementation of ZSurfaceView for WebGPU rendering.
+ * 
+ * This class provides a surface view that automatically handles canvas resizing
+ * using ResizeObserver and maintains proper aspect ratio and device pixel ratio.
+ * 
+ * @param canvas The HTML canvas element to render to
+ * 
+ * @see ZSurfaceView
+ */
 @JsExport
 @ExperimentalJsExport
 class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
 
+    /**
+     * Internal event handler storage
+     */
     var _eventHandler: ZSurfaceViewEventHandler? = null
+    
+    /**
+     * Event handler for surface view events (ready, resize, render).
+     * When set, automatically calls onReady() to initialize the surface.
+     */
     override var eventHandler: ZSurfaceViewEventHandler?
         get() = _eventHandler
         set(value) {
@@ -34,12 +52,26 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
             onReady()
         }
 
+    /**
+     * Current surface width in pixels
+     */
     override val surfaceWidth: Int
         get() = canvas.width
+        
+    /**
+     * Current surface height in pixels
+     */
     override val surfaceHeight: Int
         get() = canvas.height
 
+    /**
+     * Flag to prevent multiple resize events from being processed simultaneously
+     */
     private var pendingResize = false
+    
+    /**
+     * ResizeObserver instance that monitors canvas size changes
+     */
     private val resizeObserver = ResizeObserver { entries ->
         handleResize(entries)
     }
@@ -48,6 +80,13 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         resizeObserver.observe(canvas)
     }
 
+    /**
+     * Handles resize events from ResizeObserver.
+     * Updates canvas dimensions with proper device pixel ratio scaling
+     * and notifies the event handler.
+     * 
+     * @param entries Array of ResizeObserverEntry objects containing resize information
+     */
     private fun handleResize(entries: Array<ResizeObserverEntry>) {
         for (entry in entries) {
             if (entry.target == canvas && !pendingResize) {
@@ -72,12 +111,20 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         }
     }
 
+    /**
+     * Initializes the surface view when an event handler is set.
+     * Calls onReady() and onResize() on the event handler, then starts the render loop.
+     */
     private fun onReady() {
         eventHandler?.onReady()
         eventHandler?.onResize(surfaceWidth, surfaceHeight)
         renderLoop()
     }
 
+    /**
+     * Starts the render loop at 60 FPS.
+     * Calls the event handler's onRender() method on each frame.
+     */
     private fun renderLoop() {
         window.setInterval({eventHandler?.onRender()}, 1000/60)
     }
