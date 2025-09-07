@@ -37,7 +37,8 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
 
         val resizeObserver = ResizeObserver { entries ->
             for (entry in entries) {
-                if (entry.target == canvas) {
+                if (entry.target == canvas && !pendingResize) {
+                    pendingResize = true
                     window.requestAnimationFrame {
                         try {
                             val contentRect = entry.contentRect
@@ -49,11 +50,9 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
                             canvas.width = width
                             canvas.height = height
 
-                            // canvas.style.width = "${contentRect.width}px"
-                            // canvas.style.height = "${contentRect.height}px"
-
                             eventHandler?.onResize(width, height)
                         } finally {
+                            pendingResize = false
                         }
                     }
                 }
