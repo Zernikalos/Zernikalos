@@ -22,16 +22,18 @@ class NpmPublisher(BaseScript):
     def __init__(self):
         super().__init__("Zernikalos NPM Publisher")
         
-    def generate_npmrc(self) -> bool:
-        """Generate .npmrc file with credentials"""
-        self.print_status("Generating .npmrc file with credentials...")
+    def setup_npm_auth(self) -> bool:
+        """Setup npm authentication using environment variables"""
+        self.print_status("Setting up npm authentication...")
         
         if not self.get_github_credentials():
             return False
             
-        return self.run_gradle_command('generateNpmrc', 
-                                     f'-Puser={self.github_user}',
-                                     f'-Paccess_token={self.github_token}')
+        # Set npm authentication environment variables
+        os.environ['NPM_AUTH_TOKEN'] = self.github_token
+        
+        self.print_success("npm authentication configured via environment variables")
+        return True
             
     def build_packages(self) -> bool:
         """Build packages with webpack"""
@@ -47,15 +49,17 @@ class NpmPublisher(BaseScript):
             return self.build_packages()
         return True
         
-    def check_npmrc(self) -> bool:
-        """Check if .npmrc exists"""
-        npmrc_path = self.project_root / "build" / "js" / ".npmrc"
-        if not npmrc_path.exists():
-            self.print_warning(".npmrc file not found in build/js/")
-            self.print_status("Generating .npmrc automatically...")
-            return self.generate_npmrc()
+    def check_npm_auth(self) -> bool:
+        """Check if npm authentication is properly configured"""
+        if not self.github_token:
+            self.print_warning("GitHub token not found")
+            self.print_status("Setting up npm authentication...")
+            return self.setup_npm_auth()
             
-        self.print_success(".npmrc file found and configured")
+        # Ensure environment variables are set
+        os.environ['NPM_AUTH_TOKEN'] = self.github_token
+        
+        self.print_success("npm authentication configured")
         return True
         
     def list_packages(self) -> List[Tuple[str, str]]:
@@ -86,35 +90,37 @@ class NpmPublisher(BaseScript):
                         
         return packages
         
-    def publish_package(self, package_name: str) -> bool:
-        """Publish a specific package"""
-        package_path = self.project_root / "build" / "js" / "packages" / "@zernikalos" / package_name
+    def publish_workspace(self, package_filter: str = None) -> bool:
+        """Publish packages using npm workspace with optional filter"""
+        workspace_dir = self.project_root / "build" / "js"
         
-        if not package_path.exists():
-            self.print_error(f"Package '{package_name}' not found")
+        if not workspace_dir.exists():
+            self.print_error("Workspace directory 'build/js' not found")
             return False
             
-        package_json = package_path / "package.json"
-        if not package_json.exists():
-            self.print_error(f"package.json not found in {package_path}")
+        self.print_status("Publishing workspace packages...")
+        
+        # Get workspace packages info
+        packages = self.list_packages()
+        if not packages:
             return False
             
-        self.print_status(f"Publishing package: @zernikalos/{package_name}")
-        
-        # Get current version
-        try:
-            with open(package_json, 'r') as f:
-                data = json.load(f)
-                current_version = data.get('version', 'unknown')
-        except (json.JSONDecodeError, IOError):
-            self.print_error("Failed to read package version")
-            return False
+        # Filter packages if specified
+        if package_filter:
+            filtered_packages = [(name, version) for name, version in packages if package_filter in name]
+            if not filtered_packages:
+                self.print_error(f"No packages found matching filter: {package_filter}")
+                return False
+            packages = filtered_packages
             
-        self.print_status(f"Package version: {current_version}")
-        
+        # Show packages to be published
+        self.print_status("Packages to be published:")
+        for package_name, version in packages:
+            print(f"  - @zernikalos/{package_name} (v{version})")
+            
         # Confirm publication
         try:
-            response = input(f"Proceed with publishing @zernikalos/{package_name} v{current_version}? (y/N): ")
+            response = input(f"Proceed with publishing {len(packages)} package(s)? (y/N): ")
             if response.lower() != 'y':
                 self.print_warning("Publication cancelled")
                 return True
@@ -123,29 +129,26 @@ class NpmPublisher(BaseScript):
             self.print_warning("Operation cancelled by user")
             return True
             
-        # Publish the package
-        self.print_status("Publishing to GitHub Packages...")
+        # Publish using workspace
+        self.print_status("Publishing to GitHub Packages using workspace...")
         
         try:
-            # Change to package directory
-            original_dir = os.getcwd()
-            os.chdir(package_path)
+            # Set up environment for npm publish
+            env = os.environ.copy()
+            env['NPM_AUTH_TOKEN'] = self.github_token
             
-            # Copy .npmrc from build/js to the package directory
-            npmrc_source = self.project_root / "build" / "js" / ".npmrc"
-            npmrc_dest = Path.cwd() / ".npmrc"
+            # Build npm publish command
+            cmd = ['npm', 'publish']
             
-            if npmrc_source.exists():
-                import shutil
-                shutil.copy2(npmrc_source, npmrc_dest)
-                self.print_status("Copied .npmrc to package directory")
+            # Add workspace filter if specified
+            if package_filter:
+                cmd.extend(['--workspace', f'@zernikalos/{package_filter}'])
             else:
-                self.print_error(".npmrc not found in build/js/")
-                os.chdir(original_dir)
-                return False
+                # Publish all workspaces except test packages
+                cmd.extend(['--workspaces', '--exclude', '@zernikalos/zernikalos-test'])
             
-            # Run npm publish with full output
-            result = subprocess.run(['npm', 'publish'], capture_output=True, text=True)
+            # Run npm publish
+            result = subprocess.run(cmd, capture_output=True, text=True, env=env, cwd=workspace_dir)
             
             # Show npm output
             if result.stdout:
@@ -156,44 +159,26 @@ class NpmPublisher(BaseScript):
                 print(result.stderr)
             
             if result.returncode == 0:
-                self.print_success(f"Package @zernikalos/{package_name} v{current_version} published successfully!")
-                self.print_status(f"Package available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
-                
-                # Clean up .npmrc from package directory
-                if npmrc_dest.exists():
-                    npmrc_dest.unlink()
-                    self.print_status("Cleaned up .npmrc from package directory")
-                
-                # Return to original directory
-                os.chdir(original_dir)
+                self.print_success(f"Workspace packages published successfully!")
+                for package_name, version in packages:
+                    self.print_status(f"  - @zernikalos/{package_name} v{version}")
+                    self.print_status(f"    Available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
                 return True
             else:
                 self.print_error(f"npm publish failed with exit code {result.returncode}")
-                # Return to original directory
-                os.chdir(original_dir)
                 return False
             
         except Exception as e:
-            self.print_error(f"Failed to publish package: {e}")
-            # Return to original directory
-            os.chdir(original_dir)
+            self.print_error(f"Failed to publish workspace: {e}")
             return False
+            
+    def publish_package(self, package_name: str) -> bool:
+        """Publish a specific package using workspace"""
+        return self.publish_workspace(package_name)
             
     def publish_all_packages(self) -> bool:
-        """Publish all packages"""
-        self.print_status("Publishing all packages...")
-        
-        packages = self.list_packages()
-        if not packages:
-            return False
-            
-        success = True
-        for package_name, version in packages:
-            print()
-            if not self.publish_package(package_name):
-                success = False
-                
-        return success
+        """Publish all packages using workspace (excluding test packages)"""
+        return self.publish_workspace()
         
     def run(self, args):
         """Main execution method"""
@@ -207,8 +192,8 @@ class NpmPublisher(BaseScript):
         if not self.check_npm():
             return 1
             
-        # Auto-generate and build if needed
-        if not self.check_npmrc():
+        # Setup authentication and build if needed
+        if not self.check_npm_auth():
             return 1
             
         if not self.check_build_directory():
@@ -257,7 +242,7 @@ Prerequisites:
      - Command line: -u USER -t TOKEN
      - Interactive prompt (only token required, user defaults to Zernikalos)
   3. The script will automatically:
-     - Generate .npmrc with credentials
+     - Configure npm authentication via environment variables (more secure)
      - Build packages with webpack
      - Publish packages to GitHub Packages
         """
