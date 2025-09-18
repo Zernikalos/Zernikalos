@@ -237,7 +237,7 @@ kotlin {
             kotlin.srcDir("src/jsMain/kotlin")
             dependencies {
                 implementation(npm("ua-parser-js","1.0.37"))
-                implementation(devNpm("string-replace-loader", "3.1.0"))
+                implementation(devNpm("string-replace-loader", "3.2.0"))
             }
             dependsOn(webgpuMain)
         }
@@ -306,6 +306,7 @@ tasks.configureEach {
         name.endsWith("SourcesJar") ||
         name.endsWith("Jar")) {
         dependsOn("generateVersionConstants")
+        dependsOn("kotlinUpgradePackageLock")
     }
 }
 

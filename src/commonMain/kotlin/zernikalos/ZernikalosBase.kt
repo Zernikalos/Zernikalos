@@ -59,6 +59,10 @@ open class ZernikalosBase: ZLoggable {
     @Suppress("unused")
     val stats: ZStats = ZStats()
 
+    fun dispose() {
+        surfaceView.dispose()
+    }
+
     /**
      * Initializes the Zernikalos engine by setting up the surface view, creating the rendering and scene contexts,
      * and attaching the state handler.

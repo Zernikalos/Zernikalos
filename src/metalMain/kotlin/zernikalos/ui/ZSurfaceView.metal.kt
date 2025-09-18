@@ -51,4 +51,8 @@ class ZMtlSurfaceView(view: MTKView): ZSurfaceView {
         nativeView.delegate = viewDelegate
     }
 
+    override fun dispose() {
+        viewDelegate.dispose()
+    }
+
 }

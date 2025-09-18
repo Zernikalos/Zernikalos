@@ -34,4 +34,6 @@ interface ZSurfaceView {
      * Such as lifecycle and rendering updates, through [ZSurfaceViewEventHandler].
      */
     var eventHandler: ZSurfaceViewEventHandler?
+
+    fun dispose()
 }

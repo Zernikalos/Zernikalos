@@ -15,6 +15,7 @@ import org.w3c.dom.HTMLCanvasElement
 
 external class ResizeObserver(callback: (Array<dynamic>) -> Unit) {
     fun observe(target: Element)
+    fun disconnect()
 }
 
 external class ResizeObserverEntry {
@@ -24,12 +25,12 @@ external class ResizeObserverEntry {
 
 /**
  * JavaScript implementation of ZSurfaceView for WebGPU rendering.
- * 
+ *
  * This class provides a surface view that automatically handles canvas resizing
  * using ResizeObserver and maintains proper aspect ratio and device pixel ratio.
- * 
+ *
  * @param canvas The HTML canvas element to render to
- * 
+ *
  * @see ZSurfaceView
  */
 @JsExport
@@ -39,8 +40,12 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
     /**
      * Internal event handler storage
      */
-    var _eventHandler: ZSurfaceViewEventHandler? = null
-    
+    private var _eventHandler: ZSurfaceViewEventHandler? = null
+
+    private var rendererIntervalId: Int? = null
+
+    private var animationFrameRequestId: Int? = null
+
     /**
      * Event handler for surface view events (ready, resize, render).
      * When set, automatically calls onReady() to initialize the surface.
@@ -57,7 +62,7 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
      */
     override val surfaceWidth: Int
         get() = canvas.width
-        
+
     /**
      * Current surface height in pixels
      */
@@ -68,7 +73,7 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
      * Flag to prevent multiple resize events from being processed simultaneously
      */
     private var pendingResize = false
-    
+
     /**
      * ResizeObserver instance that monitors canvas size changes
      */
@@ -80,18 +85,30 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         resizeObserver.observe(canvas)
     }
 
+    override fun dispose() {
+        val rendererIntervalId = this.rendererIntervalId
+        if (rendererIntervalId != null) {
+            window.clearInterval(rendererIntervalId)
+        }
+        val animationFrameRequestId = this.animationFrameRequestId
+        if (animationFrameRequestId != null) {
+            window.cancelAnimationFrame(animationFrameRequestId)
+        }
+        resizeObserver.disconnect()
+    }
+
     /**
      * Handles resize events from ResizeObserver.
      * Updates canvas dimensions with proper device pixel ratio scaling
      * and notifies the event handler.
-     * 
+     *
      * @param entries Array of ResizeObserverEntry objects containing resize information
      */
     private fun handleResize(entries: Array<ResizeObserverEntry>) {
         for (entry in entries) {
             if (entry.target == canvas && !pendingResize) {
                 pendingResize = true
-                window.requestAnimationFrame {
+                animationFrameRequestId = window.requestAnimationFrame {
                     try {
                         val contentRect = entry.contentRect
                         val dpr = window.devicePixelRatio
@@ -126,7 +143,7 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
      * Calls the event handler's onRender() method on each frame.
      */
     private fun renderLoop() {
-        window.setInterval({eventHandler?.onRender()}, 1000/60)
+        rendererIntervalId = window.setInterval({eventHandler?.onRender()}, 1000/60)
     }
 
 }

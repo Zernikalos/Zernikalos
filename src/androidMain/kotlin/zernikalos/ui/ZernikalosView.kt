@@ -43,4 +43,9 @@ open class ZernikalosView: GLSurfaceView, ZSurfaceView {
         renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         preserveEGLContextOnPause = true
     }
+
+    override fun dispose() {
+        nativeRenderer.dispose()
+        onPause()
+    }
 }
