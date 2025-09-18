@@ -4,6 +4,19 @@ import android.opengl.GLSurfaceView
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
+/**
+ * @suppress
+ * A custom renderer for Android's `GLSurfaceView` that integrates with a [`ZSurfaceViewEventHandler`].
+ *
+ * This class implements the `GLSurfaceView.Renderer` interface and manages the rendering lifecycle
+ * of an OpenGL surface, delegating key events to an external event handler.
+ *
+ * Functionality includes:
+ * - Notifying when the surface is created via [onSurfaceCreated].
+ * - Notifying when the surface dimensions change via [onSurfaceChanged].
+ * - Triggering rendering operations via [onDrawFrame].
+ * - Providing a mechanism to clean up resources via [dispose].
+ */
 class AndroidNativeRenderer: GLSurfaceView.Renderer {
 
     var eventHandler: ZSurfaceViewEventHandler? = null
@@ -13,8 +26,6 @@ class AndroidNativeRenderer: GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(p0: GL10?, width: Int, height: Int) {
-//        // TODO: Review this
-//        GLES20.glViewport(0, 0, width, height)
         eventHandler?.onResize(width, height)
     }
 

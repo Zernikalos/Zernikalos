@@ -273,7 +273,7 @@ dokka {
         }
     }
     pluginsConfiguration.html {
-        templatesDir = file("docs/dokkaTemplates")
+        //templatesDir = file("docs/dokkaTemplates")
         customStyleSheets.from("docsAssets/zk-docs-styles.css")
         customAssets.from("docsAssets/logo-icon.svg")
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")

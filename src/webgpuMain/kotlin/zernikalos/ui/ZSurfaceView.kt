@@ -13,11 +13,17 @@ import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 
+/**
+ * @suppress
+ */
 external class ResizeObserver(callback: (Array<dynamic>) -> Unit) {
     fun observe(target: Element)
     fun disconnect()
 }
 
+/**
+ * @suppress
+ */
 external class ResizeObserverEntry {
     val target: Element
     val contentRect: DOMRectReadOnly

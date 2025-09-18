@@ -59,6 +59,9 @@ open class ZernikalosBase: ZLoggable {
     @Suppress("unused")
     val stats: ZStats = ZStats()
 
+    /**
+     * Disposes the Zernikalos engine and releases all associated resources.
+     */
     fun dispose() {
         surfaceView.dispose()
     }

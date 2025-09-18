@@ -35,5 +35,8 @@ interface ZSurfaceView {
      */
     var eventHandler: ZSurfaceViewEventHandler?
 
+    /**
+     * Disposes the surface view and releases all associated resources.
+     */
     fun dispose()
 }
