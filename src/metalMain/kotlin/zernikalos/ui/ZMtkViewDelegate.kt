@@ -38,4 +38,8 @@ class ZMtkViewDelegate() : NSObject(), MTKViewDelegateProtocol {
         eventHandler?.onRender()
     }
 
+    fun dispose() {
+        eventHandler = null
+    }
+
 }
