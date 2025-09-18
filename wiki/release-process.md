@@ -4,7 +4,32 @@ This page documents the complete release process of the Zernikalos engine, from 
 
 ## Process Overview
 
-The Zernikalos release system is designed to completely automate the process of publishing new versions. When a version tag is created, a CI/CD pipeline is activated that builds, tests, and publishes the engine on all supported platforms.
+The Zernikalos release system is designed to completely automate the process of publishing new versions. The recommended approach uses Python scripts for local development and testing, with automatic CI/CD pipeline activation when version tags are pushed.
+
+## Recommended Release Process (Python Scripts)
+
+### Quick Release with Python Scripts
+
+The easiest and most reliable way to create and publish new versions:
+
+```bash
+# 1. Create new version and publish everything
+python3 scripts/publish-all.py --all
+
+# 2. Or step by step:
+python3 scripts/version.py 1.2.3  # Create version
+python3 scripts/publish-npm.py -a  # Publish NPM packages
+python3 scripts/publish-android.py --all-publications  # Publish Android
+```
+
+### Python Scripts Features
+
+- ✅ **Complete automation** - Handles versioning, building, and publishing
+- ✅ **Secure authentication** - Uses environment variables (no files)
+- ✅ **Workspace support** - Efficient NPM publishing with filtering
+- ✅ **Interactive mode** - User-friendly prompts and confirmations
+- ✅ **Error handling** - Robust error detection and recovery
+- ✅ **Cross-platform** - Works on Windows, macOS, and Linux
 
 ## Automated Release Flow
 
@@ -31,54 +56,86 @@ Runs automatically after a successful build:
 - Specialized container with Android SDK
 
 #### JavaScript Publication
-- Publishes NPM package to GitHub Packages
+- Publishes NPM package to GitHub Packages using **workspace support**
+- **Secure authentication** via environment variables (no `.npmrc` files)
+- **Automatic filtering** excludes test packages
 - Automatic configuration of npm.pkg.github.com registry
 - Dependency caching for optimization
 
-## Manual Release Tools
+## Python Release Scripts
 
-### Main Script: `scripts/release.sh`
+### Main Script: `scripts/publish-all.py`
 
-This script automates the complete local release process:
-
-```bash
-# Basic usage
-./scripts/release.sh 1.2.3
-
-# Local release without push (useful for testing)
-./scripts/release.sh 1.2.3 --no-push
-```
-
-#### Script Features:
-- **Version validation**: Verifies X.Y.Z format
-- **Git verification**: Confirms clean directory
-- **Duplicate prevention**: Avoids existing version tags
-- **Interactive confirmation**: Shows changes before proceeding
-- **Error handling**: Safe exit in case of problems
-
-### NPM Publication Script: `scripts/publish-npm.sh`
-
-Specialized tool for manual NPM package publication:
+Complete automation for all publishing tasks:
 
 ```bash
-# With credentials as parameters
-./scripts/publish-npm.sh --user=Zernikalos --token=ghp_xxx
+# Interactive mode (recommended)
+python3 scripts/publish-all.py
 
-# With environment variables
-export GITHUB_USER=Zernikalos
-export GITHUB_TOKEN=ghp_xxx
-./scripts/publish-npm.sh
+# Publish everything at once
+python3 scripts/publish-all.py --all
+
+# Show project status
+python3 scripts/publish-all.py -s
 ```
 
-#### Characteristics:
-- Automatic `.npmrc` generation with credentials
+### Version Management: `scripts/version.py`
+
+Handles version creation and management:
+
+```bash
+# Create new version
+python3 scripts/version.py 1.2.3
+
+# Show current version
+python3 scripts/version.py --current
+
+# List all versions
+python3 scripts/version.py --list
+```
+
+### NPM Publishing: `scripts/publish-npm.py`
+
+Specialized tool for NPM package publication:
+
+```bash
+# List available packages
+python3 scripts/publish-npm.py -l
+
+# Publish all packages
+python3 scripts/publish-npm.py -a
+
+# Publish specific package
+python3 scripts/publish-npm.py zernikalos
+```
+
+#### Features:
+- **Secure authentication** via environment variables (no `.npmrc` files)
+- **Workspace support** for efficient publishing
+- **Automatic filtering** excludes test packages
 - Dependency validation (npm, Node.js)
 - Automatic GitHub Packages registry configuration
-- Secure access token handling
 
-## Gradle Release Tasks
+### Android Publishing: `scripts/publish-android.py`
 
-### Versioning Tasks
+Handles Android artifact publication:
+
+```bash
+# Interactive mode
+python3 scripts/publish-android.py
+
+# Publish all publications (recommended)
+python3 scripts/publish-android.py --all-publications
+
+# Show Maven coordinates
+python3 scripts/publish-android.py -i
+```
+
+## Manual Step-by-Step Release (Gradle Commands)
+
+*This section is for advanced users who prefer manual control over the release process.*
+
+### Gradle Versioning Tasks
 
 #### `setVersion`
 ```bash
@@ -100,11 +157,6 @@ export GITHUB_TOKEN=ghp_xxx
 - Runs automatically before compilation
 - Location: `src/commonMain/kotlin/zernikalos/ZVersion.kt`
 
-#### `generateNpmrc`
-- Generates `.npmrc` file for NPM authentication
-- Uses `.npmrc.template` template
-- Replaces `${GITHUB_USER}` and `${GITHUB_TOKEN}` variables
-
 #### `releaseCommit`
 ```bash
 ./gradlew releaseCommit
@@ -113,9 +165,86 @@ export GITHUB_TOKEN=ghp_xxx
 - Generates annotated Git tag
 - Depends on `updateVersion` for updated files
 
+## Creating a New Local Version
+
+### Recommended: Using Python Scripts
+
+```bash
+# Quick version creation and publishing
+python3 scripts/version.py 1.2.3
+python3 scripts/publish-all.py --all
+
+# Or interactive mode
+python3 scripts/publish-all.py
+```
+
+### Manual: Using Gradle Commands
+
+#### 1. **Set New Version**
+```bash
+# Set the new version (e.g., 1.2.3)
+./gradlew setVersion -PnewVersion=1.2.3
+```
+
+#### 2. **Generate Version Files**
+```bash
+# Generate all version-dependent files
+./gradlew updateVersion
+```
+
+#### 3. **Verify Changes**
+```bash
+# Check version in VERSION.txt
+cat VERSION.txt
+
+# Check generated version constants
+cat src/commonMain/kotlin/zernikalos/ZVersion.kt
+
+# Check package.json versions
+cat build/js/packages/@zernikalos/zernikalos/package.json | grep version
+```
+
+#### 4. **Create Release Commit and Tag**
+```bash
+# Create commit and tag
+./gradlew releaseCommit
+```
+
+#### 5. **Push to Trigger CI/CD (Optional)**
+```bash
+# Push to trigger automated build and publish
+git push origin main --tags
+```
+
+### Local Testing Before Push
+
+```bash
+# Test NPM publishing locally
+python3 scripts/publish-npm.py -l  # List packages
+python3 scripts/publish-npm.py zernikalos  # Publish specific package
+
+# Test Android publishing locally
+python3 scripts/publish-android.py -i  # Show info
+python3 scripts/publish-android.py --all-publications  # Publish all
+
+# Test everything locally
+python3 scripts/publish-all.py --all
+```
+
 ## Complete Release Process
 
-### Option 1: Automated (Recommended)
+### Option 1: Python Scripts (Recommended)
+```bash
+# Complete automation with Python scripts
+python3 scripts/publish-all.py --all
+
+# Or step by step
+python3 scripts/version.py 1.2.3
+python3 scripts/publish-npm.py -a
+python3 scripts/publish-android.py --all-publications
+```
+
+### Option 2: Manual Gradle Commands
 ```bash
 # 1. Set new version
 ./gradlew setVersion -PnewVersion=1.2.3
@@ -128,12 +257,6 @@ export GITHUB_TOKEN=ghp_xxx
 
 # 4. Push to trigger CI/CD
 git push origin main --tags
-```
-
-### Option 2: Integrated Script
-```bash
-# Executes the entire process automatically
-./scripts/release.sh 1.2.3
 ```
 
 ### Option 3: Manual Step by Step
