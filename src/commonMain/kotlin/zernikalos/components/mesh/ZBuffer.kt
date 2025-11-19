@@ -10,9 +10,9 @@ package zernikalos.components.mesh
 
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
@@ -76,7 +76,7 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
     ))
 
     var enabled: Boolean = false
-    
+
     @JsExport.Ignore
     val attributeId: ZAttributeId
         get() = ZAttributeId.entries.find {
@@ -146,6 +146,79 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
 
     override fun toString(): String {
         return "ZBuffer(attributeId=${this.attributeId}, bufferId=${data.bufferId})"
+    }
+
+    companion object {
+        /**
+         * Interleaves multiple ZBuffers by combining their data arrays into a single buffer.
+         * Each buffer's stride and offset are updated to reflect the interleaved layout.
+         * All buffers must have the same count of elements.
+         *
+         * @param buffers List of ZBuffers to interleave
+         * @throws IllegalArgumentException if buffers have different counts or if the list is empty
+         */
+        fun interleave(buffers: Array<ZBuffer>) {
+            if (buffers.isEmpty()) {
+                throw IllegalArgumentException("Cannot interleave an empty list of buffers")
+            }
+
+            // Verify all buffers have the same count
+            val count = buffers.first().count
+            if (!buffers.all { it.count == count }) {
+                throw IllegalArgumentException("All buffers must have the same count for interleaving")
+            }
+
+            // Calculate the size in bytes for each element in each buffer
+            val elementSizes = buffers.map { buffer ->
+                buffer.dataType.byteSize
+            }
+
+            // Calculate the new stride (sum of all element sizes)
+            val newStride = elementSizes.sum()
+
+            // Create the interleaved data array
+            val interleavedSize = newStride * count
+            val interleavedData = ByteArray(interleavedSize)
+
+            // Interleave the data
+            var currentOffset = 0
+            buffers.forEachIndexed { bufferIndex, buffer ->
+                val elementSize = elementSizes[bufferIndex]
+                // When stride is 0, it means tightly packed, so use elementSize
+                val originalStrideBytes = if (buffer.stride == 0) elementSize else buffer.stride
+                val originalOffsetBytes = buffer.offset
+
+                // Copy data for this buffer
+                for (i in 0 until count) {
+                    // Calculate source position considering original stride and offset
+                    val sourceStart = i * originalStrideBytes + originalOffsetBytes
+                    val destStart = i * newStride + currentOffset
+
+                    // Verify source bounds
+                    if (sourceStart + elementSize > buffer.dataArray.size) {
+                        throw IndexOutOfBoundsException(
+                            "Buffer '${buffer.name}' source index out of bounds: " +
+                            "fromIndex: $sourceStart, toIndex: ${sourceStart + elementSize}, size: ${buffer.dataArray.size}"
+                        )
+                    }
+
+                    // Copy element bytes from source to interleaved array
+                    buffer.dataArray.copyInto(
+                        destination = interleavedData,
+                        destinationOffset = destStart,
+                        startIndex = sourceStart,
+                        endIndex = sourceStart + elementSize
+                    )
+                }
+
+                // Update buffer data with new stride, offset and shared data array
+                buffer.data.stride = newStride
+                buffer.data.offset = currentOffset
+                buffer.data.dataArray = interleavedData
+
+                currentOffset += elementSize
+            }
+        }
     }
 
 }
