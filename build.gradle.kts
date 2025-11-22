@@ -33,8 +33,6 @@ val githubPackagesNpmRegistry = "https://npm.pkg.github.com"
 val publishUser = project.findProperty("user") as String? ?: System.getenv("GITHUB_ACTOR") ?: ""
 val publishAccessToken = project.findProperty("access_token") as String? ?: System.getenv("GITHUB_TOKEN") ?: ""
 
-
-
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
     kotlin("native.cocoapods") version libs.versions.kotlin.get()
@@ -44,8 +42,6 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.dokka") version libs.versions.dokka.get()
     id("com.github.ben-manes.versions") version libs.versions.versionsPlugin.get()
-    // id("org.lwjgl.plugin") apply true
-    // id("org.jlleitschuh.gradle.ktlint")
 }
 
 allprojects {
@@ -97,7 +93,7 @@ kotlin {
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions {
-                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                    //freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
             }
         }
@@ -108,7 +104,7 @@ kotlin {
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
-                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+                    //jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
                 }
             }
         }
@@ -133,11 +129,7 @@ kotlin {
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
         }
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
-            }
-        }
+
         browser {
             binaries.executable()
             commonWebpackConfig {
@@ -169,7 +161,7 @@ kotlin {
             debuggable = buildType.name != "RELEASE"
             xcf.add(this)
         }
-        it.compilerOptions.freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+        //it.compilerOptions.freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
     }
 
     cocoapods {
