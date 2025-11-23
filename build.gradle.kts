@@ -93,14 +93,14 @@ kotlin {
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions {
-                    //freeCompilerArgs.add("-Xexpect-actual-classes")
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
             }
         }
     }
 
-    androidTarget("android") {
-        publishLibraryVariants("release", "debug")
+    androidTarget {
+        //publishLibraryVariants("release", "debug")
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
