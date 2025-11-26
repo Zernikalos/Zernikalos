@@ -17,6 +17,7 @@ import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -24,7 +25,6 @@ import kotlin.js.JsName
  * Mesh will provide:
  * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
  */
-@Serializable(with = ZMeshSerializer::class)
 @JsExport
 class ZMesh internal constructor(private val data: ZMeshData):
     ZRenderizableComponent<ZMeshRenderer>(),
@@ -211,6 +211,8 @@ data class ZRawBuffer(
 
 @Serializable
 internal data class ZRawMeshData(
+    @ProtoNumber(1)
+    var refId: String = "",
     @ProtoNumber(11)
     var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
@@ -267,16 +269,20 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal class ZMeshSerializer: ZComponentSerializer<ZMesh, ZRawMeshData>() {
-    override val kSerializer: KSerializer<ZRawMeshData>
-        get() = ZRawMeshData.serializer()
+internal class ZMeshSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZMesh, ZRawMeshData>() {
+    override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
 
     override fun createComponentInstance(data: ZRawMeshData): ZMesh {
+        if (loaderContext.hasComponent(data.refId)) {
+            return loaderContext.getComponent(data.refId) as ZMesh
+        }
         val meshData = ZMeshData(
             data.drawMode,
             data.buffers
         )
-        return ZMesh(meshData)
+        val mesh = ZMesh(meshData)
+        loaderContext.addComponent(data.refId, mesh)
+        return mesh
     }
 
 }
