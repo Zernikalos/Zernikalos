@@ -16,6 +16,8 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import zernikalos.action.ZSkeletalAction
 import zernikalos.components.material.ZTexture
 import zernikalos.components.material.ZTextureSerializer
+import zernikalos.components.mesh.ZMesh
+import zernikalos.components.mesh.ZMeshSerializer
 import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -36,6 +38,7 @@ fun createZerializerModule(): SerializersModule {
 
         contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
+        contextual(ZMesh::class) { _ -> ZMeshSerializer(loaderContext) }
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
     }
 
@@ -53,6 +56,13 @@ private fun createProtoSerializersModule(): ProtoBuf {
     return protoFormat
 }
 
+/**
+ * Represents the ZKo data structure exposed externally after loading a Zko file.
+ *
+ * @property header The metadata header associated with the ZKo object. This contains the version information and ensures compatibility.
+ * @property root The root [ZObject] of the ZKo structure. This represents the starting point of the object hierarchy.
+ * @property actions An optional list of actions ([ZSkeletalAction]) that can be executed or associated with this ZKo object.
+ */
 @JsExport
 data class ZKo(
     val header: ZkoHeader,

@@ -33,7 +33,7 @@ class ZModel: ZObject() {
 
     override val type = ZObjectType.MODEL
 
-    @ProtoNumber(4)
+    @Contextual @ProtoNumber(4)
     var mesh: ZMesh = ZMesh()
     @Transient
     var shaderProgram: ZShaderProgram = ZShaderProgram()
