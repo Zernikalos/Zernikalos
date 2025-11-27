@@ -30,17 +30,45 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
             GPUBufferUsage.VERTEX or GPUBufferUsage.COPY_DST
     }
 
+    /**
+     * Calculates the byte size of the buffer data, aligned for WebGPU's requirements.
+     *
+     * WebGPU requires buffer write size to be a multiple of 4 bytes.
+     * This ensures the buffer meets this alignment requirement.
+     */
+    private val alignedSize: Int
+        get() {
+            val alignment = 4
+            val dataSize = data.dataArray.size
+            // Round up to nearest multiple of 4: ((size + alignment - 1) / alignment) * alignment
+            return ((dataSize + alignment - 1) / alignment) * alignment
+        }
+
+    /**
+     * Returns the data array aligned to a multiple of 4 bytes, with padding if needed.
+     */
+    private val alignedData: ByteArray
+        get() {
+            val dataSize = data.dataArray.size
+            return if (dataSize % 4 != 0) {
+                data.dataArray.copyOf(alignedSize)
+            } else {
+                data.dataArray
+            }
+        }
+
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
 
         // Each buffer will create a different GPUBuffer instance
         wgpuBuffer = ctx.device.createBuffer(
-            data.dataArray.size * data.dataType.byteSize,
+            alignedSize,
             usage,
             false,
             "${data.name}Buffer"
         )
-        ctx.queue.writeBuffer(wgpuBuffer, 0, data.dataArray)
+
+        ctx.queue.writeBuffer(wgpuBuffer, 0, alignedData)
     }
 
     actual override fun bind() {
