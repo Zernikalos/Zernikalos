@@ -22,10 +22,10 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
         get() = if (data.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
 
     actual override fun initialize() {
-        initializeBuffer(ctx, data)
-        if (!data.isIndexBuffer) {
-            initializeBufferKey(ctx, data)
-        }
+        // initializeBuffer(ctx, data)
+        // if (!data.isIndexBuffer) {
+        //     initializeBufferKey(ctx, data)
+        // }
         logger.debug("Initializing Buffer ${data.name}=[@${data.id}-${bufferTargetType.name}]")
     }
 
@@ -68,6 +68,37 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
 
         ctx.bindBuffer(bufferTargetType, buffer)
         ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
+    }
+
+    // TODO: Temporal code for future reference
+    fun initializeBuffer2(ctx: ZRenderingContext) {
+        ctx as ZGLRenderingContext
+
+        buffer = ctx.createBuffer()
+        ctx.bindBuffer(bufferTargetType, buffer)
+        ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
+    }
+
+    fun initializeBufferKey2(ctx: ZRenderingContext) {
+        ctx as ZGLRenderingContext
+
+        if (data.isIndexBuffer) {
+            return
+        }
+
+        val glDataType = toOglBaseType(data.dataType)
+
+        ctx.bindBuffer(bufferTargetType, buffer)
+
+        ctx.enableVertexAttrib(data.id)
+        ctx.vertexAttribPointer(
+            data.id,
+            data.size,
+            glDataType,
+            data.normalized,
+            data.stride,
+            data.offset
+        )
     }
 
 }
