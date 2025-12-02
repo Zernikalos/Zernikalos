@@ -25,11 +25,19 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
     actual override fun initialize() {
         vao.initialize(ctx)
 
+        // TODO: Temporal code to be restored
+        // data.buffers.values.filter {buff ->
+        //     buff.enabled
+        // }.forEach { buff ->
+        //     buff.initialize(ctx)
+        //     buff.bind()
+        // }
         data.buffers.values.filter {buff ->
             buff.enabled
         }.forEach { buff ->
             buff.initialize(ctx)
-            buff.bind()
+            buff.renderer.initializeBuffer2(ctx)
+            buff.renderer.initializeBufferKey2(ctx)
         }
 
         vao.unbind()
