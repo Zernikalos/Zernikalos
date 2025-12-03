@@ -240,19 +240,7 @@ internal data class ZRawMeshData(
         if (bufferContent == null) {
             return null
         }
-        return ZBuffer(
-            key.id,
-            key.dataType,
-            key.name,
-            key.size,
-            key.count,
-            key.normalized,
-            key.offset,
-            key.stride,
-            key.isIndexBuffer,
-            key.bufferId,
-            bufferContent.dataArray
-        )
+        return ZBuffer(key, bufferContent)
     }
 }
 

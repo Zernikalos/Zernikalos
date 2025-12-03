@@ -9,7 +9,6 @@
 package zernikalos.components.mesh
 
 import zernikalos.ZDataType
-import zernikalos.ZTypes
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRenderer
@@ -20,8 +19,8 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 /**
- * Utility class for representing the mix of a ZBufferKey + ZRawBuffer in a simpler way
- * Notice that ZBufferKey will only address one ZRawBuffer, however one ZRawBuffer can be addressed by more than one ZBufferKey
+ * Utility class for representing the mix of a ZBufferKey + ZBufferContent in a simpler way
+ * Notice that ZBufferKey will only address one ZBufferContent, however one ZBufferContent can be addressed by more than one ZBufferKey
  */
 @JsExport
 class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizableComponent<ZBufferRenderer>(), ZBindeable {
@@ -32,6 +31,18 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
      */
     @JsName("init")
     constructor(): this(ZBufferData())
+
+    /**
+     * Initializes a ZBuffer object with a ZBufferKey and ZBufferContent.
+     *
+     * @param key The buffer key containing layout information.
+     * @param content The buffer content containing the data array.
+     */
+    @JsName("initWithKeyAndContent")
+    constructor(
+        key: ZBufferKey,
+        content: ZBufferContent
+    ): this(ZBufferData(key, content))
 
     /**
      * Initializes a ZBuffer object with the given arguments.
@@ -62,17 +73,8 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
         bufferId: Int,
         dataArray: ByteArray
     ): this(ZBufferData(
-        id,
-        dataType,
-        name,
-        size,
-        count,
-        normalized,
-        offset,
-        stride,
-        isIndexBuffer,
-        bufferId,
-        dataArray
+        ZBufferKey(id, dataType, name, size, count, normalized, offset, stride, isIndexBuffer, bufferId),
+        ZBufferContent(bufferId, dataArray)
     ))
 
     var enabled: Boolean = false
@@ -124,7 +126,7 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
     /**
      * Represents the buffer ID associated with the ZBuffer.
      */
-    val bufferId: Int by data::id
+    val bufferId: Int by data::bufferId
 
     /**
      * Represents an array of bytes for ZBufferData data.
@@ -211,10 +213,17 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
                     )
                 }
 
-                // Update buffer data with new stride, offset and shared data array
-                buffer.data.stride = newStride
-                buffer.data.offset = currentOffset
-                buffer.data.dataArray = interleavedData
+                // Update buffer key with new stride and offset
+                buffer.data.key.stride = newStride
+                buffer.data.key.offset = currentOffset
+
+                // Update buffer content with shared interleaved data array
+                buffer.data.content.dataArray = interleavedData
+                // All buffers should share the same content ID
+                if (bufferIndex == 0) {
+                    val sharedContentId = buffer.data.content.id
+                    buffers.forEach { it.data.content.id = sharedContentId }
+                }
 
                 currentOffset += elementSize
             }
@@ -225,21 +234,45 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
 
 @JsExport
 data class ZBufferData(
-    var id: Int = -1,
-    var dataType: ZDataType = ZTypes.NONE,
-    var name: String = "",
-    var size: Int = -1,
-    var count: Int = -1,
-    var normalized: Boolean = false,
-    var offset: Int = -1,
-    var stride: Int = -1,
-    var isIndexBuffer: Boolean = false,
-    var bufferId: Int = -1,
-    var dataArray: ByteArray = byteArrayOf()
+    var key: ZBufferKey = ZBufferKey(),
+    var content: ZBufferContent = ZBufferContent()
 ): ZComponentData() {
 
+    // Properties delegated to key
+    var id: Int by key::id
+    var dataType: ZDataType by key::dataType
+    var name: String by key::name
+    var size: Int by key::size
+    var count: Int by key::count
+    var normalized: Boolean by key::normalized
+    var offset: Int by key::offset
+    var stride: Int by key::stride
+    var isIndexBuffer: Boolean by key::isIndexBuffer
+    var bufferId: Int by key::bufferId
+
+    // Properties delegated to content
+    var dataArray: ByteArray by content::dataArray
+
     val hasData: Boolean
-        get() = dataArray.isNotEmpty()
+        get() = content.dataArray.isNotEmpty()
+
+    // Constructor for backward compatibility
+    constructor(
+        id: Int,
+        dataType: ZDataType,
+        name: String,
+        size: Int,
+        count: Int,
+        normalized: Boolean,
+        offset: Int,
+        stride: Int,
+        isIndexBuffer: Boolean,
+        bufferId: Int,
+        dataArray: ByteArray
+    ) : this(
+        ZBufferKey(id, dataType, name, size, count, normalized, offset, stride, isIndexBuffer, bufferId),
+        ZBufferContent(bufferId, dataArray)
+    )
 
 }
 
