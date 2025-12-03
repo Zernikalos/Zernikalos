@@ -214,8 +214,8 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
                 }
 
                 // Update buffer key with new stride and offset
-                buffer.data.key.stride = newStride
-                buffer.data.key.offset = currentOffset
+                buffer.data.stride = newStride
+                buffer.data.offset = currentOffset
 
                 // Update buffer content with shared interleaved data array
                 buffer.data.content.dataArray = interleavedData
