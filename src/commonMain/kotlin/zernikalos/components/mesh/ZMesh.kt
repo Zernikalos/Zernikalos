@@ -202,7 +202,7 @@ data class ZBufferKey(
  */
 @Serializable
 @JsExport
-data class ZRawBuffer(
+data class ZBufferContent(
     @ProtoNumber(1)
     var id: Int = -1,
     @ProtoNumber(2)
@@ -218,7 +218,7 @@ internal data class ZRawMeshData(
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
-    private var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
+    private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
 ) {
 
     @Transient
@@ -232,12 +232,12 @@ internal data class ZRawMeshData(
             }
         }
         bufferKeys.clear()
-        rawBuffers.clear()
+        bufferContents.clear()
     }
 
     private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
-        val rawBuffer = rawBuffers.find { it.id == key.bufferId }
-        if (rawBuffer == null) {
+        val bufferContent = bufferContents.find { it.id == key.bufferId }
+        if (bufferContent == null) {
             return null
         }
         return ZBuffer(
@@ -251,7 +251,7 @@ internal data class ZRawMeshData(
             key.stride,
             key.isIndexBuffer,
             key.bufferId,
-            rawBuffer.dataArray
+            bufferContent.dataArray
         )
     }
 }
