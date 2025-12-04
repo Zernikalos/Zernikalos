@@ -11,69 +11,53 @@
 
 package zernikalos.components.mesh
 
-import kotlinx.serialization.Transient
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
-import zernikalos.context.webgpu.GPUBuffer
-import zernikalos.context.webgpu.GPUBufferUsage
+import zernikalos.context.webgpu.GPUVertexAttribute
+import zernikalos.context.webgpu.GPUVertexBufferLayout
+import zernikalos.context.webgpu.GPUVertexStepMode
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
-    @Transient
-    lateinit var wgpuBuffer: GPUBuffer
 
-    val usage: Int
-    get() {
-        return if (data.isIndexBuffer)
-            GPUBufferUsage.INDEX or GPUBufferUsage.COPY_DST
-        else
-            GPUBufferUsage.VERTEX or GPUBufferUsage.COPY_DST
-    }
 
-    /**
-     * Calculates the byte size of the buffer data, aligned for WebGPU's requirements.
-     *
-     * WebGPU requires buffer write size to be a multiple of 4 bytes.
-     * This ensures the buffer meets this alignment requirement.
-     */
-    private val alignedSize: Int
-        get() {
-            val alignment = 4
-            val dataSize = data.dataArray.size
-            // Round up to nearest multiple of 4: ((size + alignment - 1) / alignment) * alignment
-            return ((dataSize + alignment - 1) / alignment) * alignment
-        }
-
-    /**
-     * Returns the data array aligned to a multiple of 4 bytes, with padding if needed.
-     */
-    private val alignedData: ByteArray
-        get() {
-            val dataSize = data.dataArray.size
-            return if (dataSize % 4 != 0) {
-                data.dataArray.copyOf(alignedSize)
-            } else {
-                data.dataArray
-            }
-        }
 
     actual override fun initialize() {
-        ctx as ZWebGPURenderingContext
+        if (!data.content.isInitialized) {
+            data.content.initialize(ctx)
+            data.content.renderer.initializeAs(data.attributeId.id, data.isIndexBuffer)
+        }
+    }
 
-        // Each buffer will create a different GPUBuffer instance
-        wgpuBuffer = ctx.device.createBuffer(
-            alignedSize,
-            usage,
-            false,
-            "${data.name}Buffer"
+    fun createLayout(): GPUVertexBufferLayout {
+        // Use the stride from data, which includes interleaved stride when buffers are interleaved
+        // When stride is 0, it means tightly packed, so use element size
+        val strideBytes = if (data.stride == 0) data.dataType.byteSize else data.stride
+        
+        return GPUVertexBufferLayout(
+            attributes = arrayOf(
+                GPUVertexAttribute(
+                    format = typeToWebGpuType(data.dataType),
+                    offset = data.offset,
+                    shaderLocation = data.attributeId.id
+                )
+            ),
+            arrayStride = strideBytes,
+            stepMode = GPUVertexStepMode.VERTEX
         )
-
-        ctx.queue.writeBuffer(wgpuBuffer, 0, alignedData)
     }
 
     actual override fun bind() {
         // In WebGPU, binding is typically done during render pass setup
         // This method might be a no-op or used for specific binding requirements
+        ctx as ZWebGPURenderingContext
+
+        ctx.renderPass?.setVertexBuffer(data.attributeId.id, data.content.renderer.wgpuBuffer)
+    }
+
+    fun bindIndexBuffer() {
+        ctx as ZWebGPURenderingContext
+        ctx.renderPass?.setIndexBuffer(data.content.renderer.wgpuBuffer, "uint16")
     }
 
     actual override fun unbind() {

@@ -80,10 +80,7 @@ class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizable
     var enabled: Boolean = false
 
     @JsExport.Ignore
-    val attributeId: ZAttributeId
-        get() = ZAttributeId.entries.find {
-            id == it.id
-        }!!
+    val attributeId: ZAttributeId by data::attributeId
 
     /**
      * ID for this Buffer.
@@ -256,7 +253,13 @@ data class ZBufferData(
     val hasData: Boolean
         get() = content.dataArray.isNotEmpty()
 
-    // Constructor for backward compatibility
+    @JsExport.Ignore
+    val attributeId: ZAttributeId
+        get() = ZAttributeId.entries.find {
+            id == it.id
+        }!!
+
+    @JsName("initWithData")
     constructor(
         id: Int,
         dataType: ZDataType,
