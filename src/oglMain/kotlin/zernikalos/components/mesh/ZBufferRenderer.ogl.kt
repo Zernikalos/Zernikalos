@@ -9,96 +9,40 @@
 package zernikalos.components.mesh
 
 import zernikalos.components.ZComponentRenderer
-import zernikalos.context.*
-import zernikalos.logger.logger
-import zernikalos.toOglBaseType
+import zernikalos.context.ZGLRenderingContext
+import zernikalos.context.ZRenderingContext
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
-    @Transient
-    lateinit var buffer: GLWrap
-
-    private val bufferTargetType: BufferTargetType
-        get() = if (data.isIndexBuffer) BufferTargetType.ELEMENT_ARRAY_BUFFER else BufferTargetType.ARRAY_BUFFER
-
     actual override fun initialize() {
-        // initializeBuffer(ctx, data)
-        // if (!data.isIndexBuffer) {
-        //     initializeBufferKey(ctx, data)
-        // }
-        logger.debug("Initializing Buffer ${data.name}=[@${data.id}-${bufferTargetType.name}]")
+        initializeBufferContent(ctx)
+        initializeBufferKey(ctx)
     }
 
     actual override fun bind() {
-        ctx as ZGLRenderingContext
-
-        ctx.bindBuffer(bufferTargetType, buffer)
+        data.content.bind()
     }
 
     actual override fun unbind() {
     }
 
-    private fun initializeBufferKey(ctx: ZRenderingContext, data: ZBufferData) {
-        ctx as ZGLRenderingContext
-
-        val glDataType = toOglBaseType(data.dataType)
-
-        ctx.enableVertexAttrib(data.id)
-        ctx.vertexAttribPointer(
-            data.id,
-            data.size,
-            glDataType,
-            data.normalized,
-            data.stride,
-            data.offset
-        )
-    }
-
-    private fun initializeBuffer(ctx: ZRenderingContext, data: ZBufferData) {
-        if (!data.hasData) {
-            return
-        }
-        ctx as ZGLRenderingContext
-
-        buffer = ctx.createBuffer()
-        // TODO Check errors
-        //        if (!data.buffer) {
-        //            throw Error("Unable to create buffer")
-        //        }
-
-        ctx.bindBuffer(bufferTargetType, buffer)
-        ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
-    }
 
     // TODO: Temporal code for future reference
-    fun initializeBuffer2(ctx: ZRenderingContext) {
+    private fun initializeBufferContent(ctx: ZRenderingContext) {
         ctx as ZGLRenderingContext
 
-        buffer = ctx.createBuffer()
-        ctx.bindBuffer(bufferTargetType, buffer)
-        ctx.bufferData(bufferTargetType, data.dataArray, BufferUsageType.STATIC_DRAW)
-    }
-
-    fun initializeBufferKey2(ctx: ZRenderingContext) {
-        ctx as ZGLRenderingContext
-
-        if (data.isIndexBuffer) {
+        if (data.content.isInitialized) {
             return
         }
+        data.content.initialize(ctx)
+        data.content.renderer.initializeAs(data.isIndexBuffer)
+    }
 
-        val glDataType = toOglBaseType(data.dataType)
+    private fun initializeBufferKey(ctx: ZRenderingContext) {
+        ctx as ZGLRenderingContext
 
-        ctx.bindBuffer(bufferTargetType, buffer)
-
-        ctx.enableVertexAttrib(data.id)
-        ctx.vertexAttribPointer(
-            data.id,
-            data.size,
-            glDataType,
-            data.normalized,
-            data.stride,
-            data.offset
-        )
+        bind()
+        data.key.initialize(ctx)
     }
 
 }

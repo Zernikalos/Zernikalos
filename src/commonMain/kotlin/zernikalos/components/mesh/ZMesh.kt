@@ -12,8 +12,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.ZDataType
-import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
@@ -169,46 +167,6 @@ data class ZMeshData(
 
 }
 
-/**
- * @suppress
- */
-@Serializable
-@JsExport
-data class ZBufferKey(
-    @ProtoNumber(1)
-    var id: Int = -1,
-    @ProtoNumber(2)
-    var dataType: ZDataType = ZTypes.NONE,
-    @ProtoNumber(3)
-    var name: String = "",
-    @ProtoNumber(4)
-    var size: Int = -1,
-    @ProtoNumber(5)
-    var count: Int = -1,
-    @ProtoNumber(6)
-    var normalized: Boolean = false,
-    @ProtoNumber(7)
-    var offset: Int = -1,
-    @ProtoNumber(8)
-    var stride: Int = -1,
-    @ProtoNumber(9)
-    var isIndexBuffer: Boolean = false,
-    @ProtoNumber(10)
-    var bufferId: Int = -1
-)
-
-/**
- * @suppress
- */
-@Serializable
-@JsExport
-data class ZRawBuffer(
-    @ProtoNumber(1)
-    var id: Int = -1,
-    @ProtoNumber(2)
-    var dataArray: ByteArray = byteArrayOf()
-)
-
 @Serializable
 internal data class ZRawMeshData(
     @ProtoNumber(1)
@@ -218,7 +176,7 @@ internal data class ZRawMeshData(
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
-    private var rawBuffers: ArrayList<ZRawBuffer> = arrayListOf()
+    private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
 ) {
 
     @Transient
@@ -232,27 +190,15 @@ internal data class ZRawMeshData(
             }
         }
         bufferKeys.clear()
-        rawBuffers.clear()
+        bufferContents.clear()
     }
 
     private fun buildBufferForKey(key: ZBufferKey): ZBuffer? {
-        val rawBuffer = rawBuffers.find { it.id == key.bufferId }
-        if (rawBuffer == null) {
+        val bufferContent = bufferContents.find { it.id == key.bufferId }
+        if (bufferContent == null) {
             return null
         }
-        return ZBuffer(
-            key.id,
-            key.dataType,
-            key.name,
-            key.size,
-            key.count,
-            key.normalized,
-            key.offset,
-            key.stride,
-            key.isIndexBuffer,
-            key.bufferId,
-            rawBuffer.dataArray
-        )
+        return ZBuffer(key, bufferContent)
     }
 }
 
