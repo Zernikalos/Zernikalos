@@ -12,6 +12,7 @@ import kotlinx.browser.window
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.events.ZUserInputEventHandler
 
 /**
  * @suppress
@@ -62,6 +63,12 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
             _eventHandler = value
             onReady()
         }
+
+    /**
+     * Event handler for user input events (touch, etc.).
+     * Not yet implemented for WebGPU platform.
+     */
+    override var userInputEventHandler: ZUserInputEventHandler? = null
 
     /**
      * Current surface width in pixels

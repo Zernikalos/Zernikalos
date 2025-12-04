@@ -15,6 +15,8 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZRef
 import zernikalos.context.ZContext
+import zernikalos.events.ZObjectTouchListener
+import zernikalos.events.ZTouchEvent
 import zernikalos.logger.ZLoggable
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
@@ -89,6 +91,15 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     private var _initialized: Boolean = false
     val isInitialized: Boolean
         get() = _initialized
+
+    @Transient
+    private var _touchListeners: ArrayList<ZObjectTouchListener> = arrayListOf()
+
+    /**
+     * Returns whether this object has any touch listeners registered.
+     */
+    val hasTouchListeners: Boolean
+        get() = _touchListeners.isNotEmpty()
 
     /**
      * Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.
@@ -183,6 +194,60 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
      */
     fun translate(x: Float, y: Float, z: Float) {
         transform.translate(x, y, z)
+    }
+
+    /**
+     * Adds a touch event listener to this object.
+     *
+     * @param listener The listener interface to add
+     */
+    fun addTouchListener(listener: ZObjectTouchListener) {
+        if (!_touchListeners.contains(listener)) {
+            _touchListeners.add(listener)
+        }
+    }
+
+    /**
+     * Adds a touch event listener using a lambda function.
+     *
+     * @param listener Lambda function that receives the object and touch event
+     */
+    @JsName("addTouchListenerLambda")
+    fun addTouchListener(listener: (ZObject, ZTouchEvent) -> Unit) {
+        val wrapper = object : ZObjectTouchListener {
+            override fun onTouchEvent(obj: ZObject, event: ZTouchEvent) {
+                listener(obj, event)
+            }
+        }
+        addTouchListener(wrapper)
+    }
+
+    /**
+     * Removes a touch event listener from this object.
+     *
+     * @param listener The listener to remove
+     */
+    fun removeTouchListener(listener: ZObjectTouchListener) {
+        _touchListeners.remove(listener)
+    }
+
+    /**
+     * Removes all touch event listeners from this object.
+     */
+    fun removeAllTouchListeners() {
+        _touchListeners.clear()
+    }
+
+    /**
+     * Notifies all registered touch listeners of a touch event.
+     * This method is called internally by the event distribution system.
+     *
+     * @param event The touch event to notify listeners about
+     */
+    internal fun notifyTouchListeners(event: ZTouchEvent) {
+        _touchListeners.forEach { listener ->
+            listener.onTouchEvent(this, event)
+        }
     }
 
     /**

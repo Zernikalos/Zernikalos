@@ -8,6 +8,7 @@
 
 package zernikalos.ui
 
+import zernikalos.events.ZUserInputEventHandler
 import kotlin.js.JsExport
 
 /**
@@ -34,6 +35,12 @@ interface ZSurfaceView {
      * Such as lifecycle and rendering updates, through [ZSurfaceViewEventHandler].
      */
     var eventHandler: ZSurfaceViewEventHandler?
+
+    /**
+     * Represents an event handler that listens to user input events.
+     * Such as touch events, through [ZUserInputEventHandler].
+     */
+    var userInputEventHandler: ZUserInputEventHandler?
 
     /**
      * Disposes the surface view and releases all associated resources.

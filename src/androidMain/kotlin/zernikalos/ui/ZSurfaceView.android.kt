@@ -9,13 +9,13 @@
 package zernikalos.ui
 
 import android.opengl.GLSurfaceView
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
+import zernikalos.events.ZUserInputEventHandler
 
 class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
 
     var nativeSurfaceView: GLSurfaceView
     private val nativeRenderer: AndroidNativeRenderer = AndroidNativeRenderer()
+    private val touchEventConverter = AndroidTouchEventConverter()
 
     override val surfaceWidth: Int
         get() = nativeSurfaceView.width
@@ -29,9 +29,16 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
             nativeRenderer.eventHandler = value
         }
 
+    override var userInputEventHandler: ZUserInputEventHandler? = null
+        set(value) {
+            field = value
+            setupTouchListener()
+        }
+
     init {
         this.nativeSurfaceView = view
         setNativeRenderer()
+        setupTouchListener()
     }
 
     private fun setNativeRenderer() {
@@ -42,7 +49,24 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
         nativeSurfaceView.preserveEGLContextOnPause = true
     }
 
+    private fun setupTouchListener() {
+        nativeSurfaceView.setOnTouchListener { _, event ->
+            val handler = userInputEventHandler
+            if (handler != null && event != null) {
+                val touchEvents = touchEventConverter.convert(event)
+                for (touchEvent in touchEvents) {
+                    handler.onTouchEvent(touchEvent)
+                }
+                true
+            } else {
+                false
+            }
+        }
+    }
+
     override fun dispose() {
+        touchEventConverter.clear()
+        nativeSurfaceView.setOnTouchListener(null)
         nativeRenderer.dispose()
         nativeSurfaceView.onPause()
     }
