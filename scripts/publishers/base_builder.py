@@ -7,15 +7,37 @@ Abstract base class for all Zernikalos publishers
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional, Any, List, Dict
+from dataclasses import dataclass
 from common import BaseScript
+
+
+@dataclass
+class GitHubCredentials:
+    """GitHub credentials container"""
+    user: str
+    token: str
+    
+    def is_valid(self) -> bool:
+        """Check if credentials are valid"""
+        return bool(self.user and self.token)
 
 
 class BaseBuilder(BaseScript, ABC):
     """Abstract base class for all Zernikalos publishers"""
     
-    def __init__(self, script_name: str = "Zernikalos Builder", enabled_publications: Optional[List[str]] = None):
+    def __init__(
+        self, 
+        script_name: str = "Zernikalos Builder", 
+        enabled_publications: Optional[List[str]] = None,
+        credentials: Optional[GitHubCredentials] = None
+    ):
         super().__init__(script_name)
-        self.enabled_publications = enabled_publications or []
+        # Keep None to distinguish between "show info" (None) and "publish nothing" ([])
+        self.enabled_publications = enabled_publications
+        self.credentials = credentials
+        # Sync credentials with parent class attributes for compatibility
+        if credentials:
+            self._sync_credentials_to_attributes()
     
     @abstractmethod
     def authentication(self) -> bool:
@@ -64,8 +86,8 @@ class BaseBuilder(BaseScript, ABC):
         Returns:
             True if valid, False if invalid or empty
         """
+        # Should not be called if enabled_publications is None or empty
         if not self.enabled_publications:
-            self.print_warning("No publications enabled. Nothing to publish.")
             return False
         
         available = {pub["id"] for pub in self.get_available_publications()}
@@ -114,6 +136,38 @@ class BaseBuilder(BaseScript, ABC):
     def _print_unknown_publication(self, pub_id: str) -> None:
         """Print error for unknown publication ID"""
         self.print_error(f"Unknown publication ID: {pub_id}")
+    
+    def _sync_credentials_to_attributes(self) -> None:
+        """Sync credentials object to instance attributes"""
+        if self.credentials:
+            self.github_user = self.credentials.user
+            self.github_token = self.credentials.token
+    
+    def _ensure_credentials(self, args: Optional[Any] = None) -> bool:
+        """
+        Ensure credentials are available, trying multiple sources
+        
+        Returns:
+            True if credentials are available, False otherwise
+        """
+        # First, try to get from args if provided
+        if args:
+            self.set_credentials_from_args(args)
+            # Create credentials object if args provided them
+            if self.github_user and self.github_token:
+                self.credentials = GitHubCredentials(user=self.github_user, token=self.github_token)
+        
+        # If we still don't have credentials, try environment/prompt
+        if not self.credentials:
+            if not self.get_github_credentials():
+                return False
+            # Create credentials object from instance attributes
+            if self.github_user and self.github_token:
+                self.credentials = GitHubCredentials(user=self.github_user, token=self.github_token)
+        
+        # Sync credentials object to instance attributes
+        self._sync_credentials_to_attributes()
+        return True
     
     def _print_build_start(self, build_type: str = "project") -> None:
         """Print message when starting build"""
@@ -188,42 +242,19 @@ class BaseBuilder(BaseScript, ABC):
         """
         pass
     
-    def _handle_action(self, args: Any) -> int:
-        """
-        Handle specific action based on command line arguments
-        
-        Base implementation handles common patterns (info/list flags).
-        Can be overridden for custom behavior.
-        
-        Args:
-            args: Parsed command line arguments
-            
-        Returns:
-            Exit code (0 for success, 1 for failure)
-        """
-        # Check for info flag (common pattern)
-        if hasattr(args, 'info') and args.info:
-            return 0 if self.get_publish_info() else 1
-        
-        # Check for list flag (common pattern, e.g., NPM)
-        if hasattr(args, 'list') and args.list:
-            return 0 if self.get_publish_info() else 1
-        
-        # Otherwise, publish enabled publications
-        return 0 if self.publish() else 1
-    
-    def run(self, args) -> int:
+    def run(self, args: Optional[Any] = None) -> int:
         """
         Main execution method - common flow for all builders
         
         Args:
-            args: Parsed command line arguments
+            args: Optional parsed command line arguments (for backward compatibility)
             
         Returns:
             Exit code (0 for success, 1 for failure)
         """
-        # Set credentials from command line if provided
-        self.set_credentials_from_args(args)
+        # Ensure credentials are available
+        if not self._ensure_credentials(args):
+            return 1
         
         # Check prerequisites
         if not self.check_directory():
@@ -241,14 +272,12 @@ class BaseBuilder(BaseScript, ABC):
         if not self.build_verify():
             return 1
         
-        # Get project version (if needed by the builder)
-        # Some builders may need version, others may not
-        # Only check version if info is requested or if builder needs it
-        if hasattr(args, 'info') and args.info:
-            version = self.get_project_version()
-            if version is None:
-                self.print_warning("Could not get project version, but continuing...")
-        
-        # Handle specific action (info or publish)
-        return self._handle_action(args)
+        # Determine action based on enabled_publications
+        # None = show info, [] = no action, [items] = publish
+        if self.enabled_publications is None:
+            return 0 if self.get_publish_info() else 1
+        elif not self.enabled_publications:
+            return 0
+        else:
+            return 0 if self.publish() else 1
 

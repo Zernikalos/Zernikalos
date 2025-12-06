@@ -171,7 +171,8 @@ class GradleTool:
         success, _, _ = self.run_command(
             'publishAndroidDebugPublicationToMavenRepository',
             f'-Puser={user}',
-            f'-Paccess_token={access_token}'
+            f'-Paccess_token={access_token}',
+            show_output=True
         )
         return success
     
@@ -189,7 +190,8 @@ class GradleTool:
         success, _, _ = self.run_command(
             'publishAndroidReleasePublicationToMavenRepository',
             f'-Puser={user}',
-            f'-Paccess_token={access_token}'
+            f'-Paccess_token={access_token}',
+            show_output=True
         )
         return success
     
@@ -207,7 +209,41 @@ class GradleTool:
         success, _, _ = self.run_command(
             'publishAllPublicationsToMavenRepository',
             f'-Puser={user}',
-            f'-Paccess_token={access_token}'
+            f'-Paccess_token={access_token}',
+            show_output=True
         )
         return success
+    
+    def check_status(self) -> dict:
+        """
+        Check Gradle tool status and configuration
+        
+        Returns:
+            Dictionary with status information:
+            - available: bool
+            - version: Optional[str]
+            - gradlew_path: str
+            - project_root: str
+            - message: str
+        """
+        is_available, version_info = self.check_available()
+        
+        # Try to extract version from output
+        version = None
+        if version_info:
+            # Look for Gradle version line
+            for line in version_info.split('\n'):
+                if 'Gradle' in line and 'version' in line.lower():
+                    parts = line.split()
+                    if len(parts) > 1:
+                        version = parts[-1]
+                        break
+        
+        return {
+            'available': is_available,
+            'version': version,
+            'gradlew_path': str(self.gradlew_path),
+            'project_root': str(self.project_root),
+            'message': version_info if not is_available else f"Gradle {version or 'available'}"
+        }
 

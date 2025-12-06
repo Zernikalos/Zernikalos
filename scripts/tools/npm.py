@@ -211,4 +211,26 @@ class NpmTool:
             if show_output:
                 print(f"Error: {error_msg}")
             return False, None, error_msg
+    
+    def check_status(self) -> dict:
+        """
+        Check NPM tool status and configuration
+        
+        Returns:
+            Dictionary with status information:
+            - available: bool
+            - version: Optional[str]
+            - token_set: bool
+            - project_root: str
+            - message: str
+        """
+        is_available, version = self.check_available()
+        
+        return {
+            'available': is_available,
+            'version': version,
+            'token_set': self.github_token is not None,
+            'project_root': str(self.project_root),
+            'message': f"npm {version}" if is_available and version else "npm not available"
+        }
 
