@@ -103,8 +103,6 @@ class AllPublisher(BaseScript):
             
     def publish_all(self) -> bool:
         """Publish all artifacts (NPM + Android)"""
-        self.print_header("ZERNIKALOS COMPLETE PUBLISH")
-        
         success = True
         
         # Publish NPM packages
@@ -116,7 +114,7 @@ class AllPublisher(BaseScript):
             success = False
             
         # Final summary
-        self.print_header("PUBLISH SUMMARY")
+        self.print_header("ZERNIKALOS COMPLETE PUBLISH")
         if success:
             self.print_success("All artifacts published successfully!")
             self.print_status("NPM packages: ✅ Published to GitHub Packages")

@@ -30,7 +30,8 @@ class NpmPublisher(BaseScript):
             return False
 
         # Set npm authentication environment variables
-        os.environ['NPM_AUTH_TOKEN'] = self.github_token
+        # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
+        os.environ['NODE_AUTH_TOKEN'] = self.github_token
 
         self.print_success("npm authentication configured via environment variables")
         return True
@@ -57,13 +58,14 @@ class NpmPublisher(BaseScript):
             return self.setup_npm_auth()
 
         # Ensure environment variables are set
-        os.environ['NPM_AUTH_TOKEN'] = self.github_token
+        # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
+        os.environ['NODE_AUTH_TOKEN'] = self.github_token
 
         self.print_success("npm authentication configured")
         return True
 
-    def list_packages(self) -> List[Tuple[str, str]]:
-        """List available packages"""
+    def list_packages(self, exclude_test: bool = True) -> List[Tuple[str, str]]:
+        """List available packages, optionally excluding test packages"""
         self.print_status("Available packages in build/js/packages/@zernikalos/:")
 
         packages_dir = self.project_root / "build" / "js" / "packages" / "@zernikalos"
@@ -76,6 +78,11 @@ class NpmPublisher(BaseScript):
         for package_dir in packages_dir.iterdir():
             if package_dir.is_dir():
                 package_name = package_dir.name
+                
+                # Exclude test packages
+                if exclude_test and ('test' in package_name.lower() or package_name.endswith('-test')):
+                    continue
+                
                 package_json = package_dir / "package.json"
 
                 if package_json.exists():
@@ -107,13 +114,16 @@ class NpmPublisher(BaseScript):
 
         # Filter packages if specified
         if package_filter:
-            filtered_packages = [(name, version) for name, version in packages if package_filter in name]
+            # Additional safety: exclude test packages even when filter is specified
+            filtered_packages = [(name, version) for name, version in packages 
+                               if package_filter in name and 'test' not in name.lower()]
             if not filtered_packages:
                 self.print_error(f"No packages found matching filter: {package_filter}")
                 return False
             packages = filtered_packages
         else:
             # When no filter specified, only publish the main zernikalos package
+            # Test packages are already excluded by list_packages()
             main_package = [(name, version) for name, version in packages if name == "zernikalos"]
             if not main_package:
                 self.print_error("Main zernikalos package not found")
@@ -141,8 +151,9 @@ class NpmPublisher(BaseScript):
 
         try:
             # Set up environment for npm publish
+            # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
             env = os.environ.copy()
-            env['NPM_AUTH_TOKEN'] = self.github_token
+            env['NODE_AUTH_TOKEN'] = self.github_token
 
             # Build npm publish command
             cmd = ['npm', 'publish']
