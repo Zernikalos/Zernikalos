@@ -9,7 +9,7 @@ Python script for publishing Android libraries to GitHub Packages
 import sys
 import argparse
 from pathlib import Path
-from typing import Optional, List, Tuple, Any
+from typing import Optional, List, Tuple, Any, Dict
 from common import add_common_arguments
 from base_builder import BaseBuilder
 
@@ -17,8 +17,17 @@ from base_builder import BaseBuilder
 class AndroidPublisher(BaseBuilder):
     """Main class for Android artifact publishing functionality"""
     
-    def __init__(self):
-        super().__init__("Zernikalos Android Publisher")
+    def __init__(self, enabled_publications: Optional[List[str]] = None):
+        super().__init__("Zernikalos Android Publisher", enabled_publications=enabled_publications)
+    
+    def get_available_publications(self) -> List[Dict[str, str]]:
+        """Get list of available publications"""
+        return [
+            {"id": "debug", "name": "Debug", "description": "Android Debug artifacts"},
+            {"id": "release", "name": "Release", "description": "Android Release artifacts"},
+            {"id": "all", "name": "All Android", "description": "Both Debug and Release artifacts"},
+            {"id": "all_publications", "name": "All Publications", "description": "All Maven publications (Android + JS)"}
+        ]
     
     def authentication(self) -> bool:
         """Setup and verify authentication"""
@@ -26,40 +35,36 @@ class AndroidPublisher(BaseBuilder):
     
     def build(self) -> bool:
         """Build the Android project"""
-        self.print_status("Building Android project...")
         return self.gradle.build()
     
     def build_verify(self) -> bool:
         """Verify that build directory exists and artifacts are ready"""
         build_dir = self.project_root / "build"
         if not build_dir.exists():
-            self.print_warning("Build directory 'build' does not exist")
-            self.print_status("Building project automatically...")
+            self._print_build_auto("build")
             return self.build()
         return True
     
-    def publish(self, variant: str = "all_publications", *args, **kwargs) -> bool:
+    def _publish_publication(self, pub_id: str) -> bool:
         """
-        Publish artifacts to the repository
+        Publish a specific publication by ID
         
         Args:
-            variant: Publication variant (debug, release, all, all_publications)
-            *args: Variable positional arguments
-            **kwargs: Variable keyword arguments
+            pub_id: Publication ID to publish
             
         Returns:
             True if publish is successful, False otherwise
         """
-        if variant == "debug":
+        if pub_id == "debug":
             return self._publish_debug()
-        elif variant == "release":
+        elif pub_id == "release":
             return self._publish_release()
-        elif variant == "all":
+        elif pub_id == "all":
             return self._publish_all_android()
-        elif variant == "all_publications":
+        elif pub_id == "all_publications":
             return self._publish_all_publications()
         else:
-            self.print_error(f"Unknown publish variant: {variant}")
+            self._print_unknown_publication(pub_id)
             return False
     
     def get_publish_info(self) -> bool:
@@ -85,72 +90,19 @@ class AndroidPublisher(BaseBuilder):
         """Check if Gradle is available"""
         return self.check_gradle()
     
-    def _get_default_action(self) -> int:
-        """Get the default action when no specific action is provided"""
-        self.get_publish_info()
-        print()
-        
-        try:
-            response = input("What would you like to publish? (debug/release/all/all_publications/info): ").lower().strip()
-            
-            if response in ['debug', 'd']:
-                return 0 if self.publish("debug") else 1
-            elif response in ['release', 'r']:
-                return 0 if self.publish("release") else 1
-            elif response in ['all', 'a']:
-                return 0 if self.publish("all") else 1
-            elif response in ['all_publications', 'ap', 'allpub']:
-                return 0 if self.publish("all_publications") else 1
-            elif response in ['info', 'i']:
-                self.get_publish_info()
-                return 0
-            else:
-                self.print_warning("Invalid option. Use: debug, release, all, all_publications, or info")
-                return 0
-                
-        except KeyboardInterrupt:
-            print()
-            self.print_warning("Operation cancelled by user")
-            return 0
-    
-    def _handle_action(self, args: Any) -> int:
-        """Handle specific action based on command line arguments"""
-        if args.debug:
-            return 0 if self.publish("debug") else 1
-        elif args.release:
-            return 0 if self.publish("release") else 1
-        elif args.all:
-            return 0 if self.publish("all") else 1
-        elif args.all_publications:
-            return 0 if self.publish("all_publications") else 1
-        elif args.info:
-            return 0 if self.get_publish_info() else 1
-        else:
-            return self._get_default_action()
+    # _handle_action is inherited from BaseBuilder and works for AndroidPublisher
     
     # Private methods for internal publishing operations
     def _publish_debug(self) -> bool:
         """Publish Android Debug artifacts to GitHub Packages"""
-        self.print_status("Publishing Android Debug artifacts...")
-        
-        success = self.gradle.publish_android_debug(self.github_user, self.github_token)
-        if success:
-            self.print_success("Android Debug artifacts published successfully!")
-        return success
+        return self.gradle.publish_android_debug(self.github_user, self.github_token)
     
     def _publish_release(self) -> bool:
         """Publish Android Release artifacts to GitHub Packages"""
-        self.print_status("Publishing Android Release artifacts...")
-        
-        success = self.gradle.publish_android_release(self.github_user, self.github_token)
-        if success:
-            self.print_success("Android Release artifacts published successfully!")
-        return success
+        return self.gradle.publish_android_release(self.github_user, self.github_token)
     
     def _publish_all_android(self) -> bool:
         """Publish both Android Debug and Release artifacts"""
-        self.print_status("Publishing all Android artifacts...")
-        
         success = True
         
         # Publish Debug
@@ -167,18 +119,50 @@ class AndroidPublisher(BaseBuilder):
     
     def _publish_all_publications(self) -> bool:
         """Publish ALL publications to Maven Repository (recommended)"""
-        self.print_status("Publishing ALL publications to Maven Repository...")
-        
         self.print_status("This will publish:")
         self.print_status("  - dev.zernikalos:zernikalos (Android)")
         self.print_status("  - dev.zernikalos:zernikalos-js (JavaScript/Kotlin)")
         self.print_status("  - Any other configured publications")
         
-        success = self.gradle.publish_all_publications(self.github_user, self.github_token)
-        if success:
-            self.print_success("ALL publications published successfully to Maven Repository!")
-        return success
+        return self.gradle.publish_all_publications(self.github_user, self.github_token)
         
+        
+
+def _select_publications_interactive(publisher: AndroidPublisher) -> Optional[List[str]]:
+    """Interactive selection of publications to enable"""
+    publications = publisher.get_available_publications()
+    
+    publisher.get_publish_info()
+    print()
+    publisher.print_status("Available publications:")
+    for i, pub in enumerate(publications, 1):
+        print(f"  {i}. {pub['name']} ({pub['id']}) - {pub['description']}")
+    
+    print()
+    try:
+        response = input("Select publications to publish (comma-separated numbers, or 'all' for all): ").strip().lower()
+        
+        if response == 'all':
+            return [pub['id'] for pub in publications]
+        
+        # Parse comma-separated numbers
+        selected_indices = [int(x.strip()) - 1 for x in response.split(',') if x.strip().isdigit()]
+        
+        if not selected_indices:
+            publisher.print_warning("No valid selections. Nothing will be published.")
+            return []
+        
+        # Validate indices
+        valid_indices = [i for i in selected_indices if 0 <= i < len(publications)]
+        if len(valid_indices) != len(selected_indices):
+            publisher.print_warning("Some selections were invalid. Using valid selections only.")
+        
+        return [publications[i]['id'] for i in valid_indices]
+        
+    except (ValueError, KeyboardInterrupt):
+        print()
+        publisher.print_warning("Operation cancelled by user")
+        return None
 
 
 def main():
@@ -230,35 +214,59 @@ Published artifacts:
     
     args = parser.parse_args()
     
-    # Create publisher and run
-    publisher = AndroidPublisher()
+    # Determine enabled publications from args
+    enabled_publications: Optional[List[str]] = None
+    
+    if args.info:
+        # Only show info, don't publish
+        enabled_publications = None
+    elif args.debug:
+        enabled_publications = ["debug"]
+    elif args.release:
+        enabled_publications = ["release"]
+    elif args.all:
+        enabled_publications = ["all"]
+    elif args.all_publications:
+        enabled_publications = ["all_publications"]
+    else:
+        # No specific action, create temporary publisher for interactive selection
+        temp_publisher = AndroidPublisher()
+        enabled_publications = _select_publications_interactive(temp_publisher)
+        if enabled_publications is None:
+            return 0  # User cancelled
+    
+    # Create publisher with enabled publications and run
+    publisher = AndroidPublisher(enabled_publications=enabled_publications)
     return publisher.run(args)
 
 
 def run_android_publish(github_user: str, github_token: str, action: str = "info") -> bool:
     """Run Android publish functionality programmatically"""
+    # Map action to enabled publications
+    action_to_publications = {
+        "debug": ["debug"],
+        "release": ["release"],
+        "all": ["all"],
+        "all_publications": ["all_publications"],
+        "info": None
+    }
+    
+    enabled_publications = action_to_publications.get(action)
+    
     # Create a mock args object
     class MockArgs:
-        def __init__(self, debug=False, release=False, all=False, all_publications=False, info=False, user="", token=""):
-            self.debug = debug
-            self.release = release
-            self.all = all
-            self.all_publications = all_publications
+        def __init__(self, info=False, user="", token=""):
             self.info = info
             self.user = user
             self.token = token
     
     args = MockArgs(
-        debug=(action == "debug"),
-        release=(action == "release"),
-        all=(action == "all"),
-        all_publications=(action == "all_publications"),
         info=(action == "info"),
         user=github_user,
         token=github_token
     )
     
-    publisher = AndroidPublisher()
+    publisher = AndroidPublisher(enabled_publications=enabled_publications)
     if args.user:
         publisher.github_user = args.user
     if args.token:

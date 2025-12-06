@@ -9,7 +9,7 @@ Python version of the original publish-npm.sh script
 import sys
 import argparse
 from pathlib import Path
-from typing import Optional, List, Tuple, Any
+from typing import Optional, List, Tuple, Any, Dict
 from common import add_common_arguments
 from base_builder import BaseBuilder
 
@@ -17,8 +17,14 @@ from base_builder import BaseBuilder
 class NpmPublisher(BaseBuilder):
     """Main class for NPM package publishing functionality"""
 
-    def __init__(self):
-        super().__init__("Zernikalos NPM Publisher")
+    def __init__(self, enabled_publications: Optional[List[str]] = None):
+        super().__init__("Zernikalos NPM Publisher", enabled_publications=enabled_publications)
+    
+    def get_available_publications(self) -> List[Dict[str, str]]:
+        """Get list of available publications"""
+        return [
+            {"id": "all", "name": "All Packages", "description": "Publish main zernikalos package"}
+        ]
     
     def authentication(self) -> bool:
         """Setup and verify authentication"""
@@ -30,36 +36,35 @@ class NpmPublisher(BaseBuilder):
         
         # Set npm authentication token
         self.npm.set_auth_token(self.github_token)
-        self.print_success("npm authentication configured")
         return True
     
     def build(self) -> bool:
         """Build packages with webpack"""
-        self.print_status("Building packages with webpack...")
         return self.gradle.js_browser_production_webpack()
     
     def build_verify(self) -> bool:
         """Verify that build directory exists and artifacts are ready"""
         build_dir = self.project_root / "build" / "js"
         if not build_dir.exists():
-            self.print_warning("Build directory 'build/js' does not exist")
-            self.print_status("Building packages automatically...")
+            self._print_build_auto("build/js")
             return self.build()
         return True
     
-    def publish(self, package_name: Optional[str] = None, *args, **kwargs) -> bool:
+    def _publish_publication(self, pub_id: str) -> bool:
         """
-        Publish artifacts to the repository
+        Publish a specific publication by ID
         
         Args:
-            package_name: Optional package name to publish (None = all packages)
-            *args: Variable positional arguments
-            **kwargs: Variable keyword arguments
+            pub_id: Publication ID to publish
             
         Returns:
             True if publish is successful, False otherwise
         """
-        return self._publish_workspace(package_name)
+        if pub_id == "all":
+            return self._publish_workspace(None)
+        else:
+            self._print_unknown_publication(pub_id)
+            return False
     
     def get_publish_info(self) -> bool:
         """Get and display publication information"""
@@ -76,22 +81,15 @@ class NpmPublisher(BaseBuilder):
         """Check if npm is available"""
         return self.check_npm()
     
-    def _get_default_action(self) -> int:
-        """Get the default action when no specific action is provided"""
-        self._list_packages()
-        return self.get_publish_info() and 0 or 1
-    
     def _handle_action(self, args: Any) -> int:
         """Handle specific action based on command line arguments"""
+        # Override to handle list flag specially (needs to list packages first)
         if args.list:
             self._list_packages()
-            return self.get_publish_info() and 0 or 1
-        elif args.all:
-            return 0 if self.publish() else 1
-        elif args.package:
-            return 0 if self.publish(args.package) else 1
-        else:
-            return self._get_default_action()
+            return 0 if self.get_publish_info() else 1
+        
+        # Otherwise use base implementation
+        return super()._handle_action(args)
     
     # Private methods for internal operations
     def _list_packages(self, exclude_test: bool = True) -> List[Tuple[str, str]]:
@@ -115,8 +113,6 @@ class NpmPublisher(BaseBuilder):
         if not workspace_dir.exists():
             self.print_error("Workspace directory 'build/js' not found")
             return False
-
-        self.print_status("Publishing workspace packages...")
 
         # Get workspace packages info
         packages = self._list_packages()
@@ -146,20 +142,6 @@ class NpmPublisher(BaseBuilder):
         for package_name, version in packages:
             print(f"  - @zernikalos/{package_name} (v{version})")
 
-        # Confirm publication
-        try:
-            response = input(f"Proceed with publishing {len(packages)} package(s)? (y/N): ")
-            if response.lower() != 'y':
-                self.print_warning("Publication cancelled")
-                return True
-        except KeyboardInterrupt:
-            print()
-            self.print_warning("Operation cancelled by user")
-            return True
-
-        # Publish using workspace
-        self.print_status("Publishing to GitHub Packages using workspace...")
-
         # Ensure npm has the auth token
         self.npm.set_auth_token(self.github_token)
 
@@ -171,15 +153,43 @@ class NpmPublisher(BaseBuilder):
         )
 
         if success:
-            self.print_success(f"Workspace packages published successfully!")
             for package_name, version in packages:
                 self.print_status(f"  - @zernikalos/{package_name} v{version}")
                 self.print_status(f"    Available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
-            return True
-        else:
-            self.print_error("npm publish failed")
-            return False
+        
+        return success
 
+
+def _select_publications_interactive(publisher: NpmPublisher) -> Optional[List[str]]:
+    """Interactive selection of publications to enable"""
+    publications = publisher.get_available_publications()
+    
+    publisher._list_packages()
+    print()
+    publisher.print_status("Available publications:")
+    for i, pub in enumerate(publications, 1):
+        print(f"  {i}. {pub['name']} ({pub['id']}) - {pub['description']}")
+    
+    print()
+    try:
+        response = input("Select publication to publish (number, or 'all' for all): ").strip().lower()
+        
+        if response == 'all':
+            return [pub['id'] for pub in publications]
+        
+        # Parse number
+        if response.isdigit():
+            index = int(response) - 1
+            if 0 <= index < len(publications):
+                return [publications[index]['id']]
+        
+        publisher.print_warning("Invalid selection. Nothing will be published.")
+        return []
+        
+    except (ValueError, KeyboardInterrupt):
+        print()
+        publisher.print_warning("Operation cancelled by user")
+        return None
 
 
 def main():
@@ -192,8 +202,7 @@ Examples:
   python publish-npm.py                                    # Show available packages
   python publish-npm.py -l                                 # List available packages
   python publish-npm.py -a                                 # Publish all packages
-  python publish-npm.py zernikalos                         # Publish specific package
-  python publish-npm.py -u Zernikalos -t TOKEN zernikalos # With custom credentials
+  python publish-npm.py -u Zernikalos -t TOKEN -a          # With custom credentials
 
 Prerequisites:
   1. Ensure you have npm installed and configured
@@ -212,39 +221,56 @@ Prerequisites:
                        help='List available packages')
     parser.add_argument('-a', '--all', action='store_true',
                        help='Publish all packages')
-    parser.add_argument('package', nargs='?',
-                       help='Package name to publish')
 
     # Add common arguments
     add_common_arguments(parser)
 
     args = parser.parse_args()
 
-    # Create publisher and run
-    publisher = NpmPublisher()
+    # Determine enabled publications from args
+    enabled_publications: Optional[List[str]] = None
+    
+    if args.list:
+        # Only show list, don't publish
+        enabled_publications = None
+    elif args.all:
+        enabled_publications = ["all"]
+    else:
+        # No specific action, create temporary publisher for interactive selection
+        temp_publisher = NpmPublisher()
+        enabled_publications = _select_publications_interactive(temp_publisher)
+        if enabled_publications is None:
+            return 0  # User cancelled
+    
+    # Create publisher with enabled publications and run
+    publisher = NpmPublisher(enabled_publications=enabled_publications)
     return publisher.run(args)
 
 
 def run_npm_publish(github_user: str, github_token: str, action: str = "list", package_name: str = None) -> bool:
     """Run NPM publish functionality programmatically"""
+    # Map action to enabled publications
+    action_to_publications = {
+        "list": None,
+        "all": ["all"]
+    }
+    
+    enabled_publications = action_to_publications.get(action)
+    
     # Create a mock args object
     class MockArgs:
-        def __init__(self, list_flag=False, all_flag=False, user="", token="", package=None):
+        def __init__(self, list_flag=False, user="", token=""):
             self.list = list_flag
-            self.all = all_flag
             self.user = user
             self.token = token
-            self.package = package
 
     args = MockArgs(
         list_flag=(action == "list"),
-        all_flag=(action == "all"),
         user=github_user,
-        token=github_token,
-        package=package_name
+        token=github_token
     )
 
-    publisher = NpmPublisher()
+    publisher = NpmPublisher(enabled_publications=enabled_publications)
     if args.user:
         publisher.github_user = args.user
     if args.token:
