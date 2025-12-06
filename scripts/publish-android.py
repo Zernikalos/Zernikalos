@@ -24,7 +24,7 @@ class AndroidPublisher(BaseScript):
     def build_project(self) -> bool:
         """Build the Android project"""
         self.print_status("Building Android project...")
-        return self.run_gradle_command('build')
+        return self.gradle.build()
             
     def check_build_directory(self) -> bool:
         """Check if build directory exists"""
@@ -40,9 +40,7 @@ class AndroidPublisher(BaseScript):
         """Publish Android Debug artifacts to GitHub Packages"""
         self.print_status("Publishing Android Debug artifacts...")
         
-        success = self.run_gradle_command('publishAndroidDebugPublicationToMavenRepository',
-                                        f'-Puser={self.github_user}',
-                                        f'-Paccess_token={self.github_token}')
+        success = self.gradle.publish_android_debug(self.github_user, self.github_token)
         if success:
             self.print_success("Android Debug artifacts published successfully!")
         return success
@@ -51,9 +49,7 @@ class AndroidPublisher(BaseScript):
         """Publish Android Release artifacts to GitHub Packages"""
         self.print_status("Publishing Android Release artifacts...")
         
-        success = self.run_gradle_command('publishAndroidReleasePublicationToMavenRepository',
-                                        f'-Puser={self.github_user}',
-                                        f'-Paccess_token={self.github_token}')
+        success = self.gradle.publish_android_release(self.github_user, self.github_token)
         if success:
             self.print_success("Android Release artifacts published successfully!")
         return success
@@ -85,9 +81,7 @@ class AndroidPublisher(BaseScript):
         self.print_status("  - dev.zernikalos:zernikalos-js (JavaScript/Kotlin)")
         self.print_status("  - Any other configured publications")
         
-        success = self.run_gradle_command('publishAllPublicationsToMavenRepository',
-                                        f'-Puser={self.github_user}',
-                                        f'-Paccess_token={self.github_token}')
+        success = self.gradle.publish_all_publications(self.github_user, self.github_token)
         if success:
             self.print_success("ALL publications published successfully to Maven Repository!")
         return success

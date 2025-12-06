@@ -6,10 +6,7 @@ Publishes NPM packages to GitHub Packages
 Python version of the original publish-npm.sh script
 """
 
-import os
 import sys
-import subprocess
-import json
 import argparse
 from pathlib import Path
 from typing import Optional, List, Tuple
@@ -29,9 +26,8 @@ class NpmPublisher(BaseScript):
         if not self.get_github_credentials():
             return False
 
-        # Set npm authentication environment variables
-        # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
-        os.environ['NODE_AUTH_TOKEN'] = self.github_token
+        # Set npm authentication token
+        self.npm.set_auth_token(self.github_token)
 
         self.print_success("npm authentication configured via environment variables")
         return True
@@ -39,7 +35,7 @@ class NpmPublisher(BaseScript):
     def build_packages(self) -> bool:
         """Build packages with webpack"""
         self.print_status("Building packages with webpack...")
-        return self.run_gradle_command('jsBrowserProductionWebpack')
+        return self.gradle.js_browser_production_webpack()
 
     def check_build_directory(self) -> bool:
         """Check if build directory exists"""
@@ -57,9 +53,8 @@ class NpmPublisher(BaseScript):
             self.print_status("Setting up npm authentication...")
             return self.setup_npm_auth()
 
-        # Ensure environment variables are set
-        # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
-        os.environ['NODE_AUTH_TOKEN'] = self.github_token
+        # Set npm authentication token
+        self.npm.set_auth_token(self.github_token)
 
         self.print_success("npm authentication configured")
         return True
@@ -68,32 +63,13 @@ class NpmPublisher(BaseScript):
         """List available packages, optionally excluding test packages"""
         self.print_status("Available packages in build/js/packages/@zernikalos/:")
 
-        packages_dir = self.project_root / "build" / "js" / "packages" / "@zernikalos"
-        packages = []
-
-        if not packages_dir.exists():
+        packages = self.npm.list_packages(exclude_test=exclude_test)
+        
+        if not packages:
             self.print_error("No packages found in build/js/packages/@zernikalos/")
-            return packages
-
-        for package_dir in packages_dir.iterdir():
-            if package_dir.is_dir():
-                package_name = package_dir.name
-                
-                # Exclude test packages
-                if exclude_test and ('test' in package_name.lower() or package_name.endswith('-test')):
-                    continue
-                
-                package_json = package_dir / "package.json"
-
-                if package_json.exists():
-                    try:
-                        with open(package_json, 'r') as f:
-                            data = json.load(f)
-                            version = data.get('version', 'unknown')
-                            packages.append((package_name, version))
-                            print(f"  - {package_name} (v{version})")
-                    except (json.JSONDecodeError, IOError):
-                        print(f"  - {package_name} (error reading version)")
+        else:
+            for package_name, version in packages:
+                print(f"  - {package_name} (v{version})")
 
         return packages
 
@@ -149,45 +125,24 @@ class NpmPublisher(BaseScript):
         # Publish using workspace
         self.print_status("Publishing to GitHub Packages using workspace...")
 
-        try:
-            # Set up environment for npm publish
-            # npm uses NODE_AUTH_TOKEN for GitHub Packages authentication
-            env = os.environ.copy()
-            env['NODE_AUTH_TOKEN'] = self.github_token
+        # Ensure npm has the auth token
+        self.npm.set_auth_token(self.github_token)
 
-            # Build npm publish command
-            cmd = ['npm', 'publish']
+        # Publish using npm tool
+        success, stdout, stderr = self.npm.publish_workspace(
+            workspace_dir,
+            package_filter=package_filter,
+            show_output=True
+        )
 
-            # Add workspace filter if specified
-            if package_filter:
-                cmd.extend(['--workspace', f'@zernikalos/{package_filter}'])
-            else:
-                # Publish only the main zernikalos package
-                cmd.extend(['--workspace', '@zernikalos/zernikalos'])
-
-            # Run npm publish
-            result = subprocess.run(cmd, capture_output=True, text=True, env=env, cwd=workspace_dir)
-
-            # Show npm output
-            if result.stdout:
-                print("npm output:")
-                print(result.stdout)
-            if result.stderr:
-                print("npm errors:")
-                print(result.stderr)
-
-            if result.returncode == 0:
-                self.print_success(f"Workspace packages published successfully!")
-                for package_name, version in packages:
-                    self.print_status(f"  - @zernikalos/{package_name} v{version}")
-                    self.print_status(f"    Available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
-                return True
-            else:
-                self.print_error(f"npm publish failed with exit code {result.returncode}")
-                return False
-
-        except Exception as e:
-            self.print_error(f"Failed to publish workspace: {e}")
+        if success:
+            self.print_success(f"Workspace packages published successfully!")
+            for package_name, version in packages:
+                self.print_status(f"  - @zernikalos/{package_name} v{version}")
+                self.print_status(f"    Available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
+            return True
+        else:
+            self.print_error("npm publish failed")
             return False
 
     def publish_package(self, package_name: str) -> bool:

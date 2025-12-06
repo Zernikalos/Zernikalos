@@ -6,11 +6,11 @@ Shared functionality for all Zernikalos scripts
 
 import os
 import sys
-import subprocess
 import getpass
 import argparse
 from pathlib import Path
 from typing import Optional, Tuple
+from tools import GitTool, GradleTool, NpmTool
 
 
 class Colors:
@@ -30,6 +30,11 @@ class BaseScript:
         self.github_user = os.environ.get('GITHUB_ACTOR') or os.environ.get('GITHUB_USER', 'Zernikalos')
         self.github_token = os.environ.get('GITHUB_TOKEN')
         self.project_root = Path.cwd()
+        
+        # Initialize tools
+        self.git = GitTool(self.project_root)
+        self.gradle = GradleTool(self.project_root)
+        self.npm = NpmTool(self.project_root)
         
     def print_status(self, message: str) -> None:
         """Print status message with blue color"""
@@ -91,24 +96,22 @@ class BaseScript:
         
     def check_npm(self) -> bool:
         """Check if npm is available"""
-        try:
-            result = subprocess.run(['npm', '--version'], 
-                                  capture_output=True, text=True, check=True)
-            self.print_success(f"npm version: {result.stdout.strip()}")
+        is_available, version = self.npm.check_available()
+        if is_available:
+            self.print_success(f"npm version: {version}")
             return True
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        else:
             self.print_error("npm is not installed or not in PATH")
             self.print_error("Please install Node.js and npm first")
             return False
             
     def check_gradle(self) -> bool:
         """Check if gradle is available"""
-        try:
-            result = subprocess.run(['./gradlew', '--version'], 
-                                  capture_output=True, text=True, check=True)
+        is_available, _ = self.gradle.check_available()
+        if is_available:
             self.print_success("Gradle available")
             return True
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        else:
             self.print_error("Gradle wrapper not found or not executable")
             self.print_error("Please ensure gradlew is present and executable")
             return False
@@ -130,14 +133,13 @@ class BaseScript:
             
     def run_gradle_command(self, command: str, *args) -> bool:
         """Run a gradle command with error handling"""
-        try:
-            cmd = ['./gradlew', command] + list(args)
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        success, _, stderr = self.gradle.run_command(command, *args, show_output=False)
+        if success:
             return True
-        except subprocess.CalledProcessError as e:
-            self.print_error(f"Failed to run gradle command '{command}': {e}")
-            if e.stderr:
-                print(f"Error details: {e.stderr}")
+        else:
+            self.print_error(f"Failed to run gradle command '{command}'")
+            if stderr:
+                print(f"Error details: {stderr}")
             return False
             
     def confirm_action(self, message: str, default: bool = False) -> bool:
@@ -178,38 +180,19 @@ def validate_version(version: str) -> bool:
     return True
 
 
-def check_git_status() -> Tuple[bool, str]:
+def check_git_status(project_root: Path = None) -> Tuple[bool, str]:
     """Check if git working directory is clean"""
-    try:
-        result = subprocess.run(['git', 'status', '--porcelain'], 
-                              capture_output=True, text=True, check=True)
-        is_clean = not result.stdout.strip()
-        return is_clean, result.stdout
-    except subprocess.CalledProcessError as e:
-        return False, f"Failed to check git status: {e}"
+    git = GitTool(project_root)
+    return git.check_status()
 
 
-def check_version_exists(version: str) -> bool:
+def check_version_exists(version: str, project_root: Path = None) -> bool:
     """Check if version tag already exists"""
-    try:
-        result = subprocess.run(['git', 'tag', '-l'], 
-                              capture_output=True, text=True, check=True)
-        return f"v{version}" in result.stdout
-    except subprocess.CalledProcessError:
-        return False
+    git = GitTool(project_root)
+    return git.check_tag_exists(f"v{version}")
 
 
-def push_to_remote(branch: str = "main", tag: str = None) -> bool:
+def push_to_remote(branch: str = "main", tag: str = None, project_root: Path = None) -> bool:
     """Push changes and optionally a tag to remote repository"""
-    try:
-        # Push branch
-        subprocess.run(['git', 'push', 'origin', branch], check=True)
-        
-        # Push tag if provided
-        if tag:
-            subprocess.run(['git', 'push', 'origin', tag], check=True)
-            
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to push to remote: {e}")
-        return False
+    git = GitTool(project_root)
+    return git.push_branch_and_tag(branch, tag)
