@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Zernikalos Android Publish Script
-Publishes Android artifacts to GitHub Packages Maven Repository
+Auxiliary script for publishing Android artifacts to GitHub Packages Maven Repository
 
-Python script for publishing Android libraries to GitHub Packages
+This script is designed to be called from publish-all.py, but can also be run independently.
 """
 
 import sys
@@ -166,9 +166,14 @@ def _select_publications_interactive(publisher: AndroidPublisher) -> Optional[Li
 
 
 def main():
-    """Main entry point"""
+    """
+    Main entry point for standalone execution
+    
+    Note: This script is primarily designed to be called from publish-all.py.
+    This function provides backward compatibility for direct execution.
+    """
     parser = argparse.ArgumentParser(
-        description="Zernikalos Android Publish Script - Python version",
+        description="Zernikalos Android Publish Script (auxiliary)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -178,23 +183,8 @@ Examples:
   python publish-android.py -r                                 # Publish Release artifacts
   python publish-android.py -a                                 # Publish all Android artifacts (Debug + Release)
   python publish-android.py --all-publications                 # Publish ALL publications (recommended)
-  python publish-android.py -u Zernikalos -t TOKEN --all-publications  # With custom credentials
 
-Prerequisites:
-  1. Ensure you have Gradle wrapper (gradlew) available
-  2. GitHub credentials (one of these methods):
-     - Environment variables: GITHUB_ACTOR and GITHUB_TOKEN
-     - Command line: -u USER -t TOKEN
-     - Interactive prompt (only token required, user defaults to Zernikalos)
-  3. The script will automatically:
-     - Build the project if needed
-     - Publish Android artifacts to GitHub Packages Maven Repository
-
-Published artifacts:
-  - Debug: Android Debug library artifacts
-  - Release: Android Release library artifacts
-  - All Publications: Complete Maven repository with all artifacts
-  - Repository: https://maven.pkg.github.com/Zernikalos/Zernikalos
+Note: For complete publishing workflow, use publish-all.py instead.
         """
     )
     
@@ -218,7 +208,6 @@ Published artifacts:
     enabled_publications: Optional[List[str]] = None
     
     if args.info:
-        # Only show info, don't publish
         enabled_publications = None
     elif args.debug:
         enabled_publications = ["debug"]
@@ -240,8 +229,20 @@ Published artifacts:
     return publisher.run(args)
 
 
-def run_android_publish(github_user: str, github_token: str, action: str = "info") -> bool:
-    """Run Android publish functionality programmatically"""
+def run_android_publish(github_user: str, github_token: str, action: str = "all_publications") -> bool:
+    """
+    Run Android publish functionality programmatically
+    
+    This is the main entry point called by publish-all.py
+    
+    Args:
+        github_user: GitHub username/organization
+        github_token: GitHub access token
+        action: Action to perform (debug, release, all, all_publications, info)
+        
+    Returns:
+        True if successful, False otherwise
+    """
     # Map action to enabled publications
     action_to_publications = {
         "debug": ["debug"],
@@ -267,10 +268,8 @@ def run_android_publish(github_user: str, github_token: str, action: str = "info
     )
     
     publisher = AndroidPublisher(enabled_publications=enabled_publications)
-    if args.user:
-        publisher.github_user = args.user
-    if args.token:
-        publisher.github_token = args.token
+    publisher.github_user = github_user
+    publisher.github_token = github_token
     
     return publisher.run(args) == 0
 

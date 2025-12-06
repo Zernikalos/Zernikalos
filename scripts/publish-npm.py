@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Zernikalos NPM Publish Script
-Publishes NPM packages to GitHub Packages
+Auxiliary script for publishing NPM packages to GitHub Packages
 
-Python version of the original publish-npm.sh script
+This script is designed to be called from publish-all.py, but can also be run independently.
 """
 
 import sys
@@ -193,27 +193,22 @@ def _select_publications_interactive(publisher: NpmPublisher) -> Optional[List[s
 
 
 def main():
-    """Main entry point"""
+    """
+    Main entry point for standalone execution
+    
+    Note: This script is primarily designed to be called from publish-all.py.
+    This function provides backward compatibility for direct execution.
+    """
     parser = argparse.ArgumentParser(
-        description="Zernikalos NPM Publish Script - Python version",
+        description="Zernikalos NPM Publish Script (auxiliary)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python publish-npm.py                                    # Show available packages
   python publish-npm.py -l                                 # List available packages
   python publish-npm.py -a                                 # Publish all packages
-  python publish-npm.py -u Zernikalos -t TOKEN -a          # With custom credentials
 
-Prerequisites:
-  1. Ensure you have npm installed and configured
-  2. GitHub credentials (one of these methods):
-     - Environment variables: GITHUB_USER and GITHUB_TOKEN
-     - Command line: -u USER -t TOKEN
-     - Interactive prompt (only token required, user defaults to Zernikalos)
-  3. The script will automatically:
-     - Configure npm authentication via environment variables (more secure)
-     - Build packages with webpack
-     - Publish packages to GitHub Packages
+Note: For complete publishing workflow, use publish-all.py instead.
         """
     )
 
@@ -231,7 +226,6 @@ Prerequisites:
     enabled_publications: Optional[List[str]] = None
     
     if args.list:
-        # Only show list, don't publish
         enabled_publications = None
     elif args.all:
         enabled_publications = ["all"]
@@ -247,8 +241,20 @@ Prerequisites:
     return publisher.run(args)
 
 
-def run_npm_publish(github_user: str, github_token: str, action: str = "list", package_name: str = None) -> bool:
-    """Run NPM publish functionality programmatically"""
+def run_npm_publish(github_user: str, github_token: str, action: str = "all") -> bool:
+    """
+    Run NPM publish functionality programmatically
+    
+    This is the main entry point called by publish-all.py
+    
+    Args:
+        github_user: GitHub username/organization
+        github_token: GitHub access token
+        action: Action to perform (list, all)
+        
+    Returns:
+        True if successful, False otherwise
+    """
     # Map action to enabled publications
     action_to_publications = {
         "list": None,
@@ -271,10 +277,8 @@ def run_npm_publish(github_user: str, github_token: str, action: str = "list", p
     )
 
     publisher = NpmPublisher(enabled_publications=enabled_publications)
-    if args.user:
-        publisher.github_user = args.user
-    if args.token:
-        publisher.github_token = args.token
+    publisher.github_user = github_user
+    publisher.github_token = github_token
 
     return publisher.run(args) == 0
 

@@ -59,6 +59,15 @@ class AllPublisher(BaseScript):
         """Publish NPM packages using the publish-npm.py script"""
         self.print_header("PUBLISHING NPM PACKAGES")
         
+        # Verify credentials
+        if not self.github_user or not self.github_token:
+            self.print_error("GitHub credentials are required")
+            return False
+        
+        # Verify npm is available
+        if not self.check_npm():
+            return False
+        
         try:
             self.print_status("Running NPM publish...")
             success = run_npm_publish(
@@ -81,6 +90,15 @@ class AllPublisher(BaseScript):
     def publish_android_artifacts(self) -> bool:
         """Publish Android artifacts using the publish-android.py script"""
         self.print_header("PUBLISHING ANDROID ARTIFACTS")
+        
+        # Verify credentials
+        if not self.github_user or not self.github_token:
+            self.print_error("GitHub credentials are required")
+            return False
+        
+        # Verify gradle is available
+        if not self.check_gradle():
+            return False
         
         try:
             self.print_status("Running Android publish...")
@@ -196,10 +214,12 @@ class AllPublisher(BaseScript):
         # Check prerequisites
         if not self.check_directory():
             return 1
-            
-        # Get credentials
-        if not self.get_github_credentials():
-            return 1
+        
+        # For info/status commands, credentials might not be needed
+        if not (args.status or args.info):
+            # Get credentials for publishing operations
+            if not self.get_github_credentials():
+                return 1
             
         # Execute action
         if args.status:
@@ -266,14 +286,21 @@ Prerequisites:
      - Environment variables: GITHUB_ACTOR/GITHUB_USER and GITHUB_TOKEN
      - Command line: -u USER -t TOKEN
      - Interactive prompt (only token required, user defaults to Zernikalos)
-  3. The script will automatically:
-     - Use the appropriate publish script for each artifact type
+  3. Required tools:
+     - npm (for NPM publishing)
+     - Gradle wrapper (for Android publishing)
+  4. The script will automatically:
+     - Verify credentials and tools before publishing
+     - Use the appropriate auxiliary script for each artifact type
      - Publish NPM packages to GitHub Packages
      - Publish Android artifacts to GitHub Packages Maven Repository
 
 Published artifacts:
   - NPM: JavaScript packages for web/browser usage
   - Android: Debug and Release library artifacts for Android development
+
+Note: The auxiliary scripts (publish-npm.py, publish-android.py) can still be run
+      independently, but this script provides centralized control for complete workflows.
         """
     )
     
