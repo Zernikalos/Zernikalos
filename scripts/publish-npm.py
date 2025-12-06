@@ -9,57 +9,92 @@ Python version of the original publish-npm.sh script
 import sys
 import argparse
 from pathlib import Path
-from typing import Optional, List, Tuple
-from common import BaseScript, add_common_arguments
+from typing import Optional, List, Tuple, Any
+from common import add_common_arguments
+from base_builder import BaseBuilder
 
 
-class NpmPublisher(BaseScript):
+class NpmPublisher(BaseBuilder):
     """Main class for NPM package publishing functionality"""
 
     def __init__(self):
         super().__init__("Zernikalos NPM Publisher")
-
-    def setup_npm_auth(self) -> bool:
-        """Setup npm authentication using environment variables"""
-        self.print_status("Setting up npm authentication...")
-
-        if not self.get_github_credentials():
-            return False
-
+    
+    def authentication(self) -> bool:
+        """Setup and verify authentication"""
+        if not self.github_token:
+            self.print_warning("GitHub token not found")
+            self.print_status("Setting up npm authentication...")
+            if not self.get_github_credentials():
+                return False
+        
         # Set npm authentication token
         self.npm.set_auth_token(self.github_token)
-
-        self.print_success("npm authentication configured via environment variables")
+        self.print_success("npm authentication configured")
         return True
-
-    def build_packages(self) -> bool:
+    
+    def build(self) -> bool:
         """Build packages with webpack"""
         self.print_status("Building packages with webpack...")
         return self.gradle.js_browser_production_webpack()
-
-    def check_build_directory(self) -> bool:
-        """Check if build directory exists"""
+    
+    def build_verify(self) -> bool:
+        """Verify that build directory exists and artifacts are ready"""
         build_dir = self.project_root / "build" / "js"
         if not build_dir.exists():
             self.print_warning("Build directory 'build/js' does not exist")
             self.print_status("Building packages automatically...")
-            return self.build_packages()
+            return self.build()
         return True
-
-    def check_npm_auth(self) -> bool:
-        """Check if npm authentication is properly configured"""
-        if not self.github_token:
-            self.print_warning("GitHub token not found")
-            self.print_status("Setting up npm authentication...")
-            return self.setup_npm_auth()
-
-        # Set npm authentication token
-        self.npm.set_auth_token(self.github_token)
-
-        self.print_success("npm authentication configured")
+    
+    def publish(self, package_name: Optional[str] = None, *args, **kwargs) -> bool:
+        """
+        Publish artifacts to the repository
+        
+        Args:
+            package_name: Optional package name to publish (None = all packages)
+            *args: Variable positional arguments
+            **kwargs: Variable keyword arguments
+            
+        Returns:
+            True if publish is successful, False otherwise
+        """
+        return self._publish_workspace(package_name)
+    
+    def get_publish_info(self) -> bool:
+        """Get and display publication information"""
+        packages = self._list_packages()
+        if not packages:
+            return False
+        
+        print()
+        self.print_status("To publish a specific package: python publish-npm.py <package_name>")
+        self.print_status("To publish all packages: python publish-npm.py -a")
         return True
-
-    def list_packages(self, exclude_test: bool = True) -> List[Tuple[str, str]]:
+    
+    def _check_tool(self) -> bool:
+        """Check if npm is available"""
+        return self.check_npm()
+    
+    def _get_default_action(self) -> int:
+        """Get the default action when no specific action is provided"""
+        self._list_packages()
+        return self.get_publish_info() and 0 or 1
+    
+    def _handle_action(self, args: Any) -> int:
+        """Handle specific action based on command line arguments"""
+        if args.list:
+            self._list_packages()
+            return self.get_publish_info() and 0 or 1
+        elif args.all:
+            return 0 if self.publish() else 1
+        elif args.package:
+            return 0 if self.publish(args.package) else 1
+        else:
+            return self._get_default_action()
+    
+    # Private methods for internal operations
+    def _list_packages(self, exclude_test: bool = True) -> List[Tuple[str, str]]:
         """List available packages, optionally excluding test packages"""
         self.print_status("Available packages in build/js/packages/@zernikalos/:")
 
@@ -72,8 +107,8 @@ class NpmPublisher(BaseScript):
                 print(f"  - {package_name} (v{version})")
 
         return packages
-
-    def publish_workspace(self, package_filter: str = None) -> bool:
+    
+    def _publish_workspace(self, package_filter: Optional[str] = None) -> bool:
         """Publish packages using npm workspace with optional filter"""
         workspace_dir = self.project_root / "build" / "js"
 
@@ -84,7 +119,7 @@ class NpmPublisher(BaseScript):
         self.print_status("Publishing workspace packages...")
 
         # Get workspace packages info
-        packages = self.list_packages()
+        packages = self._list_packages()
         if not packages:
             return False
 
@@ -145,54 +180,6 @@ class NpmPublisher(BaseScript):
             self.print_error("npm publish failed")
             return False
 
-    def publish_package(self, package_name: str) -> bool:
-        """Publish a specific package using workspace"""
-        return self.publish_workspace(package_name)
-
-    def publish_all_packages(self) -> bool:
-        """Publish all packages using workspace (excluding test packages)"""
-        return self.publish_workspace()
-
-    def run(self, args):
-        """Main execution method"""
-        # Set credentials from command line if provided
-        self.set_credentials_from_args(args)
-
-        # Check prerequisites
-        if not self.check_directory():
-            return 1
-
-        if not self.check_npm():
-            return 1
-
-        # Setup authentication and build if needed
-        if not self.check_npm_auth():
-            return 1
-
-        if not self.check_build_directory():
-            return 1
-
-        # Execute action
-        if args.list:
-            self.list_packages()
-            print()
-            self.print_status("To publish a specific package: python publish-npm.py <package_name>")
-            self.print_status("To publish all packages: python publish-npm.py -a")
-            return 0
-
-        elif args.all:
-            return 0 if self.publish_all_packages() else 1
-
-        elif args.package:
-            return 0 if self.publish_package(args.package) else 1
-
-        else:
-            # Default action: list packages
-            self.list_packages()
-            print()
-            self.print_status("To publish a specific package: python publish-npm.py <package_name>")
-            self.print_status("To publish all packages: python publish-npm.py -a")
-            return 0
 
 
 def main():

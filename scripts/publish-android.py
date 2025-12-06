@@ -6,37 +6,130 @@ Publishes Android artifacts to GitHub Packages Maven Repository
 Python script for publishing Android libraries to GitHub Packages
 """
 
-import os
 import sys
-import subprocess
 import argparse
 from pathlib import Path
-from typing import Optional, List, Tuple
-from common import BaseScript, add_common_arguments
+from typing import Optional, List, Tuple, Any
+from common import add_common_arguments
+from base_builder import BaseBuilder
 
 
-class AndroidPublisher(BaseScript):
+class AndroidPublisher(BaseBuilder):
     """Main class for Android artifact publishing functionality"""
     
     def __init__(self):
         super().__init__("Zernikalos Android Publisher")
-        
-    def build_project(self) -> bool:
+    
+    def authentication(self) -> bool:
+        """Setup and verify authentication"""
+        return self.get_github_credentials()
+    
+    def build(self) -> bool:
         """Build the Android project"""
         self.print_status("Building Android project...")
         return self.gradle.build()
-            
-    def check_build_directory(self) -> bool:
-        """Check if build directory exists"""
+    
+    def build_verify(self) -> bool:
+        """Verify that build directory exists and artifacts are ready"""
         build_dir = self.project_root / "build"
         if not build_dir.exists():
             self.print_warning("Build directory 'build' does not exist")
             self.print_status("Building project automatically...")
-            return self.build_project()
+            return self.build()
         return True
+    
+    def publish(self, variant: str = "all_publications", *args, **kwargs) -> bool:
+        """
+        Publish artifacts to the repository
         
+        Args:
+            variant: Publication variant (debug, release, all, all_publications)
+            *args: Variable positional arguments
+            **kwargs: Variable keyword arguments
             
-    def publish_android_debug(self) -> bool:
+        Returns:
+            True if publish is successful, False otherwise
+        """
+        if variant == "debug":
+            return self._publish_debug()
+        elif variant == "release":
+            return self._publish_release()
+        elif variant == "all":
+            return self._publish_all_android()
+        elif variant == "all_publications":
+            return self._publish_all_publications()
+        else:
+            self.print_error(f"Unknown publish variant: {variant}")
+            return False
+    
+    def get_publish_info(self) -> bool:
+        """Get and display publication information"""
+        version = self.get_project_version()
+        if not version:
+            return False
+        
+        self.print_status("Publication Information:")
+        print(f"  - Group ID: dev.zernikalos")
+        print(f"  - Artifact ID: zernikalos")
+        print(f"  - Version: {version}")
+        print(f"  - Repository: https://maven.pkg.github.com/Zernikalos/Zernikalos")
+        print(f"  - Maven coordinates:")
+        print(f"    <dependency>")
+        print(f"      <groupId>dev.zernikalos</groupId>")
+        print(f"      <artifactId>zernikalos</artifactId>")
+        print(f"      <version>{version}</version>")
+        print(f"    </dependency>")
+        return True
+    
+    def _check_tool(self) -> bool:
+        """Check if Gradle is available"""
+        return self.check_gradle()
+    
+    def _get_default_action(self) -> int:
+        """Get the default action when no specific action is provided"""
+        self.get_publish_info()
+        print()
+        
+        try:
+            response = input("What would you like to publish? (debug/release/all/all_publications/info): ").lower().strip()
+            
+            if response in ['debug', 'd']:
+                return 0 if self.publish("debug") else 1
+            elif response in ['release', 'r']:
+                return 0 if self.publish("release") else 1
+            elif response in ['all', 'a']:
+                return 0 if self.publish("all") else 1
+            elif response in ['all_publications', 'ap', 'allpub']:
+                return 0 if self.publish("all_publications") else 1
+            elif response in ['info', 'i']:
+                self.get_publish_info()
+                return 0
+            else:
+                self.print_warning("Invalid option. Use: debug, release, all, all_publications, or info")
+                return 0
+                
+        except KeyboardInterrupt:
+            print()
+            self.print_warning("Operation cancelled by user")
+            return 0
+    
+    def _handle_action(self, args: Any) -> int:
+        """Handle specific action based on command line arguments"""
+        if args.debug:
+            return 0 if self.publish("debug") else 1
+        elif args.release:
+            return 0 if self.publish("release") else 1
+        elif args.all:
+            return 0 if self.publish("all") else 1
+        elif args.all_publications:
+            return 0 if self.publish("all_publications") else 1
+        elif args.info:
+            return 0 if self.get_publish_info() else 1
+        else:
+            return self._get_default_action()
+    
+    # Private methods for internal publishing operations
+    def _publish_debug(self) -> bool:
         """Publish Android Debug artifacts to GitHub Packages"""
         self.print_status("Publishing Android Debug artifacts...")
         
@@ -44,8 +137,8 @@ class AndroidPublisher(BaseScript):
         if success:
             self.print_success("Android Debug artifacts published successfully!")
         return success
-            
-    def publish_android_release(self) -> bool:
+    
+    def _publish_release(self) -> bool:
         """Publish Android Release artifacts to GitHub Packages"""
         self.print_status("Publishing Android Release artifacts...")
         
@@ -53,26 +146,26 @@ class AndroidPublisher(BaseScript):
         if success:
             self.print_success("Android Release artifacts published successfully!")
         return success
-            
-    def publish_all_android(self) -> bool:
+    
+    def _publish_all_android(self) -> bool:
         """Publish both Android Debug and Release artifacts"""
         self.print_status("Publishing all Android artifacts...")
         
         success = True
         
         # Publish Debug
-        if not self.publish_android_debug():
+        if not self._publish_debug():
             success = False
-            
+        
         print()  # Add spacing between publications
         
         # Publish Release
-        if not self.publish_android_release():
+        if not self._publish_release():
             success = False
-            
-        return success
         
-    def publish_all_publications(self) -> bool:
+        return success
+    
+    def _publish_all_publications(self) -> bool:
         """Publish ALL publications to Maven Repository (recommended)"""
         self.print_status("Publishing ALL publications to Maven Repository...")
         
@@ -86,93 +179,6 @@ class AndroidPublisher(BaseScript):
             self.print_success("ALL publications published successfully to Maven Repository!")
         return success
         
-    def show_publication_info(self):
-        """Show information about where artifacts are published"""
-        version = self.get_project_version()
-        if not version:
-            return
-            
-        self.print_status("Publication Information:")
-        print(f"  - Group ID: dev.zernikalos")
-        print(f"  - Artifact ID: zernikalos")
-        print(f"  - Version: {version}")
-        print(f"  - Repository: https://maven.pkg.github.com/Zernikalos/Zernikalos")
-        print(f"  - Maven coordinates:")
-        print(f"    <dependency>")
-        print(f"      <groupId>dev.zernikalos</groupId>")
-        print(f"      <artifactId>zernikalos</artifactId>")
-        print(f"      <version>{version}</version>")
-        print(f"    </dependency>")
-        
-    def run(self, args):
-        """Main execution method"""
-        # Set credentials from command line if provided
-        self.set_credentials_from_args(args)
-        
-        # Check prerequisites
-        if not self.check_directory():
-            return 1
-            
-        if not self.check_gradle():
-            return 1
-            
-        # Get credentials
-        if not self.get_github_credentials():
-            return 1
-            
-        # Auto-build if needed
-        if not self.check_build_directory():
-            return 1
-            
-        # Get project version
-        version = self.get_project_version()
-        if not version:
-            return 1
-            
-        # Execute action
-        if args.debug:
-            return 0 if self.publish_android_debug() else 1
-            
-        elif args.release:
-            return 0 if self.publish_android_release() else 1
-            
-        elif args.all:
-            return 0 if self.publish_all_android() else 1
-            
-        elif args.all_publications:
-            return 0 if self.publish_all_publications() else 1
-            
-        elif args.info:
-            self.show_publication_info()
-            return 0
-            
-        else:
-            # Default action: show info and ask what to publish
-            self.show_publication_info()
-            print()
-            
-            try:
-                response = input("What would you like to publish? (debug/release/all/info): ").lower().strip()
-                
-                if response in ['debug', 'd']:
-                    return 0 if self.publish_android_debug() else 1
-                elif response in ['release', 'r']:
-                    return 0 if self.publish_android_release() else 1
-                elif response in ['all', 'a']:
-                    return 0 if self.publish_all_android() else 1
-                elif response in ['all_publications', 'ap', 'allpub']:
-                    return 0 if self.publish_all_publications() else 1
-                elif response in ['info', 'i']:
-                    self.show_publication_info()
-                    return 0
-                else:
-                    self.print_warning("Invalid option. Use: debug, release, all, all_publications, or info")
-                    return 0
-                    
-            except KeyboardInterrupt:
-                print()
-                self.print_warning("Operation cancelled by user")
-                return 0
 
 
 def main():
