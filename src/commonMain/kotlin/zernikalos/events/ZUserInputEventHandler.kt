@@ -8,10 +8,13 @@
 
 package zernikalos.events
 
+import zernikalos.events.keyboard.ZKeyboardEvent
+import zernikalos.events.mouse.ZMouseEvent
+import zernikalos.events.touch.ZTouchEvent
 import kotlin.js.JsExport
 
 /**
- * Handler interface for user input events, specifically touch events.
+ * Handler interface for user input events, including touch, mouse, and keyboard events.
  *
  * This interface is separate from [zernikalos.ui.ZSurfaceViewEventHandler] to maintain
  * separation of concerns between surface lifecycle events and user input events.
@@ -25,5 +28,19 @@ interface ZUserInputEventHandler {
      * @param event The touch event containing position, movement, velocity, and acceleration data
      */
     fun onTouchEvent(event: ZTouchEvent)
+
+    /**
+     * Called when a mouse event occurs.
+     *
+     * @param event The mouse event containing position, movement, velocity, and acceleration data
+     */
+    fun onMouseEvent(event: ZMouseEvent)
+
+    /**
+     * Called when a keyboard event occurs.
+     *
+     * @param event The keyboard event containing key information and modifiers
+     */
+    fun onKeyboardEvent(event: ZKeyboardEvent)
 }
 

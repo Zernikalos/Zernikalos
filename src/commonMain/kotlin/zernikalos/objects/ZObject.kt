@@ -15,8 +15,12 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZRef
 import zernikalos.context.ZContext
-import zernikalos.events.ZObjectTouchListener
-import zernikalos.events.ZTouchEvent
+import zernikalos.events.keyboard.ZKeyboardEvent
+import zernikalos.events.keyboard.ZObjectKeyboardListener
+import zernikalos.events.mouse.ZMouseEvent
+import zernikalos.events.mouse.ZObjectMouseListener
+import zernikalos.events.touch.ZObjectTouchListener
+import zernikalos.events.touch.ZTouchEvent
 import zernikalos.logger.ZLoggable
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
@@ -95,11 +99,29 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     @Transient
     private var _touchListeners: ArrayList<ZObjectTouchListener> = arrayListOf()
 
+    @Transient
+    private var _mouseListeners: ArrayList<ZObjectMouseListener> = arrayListOf()
+
+    @Transient
+    private var _keyboardListeners: ArrayList<ZObjectKeyboardListener> = arrayListOf()
+
     /**
      * Returns whether this object has any touch listeners registered.
      */
     val hasTouchListeners: Boolean
         get() = _touchListeners.isNotEmpty()
+
+    /**
+     * Returns whether this object has any mouse listeners registered.
+     */
+    val hasMouseListeners: Boolean
+        get() = _mouseListeners.isNotEmpty()
+
+    /**
+     * Returns whether this object has any keyboard listeners registered.
+     */
+    val hasKeyboardListeners: Boolean
+        get() = _keyboardListeners.isNotEmpty()
 
     /**
      * Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.
@@ -247,6 +269,114 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     internal fun notifyTouchListeners(event: ZTouchEvent) {
         _touchListeners.forEach { listener ->
             listener.onTouchEvent(this, event)
+        }
+    }
+
+    /**
+     * Adds a mouse event listener to this object.
+     *
+     * @param listener The listener interface to add
+     */
+    fun addMouseListener(listener: ZObjectMouseListener) {
+        if (!_mouseListeners.contains(listener)) {
+            _mouseListeners.add(listener)
+        }
+    }
+
+    /**
+     * Adds a mouse event listener using a lambda function.
+     *
+     * @param listener Lambda function that receives the object and mouse event
+     */
+    @JsName("addMouseListenerLambda")
+    fun addMouseListener(listener: (ZObject, ZMouseEvent) -> Unit) {
+        val wrapper = object : ZObjectMouseListener {
+            override fun onMouseEvent(obj: ZObject, event: ZMouseEvent) {
+                listener(obj, event)
+            }
+        }
+        addMouseListener(wrapper)
+    }
+
+    /**
+     * Removes a mouse event listener from this object.
+     *
+     * @param listener The listener to remove
+     */
+    fun removeMouseListener(listener: ZObjectMouseListener) {
+        _mouseListeners.remove(listener)
+    }
+
+    /**
+     * Removes all mouse event listeners from this object.
+     */
+    fun removeAllMouseListeners() {
+        _mouseListeners.clear()
+    }
+
+    /**
+     * Notifies all registered mouse listeners of a mouse event.
+     * This method is called internally by the event distribution system.
+     *
+     * @param event The mouse event to notify listeners about
+     */
+    internal fun notifyMouseListeners(event: ZMouseEvent) {
+        _mouseListeners.forEach { listener ->
+            listener.onMouseEvent(this, event)
+        }
+    }
+
+    /**
+     * Adds a keyboard event listener to this object.
+     *
+     * @param listener The listener interface to add
+     */
+    fun addKeyboardListener(listener: ZObjectKeyboardListener) {
+        if (!_keyboardListeners.contains(listener)) {
+            _keyboardListeners.add(listener)
+        }
+    }
+
+    /**
+     * Adds a keyboard event listener using a lambda function.
+     *
+     * @param listener Lambda function that receives the object and keyboard event
+     */
+    @JsName("addKeyboardListenerLambda")
+    fun addKeyboardListener(listener: (ZObject, ZKeyboardEvent) -> Unit) {
+        val wrapper = object : ZObjectKeyboardListener {
+            override fun onKeyboardEvent(obj: ZObject, event: ZKeyboardEvent) {
+                listener(obj, event)
+            }
+        }
+        addKeyboardListener(wrapper)
+    }
+
+    /**
+     * Removes a keyboard event listener from this object.
+     *
+     * @param listener The listener to remove
+     */
+    fun removeKeyboardListener(listener: ZObjectKeyboardListener) {
+        _keyboardListeners.remove(listener)
+    }
+
+    /**
+     * Removes all keyboard event listeners from this object.
+     */
+    fun removeAllKeyboardListeners() {
+        _keyboardListeners.clear()
+    }
+
+    /**
+     * Notifies all registered keyboard listeners of a keyboard event.
+     * This method is called internally by the event distribution system.
+     *
+     * @param event The keyboard event to notify listeners about
+     */
+    internal fun notifyKeyboardListeners(event: ZKeyboardEvent) {
+        _keyboardListeners.forEach { listener ->
+            listener.onKeyboardEvent(this, event)
         }
     }
 

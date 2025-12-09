@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.events
+package zernikalos.events.touch
 
 import zernikalos.objects.ZObject
 import kotlin.js.JsExport

@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package zernikalos.events.mouse
+
+import zernikalos.objects.ZObject
+import kotlin.js.JsExport
+
+/**
+ * Interface for handling mouse events on ZObject instances.
+ *
+ * Implement this interface to receive mouse events for a specific ZObject.
+ * The listener will be called whenever a mouse event occurs and the object
+ * has this listener registered.
+ */
+@JsExport
+interface ZObjectMouseListener {
+
+    /**
+     * Called when a mouse event occurs for the associated ZObject.
+     *
+     * @param obj The ZObject that this listener is attached to
+     * @param event The mouse event containing position, movement, velocity, and acceleration data
+     */
+    fun onMouseEvent(obj: ZObject, event: ZMouseEvent)
+}

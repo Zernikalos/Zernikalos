@@ -6,12 +6,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.events
+package zernikalos.events.mouse
 
 import kotlin.js.JsExport
 
 /**
- * Represents a touch event with position, movement, velocity, and acceleration data.
+ * Represents a mouse event with position, movement, velocity, and acceleration data.
  *
  * @property x Current X coordinate in pixels
  * @property y Current Y coordinate in pixels
@@ -23,12 +23,13 @@ import kotlin.js.JsExport
  * @property velocityY Velocity in Y direction (pixels per second)
  * @property accelerationX Acceleration in X direction (pixels per second squared)
  * @property accelerationY Acceleration in Y direction (pixels per second squared)
- * @property type Type of touch event
+ * @property type Type of mouse event
  * @property timestamp Event timestamp in milliseconds
- * @property pointerId Unique identifier for the touch pointer (for multi-touch support)
+ * @property button The mouse button that was pressed (0 = left, 1 = middle, 2 = right)
+ * @property buttons Bitmask of all currently pressed mouse buttons
  */
 @JsExport
-data class ZTouchEvent(
+data class ZMouseEvent(
     val x: Float,
     val y: Float,
     val prevX: Float,
@@ -39,8 +40,8 @@ data class ZTouchEvent(
     val velocityY: Float,
     val accelerationX: Float,
     val accelerationY: Float,
-    val type: ZTouchEventType,
+    val type: ZMouseEventType,
     val timestamp: Long,
-    val pointerId: Int
+    val button: Int,
+    val buttons: Int
 )
-

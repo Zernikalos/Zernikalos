@@ -9,8 +9,8 @@
 package zernikalos.ui
 
 import android.view.MotionEvent
-import zernikalos.events.ZTouchEvent
-import zernikalos.events.ZTouchEventType
+import zernikalos.events.touch.ZTouchEvent
+import zernikalos.events.touch.ZTouchEventType
 
 /**
  * Helper class to convert Android [MotionEvent] to [ZTouchEvent].
