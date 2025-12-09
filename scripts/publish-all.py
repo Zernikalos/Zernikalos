@@ -12,41 +12,7 @@ import argparse
 from pathlib import Path
 from typing import Optional, List, Tuple
 from common import BaseScript, add_common_arguments
-
-# Import the publish functions from other scripts
-try:
-    import importlib.util
-    scripts_dir = Path(__file__).parent
-    
-    # Load publish-npm module
-    npm_spec = importlib.util.spec_from_file_location("publish_npm", scripts_dir / "publish-npm.py")
-    npm_module = importlib.util.module_from_spec(npm_spec)
-    npm_spec.loader.exec_module(npm_module)
-    run_npm_publish = npm_module.run_npm_publish
-    
-    # Load publish-android module
-    android_spec = importlib.util.spec_from_file_location("publish_android", scripts_dir / "publish-android.py")
-    android_module = importlib.util.module_from_spec(android_spec)
-    android_spec.loader.exec_module(android_module)
-    run_android_publish = android_module.run_android_publish
-    
-except ImportError:
-    # Fallback if direct import fails (when running from different directory)
-    def load_module_from_path(script_path: str):
-        """Load a Python module from a file path"""
-        spec = importlib.util.spec_from_file_location("module", script_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
-    
-    def get_publish_functions():
-        """Get publish functions from script files"""
-        scripts_dir = Path(__file__).parent
-        npm_module = load_module_from_path(scripts_dir / "publish-npm.py")
-        android_module = load_module_from_path(scripts_dir / "publish-android.py")
-        return npm_module.run_npm_publish, android_module.run_android_publish
-    
-    run_npm_publish, run_android_publish = get_publish_functions()
+from publishers import run_npm_publish, run_android_publish
 
 
 class AllPublisher(BaseScript):
@@ -56,8 +22,17 @@ class AllPublisher(BaseScript):
         super().__init__("Zernikalos All Publisher")
         
     def publish_npm_packages(self) -> bool:
-        """Publish NPM packages using the publish-npm.py script"""
+        """Publish NPM packages"""
         self.print_header("PUBLISHING NPM PACKAGES")
+        
+        # Verify credentials
+        if not self.github_user or not self.github_token:
+            self.print_error("GitHub credentials are required")
+            return False
+        
+        # Verify npm is available
+        if not self.check_npm():
+            return False
         
         try:
             self.print_status("Running NPM publish...")
@@ -79,8 +54,17 @@ class AllPublisher(BaseScript):
             return False
             
     def publish_android_artifacts(self) -> bool:
-        """Publish Android artifacts using the publish-android.py script"""
+        """Publish Android artifacts"""
         self.print_header("PUBLISHING ANDROID ARTIFACTS")
+        
+        # Verify credentials
+        if not self.github_user or not self.github_token:
+            self.print_error("GitHub credentials are required")
+            return False
+        
+        # Verify gradle is available
+        if not self.check_gradle():
+            return False
         
         try:
             self.print_status("Running Android publish...")
@@ -103,8 +87,6 @@ class AllPublisher(BaseScript):
             
     def publish_all(self) -> bool:
         """Publish all artifacts (NPM + Android)"""
-        self.print_header("ZERNIKALOS COMPLETE PUBLISH")
-        
         success = True
         
         # Publish NPM packages
@@ -116,7 +98,7 @@ class AllPublisher(BaseScript):
             success = False
             
         # Final summary
-        self.print_header("PUBLISH SUMMARY")
+        self.print_header("ZERNIKALOS COMPLETE PUBLISH")
         if success:
             self.print_success("All artifacts published successfully!")
             self.print_status("NPM packages: ✅ Published to GitHub Packages")
@@ -168,22 +150,16 @@ class AllPublisher(BaseScript):
         print(f"  - JavaScript: {'✅' if js_build.exists() else '❌'} {js_build}")
         print(f"  - Android: {'✅' if android_build.exists() else '❌'} {android_build}")
         
-        # Check scripts availability
-        try:
-            run_npm_publish("test", "test", "list")
-            npm_available = "✅ Available"
-        except Exception:
-            npm_available = "❌ Not available"
-            
-        try:
-            run_android_publish("test", "test", "info")
-            android_available = "✅ Available"
-        except Exception:
-            android_available = "❌ Not available"
+        # Check tools status
+        gradle_status = self.gradle.check_status()
+        npm_status = self.npm.check_status()
         
-        print(f"\nPublish functions:")
-        print(f"  - NPM: {npm_available}")
-        print(f"  - Android: {android_available}")
+        print(f"\nTools status:")
+        print(f"  - Gradle: {'✅' if gradle_status['available'] else '❌'} {gradle_status['message']}")
+        if gradle_status['available'] and gradle_status['version']:
+            print(f"    Path: {gradle_status['gradlew_path']}")
+        
+        print(f"  - npm: {'✅' if npm_status['available'] else '❌'} {npm_status['message']}")
         
         # Check credentials
         print(f"\nGitHub credentials:")
@@ -198,10 +174,12 @@ class AllPublisher(BaseScript):
         # Check prerequisites
         if not self.check_directory():
             return 1
-            
-        # Get credentials
-        if not self.get_github_credentials():
-            return 1
+        
+        # For info/status commands, credentials might not be needed
+        if not (args.status or args.info):
+            # Get credentials for publishing operations
+            if not self.get_github_credentials():
+                return 1
             
         # Execute action
         if args.status:
@@ -226,7 +204,7 @@ class AllPublisher(BaseScript):
             print()
             
             try:
-                response = input("What would you like to publish? (npm/android/all/status): ").lower().strip()
+                response = input("What would you like to publish? (npm/android/all): ").lower().strip()
                 
                 if response in ['npm', 'n']:
                     return 0 if self.publish_npm_packages() else 1
@@ -234,11 +212,8 @@ class AllPublisher(BaseScript):
                     return 0 if self.publish_android_artifacts() else 1
                 elif response in ['all', 'complete']:
                     return 0 if self.publish_all() else 1
-                elif response in ['status', 's', 'info', 'i']:
-                    self.show_status()
-                    return 0
                 else:
-                    self.print_warning("Invalid option. Use: npm, android, all, or status")
+                    self.print_warning("Invalid option. Use: npm, android, or all")
                     return 0
                     
             except KeyboardInterrupt:
@@ -263,13 +238,15 @@ Examples:
   python publish-all.py -u Zernikalos -t TOKEN --all       # With custom credentials
 
 Prerequisites:
-  1. Both publish-npm.py and publish-android.py scripts must be available
-  2. GitHub credentials (one of these methods):
+  1. GitHub credentials (one of these methods):
      - Environment variables: GITHUB_ACTOR/GITHUB_USER and GITHUB_TOKEN
      - Command line: -u USER -t TOKEN
      - Interactive prompt (only token required, user defaults to Zernikalos)
-  3. The script will automatically:
-     - Use the appropriate publish script for each artifact type
+  3. Required tools:
+     - npm (for NPM publishing)
+     - Gradle wrapper (for Android publishing)
+  4. The script will automatically:
+     - Verify credentials and tools before publishing
      - Publish NPM packages to GitHub Packages
      - Publish Android artifacts to GitHub Packages Maven Repository
 

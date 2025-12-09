@@ -15,15 +15,27 @@ jobs:
   build-and-publish-android:
     name: Build and Publish Android artifacts
     runs-on: ubuntu-latest
-    container:
-      image: mobiledevops/android-sdk-image:34.0.0
-      options: -u root
     env:
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_ACTOR: ${{ github.actor }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 35
+          build-tools: 35.0.0
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -42,12 +54,8 @@ jobs:
           ls -la build/ || echo "Build directory does not exist!"
           echo "Gradle build status: $?"
 
-      - name: Publish Android Debug
-        run: ./gradlew publishAndroidDebugPublicationToMavenRepository \
-               -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
-
-      - name: Publish Android Release
-        run: ./gradlew publishAndroidReleasePublicationToMavenRepository \
+      - name: Publish all publications to Maven Repository
+        run: ./gradlew publishAllPublicationsToMavenRepository \
                -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
 
       - name: Upload build artifacts for JS job
@@ -61,14 +69,18 @@ jobs:
     name: Publish JS package
     needs: build-and-publish-android
     runs-on: ubuntu-latest
-    container:
-      image: node:22-alpine
-      options: -u root
     env:
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@zernikalos'
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -76,10 +88,6 @@ jobs:
           path: |
             node_modules
           key: deps-${{ github.ref }}
-
-      - name: Setup npm registry
-        run: |
-          npm config set registry https://npm.pkg.github.com/
 
       - name: Download build artifacts from Android job
         uses: actions/download-artifact@v4

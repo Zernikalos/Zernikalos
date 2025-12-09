@@ -100,7 +100,7 @@ kotlin {
     }
 
     androidTarget {
-        //publishLibraryVariants("release", "debug")
+        publishLibraryVariants("release", "debug")
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
@@ -235,7 +235,7 @@ kotlin {
         }
 
         jsTest {
-            dependsOn(commonTest)
+            // dependsOn(commonTest) - Redundant, already included in Kotlin Target Hierarchy template
         }
 
         val macosArm64Main by getting {

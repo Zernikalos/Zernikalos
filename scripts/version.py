@@ -7,7 +7,7 @@ Automates the complete version release process for X.Y.Z versions
 
 import sys
 import argparse
-from common import BaseScript, validate_version, check_git_status, check_version_exists, push_to_remote
+from common import BaseScript, validate_version
 
 
 class VersionManager(BaseScript):
@@ -48,22 +48,22 @@ class VersionManager(BaseScript):
         
         # Step 1: Set version
         self.print_status(f"Setting version to {version}...")
-        if not self.run_gradle_command('setVersion', f'-PnewVersion={version}'):
+        if not self.gradle.set_version(version):
             return False
         
         # Step 2: Upgrade Kotlin package lock (fixes common lock file issues)
         self.print_status("Upgrading Kotlin package lock...")
-        if not self.run_gradle_command('kotlinUpgradePackageLock'):
+        if not self.gradle.upgrade_kotlin_package_lock():
             return False
         
         # Step 3: Generate version files
         self.print_status("Generating version-dependent files...")
-        if not self.run_gradle_command('updateVersion'):
+        if not self.gradle.update_version():
             return False
         
         # Step 4: Create release commit and tag
         self.print_status("Creating release commit and tag...")
-        if not self.run_gradle_command('releaseCommit'):
+        if not self.gradle.release_commit():
             return False
         
         self.print_success("Release files generated successfully!")
@@ -73,7 +73,7 @@ class VersionManager(BaseScript):
         """Push changes to remote repository"""
         self.print_status("Pushing changes to remote repository...")
         
-        if push_to_remote("main", f"v{version}"):
+        if self.git.push_branch_and_tag("main", f"v{version}"):
             self.print_success("Changes pushed successfully!")
             self.print_success(f"CI/CD pipeline will now build and publish version {version}")
             return True
@@ -127,7 +127,7 @@ class VersionManager(BaseScript):
             return 1
         
         # Check git status
-        is_clean, git_output = check_git_status()
+        is_clean, git_output = self.git.check_status()
         if not is_clean:
             self.print_warning("Git working directory is not clean. Please commit or stash changes first.")
             print(git_output)
@@ -136,7 +136,7 @@ class VersionManager(BaseScript):
                 return 1
         
         # Check if version already exists
-        if check_version_exists(args.version):
+        if self.git.check_tag_exists(f"v{args.version}"):
             self.print_error(f"Version v{args.version} already exists as a tag")
             return 1
         
