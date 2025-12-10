@@ -23,18 +23,6 @@ interface ZSceneStateHandler {
     fun onReady(context: ZContext, done: () -> Unit)
 
     /**
-     * Handles the rendering process for the current scene and rendering context.
-     * This method is expected to be called during each frame of the rendering loop.
-     *
-     * Uses the callback to specify the end of this operation.
-     *
-     * @param context The current scene context encapsulating the state of the scene, active camera,
-     * rendering context, and screen dimensions. It provides necessary data required for rendering.
-     * @param done Callback to specify the end of this operation
-     */
-    fun onResize(context: ZContext, width: Int, height: Int, done: () -> Unit)
-
-    /**
      * Handles the resizing of the scene or rendering system, typically triggered when the viewport
      * dimensions change. This should update internal state or configurations based on the new width
      * and height values.
@@ -47,6 +35,18 @@ interface ZSceneStateHandler {
      * @param height The new height of the viewport or rendering area.
      * @param done Callback to specify the end of this operation
      */
-    fun onRender(context: ZContext, done: () -> Unit)
+    fun onResize(context: ZContext, width: Int, height: Int, done: () -> Unit)
+
+    /**
+     * Handles the updating process for the current scene and rendering context.
+     * This method is expected to be called during each frame of the rendering loop.
+     *
+     * Uses the callback to specify the end of this operation.
+     *
+     * @param context The current scene context encapsulating the state of the scene, active camera,
+     * rendering context, and screen dimensions. It provides necessary data required for rendering.
+     * @param done Callback to specify the end of this operation
+     */
+    fun onUpdate(context: ZContext, done: () -> Unit)
 }
 
