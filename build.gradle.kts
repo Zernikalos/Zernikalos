@@ -128,6 +128,7 @@ kotlin {
             customField("types", "kotlin/@zernikalos/zernikalos.d.ts")
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions.freeCompilerArgs.add("-Xir-minimized-member-names=false")
+            compilerOptions.freeCompilerArgs.add("-Xes-long-as-bigint")
         }
 
         browser {
