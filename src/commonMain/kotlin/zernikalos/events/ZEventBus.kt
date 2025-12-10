@@ -39,8 +39,8 @@ class ZEventBus(private val context: ZContext) : ZUserInputEventHandler {
 
         // Traverse the scene tree and notify all objects with listeners
         for (obj in treeTraverse(scene)) {
-            if (obj.hasTouchListeners) {
-                obj.notifyTouchListeners(event)
+            if (obj.events.hasTouchListeners) {
+                obj.events.notifyTouchListeners(event)
             }
         }
     }
@@ -56,8 +56,8 @@ class ZEventBus(private val context: ZContext) : ZUserInputEventHandler {
 
         // Traverse the scene tree and notify all objects with listeners
         for (obj in treeTraverse(scene)) {
-            if (obj.hasMouseListeners) {
-                obj.notifyMouseListeners(event)
+            if (obj.events.hasMouseListeners) {
+                obj.events.notifyMouseListeners(event)
             }
         }
     }
@@ -73,8 +73,8 @@ class ZEventBus(private val context: ZContext) : ZUserInputEventHandler {
 
         // Traverse the scene tree and notify all objects with listeners
         for (obj in treeTraverse(scene)) {
-            if (obj.hasKeyboardListeners) {
-                obj.notifyKeyboardListeners(event)
+            if (obj.events.hasKeyboardListeners) {
+                obj.events.notifyKeyboardListeners(event)
             }
         }
     }
