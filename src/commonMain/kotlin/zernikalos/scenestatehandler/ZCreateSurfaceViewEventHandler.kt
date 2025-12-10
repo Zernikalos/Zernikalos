@@ -87,7 +87,7 @@ private class ZSurfaceViewEventHandlerImpl(
         isRendering = true
         pendingRender = false
 
-        stateHandler.onRender(context) {
+        stateHandler.onUpdate(context) {
             renderer.render()
             isRendering = false
 
