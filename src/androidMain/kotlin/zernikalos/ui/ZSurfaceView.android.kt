@@ -9,7 +9,7 @@
 package zernikalos.ui
 
 import android.opengl.GLSurfaceView
-import zernikalos.events.ZUserInputEventHandler
+import zernikalos.events.ZEventQueue
 
 class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
 
@@ -29,7 +29,7 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
             nativeRenderer.eventHandler = value
         }
 
-    override var userInputEventHandler: ZUserInputEventHandler? = null
+    override var eventQueue: ZEventQueue? = null
         set(value) {
             field = value
             setupTouchListener()
@@ -51,11 +51,11 @@ class ZAndroidSurfaceView(view: GLSurfaceView): ZSurfaceView {
 
     private fun setupTouchListener() {
         nativeSurfaceView.setOnTouchListener { _, event ->
-            val handler = userInputEventHandler
-            if (handler != null && event != null) {
+            val queue = eventQueue
+            if (queue != null && event != null) {
                 val touchEvents = touchEventConverter.convert(event)
                 for (touchEvent in touchEvents) {
-                    handler.onTouchEvent(touchEvent)
+                    queue.enqueueTouch(touchEvent)
                 }
                 true
             } else {

@@ -12,8 +12,8 @@ import kotlinx.browser.window
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
-import zernikalos.events.ZUserInputEventHandler
 import zernikalos.events.WebInputEventManager
+import zernikalos.events.ZEventQueue
 
 /**
  * @suppress
@@ -71,13 +71,14 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         }
 
     /**
-     * Event handler for user input events (touch, mouse, keyboard).
-     * When set, the manager will forward all input events to this handler.
+     * Event queue that accumulates user input events for synchronous processing
+     * during the game loop frame update phase.
+     * When set, the manager will enqueue all input events to this queue.
      */
-    override var userInputEventHandler: ZUserInputEventHandler?
-        get() = inputEventManager.getHandler()
+    override var eventQueue: ZEventQueue?
+        get() = inputEventManager.getEventQueue()
         set(value) {
-            inputEventManager.setHandler(value)
+            inputEventManager.setEventQueue(value)
         }
 
     /**

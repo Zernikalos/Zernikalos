@@ -10,7 +10,6 @@ package zernikalos
 
 import zernikalos.context.ZContext
 import zernikalos.context.ZContextCreator
-import zernikalos.events.createEventBus
 import zernikalos.logger.ZLoggable
 import zernikalos.logger.logger
 import zernikalos.scenestatehandler.ZSceneStateHandler
@@ -85,7 +84,7 @@ open class ZernikalosBase: ZLoggable {
         context = contextCreator.createContext(surfaceView)
 
         surfaceView.eventHandler = createSurfaceViewEventHandler(context, stateHandler)
-        surfaceView.userInputEventHandler = createEventBus(context)
+        surfaceView.eventQueue = context.eventQueue
         logger.info("View attached")
     }
 

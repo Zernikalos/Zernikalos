@@ -17,19 +17,19 @@ import zernikalos.events.mouse.ZMouseEventType
 
 /**
  * Manages the capture and conversion of DOM input events (mouse and keyboard)
- * for a canvas element, converting them to Zernikalos events and forwarding
- * them to a ZUserInputEventHandler.
+ * for a canvas element, converting them to Zernikalos events and enqueuing them
+ * in an event queue for synchronous processing during the game loop.
  *
  * This class handles:
  * - Registering event listeners on the canvas
  * - Converting DOM events to Zernikalos events using adapters
- * - Forwarding events to the configured handler
+ * - Enqueuing events in the event queue instead of processing them immediately
  * - Cleaning up event listeners on disposal
  */
 @JsExport
 class WebInputEventManager(
     private val canvas: HTMLCanvasElement,
-    private var handler: ZUserInputEventHandler?
+    private var eventQueue: ZEventQueue?
 ) {
 
     private val mouseAdapter = WebMouseEventAdapter(canvas)
@@ -42,21 +42,21 @@ class WebInputEventManager(
         // Focus canvas to receive keyboard events
         canvas.focus()
         val zEvent = mouseAdapter.convert(event, ZMouseEventType.DOWN)
-        handler?.onMouseEvent(zEvent)
+        eventQueue?.enqueueMouse(zEvent)
     }
 
     private val mouseUpListener: (Event) -> Unit = { event ->
         event as MouseEvent
         event.preventDefault()
         val zEvent = mouseAdapter.convert(event, ZMouseEventType.UP)
-        handler?.onMouseEvent(zEvent)
+        eventQueue?.enqueueMouse(zEvent)
     }
 
     private val mouseMoveListener: (Event) -> Unit = { event ->
         event as MouseEvent
         event.preventDefault()
         val zEvent = mouseAdapter.convert(event, ZMouseEventType.MOVE)
-        handler?.onMouseEvent(zEvent)
+        eventQueue?.enqueueMouse(zEvent)
     }
 
     private val mouseLeaveListener: (Event) -> Unit = { _ ->
@@ -68,21 +68,21 @@ class WebInputEventManager(
         event as KeyboardEvent
         event.preventDefault()
         val zEvent = keyboardAdapter.convert(event, ZKeyboardEventType.KEY_DOWN)
-        handler?.onKeyboardEvent(zEvent)
+        eventQueue?.enqueueKeyboard(zEvent)
     }
 
     private val keyUpListener: (Event) -> Unit = { event ->
         event as KeyboardEvent
         event.preventDefault()
         val zEvent = keyboardAdapter.convert(event, ZKeyboardEventType.KEY_UP)
-        handler?.onKeyboardEvent(zEvent)
+        eventQueue?.enqueueKeyboard(zEvent)
     }
 
     private val keyPressListener: (Event) -> Unit = { event ->
         event as KeyboardEvent
         event.preventDefault()
         val zEvent = keyboardAdapter.convert(event, ZKeyboardEventType.KEY_PRESS)
-        handler?.onKeyboardEvent(zEvent)
+        eventQueue?.enqueueKeyboard(zEvent)
     }
 
     init {
@@ -101,21 +101,41 @@ class WebInputEventManager(
     }
 
     /**
-     * Gets the current event handler.
+     * Gets the current event queue.
      *
-     * @return The current handler, or null if no handler is set
+     * @return The current event queue, or null if no queue is set
      */
-    fun getHandler(): ZUserInputEventHandler? {
-        return handler
+    fun getEventQueue(): ZEventQueue? {
+        return eventQueue
     }
 
     /**
-     * Updates the event handler that receives converted events.
+     * Updates the event queue that receives converted events.
+     *
+     * @param newQueue The new event queue to receive events, or null to disable event enqueuing
+     */
+    fun setEventQueue(newQueue: ZEventQueue?) {
+        eventQueue = newQueue
+    }
+
+    /**
+     * Gets the current event handler (for compatibility with ZUserInputEventHandler interface).
+     * Returns the event queue since it implements ZUserInputEventHandler.
+     *
+     * @return The current event queue, or null if no queue is set
+     */
+    fun getHandler(): ZUserInputEventHandler? {
+        return eventQueue
+    }
+
+    /**
+     * Updates the event handler (for compatibility with ZUserInputEventHandler interface).
+     * If the handler is a ZEventQueue, it will be used directly. Otherwise, it will be ignored.
      *
      * @param newHandler The new handler to receive events, or null to disable event forwarding
      */
     fun setHandler(newHandler: ZUserInputEventHandler?) {
-        handler = newHandler
+        eventQueue = newHandler as? ZEventQueue
     }
 
     /**

@@ -4,7 +4,7 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.MotionEvent
-import zernikalos.events.ZUserInputEventHandler
+import zernikalos.events.ZEventQueue
 
 open class ZernikalosView: GLSurfaceView, ZSurfaceView {
 
@@ -27,7 +27,7 @@ open class ZernikalosView: GLSurfaceView, ZSurfaceView {
             nativeRenderer.eventHandler = value
         }
 
-    override var userInputEventHandler: ZUserInputEventHandler? = null
+    override var eventQueue: ZEventQueue? = null
         set(value) {
             field = value
         }
@@ -57,11 +57,11 @@ open class ZernikalosView: GLSurfaceView, ZSurfaceView {
             return super.onTouchEvent(event)
         }
 
-        val handler = userInputEventHandler
-        if (handler != null) {
+        val queue = eventQueue
+        if (queue != null) {
             val touchEvents = touchEventConverter.convert(event)
             for (touchEvent in touchEvents) {
-                handler.onTouchEvent(touchEvent)
+                queue.enqueueTouch(touchEvent)
             }
             return true
         }

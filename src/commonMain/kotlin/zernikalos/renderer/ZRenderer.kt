@@ -8,8 +8,6 @@
 
 package zernikalos.renderer
 
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZRenderizable
 import zernikalos.components.ZResizable
 import zernikalos.context.ZContext
 import zernikalos.logger.ZLoggable
@@ -19,6 +17,13 @@ abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZResizable
     open fun initialize() {
         val scene = ctx.sceneContext.scene
         scene?.initialize(ctx)
+    }
+
+    open fun update() {
+        // Process all accumulated input events synchronously with the frame
+        if (!ctx.eventQueue.isEmpty) {
+            ctx.eventQueue.processAll()
+        }
     }
 
 }

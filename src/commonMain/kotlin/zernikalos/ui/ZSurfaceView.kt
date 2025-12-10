@@ -8,7 +8,7 @@
 
 package zernikalos.ui
 
-import zernikalos.events.ZUserInputEventHandler
+import zernikalos.events.ZEventQueue
 import kotlin.js.JsExport
 
 /**
@@ -37,10 +37,10 @@ interface ZSurfaceView {
     var eventHandler: ZSurfaceViewEventHandler?
 
     /**
-     * Represents an event handler that listens to user input events.
-     * Such as touch events, through [ZUserInputEventHandler].
+     * Represents the event queue that accumulates user input events for synchronous
+     * processing during the game loop frame update phase.
      */
-    var userInputEventHandler: ZUserInputEventHandler?
+    var eventQueue: ZEventQueue?
 
     /**
      * Disposes the surface view and releases all associated resources.

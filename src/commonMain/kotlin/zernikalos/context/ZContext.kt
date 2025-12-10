@@ -8,6 +8,7 @@
 
 package zernikalos.context
 
+import zernikalos.events.ZEventQueue
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
 import zernikalos.utils.genRefId
@@ -27,4 +28,10 @@ class ZContext(val sceneContext: ZSceneContext, val renderingContext: ZRendering
     var activeCamera: ZCamera? by sceneContext::activeCamera
 
     val isInitialized: Boolean by sceneContext::isInitialized
+
+    /**
+     * Event queue that accumulates user input events and processes them synchronously
+     * during the game loop frame update phase.
+     */
+    val eventQueue: ZEventQueue = ZEventQueue(this)
 }
