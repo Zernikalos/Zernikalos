@@ -10,6 +10,7 @@ package zernikalos.events
 
 import zernikalos.context.ZContext
 import zernikalos.events.keyboard.ZKeyboardEvent
+import zernikalos.events.keyboard.ZKeyboardEventType
 import zernikalos.events.mouse.ZMouseEvent
 import zernikalos.events.touch.ZTouchEvent
 import zernikalos.search.treeTraverse
@@ -69,10 +70,30 @@ class ZEventQueue(private val context: ZContext) : ZUserInputEventHandler {
      * that have registered listeners. This method should be called from the renderer's
      * update phase to ensure events are processed synchronously with the game loop.
      *
+     * The keyboard state is updated first (before distributing events), so that
+     * listeners and other code can query the current key state during event processing.
+     *
      * After processing, all event queues are cleared.
      */
     fun processAll() {
         val scene = context.scene ?: return
+
+        // Update keyboard state first (before distributing events)
+        // This ensures the state is available when listeners are called
+        keyboardEvents.forEach { event ->
+            when (event.type) {
+                ZKeyboardEventType.KEY_DOWN -> {
+                    context.input.keyboard.setKeyPressed(event.keyCode)
+                }
+                ZKeyboardEventType.KEY_UP -> {
+                    context.input.keyboard.setKeyReleased(event.keyCode)
+                }
+                ZKeyboardEventType.KEY_PRESS -> {
+                    // KEY_PRESS is just a repeat event, doesn't change the state
+                    // The key is already marked as pressed from the initial KEY_DOWN
+                }
+            }
+        }
 
         // Process touch events
         touchEvents.forEach { event ->
@@ -92,7 +113,7 @@ class ZEventQueue(private val context: ZContext) : ZUserInputEventHandler {
             }
         }
 
-        // Process keyboard events
+        // Process keyboard events (state already updated above)
         keyboardEvents.forEach { event ->
             for (obj in treeTraverse(scene)) {
                 if (obj.events.hasKeyboardListeners) {

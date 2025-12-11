@@ -84,6 +84,7 @@ open class ZernikalosBase: ZLoggable {
         context = contextCreator.createContext(surfaceView)
 
         surfaceView.eventHandler = createSurfaceViewEventHandler(context, stateHandler)
+        // TODO: Maybe do not expose this here but using the eventHandler instead
         surfaceView.eventQueue = context.eventQueue
         logger.info("View attached")
     }
