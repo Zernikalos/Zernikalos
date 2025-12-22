@@ -24,6 +24,8 @@ import zernikalos.context.ZRenderingContext
 
 actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private val data: ZTextureData) : ZComponentRenderer(ctx) {
 
+    // TODO: Implement all texture fields in order to create a https://developer.apple.com/documentation/metal/mtlsamplerdescriptor
+
     var texture: MTLTextureProtocol? = null
 
     actual override fun initialize() {

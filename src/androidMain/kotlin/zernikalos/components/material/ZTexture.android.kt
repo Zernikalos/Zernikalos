@@ -12,6 +12,8 @@ import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.ExpectTextureFilter
+import zernikalos.context.ExpectTextureWrap
 
 actual class ZTextureRenderer actual constructor(
     ctx: ZRenderingContext,
@@ -29,8 +31,10 @@ actual class ZTextureRenderer actual constructor(
 
         ctx.bindTexture(textureHandler)
 
-        ctx.texParameterMin()
-        ctx.texParameterMag()
+        ctx.texParameterMinFilter(mapFilterMode(data.minFilter))
+        ctx.texParameterMagFilter(mapFilterMode(data.magFilter))
+        ctx.texParameterWrapS(mapWrapMode(data.wrapModeU))
+        ctx.texParameterWrapT(mapWrapMode(data.wrapModeV))
 
         ctx.texImage2D(bitmap)
 
@@ -47,4 +51,19 @@ actual class ZTextureRenderer actual constructor(
     override fun unbind() {
     }
 
+}
+
+private fun mapFilterMode(filter: ZTextureFilterMode): Int {
+    return when (filter) {
+        ZTextureFilterMode.NEAREST -> ExpectTextureFilter.NEAREST
+        ZTextureFilterMode.LINEAR -> ExpectTextureFilter.LINEAR
+    }
+}
+
+private fun mapWrapMode(mode: ZTextureWrapMode): Int {
+    return when (mode) {
+        ZTextureWrapMode.REPEAT -> ExpectTextureWrap.REPEAT
+        ZTextureWrapMode.CLAMP_TO_EDGE -> ExpectTextureWrap.CLAMP_TO_EDGE
+        ZTextureWrapMode.MIRROR_REPEAT -> ExpectTextureWrap.MIRRORED_REPEAT
+    }
 }
