@@ -12,6 +12,8 @@ import kotlinx.browser.window
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
+import zernikalos.events.WebInputEventManager
+import zernikalos.events.ZEventQueue
 
 /**
  * @suppress
@@ -53,6 +55,11 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
     private var animationFrameRequestId: Int? = null
 
     /**
+     * Manager for handling input events (mouse and keyboard) from the canvas.
+     */
+    private val inputEventManager = WebInputEventManager(canvas, null)
+
+    /**
      * Event handler for surface view events (ready, resize, render).
      * When set, automatically calls onReady() to initialize the surface.
      */
@@ -61,6 +68,17 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
         set(value) {
             _eventHandler = value
             onReady()
+        }
+
+    /**
+     * Event queue that accumulates user input events for synchronous processing
+     * during the game loop frame update phase.
+     * When set, the manager will enqueue all input events to this queue.
+     */
+    override var eventQueue: ZEventQueue?
+        get() = inputEventManager.getEventQueue()
+        set(value) {
+            inputEventManager.setEventQueue(value)
         }
 
     /**
@@ -101,6 +119,7 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
             window.cancelAnimationFrame(animationFrameRequestId)
         }
         resizeObserver.disconnect()
+        inputEventManager.dispose()
     }
 
     /**

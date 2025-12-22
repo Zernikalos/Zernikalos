@@ -48,5 +48,17 @@ interface ZSceneStateHandler {
      * @param done Callback to specify the end of this operation
      */
     fun onUpdate(context: ZContext, done: () -> Unit)
+
+    /**
+     * Handles the rendering process for the current scene and rendering context.
+     * This method is expected to be called during each frame of the rendering loop
+     * to process and render the visual elements of the scene.
+     *
+     * @param context The current scene context encapsulating the state of the scene,
+     * active camera, rendering context, and screen dimensions. It provides necessary
+     * data required for rendering.
+     * @param done Callback to specify the end of this rendering operation.
+     */
+    fun onRender(context: ZContext, done: () -> Unit)
 }
 

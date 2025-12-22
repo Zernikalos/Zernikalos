@@ -11,6 +11,7 @@ package zernikalos.ui
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.MetalKit.MTKView
+import zernikalos.events.ZEventQueue
 
 @OptIn(ExperimentalForeignApi::class)
 class ZMtlSurfaceView(view: MTKView): ZSurfaceView {
@@ -40,6 +41,12 @@ class ZMtlSurfaceView(view: MTKView): ZSurfaceView {
             viewDelegate.eventHandler = value
             value?.onResize(surfaceWidth, surfaceHeight)
         }
+
+    /**
+     * Event queue for user input events (touch, etc.).
+     * Not yet implemented for Metal/iOS platform.
+     */
+    override var eventQueue: ZEventQueue? = null
 
     init {
         nativeView = view

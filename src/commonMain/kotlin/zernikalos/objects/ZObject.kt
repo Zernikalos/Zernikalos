@@ -15,6 +15,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZRef
 import zernikalos.context.ZContext
+import zernikalos.events.ZEventManager
 import zernikalos.logger.ZLoggable
 import zernikalos.math.ZTransform
 import zernikalos.math.ZVector3
@@ -89,6 +90,12 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     private var _initialized: Boolean = false
     val isInitialized: Boolean
         get() = _initialized
+
+    /**
+     * Event manager for this object, providing access to listener management functionality.
+     */
+    @Transient
+    val events: ZEventManager = ZEventManager(this)
 
     /**
      * Initializes the object and its children, preparing them for rendering. This function should be called before the object is rendered for the first time.

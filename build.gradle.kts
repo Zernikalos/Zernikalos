@@ -113,6 +113,7 @@ kotlin {
     js(IR) {
         outputModuleName.set("@zernikalos/zernikalos")
         version = zernikalosVersion
+
         compilations["main"].packageJson {
             customField("author", zernikalosAuthorName)
             customField("description", zernikalosDescription)
