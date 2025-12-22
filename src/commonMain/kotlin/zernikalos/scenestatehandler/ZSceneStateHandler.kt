@@ -35,7 +35,7 @@ interface ZSceneStateHandler {
      * @param height The new height of the viewport or rendering area.
      * @param done Callback to specify the end of this operation
      */
-    fun onResize(context: ZContext, width: Int, height: Int, done: () -> Unit)
+    fun onResize(context: ZContext, width: Int, height: Int, done: () -> Unit) : Unit = done()
 
     /**
      * Handles the updating process for the current scene and rendering context.
@@ -47,7 +47,7 @@ interface ZSceneStateHandler {
      * rendering context, and screen dimensions. It provides necessary data required for rendering.
      * @param done Callback to specify the end of this operation
      */
-    fun onUpdate(context: ZContext, done: () -> Unit)
+    fun onUpdate(context: ZContext, done: () -> Unit) : Unit = done()
 
     /**
      * Handles the rendering process for the current scene and rendering context.
@@ -59,6 +59,6 @@ interface ZSceneStateHandler {
      * data required for rendering.
      * @param done Callback to specify the end of this rendering operation.
      */
-    fun onRender(context: ZContext, done: () -> Unit)
+    fun onRender(context: ZContext, done: () -> Unit) : Unit = done()
 }
 
