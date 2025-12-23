@@ -136,6 +136,10 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
         children.forEach { child -> child.render(ctx) }
     }
 
+    fun update(ctx: ZContext) {
+        children.forEach { child -> child.update(ctx) }
+    }
+
     /**
      * Adds a child object to this object, establishing a parent-child relationship. The child object will be rendered relative to this object's transform.
      *
