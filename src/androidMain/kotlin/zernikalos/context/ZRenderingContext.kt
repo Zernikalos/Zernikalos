@@ -189,14 +189,6 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texture.id as Int)
     }
 
-    actual fun texParameterMin() {
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST)
-    }
-
-    actual fun texParameterMag() {
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST)
-    }
-
     actual fun texParameterMinFilter(filter: Int) {
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, filter)
     }

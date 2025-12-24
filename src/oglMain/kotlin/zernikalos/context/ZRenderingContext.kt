@@ -108,10 +108,6 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun bindTexture(texture: GLWrap)
 
-    fun texParameterMin()
-
-    fun texParameterMag()
-
     fun texParameterMinFilter(filter: Int)
 
     fun texParameterMagFilter(filter: Int)

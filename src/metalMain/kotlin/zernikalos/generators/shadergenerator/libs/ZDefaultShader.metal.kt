@@ -315,12 +315,7 @@ float3 calculateBlinnPhongColor(
 #endif
 
 #if defined(USE_TEXTURE)
-    float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap) {
-        constexpr sampler colorSampler(mip_filter::linear,
-                                       mag_filter::linear,
-                                       min_filter::linear,
-                                       address::repeat);
-
+    float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap, sampler colorSampler) {
         half4 colorSample = colorMap.sample(colorSampler, in.texCoord.xy);
 
         return float4(colorSample);
@@ -332,19 +327,23 @@ float4 fragmentComputeColorOut(ColorInOut in) {
 }
 
 fragment float4 fragmentShader(ColorInOut in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) ]],
+                               constant Uniforms & uniforms [[ buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) ]]
                                #if defined(USE_PBR_MATERIAL)
-                               constant PBRMaterialUniforms &pbrMaterial [[buffer(${UNIFORM_IDS.BLOCK_PBR_MATERIAL})]],
+                               , constant PBRMaterialUniforms &pbrMaterial [[buffer(${UNIFORM_IDS.BLOCK_PBR_MATERIAL})]]
                                #endif
                                #if defined(USE_PHONG_MATERIAL)
-                               constant PhongMaterialUniforms &phongMaterial [[buffer(${UNIFORM_IDS.BLOCK_PHONG_MATERIAL})]],
+                               , constant PhongMaterialUniforms &phongMaterial [[buffer(${UNIFORM_IDS.BLOCK_PHONG_MATERIAL})]]
                                #endif
-                               texture2d<half> colorMap     [[ texture(0) ]])
+                               #if defined(USE_TEXTURE)
+                               , texture2d<half> colorMap     [[ texture(0) ]]
+                               , sampler colorSampler         [[ sampler(0) ]]
+                               #endif
+                               )
 {
     float4 baseColor = float4(1.0);
 
     #if defined(USE_TEXTURE)
-        baseColor = fragmentComputeColorOutFromTexture(in, colorMap);
+        baseColor = fragmentComputeColorOutFromTexture(in, colorMap, colorSampler);
     #elif defined(USE_COLOR)
         baseColor = float4(in.color, 1.0);
     #endif
