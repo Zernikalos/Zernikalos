@@ -189,12 +189,20 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texture.id as Int)
     }
 
-    actual fun texParameterMin() {
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST)
+    actual fun texParameterMinFilter(filter: Int) {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, filter)
     }
 
-    actual fun texParameterMag() {
-        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST)
+    actual fun texParameterMagFilter(filter: Int) {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, filter)
+    }
+
+    actual fun texParameterWrapS(mode: Int) {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, mode)
+    }
+
+    actual fun texParameterWrapT(mode: Int) {
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, mode)
     }
 
     actual fun texImage2D(bitmap: ZBitmap) {
@@ -237,4 +245,15 @@ actual object ExpectCullModeType {
     actual val FRONT: Int = GLES30.GL_FRONT
     actual val BACK: Int = GLES30.GL_BACK
     actual val FRONT_AND_BACK: Int = GLES30.GL_FRONT_AND_BACK
+}
+
+actual object ExpectTextureFilter {
+    actual val NEAREST: Int = GLES30.GL_NEAREST
+    actual val LINEAR: Int = GLES30.GL_LINEAR
+}
+
+actual object ExpectTextureWrap {
+    actual val REPEAT: Int = GLES30.GL_REPEAT
+    actual val CLAMP_TO_EDGE: Int = GLES30.GL_CLAMP_TO_EDGE
+    actual val MIRRORED_REPEAT: Int = GLES30.GL_MIRRORED_REPEAT
 }

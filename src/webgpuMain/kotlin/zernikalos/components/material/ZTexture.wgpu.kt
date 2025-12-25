@@ -8,20 +8,11 @@
 
 package zernikalos.components.material
 
+import zernikalos.ZBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
-import zernikalos.context.webgpu.GPUExtent3D
-import zernikalos.context.webgpu.GPUSampler
-import zernikalos.context.webgpu.GPUSamplerDescriptor
-import zernikalos.context.webgpu.GPUTexture
-import zernikalos.context.webgpu.GPUTextureDescriptor
-import zernikalos.context.webgpu.GPUTextureFormat
-import zernikalos.context.webgpu.GPUTextureUsage
-import zernikalos.context.webgpu.GPUAddressMode
-import zernikalos.context.webgpu.GPUFilterMode
-import zernikalos.context.webgpu.GPUImageCopyExternalImage
-import zernikalos.context.webgpu.GPUImageCopyTexture
+import zernikalos.context.webgpu.*
 
 actual class ZTextureRenderer actual constructor(
     ctx: ZRenderingContext,
@@ -38,20 +29,22 @@ actual class ZTextureRenderer actual constructor(
 
         val bitmap = ZBitmap(data.dataArray)
 
+        val textureFormat = mapTextureFormat(data)
+
         texture = device.createTexture(
             GPUTextureDescriptor(
                 size = GPUExtent3D(data.width, data.height, 1),
-                format = GPUTextureFormat.RGBA8Unorm,
+                format = textureFormat,
                 usage = GPUTextureUsage.TEXTURE_BINDING or GPUTextureUsage.COPY_DST or GPUTextureUsage.RENDER_ATTACHMENT
             )
         )
 
         sampler = ctx.device.createSampler(
             GPUSamplerDescriptor(
-                addressModeU = GPUAddressMode.CLAMP_TO_EDGE,
-                addressModeV = GPUAddressMode.CLAMP_TO_EDGE,
-                magFilter = GPUFilterMode.LINEAR,
-                minFilter = GPUFilterMode.LINEAR
+                addressModeU = mapAddressMode(data.wrapModeU),
+                addressModeV = mapAddressMode(data.wrapModeV),
+                magFilter = mapFilterMode(data.magFilter),
+                minFilter = mapFilterMode(data.minFilter)
             )
         )
 
@@ -72,4 +65,53 @@ actual class ZTextureRenderer actual constructor(
 
     override fun unbind() {}
 
+}
+
+private fun mapFilterMode(filter: ZTextureFilterMode): String {
+    return when (filter) {
+        ZTextureFilterMode.NEAREST -> GPUFilterMode.NEAREST
+        ZTextureFilterMode.LINEAR -> GPUFilterMode.LINEAR
+    }
+}
+
+private fun mapAddressMode(mode: ZTextureWrapMode): String {
+    return when (mode) {
+        ZTextureWrapMode.REPEAT -> GPUAddressMode.REPEAT
+        ZTextureWrapMode.CLAMP_TO_EDGE -> GPUAddressMode.CLAMP_TO_EDGE
+        ZTextureWrapMode.MIRROR_REPEAT -> GPUAddressMode.MIRROR_REPEAT
+    }
+}
+
+private fun mapTextureFormat(data: ZTextureData): String {
+    return when {
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            GPUTextureFormat.RGBA8Unorm
+
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GPUTextureFormat.RGBA8UnormSRGB
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            GPUTextureFormat.BGRA8Unorm
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GPUTextureFormat.BGRA8UnormSRGB
+
+        data.channels == ZTextureChannels.R && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.R8Unorm
+
+        data.channels == ZTextureChannels.RG && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.RG8Unorm
+
+        data.channels == ZTextureChannels.RGB && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.RGBA8Unorm // Fallback, RGB8Unorm might not be available
+
+        else -> GPUTextureFormat.RGBA8Unorm // Default fallback
+    }
 }

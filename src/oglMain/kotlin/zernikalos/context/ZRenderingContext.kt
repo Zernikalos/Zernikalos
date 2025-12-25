@@ -108,9 +108,13 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun bindTexture(texture: GLWrap)
 
-    fun texParameterMin()
+    fun texParameterMinFilter(filter: Int)
 
-    fun texParameterMag()
+    fun texParameterMagFilter(filter: Int)
+
+    fun texParameterWrapS(mode: Int)
+
+    fun texParameterWrapT(mode: Int)
 
     fun texImage2D(bitmap: ZBitmap)
 
@@ -193,4 +197,15 @@ expect object ExpectCullModeType {
     val FRONT: Int
     val BACK: Int
     val FRONT_AND_BACK: Int
+}
+
+expect object ExpectTextureFilter {
+    val NEAREST: Int
+    val LINEAR: Int
+}
+
+expect object ExpectTextureWrap {
+    val REPEAT: Int
+    val CLAMP_TO_EDGE: Int
+    val MIRRORED_REPEAT: Int
 }
