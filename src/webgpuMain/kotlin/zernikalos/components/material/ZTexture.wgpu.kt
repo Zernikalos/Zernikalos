@@ -8,6 +8,7 @@
 
 package zernikalos.components.material
 
+import zernikalos.ZBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
@@ -28,7 +29,7 @@ actual class ZTextureRenderer actual constructor(
 
         val bitmap = ZBitmap(data.dataArray)
 
-        val textureFormat = mapTextureFormat(data.format)
+        val textureFormat = mapTextureFormat(data)
 
         texture = device.createTexture(
             GPUTextureDescriptor(
@@ -81,14 +82,36 @@ private fun mapAddressMode(mode: ZTextureWrapMode): String {
     }
 }
 
-private fun mapTextureFormat(format: ZTextureFormat): String {
-    return when (format) {
-        ZTextureFormat.RGBA8UNORM -> GPUTextureFormat.RGBA8Unorm
-        ZTextureFormat.RGBA8UNORM_SRGB -> GPUTextureFormat.RGBA8UnormSRGB
-        ZTextureFormat.BGRA8UNORM -> GPUTextureFormat.BGRA8Unorm
-        ZTextureFormat.BGRA8UNORM_SRGB -> GPUTextureFormat.BGRA8UnormSRGB
-        ZTextureFormat.R8UNORM -> GPUTextureFormat.R8Unorm
-        ZTextureFormat.RG8UNORM -> GPUTextureFormat.RG8Unorm
-        ZTextureFormat.RGB8UNORM -> GPUTextureFormat.RGBA8Unorm // Fallback, RGB8Unorm might not be available
+private fun mapTextureFormat(data: ZTextureData): String {
+    return when {
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            GPUTextureFormat.RGBA8Unorm
+
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GPUTextureFormat.RGBA8UnormSRGB
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            GPUTextureFormat.BGRA8Unorm
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GPUTextureFormat.BGRA8UnormSRGB
+
+        data.channels == ZTextureChannels.R && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.R8Unorm
+
+        data.channels == ZTextureChannels.RG && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.RG8Unorm
+
+        data.channels == ZTextureChannels.RGB && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized ->
+            GPUTextureFormat.RGBA8Unorm // Fallback, RGB8Unorm might not be available
+
+        else -> GPUTextureFormat.RGBA8Unorm // Default fallback
     }
 }

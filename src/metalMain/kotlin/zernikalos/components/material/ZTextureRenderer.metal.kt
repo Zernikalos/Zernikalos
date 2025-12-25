@@ -16,6 +16,7 @@ import platform.Metal.*
 import platform.MetalKit.MTKTextureLoader
 import platform.MetalKit.MTKTextureLoaderOptionTextureStorageMode
 import platform.MetalKit.MTKTextureLoaderOptionTextureUsage
+import zernikalos.ZBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
@@ -82,5 +83,34 @@ private fun mapAddressMode(mode: ZTextureWrapMode): ULong {
         ZTextureWrapMode.REPEAT -> MTLSamplerAddressModeRepeat
         ZTextureWrapMode.CLAMP_TO_EDGE -> MTLSamplerAddressModeClampToEdge
         ZTextureWrapMode.MIRROR_REPEAT -> MTLSamplerAddressModeMirrorRepeat
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun mapTextureFormat(data: ZTextureData): ULong {
+    return when {
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            MTLPixelFormatRGBA8Unorm
+
+        data.channels == ZTextureChannels.RGBA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            MTLPixelFormatRGBA8Unorm_sRGB
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.LINEAR ->
+            MTLPixelFormatBGRA8Unorm
+
+        data.channels == ZTextureChannels.BGRA && data.pixelType == ZBaseType.UNSIGNED_BYTE &&
+        data.normalized && data.colorSpace == ZTextureColorSpace.SRGB ->
+            MTLPixelFormatBGRA8Unorm_sRGB
+
+        data.channels == ZTextureChannels.R && data.pixelType == ZBaseType.UNSIGNED_BYTE ->
+            MTLPixelFormatR8Unorm
+
+        data.channels == ZTextureChannels.RG && data.pixelType == ZBaseType.UNSIGNED_BYTE ->
+            MTLPixelFormatRG8Unorm
+
+        else -> MTLPixelFormatRGBA8Unorm
     }
 }

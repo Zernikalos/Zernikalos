@@ -8,6 +8,8 @@
 
 package zernikalos.components.material
 
+import android.opengl.GLES30
+import zernikalos.ZBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
@@ -65,5 +67,36 @@ private fun mapWrapMode(mode: ZTextureWrapMode): Int {
         ZTextureWrapMode.REPEAT -> ExpectTextureWrap.REPEAT
         ZTextureWrapMode.CLAMP_TO_EDGE -> ExpectTextureWrap.CLAMP_TO_EDGE
         ZTextureWrapMode.MIRROR_REPEAT -> ExpectTextureWrap.MIRRORED_REPEAT
+    }
+}
+
+private fun mapTextureFormat(data: ZTextureData): Int {
+    return when(data.channels) {
+        ZTextureChannels.RGBA, ZTextureChannels.BGRA -> GLES30.GL_RGBA
+        ZTextureChannels.RGB -> GLES30.GL_RGB
+        ZTextureChannels.RG -> GLES30.GL_RG
+        ZTextureChannels.R -> GLES30.GL_RED
+    }
+}
+
+private fun mapTextureInternalFormat(data: ZTextureData): Int {
+    return when {
+        data.channels == ZTextureChannels.RGBA && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GLES30.GL_SRGB8_ALPHA8
+        data.channels == ZTextureChannels.RGBA ->
+            GLES30.GL_RGBA8
+        data.channels == ZTextureChannels.BGRA && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GLES30.GL_SRGB8_ALPHA8
+        data.channels == ZTextureChannels.BGRA ->
+            GLES30.GL_RGBA8
+        data.channels == ZTextureChannels.RGB && data.colorSpace == ZTextureColorSpace.SRGB ->
+            GLES30.GL_SRGB8
+        data.channels == ZTextureChannels.RGB ->
+            GLES30.GL_RGB8
+        data.channels == ZTextureChannels.RG ->
+            GLES30.GL_RG8
+        data.channels == ZTextureChannels.R ->
+            GLES30.GL_R8
+        else -> GLES30.GL_RGBA8
     }
 }

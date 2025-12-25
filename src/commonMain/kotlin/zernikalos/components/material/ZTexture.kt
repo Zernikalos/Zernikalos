@@ -12,6 +12,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZBaseType
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
@@ -46,25 +47,33 @@ enum class ZTextureWrapMode {
 }
 
 /**
- * Texture format specification.
+ * Texture channel format specification.
  */
 @JsExport
 @Serializable
-enum class ZTextureFormat {
-    @SerialName("rgba8unorm")
-    RGBA8UNORM,
-    @SerialName("rgba8unorm-srgb")
-    RGBA8UNORM_SRGB,
-    @SerialName("bgra8unorm")
-    BGRA8UNORM,
-    @SerialName("bgra8unorm-srgb")
-    BGRA8UNORM_SRGB,
-    @SerialName("r8unorm")
-    R8UNORM,
-    @SerialName("rg8unorm")
-    RG8UNORM,
-    @SerialName("rgb8unorm")
-    RGB8UNORM
+enum class ZTextureChannels {
+    @SerialName("r")
+    R,
+    @SerialName("rg")
+    RG,
+    @SerialName("rgb")
+    RGB,
+    @SerialName("rgba")
+    RGBA,
+    @SerialName("bgra")
+    BGRA
+}
+
+/**
+ * Texture color space specification.
+ */
+@JsExport
+@Serializable
+enum class ZTextureColorSpace {
+    @SerialName("linear")
+    LINEAR,
+    @SerialName("srgb")
+    SRGB
 }
 
 /**
@@ -139,9 +148,24 @@ class ZTexture internal constructor(private val data: ZTextureData): ZRenderizab
     var wrapModeV: ZTextureWrapMode by data::wrapModeV
 
     /**
-     * Represents the texture format.
+     * Represents the pixel type (e.g., UNSIGNED_BYTE, FLOAT).
      */
-    var format: ZTextureFormat by data::format
+    var pixelType: ZBaseType by data::pixelType
+
+    /**
+     * Represents the channel format (e.g., RGBA, RGB, R).
+     */
+    var channels: ZTextureChannels by data::channels
+
+    /**
+     * Represents the color space (LINEAR or SRGB).
+     */
+    var colorSpace: ZTextureColorSpace by data::colorSpace
+
+    /**
+     * Represents whether the texture values are normalized.
+     */
+    var normalized: Boolean by data::normalized
 
     override fun createRenderer(ctx: ZRenderingContext): ZTextureRenderer {
         return ZTextureRenderer(ctx, data)
@@ -179,10 +203,42 @@ data class ZTextureData(
     @ProtoNumber(9)
     var wrapModeV: ZTextureWrapMode = ZTextureWrapMode.CLAMP_TO_EDGE,
     @ProtoNumber(10)
-    var format: ZTextureFormat = ZTextureFormat.RGBA8UNORM,
+    var pixelType: ZBaseType = ZBaseType.UNSIGNED_BYTE,
+    @ProtoNumber(11)
+    var channels: ZTextureChannels = ZTextureChannels.RGBA,
+    @ProtoNumber(12)
+    var colorSpace: ZTextureColorSpace = ZTextureColorSpace.LINEAR,
+    @ProtoNumber(13)
+    var normalized: Boolean = true,
     @ProtoNumber(100)
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData()
+
+/**
+ * Helper function to build a format string from texture components.
+ * Useful for debugging and logging.
+ */
+fun ZTextureData.getFormatString(): String {
+    val channelStr = when(channels) {
+        ZTextureChannels.R -> "r"
+        ZTextureChannels.RG -> "rg"
+        ZTextureChannels.RGB -> "rgb"
+        ZTextureChannels.RGBA -> "rgba"
+        ZTextureChannels.BGRA -> "bgra"
+    }
+    val typeStr = when(pixelType) {
+        ZBaseType.UNSIGNED_BYTE -> "8"
+        ZBaseType.UNSIGNED_SHORT -> "16"
+        ZBaseType.FLOAT -> "32float"
+        else -> "8"
+    }
+    val normStr = if(normalized) "unorm" else "uint"
+    val csStr = when(colorSpace) {
+        ZTextureColorSpace.SRGB -> "-srgb"
+        ZTextureColorSpace.LINEAR -> ""
+    }
+    return "$channelStr$typeStr$normStr$csStr"
+}
 
 /**
  * @suppress
