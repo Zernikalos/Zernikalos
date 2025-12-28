@@ -199,4 +199,83 @@ class GitTool:
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):
             return False
+    
+    def get_last_release_tag(self) -> Optional[str]:
+        """
+        Get the last release tag (format v*.*.*)
+        
+        Uses git describe to find the most recent tag matching the pattern v*.*.*
+        which corresponds to semantic version tags.
+        
+        Returns:
+            Last release tag name (e.g., 'v0.6.0') or None if no tags found
+        """
+        try:
+            result = subprocess.run(
+                ['git', 'describe', '--tags', '--abbrev=0', '--match', 'v*.*.*'],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            tag = result.stdout.strip()
+            return tag if tag else None
+        except subprocess.CalledProcessError:
+            # No tags found or no matching tags
+            return None
+        except FileNotFoundError:
+            return None
+    
+    def get_commits_since_tag(self, tag: str) -> List[str]:
+        """
+        Get list of commit messages since a specific tag
+        
+        Retrieves commit subject lines (first line of commit message) from the
+        specified tag to HEAD. Used for analyzing Conventional Commits.
+        
+        Args:
+            tag: Tag name to get commits from (e.g., 'v0.6.0')
+            
+        Returns:
+            List of commit messages (subject lines only)
+        """
+        try:
+            result = subprocess.run(
+                ['git', 'log', f'{tag}..HEAD', '--pretty=format:%s'],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            commits = [line.strip() for line in result.stdout.split('\n') if line.strip()]
+            return commits
+        except subprocess.CalledProcessError:
+            return []
+        except FileNotFoundError:
+            return []
+    
+    def get_current_commit_hash(self, short: bool = True) -> Optional[str]:
+        """
+        Get the current commit hash
+        
+        Args:
+            short: If True, return short hash (7 chars), otherwise full hash
+            
+        Returns:
+            Commit hash or None if error
+        """
+        try:
+            format_str = '%h' if short else '%H'
+            result = subprocess.run(
+                ['git', 'rev-parse', format_str, 'HEAD'],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=self.project_root
+            )
+            return result.stdout.strip()
+        except subprocess.CalledProcessError:
+            return None
+        except FileNotFoundError:
+            return None
 

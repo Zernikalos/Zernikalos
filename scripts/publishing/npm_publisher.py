@@ -1,9 +1,11 @@
 """
-NPM Publisher Module
+NPM Publisher
 Provides NPM package publishing functionality
 """
 
-from typing import Optional, List, Tuple, Any, Dict
+from typing import Optional, List, Tuple, Dict
+from pathlib import Path
+from common import BaseScript
 from .base_builder import BaseBuilder, GitHubCredentials
 
 
@@ -12,6 +14,7 @@ class NpmPublisher(BaseBuilder):
 
     def __init__(
         self, 
+        project_root: Path = None,
         enabled_publications: Optional[List[str]] = None,
         credentials: Optional[GitHubCredentials] = None
     ):
@@ -20,6 +23,8 @@ class NpmPublisher(BaseBuilder):
             enabled_publications=enabled_publications,
             credentials=credentials
         )
+        if project_root:
+            self.project_root = project_root
     
     def get_available_publications(self) -> List[Dict[str, str]]:
         """Get list of available publications"""
@@ -74,7 +79,7 @@ class NpmPublisher(BaseBuilder):
             return False
         
         print()
-        self.print_status("To publish packages, use: python publish-all.py -n")
+        self.print_status("To publish packages, use: python zmanager.py publish --npm")
         return True
     
     def _check_tool(self) -> bool:
@@ -148,38 +153,4 @@ class NpmPublisher(BaseBuilder):
                 self.print_status(f"    Available at: https://npm.pkg.github.com/@zernikalos/{package_name}")
         
         return success
-
-
-def run_npm_publish(github_user: str, github_token: str, action: str = "all") -> bool:
-    """
-    Run NPM publish functionality programmatically
-    
-    Args:
-        github_user: GitHub username/organization
-        github_token: GitHub access token
-        action: Action to perform (list, all)
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    from .base_builder import GitHubCredentials
-    
-    # Map action to enabled publications
-    action_to_publications = {
-        "list": None,
-        "all": ["all"]
-    }
-    
-    enabled_publications = action_to_publications.get(action)
-    
-    # Create credentials object
-    credentials = GitHubCredentials(user=github_user, token=github_token)
-    
-    # Create publisher with credentials
-    publisher = NpmPublisher(
-        enabled_publications=enabled_publications,
-        credentials=credentials
-    )
-    
-    return publisher.run() == 0
 
