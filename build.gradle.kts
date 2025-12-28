@@ -16,7 +16,8 @@ val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
 var zernikalosVersion: String
-    get() = file("VERSION.txt").readText().trim()
+    get() = project.findProperty("version") as String? 
+        ?: file("VERSION.txt").readText().trim()
     set(value) { file("VERSION.txt").writeText(value) }
 val zernikalosDescription = "Zernikalos Game Engine"
 
@@ -333,6 +334,21 @@ tasks.register("updateVersion") {
 
     // This task acts as an aggregator. It will use the version currently in VERSION.txt.
     finalizedBy("generateVersionConstants", "podspec", "jsBrowserDistribution")
+}
+
+tasks.register("printVersion") {
+    description = "Prints the current project version (respects -Pversion parameter)"
+    group = "versioning"
+    
+    doLast {
+        println("=".repeat(60))
+        println("📦 Project Version Information")
+        println("=".repeat(60))
+        println("Version from VERSION.txt: ${file("VERSION.txt").readText().trim()}")
+        println("Version from -Pversion param: ${project.findProperty("version") ?: "(not provided)"}")
+        println("Effective version (used by build): $zernikalosVersion")
+        println("=".repeat(60))
+    }
 }
 
 tasks.register<Exec>("releaseCommit") {
