@@ -30,18 +30,21 @@ jobs:
         run: |
           BASE_VERSION=$(cat VERSION.txt)
           COMMIT_HASH=$(git rev-parse --short HEAD)
-          NEXT_VERSION="${BASE_VERSION}-next.${COMMIT_HASH}"
-          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-          echo "Publishing next version: $NEXT_VERSION"
+          MAVEN_VERSION="${BASE_VERSION}-SNAPSHOT"
+          NPM_VERSION="${BASE_VERSION}-next.${COMMIT_HASH}"
+          echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
+          echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing Maven version: $MAVEN_VERSION"
+          echo "Publishing npm version: $NPM_VERSION"
 
       - name: Verify Version Configuration
-        run: ./gradlew printVersion -Pversion=${{ steps.version.outputs.version }}
+        run: ./gradlew printVersion -Pversion=${{ steps.version.outputs.maven_version }}
 
       - name: Build
-        run: ./gradlew build -Pversion=${{ steps.version.outputs.version }}
+        run: ./gradlew build -Pversion=${{ steps.version.outputs.maven_version }}
 
       - name: Publish to Maven Repository
-        run: ./gradlew publishAllPublicationsToMavenRepository -Pversion=${{ steps.version.outputs.version }} -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+        run: ./gradlew publishAllPublicationsToMavenRepository -Pversion=${{ steps.version.outputs.maven_version }} -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -52,7 +55,9 @@ jobs:
 
       - name: Publish JS Package
         working-directory: build/js
-        run: npm publish --workspace=@zernikalos/zernikalos --tag next
+        run: |
+          npm version ${{ steps.version.outputs.npm_version }} --no-git-tag-version
+          npm publish --workspace=@zernikalos/zernikalos --tag next
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
 
