@@ -17,7 +17,7 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
     actual fun unbind() {
     }
 
-    actual fun update() {
+    actual override fun update() {
         ctx.scene?.update(ctx)
     }
 

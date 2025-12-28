@@ -31,7 +31,7 @@ abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZResizable
 expect class ZRenderer(ctx: ZContext): ZRendererBase {
     fun bind()
     fun unbind()
-    fun update()
+    override fun update()
     fun render()
     override fun onViewportResize(width: Int, height: Int)
 }
