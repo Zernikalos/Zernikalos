@@ -277,20 +277,24 @@ dokka {
 
 // Custom Tasks
 
-// Generate a ZVersion.kt file with the current version number.
-tasks.register("generateVersionConstants") {
+// ============================================================================
+// VERSION MANAGEMENT TASKS
+// ============================================================================
+
+// Generates ZVersion.kt file with current version number.
+// This task runs automatically before compilation tasks.
+tasks.register("generateVersionFile") {
     val outputDir = file("src/commonMain/kotlin/zernikalos")
     val outputFile = file("$outputDir/ZVersion.kt")
 
     inputs.property("version", zernikalosVersion)
-
     outputs.dir(outputDir)
 
     doLast {
         outputDir.mkdirs()
         val templateFile = file(".zversion.kt.template")
         val templateContent = templateFile.readText()
-        val processedContent = templateContent.replace("\${project.version}", project.version.toString())
+        val processedContent = templateContent.replace("\${project.version}", zernikalosVersion)
         outputFile.writeText(processedContent)
     }
 }
@@ -300,42 +304,13 @@ tasks.configureEach {
     if (name.startsWith("compile") ||
         name.endsWith("SourcesJar") ||
         name.endsWith("Jar")) {
-        dependsOn("generateVersionConstants")
+        dependsOn("generateVersionFile")
         dependsOn("kotlinUpgradePackageLock")
     }
 }
 
-tasks.register<Copy>("generateNpmrc") {
-    from(".npmrc.template")
-    into(layout.buildDirectory.dir("js").get().toString())
-    rename(".npmrc.template", ".npmrc")
-    filter { line ->
-        line.replace("\${GITHUB_USER}", publishUser)
-            .replace("\${GITHUB_TOKEN}", publishAccessToken)
-    }
-}
-
-tasks.register("setVersion") {
-    description = "Sets the project version in VERSION.txt. Usage: ./gradlew setVersion -PnewVersion=X.Y.Z"
-    group = "versioning"
-
-    doLast {
-        val newVersion = project.findProperty("newVersion") as String?
-            ?: throw GradleException("Please provide the version with -PnewVersion=X.Y.Z")
-        zernikalosVersion = newVersion
-        println("VERSION.txt has been updated to: $zernikalosVersion")
-        println("Now, run './gradlew updateVersion' to apply this version to generated files.")
-    }
-}
-
-tasks.register("updateVersion") {
-    description = "Generates all version-dependent files (constants, podspec, etc.). Run setVersion first."
-    group = "versioning"
-
-    // This task acts as an aggregator. It will use the version currently in VERSION.txt.
-    finalizedBy("generateVersionConstants", "podspec", "jsBrowserDistribution")
-}
-
+// Prints current project version information (useful for debugging and CI).
+// Respects -Pversion parameter override.
 tasks.register("printVersion") {
     description = "Prints the current project version (respects -Pversion parameter)"
     group = "versioning"
@@ -351,6 +326,33 @@ tasks.register("printVersion") {
     }
 }
 
+// Sets the project version in VERSION.txt.
+// Usage: ./gradlew setVersion -PnewVersion=X.Y.Z
+tasks.register("setVersion") {
+    description = "Sets the project version in VERSION.txt. Usage: ./gradlew setVersion -PnewVersion=X.Y.Z"
+    group = "versioning"
+
+    doLast {
+        val newVersion = project.findProperty("newVersion") as String?
+            ?: throw GradleException("Please provide the version with -PnewVersion=X.Y.Z")
+        zernikalosVersion = newVersion
+        println("VERSION.txt has been updated to: $zernikalosVersion")
+        println("Now, run './gradlew updateVersion' to apply this version to generated files.")
+    }
+}
+
+// Aggregator task that generates all version-dependent files.
+// Run this after setVersion to propagate version changes.
+tasks.register("updateVersion") {
+    description = "Generates all version-dependent files (constants, podspec, etc.). Run setVersion first."
+    group = "versioning"
+
+    // This task acts as an aggregator. It will use the version currently in VERSION.txt.
+    finalizedBy("generateVersionFile", "podspec", "jsBrowserDistribution")
+}
+
+// Creates a release commit and git tag.
+// Usage: ./gradlew releaseCommit (after setVersion and updateVersion)
 tasks.register<Exec>("releaseCommit") {
     description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
     group = "versioning"
@@ -365,6 +367,26 @@ tasks.register<Exec>("releaseCommit") {
         "git add . && git commit -m \"release: 🚀 v$zernikalosVersion\" && git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\""
     )
 }
+
+// ============================================================================
+// PUBLISHING CONFIGURATION TASKS
+// ============================================================================
+
+// Generates .npmrc file with GitHub Packages authentication.
+// Used for publishing npm packages to GitHub Packages registry.
+tasks.register<Copy>("generateNpmrc") {
+    from(".npmrc.template")
+    into(layout.buildDirectory.dir("js").get().toString())
+    rename(".npmrc.template", ".npmrc")
+    filter { line ->
+        line.replace("\${GITHUB_USER}", publishUser)
+            .replace("\${GITHUB_TOKEN}", publishAccessToken)
+    }
+}
+
+// ============================================================================
+// TEST CONFIGURATION
+// ============================================================================
 
 tasks.withType<org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest>().configureEach {
     testLogging {

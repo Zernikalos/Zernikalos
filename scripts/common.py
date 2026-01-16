@@ -173,11 +173,25 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
 
 
 def validate_version(version: str) -> bool:
-    """Validate version format (X.Y.Z)"""
+    """
+    Validate version format
+    
+    Supports:
+    - Standard versions: X.Y.Z (e.g., 0.6.0)
+    - SNAPSHOT versions: X.Y.Z-SNAPSHOT (e.g., 0.7.0-SNAPSHOT)
+    - Next versions: X.Y.Z-next.* (e.g., 0.7.0-next.42a2e33)
+    """
     import re
-    if not re.match(r'^[0-9]+\.[0-9]+\.[0-9]+$', version):
-        return False
-    return True
+    # Standard version: X.Y.Z
+    if re.match(r'^[0-9]+\.[0-9]+\.[0-9]+$', version):
+        return True
+    # SNAPSHOT version: X.Y.Z-SNAPSHOT
+    if re.match(r'^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$', version):
+        return True
+    # Next version: X.Y.Z-next.*
+    if re.match(r'^[0-9]+\.[0-9]+\.[0-9]+-next\.[a-zA-Z0-9]+$', version):
+        return True
+    return False
 
 
 def check_git_status(project_root: Path = None) -> Tuple[bool, str]:

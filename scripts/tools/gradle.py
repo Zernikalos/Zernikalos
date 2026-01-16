@@ -82,9 +82,13 @@ class GradleTool:
                 return True, None, None
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr if e.stderr else str(e)
+            stdout_msg = e.stdout if hasattr(e, 'stdout') and e.stdout else None
             if show_output:
-                print(f"Error: {error_msg}")
-            return False, None, error_msg
+                if stdout_msg:
+                    print(f"Gradle stdout: {stdout_msg}")
+                print(f"Gradle stderr: {error_msg}")
+                print(f"Command failed with exit code {e.returncode}")
+            return False, stdout_msg, error_msg
         except FileNotFoundError:
             error_msg = "Gradle wrapper not found or not executable"
             if show_output:
@@ -127,24 +131,52 @@ class GradleTool:
         success, _, _ = self.run_command('kotlinUpgradePackageLock')
         return success
     
-    def update_version(self) -> bool:
+    def update_version(self, version: str = None) -> bool:
         """
         Generate version-dependent files
         
-        Returns:
-            True if successful, False otherwise
-        """
-        success, _, _ = self.run_command('updateVersion')
-        return success
-    
-    def release_commit(self) -> bool:
-        """
-        Create release commit and tag
+        Args:
+            version: Optional version string to pass as project property.
+                    If not provided, will use version from VERSION.txt
         
         Returns:
             True if successful, False otherwise
         """
-        success, _, _ = self.run_command('releaseCommit')
+        args = []
+        if version:
+            args.append(f'-Pversion={version}')
+        
+        success, stdout, stderr = self.run_command('updateVersion', *args, show_output=True)
+        if not success:
+            # Print error details for debugging
+            if stderr:
+                print(f"Gradle error: {stderr}")
+            if stdout:
+                print(f"Gradle output: {stdout}")
+        return success
+    
+    def release_commit(self, version: str = None) -> bool:
+        """
+        Create release commit and tag
+        
+        Args:
+            version: Optional version string to pass as project property.
+                    If not provided, will use version from VERSION.txt
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        args = []
+        if version:
+            args.append(f'-Pversion={version}')
+        
+        success, stdout, stderr = self.run_command('releaseCommit', *args, show_output=True)
+        if not success:
+            # Print error details for debugging
+            if stderr:
+                print(f"Gradle error: {stderr}")
+            if stdout:
+                print(f"Gradle output: {stdout}")
         return success
     
     def js_browser_production_webpack(self) -> bool:

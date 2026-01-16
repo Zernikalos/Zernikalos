@@ -1,25 +1,29 @@
 """
-Android Publisher Module
-Provides Android artifact publishing functionality
+Maven Publisher
+Provides Maven/Android artifact publishing functionality
 """
 
 from typing import Optional, List, Dict
+from pathlib import Path
 from .base_builder import BaseBuilder, GitHubCredentials
 
 
-class AndroidPublisher(BaseBuilder):
-    """Main class for Android artifact publishing functionality"""
+class MavenPublisher(BaseBuilder):
+    """Main class for Maven/Android artifact publishing functionality"""
     
     def __init__(
         self, 
+        project_root: Path = None,
         enabled_publications: Optional[List[str]] = None,
         credentials: Optional[GitHubCredentials] = None
     ):
         super().__init__(
-            "Zernikalos Android Publisher", 
+            "Zernikalos Maven Publisher", 
             enabled_publications=enabled_publications,
             credentials=credentials
         )
+        if project_root:
+            self.project_root = project_root
     
     def get_available_publications(self) -> List[Dict[str, str]]:
         """Get list of available publications"""
@@ -124,41 +128,4 @@ class AndroidPublisher(BaseBuilder):
         self.print_status("  - Any other configured publications")
         
         return self.gradle.publish_all_publications(self.github_user, self.github_token)
-
-
-def run_android_publish(github_user: str, github_token: str, action: str = "all_publications") -> bool:
-    """
-    Run Android publish functionality programmatically
-    
-    Args:
-        github_user: GitHub username/organization
-        github_token: GitHub access token
-        action: Action to perform (debug, release, all, all_publications, info)
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    from .base_builder import GitHubCredentials
-    
-    # Map action to enabled publications
-    action_to_publications = {
-        "debug": ["debug"],
-        "release": ["release"],
-        "all": ["all"],
-        "all_publications": ["all_publications"],
-        "info": None
-    }
-    
-    enabled_publications = action_to_publications.get(action)
-    
-    # Create credentials object
-    credentials = GitHubCredentials(user=github_user, token=github_token)
-    
-    # Create publisher with credentials
-    publisher = AndroidPublisher(
-        enabled_publications=enabled_publications,
-        credentials=credentials
-    )
-    
-    return publisher.run() == 0
 
