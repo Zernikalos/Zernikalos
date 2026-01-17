@@ -6,6 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import org.jetbrains.changelog.date
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.time.Year
@@ -16,7 +17,7 @@ val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
 var zernikalosVersion: String
-    get() = project.findProperty("version") as String? 
+    get() = project.findProperty("version") as String?
         ?: file("VERSION.txt").readText().trim()
     set(value) { file("VERSION.txt").writeText(value) }
 val zernikalosDescription = "Zernikalos Game Engine"
@@ -43,6 +44,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.dokka") version libs.versions.dokka.get()
     id("com.github.ben-manes.versions") version libs.versions.versionsPlugin.get()
+    id("org.jetbrains.changelog") version libs.versions.changelogPlugin.get()
 }
 
 allprojects {
@@ -258,6 +260,10 @@ fun getYear(): String {
     return Year.now().toString()
 }
 
+// ============================================================================
+// DOCKKA CONFIGURATION
+// ============================================================================
+
 dokka {
     moduleName.set(zernikalosNameCapital)
     dokkaSourceSets.configureEach {
@@ -273,6 +279,30 @@ dokka {
         customAssets.from("docsAssets/logo-icon.svg")
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")
     }
+}
+
+// ============================================================================
+// CHANGELOG CONFIGURATION
+// ============================================================================
+
+changelog {
+    version.set(provider { zernikalosVersion })
+    path = file("CHANGELOG.md").canonicalPath
+    header = provider { "[${version.get()}] - ${date()}" }
+    headerParserRegex = """(\d+\.\d+\.\d+)""".toRegex()
+    introduction = """
+        All notable changes to the Zernikalos Engine will be documented in this file.
+
+        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+    """.trimIndent()
+    itemPrefix = "-"
+    keepUnreleasedSection = true
+    unreleasedTerm = "[Unreleased]"
+    groups = listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security")
+    lineSeparator = "\n"
+    combinePreReleases = true
+    repositoryUrl = "https://github.com/$githubOwner/$githubRepo"
 }
 
 // Custom Tasks
@@ -314,7 +344,7 @@ tasks.configureEach {
 tasks.register("printVersion") {
     description = "Prints the current project version (respects -Pversion parameter)"
     group = "versioning"
-    
+
     doLast {
         println("=".repeat(60))
         println("📦 Project Version Information")
@@ -351,14 +381,22 @@ tasks.register("updateVersion") {
     finalizedBy("generateVersionFile", "podspec", "jsBrowserDistribution")
 }
 
+// Configure changelog patch task to run as part of release process
+tasks.named("patchChangelog", org.jetbrains.changelog.tasks.PatchChangelogTask::class.java).configure {
+    description = "Patches the changelog with the current version (part of release process)"
+    group = "versioning"
+    // This will run after updateVersion to ensure version is set correctly
+    mustRunAfter("updateVersion")
+}
+
 // Creates a release commit and git tag.
 // Usage: ./gradlew releaseCommit (after setVersion and updateVersion)
 tasks.register<Exec>("releaseCommit") {
     description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
     group = "versioning"
 
-    // Ensure this runs after the version is updated and files are generated.
-    dependsOn("updateVersion")
+    // Ensure this runs after the version is updated, files are generated, and changelog is patched.
+    dependsOn("updateVersion", "patchChangelog")
 
     workingDir = rootDir
     commandLine(
