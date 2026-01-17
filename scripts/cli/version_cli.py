@@ -48,12 +48,13 @@ def confirm_release(base: BaseScript, current_version: str, new_version: str, no
     print("  3. Generate version constants")
     print("  4. Create release commit")
     print(f"  5. Create git tag v{new_version}")
+    print("  6. Regenerate CHANGELOG.md with new version")
     
     if no_push:
-        print("  6. [SKIP] Push changes (--no-push flag detected)")
+        print("  7. [SKIP] Push changes (--no-push flag detected)")
         base.print_warning("This is a LOCAL release only. No CI/CD will be triggered.")
     else:
-        print("  6. Push changes and tag to trigger CI/CD")
+        print("  7. Push changes and tag to trigger CI/CD")
     print()
     
     return base.confirm_action("Proceed with release?", default=False)

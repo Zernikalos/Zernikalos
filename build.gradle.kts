@@ -40,13 +40,13 @@ var zernikalosVersion: String
         // Otherwise, read from file (more reliable for plugins like CocoaPods)
         val versionFile = file("VERSION.txt")
         return if (versionFile.exists()) {
-            versionFile.readText().trim().takeIf { it.isNotEmpty() } 
+            versionFile.readText().trim().takeIf { it.isNotEmpty() }
                 ?: throw GradleException("VERSION.txt exists but is empty")
         } else {
             throw GradleException("VERSION.txt not found")
         }
     }
-    set(value) { 
+    set(value) {
         file("VERSION.txt").writeText(value)
         // Sync with project version
         project.version = value
@@ -308,17 +308,17 @@ dokka {
 // Configure the default gitChangelog task
 tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask::class.java).configure {
     file.set(file("CHANGELOG.md"))
-    
+
     // Read template from file and replace placeholders with actual values
     val templateFile = file(".changelog.template")
     val templateContentFromFile = templateFile.readText()
         .replace("__GITHUB_OWNER__", githubOwner)
         .replace("__GITHUB_REPO__", githubRepo)
-    
+
     templateContent.set(templateContentFromFile)
-    
+
     fromRepo.set(file(".").absolutePath)
-    
+
     // Process all tags from the beginning to HEAD
     // Empty string means from the beginning of the repository
     // This allows the plugin to process all release tags
@@ -410,70 +410,52 @@ tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
     mustRunAfter("updateVersion")
 }
 
-// Creates initial release commit excluding CHANGELOG.md (will be added later)
-tasks.register<Exec>("createReleaseCommit") {
-    description = "Creates release commit excluding CHANGELOG.md"
+// Creates release commit and tag, regenerates changelog, and finalizes everything in one atomic operation
+tasks.register("releaseCommit") {
+    description = "Creates release commit, tags it, regenerates changelog, and amends commit with updated changelog. Format: 'release: 🚀 vX.Y.Z'"
     group = "versioning"
     dependsOn("updateVersion")
-    
-    workingDir = rootDir
-    commandLine(
-        "sh", "-c",
-        """
-        if [ -f CHANGELOG.md ]; then
-            git restore --staged CHANGELOG.md 2>/dev/null || true
-            git checkout -- CHANGELOG.md 2>/dev/null || true
-        fi && \
-        git add . && \
-        git commit -m "release: 🚀 v$zernikalosVersion"
-        """.trimIndent()
-    )
-}
 
-// Creates the release tag (needed before regenerating changelog)
-tasks.register<Exec>("createReleaseTag") {
-    description = "Creates release tag"
-    group = "versioning"
-    dependsOn("createReleaseCommit")
-    
-    workingDir = rootDir
-    commandLine("sh", "-c", "git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\"")
-}
+    doLast {
+        fun execCommand(command: String): Int {
+            val process = ProcessBuilder("sh", "-c", command)
+                .directory(rootDir)
+                .redirectErrorStream(true)
+                .start()
+            process.waitFor()
+            return process.exitValue()
+        }
 
-// Regenerates changelog now that the tag exists (includes new version)
-tasks.register<Exec>("regenerateChangelog") {
-    description = "Regenerates changelog after tag creation to include new version"
-    group = "versioning"
-    dependsOn("createReleaseTag")
-    
-    workingDir = rootDir
-    commandLine("./gradlew", "gitChangelog", "--quiet")
-}
+        // Step 1: Create commit excluding CHANGELOG.md
+        execCommand(
+            """
+            if [ -f CHANGELOG.md ]; then
+                git restore --staged CHANGELOG.md 2>/dev/null || true
+                git checkout -- CHANGELOG.md 2>/dev/null || true
+            fi && \
+            git add . && \
+            git commit -m "release: 🚀 v$zernikalosVersion"
+            """.trimIndent()
+        )
 
-// Amends commit with changelog and updates tag to point to amended commit
-tasks.register<Exec>("finalizeReleaseCommit") {
-    description = "Amends commit with updated changelog and updates tag to point to amended commit"
-    group = "versioning"
-    dependsOn("regenerateChangelog")
-    
-    workingDir = rootDir
-    commandLine(
-        "sh", "-c",
-        """
-        git add CHANGELOG.md && \
-        git commit --amend --no-edit && \
-        git tag -d "v$zernikalosVersion" && \
-        git tag -a "v$zernikalosVersion" -m "Release v$zernikalosVersion"
-        """.trimIndent()
-    )
-}
+        // Step 2: Create tag (needed for changelog generation)
+        execCommand("git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\"")
 
-// Main release commit task that orchestrates all steps
-tasks.register("releaseCommit") {
-    description = "Stages all changes, creates a release commit, tags it, updates changelog, and amends commit. Format: 'release: 🚀 vX.Y.Z'"
-    group = "versioning"
-    
-    dependsOn("finalizeReleaseCommit")
+        // Step 3: Regenerate changelog with new version (execute task directly)
+        tasks.named<se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask>("gitChangelog").get().actions.forEach { action ->
+            action.execute(tasks.getByName("gitChangelog"))
+        }
+
+        // Step 4: Amend commit with changelog and update tag
+        execCommand(
+            """
+            git add CHANGELOG.md && \
+            git commit --amend --no-edit && \
+            git tag -d "v$zernikalosVersion" && \
+            git tag -a "v$zernikalosVersion" -m "Release v$zernikalosVersion"
+            """.trimIndent()
+        )
+    }
 }
 
 // ============================================================================
