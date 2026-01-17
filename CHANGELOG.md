@@ -2,7 +2,7 @@
 
 All notable changes to the Zernikalos Engine will be documented in this file.
 
-## [Unreleased](https://github.com/Zernikalos/Zernikalos/releases/tag/Unreleased) ()
+## [v0.7.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.7.0) (2026-01-17)
 
 ### Added
 
@@ -14,11 +14,13 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 
 ### Fixed
 
+- 🐛 Fixing releaseCommit task behavior ([b31487fb90fdb22](https://github.com/Zernikalos/Zernikalos/commit/b31487fb90fdb223df8b239792f5d9fc6254b9c0))
 - 🐛 Error while retrieving version on cocoa config ([f2cb512d471867f](https://github.com/Zernikalos/Zernikalos/commit/f2cb512d471867fe342500a2d38846ceb5036007))
 
 
 ### Changed
 
+- 💡 Merging tasks into one ([d0c82fb848a46a0](https://github.com/Zernikalos/Zernikalos/commit/d0c82fb848a46a098c89ae60d669920a03aa7981))
 - 💡 Improving texture format ([e8a99438e4ac8bc](https://github.com/Zernikalos/Zernikalos/commit/e8a99438e4ac8bc11311f8002246007ad659de17))
 - 💡 SceneStateHandler with optional methods ([8b3cdd92c31473f](https://github.com/Zernikalos/Zernikalos/commit/8b3cdd92c31473f6cb9c0c512bfc509b0acdc5a4))
 - 💡 Including event handling in the main loop process ([da7674569d61635](https://github.com/Zernikalos/Zernikalos/commit/da7674569d61635bf3ea3c516337d5f5fefafff8))
