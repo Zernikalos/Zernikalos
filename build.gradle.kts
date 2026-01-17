@@ -410,21 +410,70 @@ tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
     mustRunAfter("updateVersion")
 }
 
-// Creates a release commit and git tag.
-// Usage: ./gradlew releaseCommit (after setVersion and updateVersion)
-tasks.register<Exec>("releaseCommit") {
-    description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
+// Creates initial release commit excluding CHANGELOG.md (will be added later)
+tasks.register<Exec>("createReleaseCommit") {
+    description = "Creates release commit excluding CHANGELOG.md"
     group = "versioning"
-
-    // Ensure this runs after the version is updated, files are generated, and changelog is updated.
-    dependsOn("updateVersion", "gitChangelog")
-
+    dependsOn("updateVersion")
+    
     workingDir = rootDir
     commandLine(
-        "sh",
-        "-c",
-        "git add . && git commit -m \"release: 🚀 v$zernikalosVersion\" && git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\""
+        "sh", "-c",
+        """
+        if [ -f CHANGELOG.md ]; then
+            git restore --staged CHANGELOG.md 2>/dev/null || true
+            git checkout -- CHANGELOG.md 2>/dev/null || true
+        fi && \
+        git add . && \
+        git commit -m "release: 🚀 v$zernikalosVersion"
+        """.trimIndent()
     )
+}
+
+// Creates the release tag (needed before regenerating changelog)
+tasks.register<Exec>("createReleaseTag") {
+    description = "Creates release tag"
+    group = "versioning"
+    dependsOn("createReleaseCommit")
+    
+    workingDir = rootDir
+    commandLine("sh", "-c", "git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\"")
+}
+
+// Regenerates changelog now that the tag exists (includes new version)
+tasks.register<Exec>("regenerateChangelog") {
+    description = "Regenerates changelog after tag creation to include new version"
+    group = "versioning"
+    dependsOn("createReleaseTag")
+    
+    workingDir = rootDir
+    commandLine("./gradlew", "gitChangelog", "--quiet")
+}
+
+// Amends commit with changelog and updates tag to point to amended commit
+tasks.register<Exec>("finalizeReleaseCommit") {
+    description = "Amends commit with updated changelog and updates tag to point to amended commit"
+    group = "versioning"
+    dependsOn("regenerateChangelog")
+    
+    workingDir = rootDir
+    commandLine(
+        "sh", "-c",
+        """
+        git add CHANGELOG.md && \
+        git commit --amend --no-edit && \
+        git tag -d "v$zernikalosVersion" && \
+        git tag -a "v$zernikalosVersion" -m "Release v$zernikalosVersion"
+        """.trimIndent()
+    )
+}
+
+// Main release commit task that orchestrates all steps
+tasks.register("releaseCommit") {
+    description = "Stages all changes, creates a release commit, tags it, updates changelog, and amends commit. Format: 'release: 🚀 vX.Y.Z'"
+    group = "versioning"
+    
+    dependsOn("finalizeReleaseCommit")
 }
 
 // ============================================================================

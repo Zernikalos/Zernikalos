@@ -35,6 +35,7 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 
 ### Chore
 
+- 🤖 Replacing changelog generator for a better pick ([daf650ed42fd1c0](https://github.com/Zernikalos/Zernikalos/commit/daf650ed42fd1c09df86c25c7b557bc2e5bd1f40))
 - 🤖 Adding changelog generator ([0b502f1f6d0c4a5](https://github.com/Zernikalos/Zernikalos/commit/0b502f1f6d0c4a538e7c7b3fe215bd3afb553ca7))
 - 🤖 Improvements on Python scripts ([b2233fe1d14b585](https://github.com/Zernikalos/Zernikalos/commit/b2233fe1d14b58533eb6981b3f784dc86074967a))
 - 🤖 Improving gradle tasks ([a7fe7d3ae79f8ac](https://github.com/Zernikalos/Zernikalos/commit/a7fe7d3ae79f8ac940b113c8db70c80505fa71fb))
