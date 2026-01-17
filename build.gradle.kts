@@ -16,10 +16,6 @@ val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
-var zernikalosVersion: String
-    get() = project.findProperty("version") as String?
-        ?: file("VERSION.txt").readText().trim()
-    set(value) { file("VERSION.txt").writeText(value) }
 val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
@@ -34,6 +30,28 @@ val githubPackagesNpmRegistry = "https://npm.pkg.github.com"
 
 val publishUser = project.findProperty("user") as String? ?: System.getenv("GITHUB_ACTOR") ?: ""
 val publishAccessToken = project.findProperty("access_token") as String? ?: System.getenv("GITHUB_TOKEN") ?: ""
+
+var zernikalosVersion: String
+    get() {
+        // Check if version was explicitly set via -Pversion parameter first
+        val explicitVersion = project.findProperty("version") as String?
+        if (!explicitVersion.isNullOrEmpty() && explicitVersion != "unspecified") {
+            return explicitVersion
+        }
+        // Otherwise, read from file (more reliable for plugins like CocoaPods)
+        val versionFile = file("VERSION.txt")
+        return if (versionFile.exists()) {
+            versionFile.readText().trim().takeIf { it.isNotEmpty() } 
+                ?: throw GradleException("VERSION.txt exists but is empty")
+        } else {
+            throw GradleException("VERSION.txt not found")
+        }
+    }
+    set(value) { 
+        file("VERSION.txt").writeText(value)
+        // Sync with project version
+        project.version = value
+    }
 
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
