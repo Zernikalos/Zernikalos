@@ -6,6 +6,7 @@ serialization = "1.9.0"
 ktlint = "11.0.0"
 dokka = "2.1.0"
 versionsPlugin = "0.52.0"
+gitChangelogPlugin = "3.1.1"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -17,3 +18,4 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 [plugins]
 cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+gitChangelog = { id = "se.bjurr.gitchangelog.git-changelog-gradle-plugin", version.ref = "gitChangelogPlugin" }

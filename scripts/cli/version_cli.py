@@ -48,12 +48,13 @@ def confirm_release(base: BaseScript, current_version: str, new_version: str, no
     print("  3. Generate version constants")
     print("  4. Create release commit")
     print(f"  5. Create git tag v{new_version}")
+    print("  6. Regenerate CHANGELOG.md with new version")
     
     if no_push:
-        print("  6. [SKIP] Push changes (--no-push flag detected)")
+        print("  7. [SKIP] Push changes (--no-push flag detected)")
         base.print_warning("This is a LOCAL release only. No CI/CD will be triggered.")
     else:
-        print("  6. Push changes and tag to trigger CI/CD")
+        print("  7. Push changes and tag to trigger CI/CD")
     print()
     
     return base.confirm_action("Proceed with release?", default=False)
@@ -67,8 +68,8 @@ def show_next_steps(base: BaseScript, version: str) -> None:
     base.print_status("Next steps:")
     print("  1. Monitor the GitHub Actions workflow:")
     print("     https://github.com/Zernikalos/Zernikalos/actions")
-    print("  2. Check the release build:")
-    print("     https://github.com/Zernikalos/Zernikalos/actions/workflows/build.yml")
+    print("  2. Check the release workflow:")
+    print("     https://github.com/Zernikalos/Zernikalos/actions/workflows/release.yml")
     print("  3. Verify packages are published:")
     print("     - Maven: https://maven.pkg.github.com/Zernikalos/Zernikalos")
     print("     - NPM: https://npm.pkg.github.com/@zernikalos/zernikalos")

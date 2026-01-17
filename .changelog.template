@@ -1,0 +1,108 @@
+# Changelog
+
+All notable changes to the Zernikalos Engine will be documented in this file.
+
+{{#tags}}
+## [{{name}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/releases/tag/{{name}}) ({{tagDate .}})
+
+{{#ifContainsType commits type='feat'}}
+### Added
+
+{{#commits}}
+{{#ifCommitType . type='feat'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='fix'}}
+### Fixed
+
+{{#commits}}
+{{#ifCommitType . type='fix'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='perf'}}
+### Performance
+
+{{#commits}}
+{{#ifCommitType . type='perf'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='refactor'}}
+### Changed
+
+{{#commits}}
+{{#ifCommitType . type='refactor'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='docs'}}
+### Documentation
+
+{{#commits}}
+{{#ifCommitType . type='docs'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='style'}}
+### Style
+
+{{#commits}}
+{{#ifCommitType . type='style'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='test'}}
+### Tests
+
+{{#commits}}
+{{#ifCommitType . type='test'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='build'}}
+### Build
+
+{{#commits}}
+{{#ifCommitType . type='build'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='ci'}}
+### CI/CD
+
+{{#commits}}
+{{#ifCommitType . type='ci'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{#ifContainsType commits type='chore'}}
+### Chore
+
+{{#commits}}
+{{#ifCommitType . type='chore'}}
+- {{#eachCommitScope .}}**{{.}}** {{/eachCommitScope}}{{{commitDescription .}}} ([{{hash}}](https://github.com/__GITHUB_OWNER__/__GITHUB_REPO__/commit/{{hashFull}}))
+{{/ifCommitType}}
+{{/commits}}
+{{/ifContainsType}}
+
+{{/tags}}

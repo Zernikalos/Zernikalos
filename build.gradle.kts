@@ -15,10 +15,6 @@ val zernikalosGroup = "dev.zernikalos"
 val zernikalosName = "zernikalos"
 val zernikalosNamedGroup = "$zernikalosGroup.$zernikalosName"
 val zernikalosNameCapital = "Zernikalos"
-var zernikalosVersion: String
-    get() = project.findProperty("version") as String? 
-        ?: file("VERSION.txt").readText().trim()
-    set(value) { file("VERSION.txt").writeText(value) }
 val zernikalosDescription = "Zernikalos Game Engine"
 
 val zernikalosAuthorName = "Aarón Negrín"
@@ -34,6 +30,30 @@ val githubPackagesNpmRegistry = "https://npm.pkg.github.com"
 val publishUser = project.findProperty("user") as String? ?: System.getenv("GITHUB_ACTOR") ?: ""
 val publishAccessToken = project.findProperty("access_token") as String? ?: System.getenv("GITHUB_TOKEN") ?: ""
 
+var zernikalosVersion: String
+    get() {
+        // Check if version was explicitly set via -Pversion parameter first
+        val explicitVersion = project.findProperty("version") as String?
+        if (!explicitVersion.isNullOrEmpty() && explicitVersion != "unspecified") {
+            return explicitVersion
+        }
+        // Otherwise, read from file (more reliable for plugins like CocoaPods)
+        val versionFile = file("VERSION.txt")
+        return if (versionFile.exists()) {
+            versionFile.readText().trim().takeIf { it.isNotEmpty() }
+                ?: throw GradleException("VERSION.txt exists but is empty")
+        } else {
+            throw GradleException("VERSION.txt not found")
+        }
+    }
+    set(value) {
+        file("VERSION.txt").writeText(value)
+        // Sync with project version
+        project.version = value
+    }
+
+project.version = zernikalosVersion
+
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
     kotlin("native.cocoapods") version libs.versions.kotlin.get()
@@ -43,6 +63,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.dokka") version libs.versions.dokka.get()
     id("com.github.ben-manes.versions") version libs.versions.versionsPlugin.get()
+    id("se.bjurr.gitchangelog.git-changelog-gradle-plugin") version libs.versions.gitChangelogPlugin.get()
 }
 
 allprojects {
@@ -100,6 +121,7 @@ kotlin {
         }
     }
 
+    @Suppress("DEPRECATION")
     androidTarget {
         publishLibraryVariants("release", "debug")
         compilations.all {
@@ -258,6 +280,10 @@ fun getYear(): String {
     return Year.now().toString()
 }
 
+// ============================================================================
+// DOCKKA CONFIGURATION
+// ============================================================================
+
 dokka {
     moduleName.set(zernikalosNameCapital)
     dokkaSourceSets.configureEach {
@@ -273,6 +299,31 @@ dokka {
         customAssets.from("docsAssets/logo-icon.svg")
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")
     }
+}
+
+// ============================================================================
+// GIT CHANGELOG CONFIGURATION
+// ============================================================================
+
+// Configure the default gitChangelog task
+tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask::class.java).configure {
+    file.set(file("CHANGELOG.md"))
+
+    // Read template from file and replace placeholders with actual values
+    val templateFile = file(".changelog.template")
+    val templateContentFromFile = templateFile.readText()
+        .replace("__GITHUB_OWNER__", githubOwner)
+        .replace("__GITHUB_REPO__", githubRepo)
+
+    templateContent.set(templateContentFromFile)
+
+    fromRepo.set(file(".").absolutePath)
+
+    // Process all tags from the beginning to HEAD
+    // Empty string means from the beginning of the repository
+    // This allows the plugin to process all release tags
+    fromRevision.set("")
+    toRevision.set("HEAD")
 }
 
 // Custom Tasks
@@ -314,7 +365,7 @@ tasks.configureEach {
 tasks.register("printVersion") {
     description = "Prints the current project version (respects -Pversion parameter)"
     group = "versioning"
-    
+
     doLast {
         println("=".repeat(60))
         println("📦 Project Version Information")
@@ -351,21 +402,60 @@ tasks.register("updateVersion") {
     finalizedBy("generateVersionFile", "podspec", "jsBrowserDistribution")
 }
 
-// Creates a release commit and git tag.
-// Usage: ./gradlew releaseCommit (after setVersion and updateVersion)
-tasks.register<Exec>("releaseCommit") {
-    description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
+// Configure gitChangelog task to run as part of release process
+tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask::class.java).configure {
+    description = "Generates changelog from git commits (part of release process)"
     group = "versioning"
+    // This will run after updateVersion to ensure version is set correctly
+    mustRunAfter("updateVersion")
+}
 
-    // Ensure this runs after the version is updated and files are generated.
+// Creates release commit and tag, regenerates changelog, and finalizes everything in one atomic operation
+tasks.register("releaseCommit") {
+    description = "Creates release commit, tags it, regenerates changelog, and amends commit with updated changelog. Format: 'release: 🚀 vX.Y.Z'"
+    group = "versioning"
     dependsOn("updateVersion")
 
-    workingDir = rootDir
-    commandLine(
-        "sh",
-        "-c",
-        "git add . && git commit -m \"release: 🚀 v$zernikalosVersion\" && git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\""
-    )
+    doLast {
+        fun execCommand(command: String): Int {
+            val process = ProcessBuilder("sh", "-c", command)
+                .directory(rootDir)
+                .redirectErrorStream(true)
+                .start()
+            process.waitFor()
+            return process.exitValue()
+        }
+
+        // Step 1: Create commit excluding CHANGELOG.md
+        execCommand(
+            """
+            if [ -f CHANGELOG.md ]; then
+                git restore --staged CHANGELOG.md 2>/dev/null || true
+                git checkout -- CHANGELOG.md 2>/dev/null || true
+            fi && \
+            git add . && \
+            git commit -m "release: 🚀 v$zernikalosVersion"
+            """.trimIndent()
+        )
+
+        // Step 2: Create tag (needed for changelog generation)
+        execCommand("git tag -a \"v$zernikalosVersion\" -m \"Release v$zernikalosVersion\"")
+
+        // Step 3: Regenerate changelog with new version (execute task directly)
+        tasks.named<se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask>("gitChangelog").get().actions.forEach { action ->
+            action.execute(tasks.getByName("gitChangelog"))
+        }
+
+        // Step 4: Amend commit with changelog and update tag
+        execCommand(
+            """
+            git add CHANGELOG.md && \
+            git commit --amend --no-edit && \
+            git tag -d "v$zernikalosVersion" && \
+            git tag -a "v$zernikalosVersion" -m "Release v$zernikalosVersion"
+            """.trimIndent()
+        )
+    }
 }
 
 // ============================================================================
