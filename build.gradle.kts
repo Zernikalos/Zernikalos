@@ -6,7 +6,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import org.jetbrains.changelog.date
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.time.Year
@@ -53,6 +52,8 @@ var zernikalosVersion: String
         project.version = value
     }
 
+project.version = zernikalosVersion
+
 plugins {
     kotlin("multiplatform") version libs.versions.kotlin.get() apply true
     kotlin("native.cocoapods") version libs.versions.kotlin.get()
@@ -62,7 +63,7 @@ plugins {
     id("maven-publish")
     id("org.jetbrains.dokka") version libs.versions.dokka.get()
     id("com.github.ben-manes.versions") version libs.versions.versionsPlugin.get()
-    id("org.jetbrains.changelog") version libs.versions.changelogPlugin.get()
+    id("se.bjurr.gitchangelog.git-changelog-gradle-plugin") version libs.versions.gitChangelogPlugin.get()
 }
 
 allprojects {
@@ -120,6 +121,7 @@ kotlin {
         }
     }
 
+    @Suppress("DEPRECATION")
     androidTarget {
         publishLibraryVariants("release", "debug")
         compilations.all {
@@ -300,27 +302,28 @@ dokka {
 }
 
 // ============================================================================
-// CHANGELOG CONFIGURATION
+// GIT CHANGELOG CONFIGURATION
 // ============================================================================
 
-changelog {
-    version.set(provider { zernikalosVersion })
-    path = file("CHANGELOG.md").canonicalPath
-    header = provider { "[${version.get()}] - ${date()}" }
-    headerParserRegex = """(\d+\.\d+\.\d+)""".toRegex()
-    introduction = """
-        All notable changes to the Zernikalos Engine will be documented in this file.
-
-        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-        and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-    """.trimIndent()
-    itemPrefix = "-"
-    keepUnreleasedSection = true
-    unreleasedTerm = "[Unreleased]"
-    groups = listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security")
-    lineSeparator = "\n"
-    combinePreReleases = true
-    repositoryUrl = "https://github.com/$githubOwner/$githubRepo"
+// Configure the default gitChangelog task
+tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask::class.java).configure {
+    file.set(file("CHANGELOG.md"))
+    
+    // Read template from file and replace placeholders with actual values
+    val templateFile = file(".changelog.template")
+    val templateContentFromFile = templateFile.readText()
+        .replace("__GITHUB_OWNER__", githubOwner)
+        .replace("__GITHUB_REPO__", githubRepo)
+    
+    templateContent.set(templateContentFromFile)
+    
+    fromRepo.set(file(".").absolutePath)
+    
+    // Process all tags from the beginning to HEAD
+    // Empty string means from the beginning of the repository
+    // This allows the plugin to process all release tags
+    fromRevision.set("")
+    toRevision.set("HEAD")
 }
 
 // Custom Tasks
@@ -399,9 +402,9 @@ tasks.register("updateVersion") {
     finalizedBy("generateVersionFile", "podspec", "jsBrowserDistribution")
 }
 
-// Configure changelog patch task to run as part of release process
-tasks.named("patchChangelog", org.jetbrains.changelog.tasks.PatchChangelogTask::class.java).configure {
-    description = "Patches the changelog with the current version (part of release process)"
+// Configure gitChangelog task to run as part of release process
+tasks.named("gitChangelog", se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask::class.java).configure {
+    description = "Generates changelog from git commits (part of release process)"
     group = "versioning"
     // This will run after updateVersion to ensure version is set correctly
     mustRunAfter("updateVersion")
@@ -413,8 +416,8 @@ tasks.register<Exec>("releaseCommit") {
     description = "Stages all changes, creates a release commit, and tags it. Format: 'release: 🚀 vX.Y.Z'"
     group = "versioning"
 
-    // Ensure this runs after the version is updated, files are generated, and changelog is patched.
-    dependsOn("updateVersion", "patchChangelog")
+    // Ensure this runs after the version is updated, files are generated, and changelog is updated.
+    dependsOn("updateVersion", "gitChangelog")
 
     workingDir = rootDir
     commandLine(
