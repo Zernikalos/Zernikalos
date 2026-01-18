@@ -1,9 +1,6 @@
 name: Zernikalos Next Release
 
 on:
-  push:
-    branches: [ main ]
-    tags-ignore: [ 'v*.*.*' ]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +12,8 @@ jobs:
   publish-next:
     name: Publish Next Release
     runs-on: ubuntu-latest
+    # Skip if commit message starts with "release:" (release commits have this format)
+    # if: ${{ !startsWith(github.event.head_commit.message, 'release:') }}
     env:
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_ACTOR: ${{ github.actor }}
@@ -49,7 +48,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@zernikalos'
 
@@ -60,4 +59,3 @@ jobs:
           npm publish --workspace=@zernikalos/zernikalos --tag next
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-
