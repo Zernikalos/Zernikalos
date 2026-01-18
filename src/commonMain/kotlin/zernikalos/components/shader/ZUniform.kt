@@ -11,8 +11,8 @@ package zernikalos.components.shader
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZAlgebraObject
@@ -53,7 +53,7 @@ class ZUniform internal constructor(private val data: ZUniformData):
     var dataType: ZDataType by data::dataType
 
     override var value: ZAlgebraObject
-        get() = data.value!!
+        get() = data.value
         set(value) {
             data.value = value
         }

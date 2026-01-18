@@ -168,7 +168,7 @@ private data class ZColorSurrogate(
     val alpha: Float,
 )
 
-private class ZColorSerializer: KSerializer<ZColor> {
+internal class ZColorSerializer: KSerializer<ZColor> {
     override val descriptor: SerialDescriptor
         get() = ZColorSurrogate.serializer().descriptor
 

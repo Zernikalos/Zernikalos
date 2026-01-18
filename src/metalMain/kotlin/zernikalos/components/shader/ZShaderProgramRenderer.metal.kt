@@ -38,7 +38,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun initializeShader() {
         ctx as ZMtlRenderingContext
 

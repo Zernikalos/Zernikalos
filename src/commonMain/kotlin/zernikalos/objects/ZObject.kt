@@ -87,6 +87,7 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     override val parent: ZObject?
         get() = _parent
 
+    @Transient
     private var _initialized: Boolean = false
     val isInitialized: Boolean
         get() = _initialized

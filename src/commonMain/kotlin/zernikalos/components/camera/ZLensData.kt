@@ -9,6 +9,7 @@
 package zernikalos.components.camera
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
 import zernikalos.math.ZMatrix4
@@ -25,11 +26,15 @@ abstract class ZLensData(): ZComponentData() {
     @ProtoNumber(3)
     var _aspectRatio: Float? = null
 
+    @Transient
     var width: Float? = null
+    @Transient
     var height: Float? = null
 
+    @Transient
     var useComputedAspectRatio: Boolean = false
 
+    @Transient
     protected val matrix = ZMatrix4.Identity
     abstract val projectionMatrix: ZMatrix4
 

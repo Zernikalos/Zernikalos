@@ -155,7 +155,7 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
     /**
      * Sets the UUID for this component.
      * This method is used internally by mixins to synchronize UUIDs.
-     * 
+     *
      * @param newUuid The UUID to set for this component.
      */
     internal fun setUuid(newUuid: Uuid?) {
@@ -169,13 +169,13 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
     // Capability flags
     private var _isRenderizable: Boolean = false
     private var _isSerializable: Boolean = false
-    
+
     final override val isRenderizable: Boolean
         get() = _isRenderizable
-    
+
     /**
      * Indicates whether this component can be serialized.
-     * 
+     *
      * @return true if the component supports serialization, false otherwise.
      */
     val isSerializable: Boolean
@@ -302,7 +302,7 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
      * @param ctx The rendering context used for renderer creation.
      * @return A new renderer instance.
      */
-    abstract fun createRenderer(ctx: ZRenderingContext): R
+    internal abstract fun createRenderer(ctx: ZRenderingContext): R
 }
 
 /**
@@ -321,7 +321,7 @@ class ZSerializableImpl<D: ZComponentData>(
     private val component: ZBaseComponent,
     override val data: D
 ): ZSerializableMixin<D> {
-    
+
     init {
         component.setUuid(data.uuid)
     }
@@ -341,16 +341,16 @@ class ZSerializableImpl<D: ZComponentData>(
 abstract class ZSerializableComponent<D: ZComponentData>(
     data: D
 ): ZBaseComponent() {
-    
+
     private val serializableImpl = ZSerializableImpl(this, data)
-    
+
     init {
         flagAsSerializable()
     }
-    
+
     /**
      * Provides access to the component's serializable data.
-     * 
+     *
      * @return The data instance for this component.
      */
     val data: D
@@ -378,10 +378,10 @@ abstract class ZSerializableComponent<D: ZComponentData>(
 abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
     data: D
 ): ZBaseComponent() {
-    
+
     private val renderizableImpl = ZRenderizableImpl(this) { createRenderer(it) }
     private val serializableImpl = ZSerializableImpl(this, data)
-    
+
     init {
         flagAsRenderizable()
         flagAsSerializable()
@@ -389,7 +389,7 @@ abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
 
     /**
      * Provides access to the component's renderer.
-     * 
+     *
      * @return The renderer instance for this component.
      * @throws Error if the component has not been initialized.
      */
@@ -398,7 +398,7 @@ abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
 
     /**
      * Provides access to the component's serializable data.
-     * 
+     *
      * @return The data instance for this component.
      */
     val data: D
@@ -413,11 +413,11 @@ abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
 
     /**
      * Creates a new renderer instance for this component.
-     * 
+     *
      * @param ctx The rendering context used for renderer creation.
      * @return A new renderer instance.
      */
-    abstract fun createRenderer(ctx: ZRenderingContext): R
+    internal abstract fun createRenderer(ctx: ZRenderingContext): R
 }
 
 
@@ -527,14 +527,14 @@ abstract class ZComponentSerializer<
         if (!(value as ZBaseComponent).isSerializable) {
             throw Error("Component does not support serialization")
         }
-        
+
         @Suppress("UNCHECKED_CAST")
         val data = when (value) {
             is ZSerializableComponent<*> -> value.data
             is ZOmniComponent<*, *> -> value.data
             else -> throw Error("Component does not support serialization")
         } as D
-        
+
         encoder.encodeSerializableValue(kSerializer, data)
     }
 
