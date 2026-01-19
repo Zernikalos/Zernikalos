@@ -9,11 +9,13 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.camera.ZPerspectiveLens
 import zernikalos.context.ZContext
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZVector3
+import zernikalos.objects.ZCamera.Companion.DefaultPerspectiveCamera
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -27,6 +29,7 @@ import kotlin.js.JsName
 @Serializable
 class ZCamera(): ZObject() {
 
+    @Transient
     override val type = ZObjectType.CAMERA
 
     /**

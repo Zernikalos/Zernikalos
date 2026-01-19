@@ -10,7 +10,6 @@ package zernikalos.math
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -216,7 +215,7 @@ private data class ZVector4Surrogate(
     @ProtoNumber(4) val w: Float,
 )
 
-private class ZVector4Serializer: KSerializer<ZVector4> {
+internal class ZVector4Serializer: KSerializer<ZVector4> {
     override val descriptor: SerialDescriptor
         get() = ZVector4Surrogate.serializer().descriptor
 

@@ -516,7 +516,7 @@ private data class ZQuaternionSurrogate(
     @ProtoNumber(4) val z: Float,
 )
 
-private class ZQuaternionSerializer: KSerializer<ZQuaternion> {
+internal class ZQuaternionSerializer: KSerializer<ZQuaternion> {
     override val descriptor: SerialDescriptor
         get() = ZQuaternionSurrogate.serializer().descriptor
 

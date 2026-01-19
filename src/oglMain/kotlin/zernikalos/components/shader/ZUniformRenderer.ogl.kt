@@ -35,14 +35,11 @@ actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, private
 
     override fun bind() {
         ctx as ZGLRenderingContext
-        if (data.value == null) {
-            return
-        }
         if (!uniformId.isValid) {
             return
         }
         when (data.dataType) {
-            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value!!.floatArray)
+            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value.floatArray)
             else -> return
         }
     }

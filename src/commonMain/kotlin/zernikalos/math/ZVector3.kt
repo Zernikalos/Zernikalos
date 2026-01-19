@@ -291,7 +291,7 @@ private data class ZVector3Surrogate(
     @ProtoNumber(3) val z: Float,
 )
 
-private class ZVector3Serializer: KSerializer<ZVector3> {
+internal class ZVector3Serializer: KSerializer<ZVector3> {
     override val descriptor: SerialDescriptor
         get() = ZVector3Surrogate.serializer().descriptor
 

@@ -31,6 +31,7 @@ import kotlin.js.JsExport
 @Serializable
 class ZModel: ZObject() {
 
+    @Transient
     override val type = ZObjectType.MODEL
 
     @Contextual @ProtoNumber(4)
@@ -59,6 +60,7 @@ class ZModel: ZObject() {
     @Transient
     lateinit var renderer: ZModelRenderer
 
+    @Transient
     var action: ZSkeletalAction? = null
 
     override fun internalInitialize(ctx: ZContext) {
