@@ -118,6 +118,15 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun texImage2D(bitmap: ZBitmap)
 
+    fun texImage2D(
+        internalFormat: Int,
+        width: Int,
+        height: Int,
+        format: Int,
+        pixelType: Int,
+        pixels: ByteArray
+    )
+
 }
 
 @OptIn(ExperimentalJsExport::class)

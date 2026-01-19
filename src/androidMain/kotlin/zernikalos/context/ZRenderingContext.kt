@@ -209,6 +209,30 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap.nativeBitmap, 0)
     }
 
+    actual fun texImage2D(
+        internalFormat: Int,
+        width: Int,
+        height: Int,
+        format: Int,
+        pixelType: Int,
+        pixels: ByteArray
+    ) {
+        val buffer = ByteBuffer.allocateDirect(pixels.size)
+        buffer.put(pixels)
+        buffer.position(0)
+        GLES30.glTexImage2D(
+            GLES30.GL_TEXTURE_2D,
+            0,
+            internalFormat,
+            width,
+            height,
+            0,
+            format,
+            pixelType,
+            buffer
+        )
+    }
+
 }
 
 actual object ExpectEnabler {

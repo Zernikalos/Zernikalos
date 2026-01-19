@@ -30,8 +30,10 @@ fun toOglType(t: ZDataType): Int {
     return value
 }
 
-fun toOglBaseType(t: ZDataType): Int {
-    val value = when (t.type) {
+fun toOglBaseType(t: ZDataType): Int = toOglBaseType(t.type)
+
+fun toOglBaseType(t: ZBaseType): Int {
+    return when (t) {
         ZBaseType.NONE -> 0
         ZBaseType.BYTE -> OglDataTypes.BYTE
         ZBaseType.UNSIGNED_BYTE -> OglDataTypes.UNSIGNED_BYTE
@@ -43,7 +45,6 @@ fun toOglBaseType(t: ZDataType): Int {
         ZBaseType.DOUBLE -> OglDataTypes.DOUBLE
         ZBaseType.TEXTURE -> OglDataTypes.TEXTURE
     }
-    return value
 }
 
 expect object OglDataTypes {

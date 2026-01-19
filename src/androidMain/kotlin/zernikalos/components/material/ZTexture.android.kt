@@ -9,7 +9,7 @@
 package zernikalos.components.material
 
 import android.opengl.GLES30
-import zernikalos.ZBaseType
+import zernikalos.toOglBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
@@ -30,7 +30,6 @@ actual class ZTextureRenderer actual constructor(
         val bitmap = ZBitmap(data.dataArray)
 
         textureHandler = ctx.genTexture()
-
         ctx.bindTexture(textureHandler)
 
         ctx.texParameterMinFilter(mapFilterMode(data.minFilter))
@@ -38,7 +37,20 @@ actual class ZTextureRenderer actual constructor(
         ctx.texParameterWrapS(mapWrapMode(data.wrapModeU))
         ctx.texParameterWrapT(mapWrapMode(data.wrapModeV))
 
-        ctx.texImage2D(bitmap)
+        val internalFormat = mapTextureInternalFormat(data)
+        val format = mapTextureFormat(data)
+        val pixelType = toOglBaseType(data.pixelType)
+
+        // data.dataArray contains encoded image data (PNG/JPEG), not raw pixels.
+        // Unlike Metal's MTKTextureLoader which decodes automatically, OpenGL requires
+        // raw pixel data. We use Android's BitmapFactory (via ZBitmap) to decode,
+        // then extract the raw pixels with copyPixelsToBuffer.
+        val width = bitmap.nativeBitmap.width
+        val height = bitmap.nativeBitmap.height
+        val pixels = ByteArray(width * height * getBytesPerPixel(data))
+        bitmap.nativeBitmap.copyPixelsToBuffer(java.nio.ByteBuffer.wrap(pixels))
+
+        ctx.texImage2D(internalFormat, width, height, format, pixelType, pixels)
 
         bitmap.dispose()
     }
@@ -99,4 +111,14 @@ private fun mapTextureInternalFormat(data: ZTextureData): Int {
             GLES30.GL_R8
         else -> GLES30.GL_RGBA8
     }
+}
+
+private fun getBytesPerPixel(data: ZTextureData): Int {
+    val channelCount = when (data.channels) {
+        ZTextureChannels.R -> 1
+        ZTextureChannels.RG -> 2
+        ZTextureChannels.RGB -> 3
+        ZTextureChannels.RGBA, ZTextureChannels.BGRA -> 4
+    }
+    return channelCount * data.pixelType.byteSize
 }
