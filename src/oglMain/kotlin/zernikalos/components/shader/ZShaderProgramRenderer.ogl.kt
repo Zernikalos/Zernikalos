@@ -41,6 +41,14 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         }
 
         program.link()
+
+//        // Configure sampler uniform for texture unit 0
+//        val textureSamplerLoc = ctx.getUniformLocation(program.renderer.programId, "u_texture")
+//        if (textureSamplerLoc.isValid) {
+//            ctx.useProgram(program.renderer.programId)
+//            ctx.uniform1i(textureSamplerLoc, 0)
+//        }
+
         data.uniforms.singles.forEach { uniform ->
             uniform.initialize(ctx)
             uniform.renderer.uniformId = ctx.getUniformLocation(

@@ -118,6 +118,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glUniformMatrix4fv(uniform.id as Int, count, transpose, values, 0)
     }
 
+    actual fun uniform1i(uniform: GLWrap, value: Int) {
+        GLES30.glUniform1i(uniform.id as Int, value)
+    }
+
     actual fun createBuffer(): GLWrap {
         val buff = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)

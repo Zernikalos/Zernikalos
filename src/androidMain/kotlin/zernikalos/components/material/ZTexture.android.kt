@@ -30,6 +30,7 @@ actual class ZTextureRenderer actual constructor(
         val bitmap = ZBitmap(data.dataArray)
 
         textureHandler = ctx.genTexture()
+        ctx.activeTexture()
         ctx.bindTexture(textureHandler)
 
         ctx.texParameterMinFilter(mapFilterMode(data.minFilter))

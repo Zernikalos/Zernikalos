@@ -66,6 +66,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun uniformMatrix4fv(uniform: GLWrap, count: Int, transpose: Boolean, values: FloatArray)
 
+    fun uniform1i(uniform: GLWrap, value: Int)
+
     fun getUniformBlockIndex(program: GLWrap, uniformBlockName: String): GLWrap
 
     fun uniformBlockBinding(program: GLWrap, uniformBlockIndex: GLWrap, uniformBlockBinding: Int)

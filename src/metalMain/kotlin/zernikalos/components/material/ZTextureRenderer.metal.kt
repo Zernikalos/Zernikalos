@@ -14,6 +14,7 @@ import platform.Foundation.NSError
 import platform.Foundation.create
 import platform.Metal.*
 import platform.MetalKit.MTKTextureLoader
+import platform.MetalKit.MTKTextureLoaderOptionSRGB
 import platform.MetalKit.MTKTextureLoaderOptionTextureStorageMode
 import platform.MetalKit.MTKTextureLoaderOptionTextureUsage
 import zernikalos.ZBaseType
@@ -47,8 +48,16 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private
 
         val err: CPointer<ObjCObjectVar<NSError?>>? = null
 
-        val options: Map<Any?, *> = mapOf(MTKTextureLoaderOptionTextureUsage to MTLTextureUsageShaderRead,
-            MTKTextureLoaderOptionTextureStorageMode to MTLStorageModePrivate)
+        // MTKTextureLoaderOptionSRGB controls whether the texture uses sRGB color space
+        // true = sRGB format (e.g., RGBA8Unorm_sRGB) for albedo/diffuse textures
+        // false = linear format (e.g., RGBA8Unorm) for normal maps, roughness, etc.
+        val useSRGB = data.colorSpace == ZTextureColorSpace.SRGB
+
+        val options: Map<Any?, *> = mapOf(
+            MTKTextureLoaderOptionTextureUsage to MTLTextureUsageShaderRead,
+            MTKTextureLoaderOptionTextureStorageMode to MTLStorageModePrivate,
+            MTKTextureLoaderOptionSRGB to useSRGB
+        )
 
         data.dataArray.usePinned { pinned ->
             val textureData = NSData.create(bytes = pinned.addressOf(0), data.dataArray.size.toULong())
