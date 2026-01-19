@@ -15,8 +15,8 @@ import kotlin.js.JsExport
 @Serializable
 enum class ZObjectType {
     SCENE,
-    MODEL,
     GROUP,
+    MODEL,
     CAMERA,
     SKELETON,
     LIGHT

@@ -8,7 +8,6 @@
 
 package zernikalos.loader
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -19,7 +18,7 @@ import zernikalos.objects.*
 
 @Serializable
 data class ZkoObjectProto(
-    val type: String,
+    val type: ZObjectType,
     val refId: String,
     val isReference: Boolean,
     val zObject: ZObject
@@ -27,7 +26,7 @@ data class ZkoObjectProto(
 
 @Serializable
 data class ZkoObjectProtoDef(
-    @ProtoNumber(1) val type: String,
+    @ProtoNumber(1) val type: ZObjectType,
     @ProtoNumber(2) val refId: String,
     @ProtoNumber(3) val isReference: Boolean,
 
@@ -36,6 +35,7 @@ data class ZkoObjectProtoDef(
     @ProtoNumber(102) val model: ZModel?,
     @ProtoNumber(103) val camera: ZCamera?,
     @ProtoNumber(104) val skeleton: ZSkeleton?,
+    @ProtoNumber(106) val light: ZLight?,
 )
 
 class ZkoObjectProtoSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZkoObjectProto> {
@@ -60,11 +60,12 @@ class ZkoObjectProtoSerializer(private val loaderContext: ZLoaderContext): KSeri
 
     private fun detectZObject(data: ZkoObjectProtoDef): ZObject {
         when (data.type) {
-            ZObjectType.SCENE.name -> return data.scene!!
-            ZObjectType.GROUP.name -> return data.group!!
-            ZObjectType.MODEL.name -> return data.model!!
-            ZObjectType.CAMERA.name -> return data.camera!!
-            ZObjectType.SKELETON.name -> return data.skeleton!!
+            ZObjectType.SCENE -> return data.scene!!
+            ZObjectType.GROUP -> return data.group!!
+            ZObjectType.MODEL -> return data.model!!
+            ZObjectType.CAMERA -> return data.camera!!
+            ZObjectType.SKELETON -> return data.skeleton!!
+            ZObjectType.LIGHT -> return data.light!!
         }
         throw Error("Type has not been found on object")
     }

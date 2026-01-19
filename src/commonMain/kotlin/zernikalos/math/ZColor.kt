@@ -154,6 +154,14 @@ class ZColor(): ZAlgebraObject {
         this.blue = ((colorValue shr 8) and 0xFF) / 255.0f
         this.alpha = (colorValue and 0xFF) / 255.0f
     }
+
+    companion object {
+        val WHITE: ZColor = ZColor(1.0f, 1.0f, 1.0f, 1.0f)
+        val BLACK: ZColor = ZColor(0.0f, 0.0f, 0.0f, 1.0f)
+        val RED: ZColor = ZColor(1.0f, 0.0f, 0.0f, 1.0f)
+        val GREEN: ZColor = ZColor(0.0f, 1.0f, 0.0f, 1.0f)
+        val BLUE: ZColor = ZColor(0.0f, 0.0f, 1.0f, 1.0f)
+    }
 }
 
 @Serializable
