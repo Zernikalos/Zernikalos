@@ -70,16 +70,16 @@ actual class ZTextureRenderer actual constructor(
 
 private fun mapFilterMode(filter: ZTextureFilterMode): Int {
     return when (filter) {
-        ZTextureFilterMode.NEAREST -> ExpectTextureFilter.NEAREST
-        ZTextureFilterMode.LINEAR -> ExpectTextureFilter.LINEAR
+        ZTextureFilterMode.NEAREST -> GLES30.GL_NEAREST
+        ZTextureFilterMode.LINEAR -> GLES30.GL_LINEAR
     }
 }
 
 private fun mapWrapMode(mode: ZTextureWrapMode): Int {
     return when (mode) {
-        ZTextureWrapMode.REPEAT -> ExpectTextureWrap.REPEAT
-        ZTextureWrapMode.CLAMP_TO_EDGE -> ExpectTextureWrap.CLAMP_TO_EDGE
-        ZTextureWrapMode.MIRROR_REPEAT -> ExpectTextureWrap.MIRRORED_REPEAT
+        ZTextureWrapMode.REPEAT -> GLES30.GL_REPEAT
+        ZTextureWrapMode.CLAMP_TO_EDGE -> GLES30.GL_CLAMP_TO_EDGE
+        ZTextureWrapMode.MIRROR_REPEAT -> GLES30.GL_MIRRORED_REPEAT
     }
 }
 
