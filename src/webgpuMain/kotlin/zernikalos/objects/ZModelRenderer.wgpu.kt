@@ -19,7 +19,6 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
 
     var pipeline: GPURenderPipeline? = null
     var bindGroup: GPUBindGroup? = null
-    var textureBindGroup: GPUBindGroup? = null
 
     actual fun initialize() {
         ctx as ZWebGPURenderingContext
@@ -46,46 +45,12 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
                 entries = bindGroupEntries.toTypedArray()
             ).toGpu()
         )
-
-        // Group 1: Texture and Sampler
         val bindGroupLayouts = mutableListOf(bindGroupLayout)
-        val texture = model.material?.texture
 
-        if (texture != null) {
-            val textureBindGroupLayout = ctx.device.createBindGroupLayout(
-                GPUBindGroupLayoutDescriptor(
-                    label = "Texture BindGroupLayout",
-                    entries = arrayOf(
-                        GPUBindGroupLayoutEntry(
-                            binding = 0,
-                            visibility = GPUShaderStage.FRAGMENT,
-                            texture = GPUTextureBindingLayout()
-                        ),
-                        GPUBindGroupLayoutEntry(
-                            binding = 1,
-                            visibility = GPUShaderStage.FRAGMENT,
-                            sampler = GPUSamplerBindingLayout()
-                        )
-                    )
-                ).toGpu()
-            )
-            bindGroupLayouts.add(textureBindGroupLayout)
-
-            textureBindGroup = ctx.device.createBindGroup(
-                GPUBindGroupDescriptor(
-                    layout = textureBindGroupLayout,
-                    entries = arrayOf(
-                        GPUBindGroupEntry(
-                            binding = 0,
-                            resource = texture.renderer.texture!!.createView()
-                        ),
-                        GPUBindGroupEntry(
-                            binding = 1,
-                            resource = texture.renderer.sampler!!
-                        )
-                    )
-                ).toGpu()
-            )
+        if (model.hasTextures) {
+            val texture = model.material!!.texture!!
+            texture.renderer.createTextureBindGroup()
+            texture.renderer.textureBindGroupLayout?.let { bindGroupLayouts.add(it) }
         }
 
         val renderPipelineDescriptor = GPURenderPipelineDescriptor(
@@ -132,8 +97,10 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
         ctx.renderPass?.setPipeline(pipeline!!)
         // TODO: hardcoded bind group slots
         ctx.renderPass?.setBindGroup(0, bindGroup!!)
-        if (textureBindGroup != null) {
-            ctx.renderPass?.setBindGroup(1, textureBindGroup!!)
+
+        val texture = model.material?.texture
+        if (texture != null) {
+            ctx.renderPass?.setBindGroup(1, texture.renderer.textureBindGroup!!)
         }
 
         model.shaderProgram.bind()
