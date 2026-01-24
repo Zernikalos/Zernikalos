@@ -50,6 +50,7 @@ actual class ZBitmap {
         isLoading = Promise { res, rej ->
             imageBitmapPromise?.then { img ->
                 _imageBitmap = img
+                console.log("[ZBitmap] Bitmap loaded successfully: width=${img.width}, height=${img.height}")
                 res(null)
             }?.catch { e ->
                 rej(e)

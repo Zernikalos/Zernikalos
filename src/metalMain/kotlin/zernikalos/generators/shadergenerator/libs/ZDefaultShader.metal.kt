@@ -185,6 +185,12 @@ val shaderFragmentMain = """
 // Basic PBR calculation constants
 constant float PI = 3.14159265359;
 
+// Tonemapping (Reinhard) and gamma correction
+float3 applyTonemapping(float3 color) {
+    color = color / (color + float3(1.0));
+    return pow(color, float3(1.0/2.2));
+}
+
 #if defined(USE_PBR_MATERIAL) && defined(USE_NORMALS)
 // Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
 float DistributionGGX(float3 N, float3 H, float roughness) {
@@ -349,17 +355,17 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
     #endif
 
     #if defined(USE_PBR_MATERIAL)
-        float3 emissive = pbrMaterial.emissive.rgb * pbrMaterial.emissiveIntensity;
+        // WORKAROUND: Emissive disabled until emissive maps are supported (see GitHub issue)
+        // Without emissive maps, models with emissive=[1,1,1] wash out to white
+        float3 emissive = pbrMaterial.emissive.rgb * min(pbrMaterial.emissiveIntensity, 0.0);
+
         #if defined(USE_NORMALS)
-            float3 pbrColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial);
-            float3 finalColor = pbrColor + emissive;
+            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial);
         #else
-            float3 finalColor = baseColor.rgb + emissive;
+            float3 litColor = baseColor.rgb;
         #endif
 
-        // Tonemapping (ACES approximation) and gamma correction
-        finalColor = finalColor / (finalColor + float3(1.0));
-        finalColor = pow(finalColor, float3(1.0/2.2));
+        float3 finalColor = applyTonemapping(litColor + emissive);
         return float4(finalColor, baseColor.a);
     #elif defined(USE_PHONG_MATERIAL)
         #if defined(USE_NORMALS)

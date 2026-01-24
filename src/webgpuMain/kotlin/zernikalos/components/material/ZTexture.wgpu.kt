@@ -13,6 +13,7 @@ import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.*
+import zernikalos.logger.logger
 
 actual class ZTextureRenderer actual constructor(
     ctx: ZRenderingContext,
@@ -20,6 +21,8 @@ actual class ZTextureRenderer actual constructor(
 ) : ZComponentRenderer(ctx) {
 
     var texture: GPUTexture? = null
+    var textureBindGroup: GPUBindGroup? = null
+    var textureBindGroupLayout: GPUBindGroupLayout? = null
     var sampler: GPUSampler? = null
 
     actual override fun initialize() {
@@ -27,9 +30,16 @@ actual class ZTextureRenderer actual constructor(
 
         val device = ctx.device
 
+        logger.debug("[ZTextureRenderer] Initializing texture id=${data.id}")
+        logger.debug("[ZTextureRenderer] data.width=${data.width}, data.height=${data.height}")
+
         val bitmap = ZBitmap(data.dataArray)
 
         val textureFormat = mapTextureFormat(data)
+
+        if (data.width == 0 || data.height == 0) {
+            logger.error("[ZTextureRenderer] ERROR: width or height is 0! Texture will fail.")
+        }
 
         texture = device.createTexture(
             GPUTextureDescriptor(
@@ -50,6 +60,7 @@ actual class ZTextureRenderer actual constructor(
 
         bitmap.isLoading.then {
             val imageBitmap = bitmap.imageBitmap!!
+            logger.debug("[ZTextureRenderer] Bitmap loaded: imageBitmap.width=${imageBitmap.width}, imageBitmap.height=${imageBitmap.height}")
 
             ctx.queue.copyExternalImageToTexture(
                 GPUImageCopyExternalImage(imageBitmap),
@@ -59,6 +70,48 @@ actual class ZTextureRenderer actual constructor(
 
             bitmap.dispose()
         }
+    }
+
+    fun createTextureBindGroup() {
+        ctx as ZWebGPURenderingContext
+
+        if (texture == null) return
+
+        textureBindGroupLayout = ctx.device.createBindGroupLayout(
+            GPUBindGroupLayoutDescriptor(
+                label = "Texture BindGroupLayout",
+                entries = arrayOf(
+                    GPUBindGroupLayoutEntry(
+                        binding = 0,
+                        visibility = GPUShaderStage.FRAGMENT,
+                        texture = GPUTextureBindingLayout()
+                    ),
+                    GPUBindGroupLayoutEntry(
+                        binding = 1,
+                        visibility = GPUShaderStage.FRAGMENT,
+                        sampler = GPUSamplerBindingLayout()
+                    )
+                )
+            ).toGpu()
+        )
+        // bindGroupLayouts.add(textureBindGroupLayout)
+
+        textureBindGroup = ctx.device.createBindGroup(
+            GPUBindGroupDescriptor(
+                layout = textureBindGroupLayout!!,
+                label = "Texture BindGroup",
+                entries = arrayOf(
+                    GPUBindGroupEntry(
+                        binding = 0,
+                        resource = texture!!.createView()
+                    ),
+                    GPUBindGroupEntry(
+                        binding = 1,
+                        resource = sampler!!
+                    )
+                )
+            ).toGpu()
+        )
     }
 
     override fun bind() {}

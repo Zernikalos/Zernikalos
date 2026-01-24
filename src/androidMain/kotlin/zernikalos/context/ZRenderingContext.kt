@@ -118,6 +118,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glUniformMatrix4fv(uniform.id as Int, count, transpose, values, 0)
     }
 
+    actual fun uniform1i(uniform: GLWrap, value: Int) {
+        GLES30.glUniform1i(uniform.id as Int, value)
+    }
+
     actual fun createBuffer(): GLWrap {
         val buff = IntArray(1)
         GLES30.glGenBuffers(1, buff, 0)
@@ -207,6 +211,30 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
 
     actual fun texImage2D(bitmap: ZBitmap) {
         GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap.nativeBitmap, 0)
+    }
+
+    actual fun texImage2D(
+        internalFormat: Int,
+        width: Int,
+        height: Int,
+        format: Int,
+        pixelType: Int,
+        pixels: ByteArray
+    ) {
+        val buffer = ByteBuffer.allocateDirect(pixels.size)
+        buffer.put(pixels)
+        buffer.position(0)
+        GLES30.glTexImage2D(
+            GLES30.GL_TEXTURE_2D,
+            0,
+            internalFormat,
+            width,
+            height,
+            0,
+            format,
+            pixelType,
+            buffer
+        )
     }
 
 }

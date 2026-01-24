@@ -290,6 +290,9 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
         get() = renderizableImpl.renderer
 
     override fun initialize(ctx: ZRenderingContext) {
+        if (isInitialized) {
+            return
+        }
         super.initialize(ctx)
         if (isRenderizable) {
             renderizableImpl.createRenderer(ctx)
@@ -405,6 +408,9 @@ abstract class ZOmniComponent<D: ZComponentData, R: ZComponentRenderer>(
         get() = serializableImpl.data
 
     override fun initialize(ctx: ZRenderingContext) {
+        if (isInitialized) {
+            return
+        }
         super.initialize(ctx)
         if (isRenderizable) {
             renderizableImpl.createRenderer(ctx)

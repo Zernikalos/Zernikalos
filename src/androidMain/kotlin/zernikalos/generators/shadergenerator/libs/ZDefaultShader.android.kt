@@ -133,6 +133,12 @@ out vec4 f_color;
 
 const float PI = 3.14159265359;
 
+// Tonemapping (Reinhard) and gamma correction
+vec3 applyTonemapping(vec3 color) {
+    color = color / (color + vec3(1.0));
+    return pow(color, vec3(1.0/2.2));
+}
+
 #ifdef USE_PBR_MATERIAL
     // Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
     float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -262,19 +268,17 @@ void main() {
     #endif
 
     #if defined(USE_PBR_MATERIAL)
-        // Emissive contribution
-        vec3 emissive = u_pbrMaterial.emissive.rgb * u_pbrMaterial.emissiveIntensity;
+        // WORKAROUND: Emissive disabled until emissive maps are supported (see GitHub issue)
+        // Without emissive maps, models with emissive=[1,1,1] wash out to white
+        vec3 emissive = u_pbrMaterial.emissive.rgb * min(u_pbrMaterial.emissiveIntensity, 0.0);
 
         #if defined(USE_NORMALS)
-            vec3 pbrColor = calculatePBRColor(baseColor, v_normal);
-            vec3 finalColor = pbrColor + emissive;
+            vec3 litColor = calculatePBRColor(baseColor, v_normal);
         #else
-            vec3 finalColor = baseColor.rgb + emissive;
+            vec3 litColor = baseColor.rgb;
         #endif
 
-        // Tonemapping (ACES approximation) and gamma correction
-        finalColor = finalColor / (finalColor + vec3(1.0));
-        finalColor = pow(finalColor, vec3(1.0/2.2));
+        vec3 finalColor = applyTonemapping(litColor + emissive);
         f_color = vec4(finalColor, baseColor.a);
     #elif defined(USE_PHONG_MATERIAL)
         #if defined(USE_NORMALS)
