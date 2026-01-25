@@ -22,12 +22,15 @@ struct SceneUniforms {
 }
 @binding(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) @group(0) var<uniform> sceneUniforms : SceneUniforms;
 
+//#ifdef USE_SKINNING
 struct SkinningUniforms {
     bones : array<mat4x4<f32>, 100>,
     invBindMatrix : array<mat4x4<f32>, 100>
 }
 @binding(${UNIFORM_IDS.BLOCK_SKINNING_MATRIX}) @group(0) var<uniform> skinUniforms : SkinningUniforms;
+//#endif
 
+//#ifdef USE_PBR_MATERIAL
 struct PBRMaterialUniforms {
     color: vec4<f32>,
     emissive: vec4<f32>,
@@ -36,30 +39,48 @@ struct PBRMaterialUniforms {
     roughness: f32
 }
 @binding(${UNIFORM_IDS.BLOCK_PBR_MATERIAL}) @group(0) var<uniform> pbrMaterial: PBRMaterialUniforms;
+//#endif
 
-// Bindings
+//#ifdef USE_TEXTURES
 @group(1) @binding(0) var t_diffuse: texture_2d<f32>;
 @group(1) @binding(1) var s_diffuse: sampler;
+//#endif
 
 // Vertex Data
 struct VertexInput {
     @location(${ZAttributeId.POSITION.id}) position: vec3<f32>,
+//#ifdef USE_NORMALS
     @location(${ZAttributeId.NORMAL.id}) normal: vec3<f32>,
+//#endif
+//#ifdef USE_TEXTURES
     @location(${ZAttributeId.UV.id}) uv : vec2<f32>,
-    // @location(${ZAttributeId.COLOR.id}) color : vec3<f32>,
+//#endif
+//#ifdef USE_COLORS
+    @location(${ZAttributeId.COLOR.id}) color : vec3<f32>,
+//#endif
+//#ifdef USE_SKINNING
     @location(${ZAttributeId.BONE_WEIGHT.id}) boneWeights : vec4<f32>,
     @location(${ZAttributeId.BONE_INDEX.id}) boneIndices : vec4<u32>,
+//#endif
 }
 
 struct VertexOutput {
     @builtin(position) position : vec4<f32>,
+//#ifdef USE_NORMALS
     @location(0) normal: vec3<f32>,
+//#endif
+//#ifdef USE_TEXTURES
     @location(1) uv : vec2<f32>,
+//#endif
+//#ifdef USE_COLORS
     @location(2) color : vec3<f32>,
-    @location(3) viewPosition: vec3<f32>
+//#endif
+//#ifdef USE_PBR_MATERIAL
+    @location(3) viewPosition: vec3<f32>,
+//#endif
 }
 
-// Skinning Calculation
+//#ifdef USE_SKINNING
 fn calcSkinnedPosition(position: vec3<f32>, boneWeights: vec4<f32>, boneIndices: vec4<u32>) -> vec4<f32> {
     var skinnedPosition = vec4<f32>(0.0);
     var totalWeight = 0.0;
@@ -79,25 +100,49 @@ fn calcSkinnedPosition(position: vec3<f32>, boneWeights: vec4<f32>, boneIndices:
         return vec4<f32>(position, 1.0);
     }
 }
+//#endif
 
 // Vertex Shader
 @vertex
 fn vs_main(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
 
-    let skinnedPosition = calcSkinnedPosition(input.position, input.boneWeights, input.boneIndices);
-    output.position = sceneUniforms.modelViewProjectionMatrix * skinnedPosition;
+//#ifdef USE_SKINNING
+    let finalPosition = calcSkinnedPosition(input.position, input.boneWeights, input.boneIndices);
+//#else
+    let finalPosition = vec4<f32>(input.position, 1.0);
+//#endif
 
-    // Transform normal using the view matrix (simplification for now)
+    output.position = sceneUniforms.modelViewProjectionMatrix * finalPosition;
+
+//#ifdef USE_NORMALS
     output.normal = normalize((sceneUniforms.viewMatrix * vec4<f32>(input.normal, 0.0)).xyz);
+//#endif
+
+//#ifdef USE_TEXTURES
+    //#ifdef FLIP_TEXTURE_Y
+    output.uv = vec2<f32>(input.uv.x, 1.0 - input.uv.y);
+    //#else
     output.uv = input.uv;
-    output.color = vec3<f32>(1.0); // Pass white as default vertex color
-    output.viewPosition = (sceneUniforms.viewMatrix * skinnedPosition).xyz;
+    //#endif
+//#endif
+
+//#ifdef USE_COLORS
+    output.color = input.color;
+//#else
+    //#ifdef USE_PBR_MATERIAL
+    // No vertex colors, will use material color in fragment shader
+    //#endif
+//#endif
+
+//#ifdef USE_PBR_MATERIAL
+    output.viewPosition = (sceneUniforms.viewMatrix * finalPosition).xyz;
+//#endif
 
     return output;
 }
 
-// PBR Functions
+//#ifdef USE_PBR_MATERIAL
 fn DistributionGGX(N: vec3<f32>, H: vec3<f32>, roughness: f32) -> f32 {
     let a = roughness * roughness;
     let a2 = a * a;
@@ -164,24 +209,43 @@ fn calculatePBRColor(baseColor: vec4<f32>, normal: vec3<f32>, viewPosition: vec3
     let ambient = vec3<f32>(0.03) * albedo;
     return ambient + Lo;
 }
+//#endif
+
+// Tonemapping and gamma correction
+fn applyTonemapping(color: vec3<f32>) -> vec3<f32> {
+    var result = color / (color + vec3<f32>(1.0));
+    return pow(result, vec3<f32>(1.0/2.2));
+}
 
 // Fragment Shader
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
-    var baseColor = textureSample(t_diffuse, s_diffuse, input.uv);
-    // Fallback to vertex color if texture is not sufficient
-    if (baseColor.a < 0.1) {
-        baseColor = vec4<f32>(input.color, 1.0);
-    }
+    var baseColor = vec4<f32>(1.0);
 
+//#ifdef USE_TEXTURES
+    baseColor = textureSample(t_diffuse, s_diffuse, input.uv);
+//#endif
+
+//#ifdef USE_COLORS
+    //#ifndef USE_TEXTURES
+    baseColor = vec4<f32>(input.color, 1.0);
+    //#endif
+    // If we have textures and colors, we could blend them here if needed
+//#endif
+
+//#ifdef USE_PBR_MATERIAL
+    //#ifdef USE_NORMALS
     let pbrColor = calculatePBRColor(baseColor, input.normal, input.viewPosition);
-    let emissive = pbrMaterial.emissive.rgb * pbrMaterial.emissiveIntensity;
-    var finalColor = pbrColor + emissive;
+    //#else
+    let pbrColor = baseColor.rgb * pbrMaterial.color.rgb;
+    //#endif
 
-    // Tonemapping and gamma correction
-    finalColor = finalColor / (finalColor + vec3<f32>(1.0));
-    finalColor = pow(finalColor, vec3<f32>(1.0/2.2));
-
+    // WORKAROUND: Emissive disabled until emissive maps are supported
+    let emissive = pbrMaterial.emissive.rgb * min(pbrMaterial.emissiveIntensity, 0.0);
+    let finalColor = applyTonemapping(pbrColor + emissive);
     return vec4<f32>(finalColor, baseColor.a);
+//#else
+    return baseColor;
+//#endif
 }
 """
