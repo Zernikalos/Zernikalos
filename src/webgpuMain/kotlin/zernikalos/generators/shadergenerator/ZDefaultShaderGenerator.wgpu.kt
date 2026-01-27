@@ -16,7 +16,6 @@ import zernikalos.generators.shadergenerator.libs.skinningShaderSource
 
 internal class ZDefaultShaderGenerator: ZShaderGenerator() {
     override fun buildShaderSource(enabler: ZShaderProgramParameters, source: ZShaderSource) {
-        source.wgpuShaderSource = skinningShaderSource
+        source.wgpuShaderSource = shaderPreprocessor(skinningShaderSource, enabler)
     }
-
 }
