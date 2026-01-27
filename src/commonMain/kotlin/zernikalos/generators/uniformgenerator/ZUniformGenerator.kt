@@ -11,11 +11,5 @@ package zernikalos.generators.uniformgenerator
 import zernikalos.context.ZSceneContext
 import zernikalos.math.ZAlgebraObject
 import zernikalos.objects.ZObject
-import kotlin.js.JsExport
 
-@JsExport
-interface ZUniformGenerator {
-
-    fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject
-
-}
+typealias ZUniformGenerator = (ZSceneContext, ZObject) -> ZAlgebraObject

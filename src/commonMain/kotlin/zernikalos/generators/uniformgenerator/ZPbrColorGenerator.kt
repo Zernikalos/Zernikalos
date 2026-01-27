@@ -8,22 +8,15 @@
 
 package zernikalos.generators.uniformgenerator
 
-import zernikalos.context.ZSceneContext
-import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZVoidAlgebraObject
 import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
 
-class ZPbrColorGenerator: ZUniformGenerator {
-    override fun compute(
-        sceneContext: ZSceneContext,
-        obj: ZObject
-    ): ZAlgebraObject {
-        obj as ZModel
-        val material = obj.material
-        if (material?.usesPbr == true) {
-            return material.pbr?.color ?: ZVoidAlgebraObject()
-        }
-        return ZVoidAlgebraObject()
+val ZPbrColorGenerator: ZUniformGenerator = { sceneContext, obj ->
+    obj as ZModel
+    val material = obj.material
+    if (material?.usesPbr == true) {
+        material.pbr?.color ?: ZVoidAlgebraObject()
+    } else {
+        ZVoidAlgebraObject()
     }
 }

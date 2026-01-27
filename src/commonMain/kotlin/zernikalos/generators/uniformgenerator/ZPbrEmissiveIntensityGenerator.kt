@@ -8,18 +8,20 @@
 
 package zernikalos.generators.uniformgenerator
 
-import zernikalos.context.ZSceneContext
-import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZScalar
 import zernikalos.math.ZVoidAlgebraObject
 import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
 
-class ZPbrEmissiveIntensityGenerator: ZUniformGenerator {
-    override fun compute(sceneContext: ZSceneContext, obj: ZObject): ZAlgebraObject {
-        val model = obj as? ZModel ?: return ZVoidAlgebraObject()
-        val material = model.material?.takeIf { it.usesPbr } ?: return ZVoidAlgebraObject()
-
-        return material.pbr?.emissiveIntensity?.let { ZScalar(it) } ?: ZVoidAlgebraObject()
+val ZPbrEmissiveIntensityGenerator: ZUniformGenerator = { sceneContext, obj ->
+    val model = obj as? ZModel
+    if (model == null) {
+        ZVoidAlgebraObject()
+    } else {
+        val material = model.material?.takeIf { it.usesPbr }
+        if (material == null) {
+            ZVoidAlgebraObject()
+        } else {
+            material.pbr?.emissiveIntensity?.let { ZScalar(it) } ?: ZVoidAlgebraObject()
+        }
     }
 }

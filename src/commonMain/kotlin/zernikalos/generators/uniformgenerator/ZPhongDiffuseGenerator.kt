@@ -8,20 +8,19 @@
 
 package zernikalos.generators.uniformgenerator
 
-import zernikalos.context.ZSceneContext
-import zernikalos.math.ZAlgebraObject
 import zernikalos.math.ZVoidAlgebraObject
 import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
 
-class ZPhongDiffuseGenerator: ZUniformGenerator {
-    override fun compute(
-        sceneContext: ZSceneContext,
-        obj: ZObject
-    ): ZAlgebraObject {
-        val model = obj as? ZModel ?: return ZVoidAlgebraObject()
-        val material = model.material?.takeIf { it.usesPhong } ?: return ZVoidAlgebraObject()
-
-        return material.phong?.diffuse ?: ZVoidAlgebraObject()
+val ZPhongDiffuseGenerator: ZUniformGenerator = { sceneContext, obj ->
+    val model = obj as? ZModel
+    if (model == null) {
+        ZVoidAlgebraObject()
+    } else {
+        val material = model.material?.takeIf { it.usesPhong }
+        if (material == null) {
+            ZVoidAlgebraObject()
+        } else {
+            material.phong?.diffuse ?: ZVoidAlgebraObject()
+        }
     }
 }
