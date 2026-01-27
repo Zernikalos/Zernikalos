@@ -6,6 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import org.jetbrains.dokka.gradle.engine.parameters.KotlinPlatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import java.time.Year
@@ -263,7 +264,7 @@ kotlin {
             // dependsOn(commonTest) - Redundant, already included in Kotlin Target Hierarchy template
         }
 
-        val macosArm64Main by getting {
+        macosArm64Main {
             dependsOn(metalMain)
             kotlin.srcDir("src/macosMain/kotlin")
         }
@@ -293,8 +294,36 @@ dokka {
             remoteLineSuffix.set("#L")
         }
     }
+
+    val jsLike = listOf("jsMain" to "JS", "webgpuMain" to "WebGPU",)
+
+    val androidLike = listOf("androidMain" to "Android", "oglMain" to "OGL",)
+
+    val appleLike = listOf("metalMain" to "Metal", "macosArm64Main" to "macOS", "iosMain" to "iOS",)
+
+    jsLike.forEach { (name, label) ->
+        dokkaSourceSets.named(name) {
+            analysisPlatform.set(KotlinPlatform.JS)
+            displayName.set(label)
+        }
+    }
+
+    androidLike.forEach { (name, label) ->
+        dokkaSourceSets.named(name) {
+            analysisPlatform.set(KotlinPlatform.AndroidJVM)
+            displayName.set(label)
+        }
+    }
+
+    appleLike.forEach { (name, label) ->
+        dokkaSourceSets.named(name) {
+            analysisPlatform.set(KotlinPlatform.Native)
+            displayName.set(label)
+        }
+    }
+
     pluginsConfiguration.html {
-        //templatesDir = file("docs/dokkaTemplates")
+        templatesDir = file("docs/dokkaTemplates")
         customStyleSheets.from("docsAssets/zk-docs-styles.css")
         customAssets.from("docsAssets/logo-icon.svg")
         footerMessage.set("© ${getYear()} $zernikalosNameCapital")
