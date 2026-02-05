@@ -134,8 +134,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
     }
 
     actual fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType) {
-        val buff = ByteBuffer.wrap(dataArray)
-        GLES30.glBufferData(targetType.value, dataArray.size, buff, usageType.value)
+        val buffer = ByteBuffer.allocateDirect(dataArray.size)
+        buffer.put(dataArray)
+        buffer.position(0)
+        GLES30.glBufferData(targetType.value, dataArray.size, buffer, usageType.value)
     }
 
     actual fun bufferData(targetType: BufferTargetType, byteSize: Int, usageType: BufferUsageType) {

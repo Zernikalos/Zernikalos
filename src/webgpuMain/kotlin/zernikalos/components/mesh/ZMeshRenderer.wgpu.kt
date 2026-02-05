@@ -53,10 +53,10 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
         val indices = data.indexBuffer!!
 
         enabledVertexBuffers
-        .sortedBy { it.id } // Use the same consistent order
-        .forEach{ buff -> // Use index for the slot
-            buff.bind()
-        }
+            .sortedBy { it.id } // Use the same consistent order
+            .forEach{ buff -> // Use index for the slot
+                buff.bind()
+            }
         indices.renderer.bindIndexBuffer()
     }
 
