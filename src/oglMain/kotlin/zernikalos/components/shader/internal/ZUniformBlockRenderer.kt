@@ -1,27 +1,27 @@
 /*
- * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2026. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package zernikalos.components.shader
+package zernikalos.components.shader.internal
 
-import zernikalos.components.ZComponentRenderer
+import zernikalos.components.shader.ZUniformBlockData
 import zernikalos.context.*
 import zernikalos.math.ZAlgebraObjectCollection
 
-actual class ZUniformBlockRenderer actual constructor(
-    ctx: ZRenderingContext,
+internal class ZUniformBlockRenderer(
+    private val ctx: ZRenderingContext,
     private val data: ZUniformBlockData
-) : ZComponentRenderer(ctx) {
+) : ZUniformInternalRenderer {
 
     private var ubo: GLWrap? = null
 
     private var bindingPoint: Int = -1
 
-    actual override fun initialize() {
+    override fun initialize() {
     }
 
     fun bindLocation(programId: GLWrap) {
@@ -54,7 +54,7 @@ actual class ZUniformBlockRenderer actual constructor(
         ctx.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, ubo!!)
     }
 
-    actual override fun bind() {
+    override fun bind() {
         ctx as ZGLRenderingContext
 
         val algObj = data.value as ZAlgebraObjectCollection
@@ -62,7 +62,7 @@ actual class ZUniformBlockRenderer actual constructor(
         ctx.bufferData(BufferTargetType.UNIFORM_BUFFER, algObj.byteArray, BufferUsageType.DYNAMIC_DRAW)
     }
 
-    actual override fun unbind() {
+    override fun unbind() {
         ctx as ZGLRenderingContext
         //ctx?.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, 0)
     }

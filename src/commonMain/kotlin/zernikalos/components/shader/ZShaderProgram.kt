@@ -8,7 +8,10 @@
 
 package zernikalos.components.shader
 
-import zernikalos.components.*
+import zernikalos.components.ZBindeable
+import zernikalos.components.ZComponentData
+import zernikalos.components.ZComponentRenderer
+import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -37,10 +40,6 @@ class ZShaderProgram internal constructor(private val data: ZShaderProgramData):
 
     fun hasAttributeById(attrId: ZAttributeId): Boolean {
         return attributes.values.any { it.id == attrId.id }
-    }
-
-    fun addUniformBlock(name: String, uniformBlock: ZUniformBlock) {
-        data.uniforms[name] = uniformBlock
     }
 
     fun addUniform(name: String, uniform: ZBaseUniform) {

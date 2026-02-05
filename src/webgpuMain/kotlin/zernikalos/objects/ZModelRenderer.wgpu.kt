@@ -24,8 +24,8 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
         ctx as ZWebGPURenderingContext
 
         // Group 0: Uniforms
-        val bindGroupLayoutEntries = model.shaderProgram.uniforms.blocks.asSequence().map { block ->
-            block.renderer.bindGroupLayoutEntry!!
+        val bindGroupLayoutEntries = model.shaderProgram.uniforms.all.asSequence().map { uniform ->
+            uniform.renderer.bindGroupLayoutEntry!!
         }.toList()
 
         val bindGroupLayout = ctx.device.createBindGroupLayout(
@@ -35,8 +35,8 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
             ).toGpu()
         )
 
-        val bindGroupEntries = model.shaderProgram.uniforms.blocks.asSequence().map { block ->
-            block.renderer.bindGroupEntry!!
+        val bindGroupEntries = model.shaderProgram.uniforms.all.asSequence().map { uniform ->
+            uniform.renderer.bindGroupEntry!!
         }.toList()
 
         bindGroup = ctx.device.createBindGroup(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2026. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,39 +8,43 @@
 
 package zernikalos.components.shader
 
-import zernikalos.ZTypes
 import zernikalos.components.ZComponentRenderer
+import zernikalos.components.shader.internal.ZUniformBlockRenderer
+import zernikalos.components.shader.internal.ZUniformInternalRenderer
+import zernikalos.components.shader.internal.ZUniformSingleRenderer
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
-import zernikalos.logger.logger
 
-actual class ZUniformRenderer actual constructor(ctx: ZRenderingContext, private val data: ZUniformData): ZComponentRenderer(ctx) {
+actual class ZUniformRenderer actual constructor(
+    ctx: ZRenderingContext,
+    private val data: ZUniformBlockData
+): ZComponentRenderer(ctx) {
 
-    lateinit private var _uniformId: GLWrap
+    private val internalRenderer: ZUniformInternalRenderer
 
-    actual override fun initialize() {
+    init {
+        internalRenderer = if (data.uniforms.size == 1) {
+            ZUniformSingleRenderer(ctx, data)
+        } else {
+            ZUniformBlockRenderer(ctx, data)
+        }
     }
 
-    var uniformId: GLWrap
-        get() = _uniformId
-        set(value) {
-            _uniformId = value
-            if (uniformId.isValid) {
-                logger.debug("Binding ${data.uniformName} to uniformId ${uniformId}")
-            } else {
-                logger.debug("Invalid uniform ${data.uniformName}")
-            }
-        }
+    actual override fun initialize() = internalRenderer.initialize()
 
-    override fun bind() {
+    override fun bind() = internalRenderer.bind()
+
+    override fun unbind() = internalRenderer.unbind()
+
+    fun bindLocation(programId: GLWrap) {
         ctx as ZGLRenderingContext
-        if (!uniformId.isValid) {
-            return
-        }
-        when (data.dataType) {
-            ZTypes.MAT4F -> ctx.uniformMatrix4fv(uniformId, data.count, false, data.value.floatArray)
-            else -> return
+        when (internalRenderer) {
+            is ZUniformSingleRenderer -> {
+                val singleData = data.uniforms.values.first()
+                internalRenderer.setUniformId(ctx.getUniformLocation(programId, singleData.uniformName))
+            }
+            is ZUniformBlockRenderer -> internalRenderer.bindLocation(programId)
         }
     }
 }
