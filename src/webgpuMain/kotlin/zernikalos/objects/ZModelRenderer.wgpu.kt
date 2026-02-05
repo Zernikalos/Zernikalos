@@ -54,6 +54,7 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
         }
 
         val renderPipelineDescriptor = GPURenderPipelineDescriptor(
+            label = "${model.name} RenderPipeline",
             layout = ctx.device.createPipelineLayout(
                 GPUPipelineLayoutDescriptor(
                     bindGroupLayouts = bindGroupLayouts.toTypedArray()

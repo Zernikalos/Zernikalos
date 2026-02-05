@@ -20,8 +20,6 @@ import zernikalos.context.webgpu.GPUVertexStepMode
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
-
-
     actual override fun initialize() {
         if (!data.content.isInitialized) {
             data.content.initialize(ctx)
@@ -33,7 +31,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
         // Use the stride from data, which includes interleaved stride when buffers are interleaved
         // When stride is 0, it means tightly packed, so use element size
         val strideBytes = if (data.stride == 0) data.dataType.byteSize else data.stride
-        
+
         return GPUVertexBufferLayout(
             attributes = arrayOf(
                 GPUVertexAttribute(

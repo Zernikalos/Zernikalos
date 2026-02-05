@@ -6,6 +6,9 @@ import kotlin.js.JsExport
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
 
+/**
+ * @suppress
+ */
 @OptIn(ExperimentalTime::class)
 fun System.currentTimeMillis(): Long = System.now().toEpochMilliseconds()
 
