@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Aarón Negrín - Zernikalos Engine.
+ * Copyright (c) 2024-2025. Aarón Negrín - Zernikalos Engine.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,51 +15,68 @@ import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
-import zernikalos.math.ZAlgebraObject
-import zernikalos.math.ZMatrix4
-import zernikalos.math.ZVector2
-import zernikalos.math.ZVoidAlgebraObject
+import zernikalos.logger.logger
+import zernikalos.math.*
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-class ZUniform internal constructor(private val data: ZUniformData):
+class ZUniform internal constructor(private val data: ZUniformBlockData):
     ZRenderizableComponent<ZUniformRenderer>(), ZBindeable, ZBaseUniform {
 
-    @JsName("initWithArgs")
-    constructor(id: Int, uniformName: String, count: Int , dataType: ZDataType): this(ZUniformData(id, uniformName, count, dataType))
+    @JsExport.Ignore
+    constructor(id: Int, uniformName: String, uniforms: LinkedHashMap<String, ZUniformData>): this(
+        ZUniformBlockData(
+            id,
+            uniformName,
+            uniforms
+        )
+    )
+
+    @JsName("initWithUniforms")
+    constructor(id: Int, uniformName: String, uniforms: List<Pair<String, ZUniformData>>): this(
+        ZUniformBlockData(
+            id,
+            uniformName,
+            LinkedHashMap(uniforms.toMap())
+        )
+    )
+
+    @JsName("initSingle")
+    constructor(id: Int, uniformName: String, count: Int, dataType: ZDataType): this(
+        ZUniformBlockData(
+            id = id,
+            uniformBlockName = uniformName,
+            uniforms = linkedMapOf(
+                uniformName to ZUniformData(id, uniformName, count, dataType)
+            )
+        )
+    )
+
     @JsName("init")
-    constructor(): this(ZUniformData())
+    constructor(): this(ZUniformBlockData())
 
-    /**
-     * Represents the unique identifier for a `ZUniform` instance.
-     * This ID is used to differentiate between different uniform components
-     */
-    override var id: Int by data::id
+    val uniforms: MutableMap<String, ZUniformData> by data::uniforms
 
-    /**
-     * This is the name within the shader source code
-     */
-    override var uniformName: String by data::uniformName
+    override val id: Int by data::id
 
-    /**
-     * How many elements of this will be used
-     */
-    var count: Int by data::count
+    override val uniformName: String by data::uniformBlockName
 
-    /**
-     * The datatype of all individual elements used by this uniform
-     */
-    var dataType: ZDataType by data::dataType
+    override var value: ZAlgebraObject by data::value
 
-    override var value: ZAlgebraObject
-        get() = data.value
-        set(value) {
-            data.value = value
-        }
+    val isSingleUniform: Boolean
+        get() = uniforms.size == 1
+
+    val singleElement: ZUniformData?
+        get() = if (isSingleUniform) uniforms.values.firstOrNull() else null
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
+    }
+
+    override fun initialize(ctx: ZRenderingContext) {
+        super.initialize(ctx)
+        logger.debug("Initialized uniform: ${data.uniformBlockName} (${data.byteSize} bytes)")
     }
 
     override fun bind() = renderer.bind()
@@ -84,7 +101,34 @@ data class ZUniformData(
     override var value: ZAlgebraObject = algebraObjectByType(dataType)
 }
 
-expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComponentRenderer {
+data class ZUniformBlockData(
+    val id: Int = -1,
+    val uniformBlockName: String = "",
+    val uniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
+): ZComponentData() {
+
+    val count: Int = uniforms.size
+
+    val byteSize: Int
+        get() = uniforms.values.sumOf { it.byteSize }
+
+    private var _value = ZAlgebraObjectCollection(byteSize)
+
+    var value: ZAlgebraObject
+        get() {
+            var offset = 0
+            uniforms.values.forEach { uniform ->
+                _value.copyInto(offset, uniform.value)
+                offset += uniform.byteSize
+            }
+            return _value
+        }
+        set(value) {
+            _value = value as ZAlgebraObjectCollection
+        }
+}
+
+expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRenderer {
 
     override fun initialize()
 }
@@ -92,8 +136,8 @@ expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformData): ZComp
 // TODO: This need to be reimplemented somehow
 private fun algebraObjectByType(type: ZDataType): ZAlgebraObject {
     return when (type) {
-        ZTypes.MAT4F -> return ZMatrix4()
-        ZTypes.VEC2F -> return ZVector2()
+        ZTypes.MAT4F -> ZMatrix4()
+        ZTypes.VEC2F -> ZVector2()
         else -> ZVoidAlgebraObject()
     }
 }

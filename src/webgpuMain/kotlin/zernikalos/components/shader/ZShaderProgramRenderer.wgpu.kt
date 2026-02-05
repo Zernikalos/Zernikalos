@@ -28,15 +28,14 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         shaderModule = ctx.device.createShaderModule(data.shaderSource.wgpuShaderSource)
         logger.debug(data.shaderSource.wgpuShaderSource)
 
-        // TODO: Only blocks are being considered
-        data.uniforms.blocks.forEach { block ->
-            block.initialize(ctx)
+        data.uniforms.all.forEach { uniform ->
+            uniform.initialize(ctx)
         }
     }
 
     actual override fun bind() {
-        data.uniforms.blocks.forEach { block ->
-            block.bind()
+        data.uniforms.all.forEach { uniform ->
+            uniform.bind()
         }
     }
 

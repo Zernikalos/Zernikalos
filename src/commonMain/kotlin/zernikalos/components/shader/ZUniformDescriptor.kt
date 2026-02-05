@@ -75,15 +75,15 @@ fun ZInverseBindMatrixArray(count: Int): ZUniformData {
     return ZUniformData(UNIFORM_IDS.INVERSE_BIND_MATRIX, "u_invBindMatrix", count, ZTypes.MAT4F)
 }
 
-val ZModelViewProjectionMatrixBlock: ZUniformBlock
-    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_SCENE_MATRIX, "u_sceneMatrixBlock", listOf(
+val ZModelViewProjectionMatrixBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_SCENE_MATRIX, "u_sceneMatrixBlock", listOf(
         UNIFORM_NAMES.PROJECTION_MATRIX to ZUniformProjectionMatrix,
         UNIFORM_NAMES.VIEW_MATRIX to ZUniformViewMatrix,
         UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX to ZUniformModelViewProjectionMatrix
     ))
 
-val ZSkinningMatrixBlock: ZUniformBlock
-    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_SKINNING_MATRIX, "u_skinningMatrixBlock", listOf(
+val ZSkinningMatrixBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_SKINNING_MATRIX, "u_skinningMatrixBlock", listOf(
         UNIFORM_NAMES.BONES to ZBonesMatrixArray(100),
         UNIFORM_NAMES.INVERSE_BIND_MATRIX to ZInverseBindMatrixArray(100)
     ))
@@ -103,8 +103,8 @@ val ZUniformPbrMetalness: ZUniformData
 val ZUniformPbrRoughness: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PBR_ROUGHNESS, "u_pbrRoughness", 1, ZTypes.FLOAT)
 
-val ZPbrMaterialBlock: ZUniformBlock
-    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_PBR_MATERIAL, "u_pbrMaterialBlock", listOf(
+val ZPbrMaterialBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_PBR_MATERIAL, "u_pbrMaterialBlock", listOf(
         UNIFORM_NAMES.PBR_COLOR to ZUniformPbrColor,
         UNIFORM_NAMES.PBR_EMISSIVE to ZUniformPbrEmissive,
         UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY to ZUniformPbrEmissiveIntensity,
@@ -124,8 +124,8 @@ val ZUniformPhongSpecular: ZUniformData
 val ZUniformPhongShininess: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.PHONG_SHININESS, "u_phongShininess", 1, ZTypes.FLOAT)
 
-val ZUniformPhongMaterialBlock: ZUniformBlock
-    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_PHONG_MATERIAL, "u_phongMaterialBlock", listOf(
+val ZUniformPhongMaterialBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_PHONG_MATERIAL, "u_phongMaterialBlock", listOf(
         UNIFORM_NAMES.PHONG_AMBIENT to ZUniformPhongAmbient,
         UNIFORM_NAMES.PHONG_DIFFUSE to ZUniformPhongDiffuse,
         UNIFORM_NAMES.PHONG_SPECULAR to ZUniformPhongSpecular,

@@ -32,7 +32,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     private fun initializeUniformBuffer() {
         ctx as ZMtlRenderingContext
 
-        data.uniforms.blocks.forEach { uniform ->
+        data.uniforms.all.forEach { uniform ->
             uniform.initialize(ctx)
         }
 
@@ -65,8 +65,8 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     actual override fun bind() {
         ctx as ZMtlRenderingContext
 
-        data.uniforms.blocks.forEach { uniformBlock ->
-            uniformBlock.bind()
+        data.uniforms.all.forEach { uniform ->
+            uniform.bind()
         }
     }
 

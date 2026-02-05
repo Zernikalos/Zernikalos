@@ -49,14 +49,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 //            ctx.uniform1i(textureSamplerLoc, 0)
 //        }
 
-        data.uniforms.singles.forEach { uniform ->
-            uniform.initialize(ctx)
-            uniform.renderer.uniformId = ctx.getUniformLocation(
-                program.renderer.programId,
-                uniform.uniformName
-            )
-        }
-        data.uniforms.blocks.forEach { uniform ->
+        data.uniforms.all.forEach { uniform ->
             uniform.initialize(ctx)
             uniform.renderer.bindLocation(program.renderer.programId)
         }
@@ -64,10 +57,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 
     actual override fun bind() {
         program.bind()
-        data.uniforms.singles.forEach { uniform ->
-            uniform.bind()
-        }
-        data.uniforms.blocks.forEach { uniform ->
+        data.uniforms.all.forEach { uniform ->
             uniform.bind()
         }
     }
