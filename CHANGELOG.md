@@ -2,6 +2,42 @@
 
 All notable changes to the Zernikalos Engine will be documented in this file.
 
+## [v0.8.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.8.0) (2026-02-11)
+
+### Added
+
+- 🎸 Exporting inverse bind matrices ([094f76e7945a676](https://github.com/Zernikalos/Zernikalos/commit/094f76e7945a676bd381c002d5fd5e93dd864879))
+- 🎸 Basic WebGPU shader preprocessor ([510c2e7014320fd](https://github.com/Zernikalos/Zernikalos/commit/510c2e7014320fdcac16bea2044fd4c9f10204bc))
+- 🎸 Lightning system implementation ([d09d0756be84fdf](https://github.com/Zernikalos/Zernikalos/commit/d09d0756be84fdf49d635e89f927e8fa49bdfa85))
+- 🎸 Upgrade ZKO to v0.15.0 ([7183275576d7cda](https://github.com/Zernikalos/Zernikalos/commit/7183275576d7cda8de34c3bb8c31a9c853ba9064))
+
+### Fixed
+
+- 🐛 Fixing error for OGl affecting performance ([513f855bc196cd3](https://github.com/Zernikalos/Zernikalos/commit/513f855bc196cd30a3debd59f0564e5ce65a8c61))
+- 🐛 Error on textures with no dimension for webgpu ([dd493fdeeabdcac](https://github.com/Zernikalos/Zernikalos/commit/dd493fdeeabdcac8584e9907c434b0fdd6f25dbf))
+- 🐛 Workaround for material with emissive maps ([ded463e3992faa4](https://github.com/Zernikalos/Zernikalos/commit/ded463e3992faa47ef78fb3a938925bcbd705f40))
+- 🐛 Fixing some warnings shown during build ([7d6611be91a5a7b](https://github.com/Zernikalos/Zernikalos/commit/7d6611be91a5a7b3c390cd5e9af2cb6f41dc8672))
+
+
+### Changed
+
+- 💡 Merging uniform and uniform blocks into one single entity ([91064e87d710880](https://github.com/Zernikalos/Zernikalos/commit/91064e87d710880198a181950b368a0e6aff51c2))
+- 💡 Converting uniform generators from classes to functions ([a9d759343729dad](https://github.com/Zernikalos/Zernikalos/commit/a9d759343729dad4b8b028a36600c6e74eb34404))
+- 💡 Improve texture handling on Ogl ([0da63ffc9a1325e](https://github.com/Zernikalos/Zernikalos/commit/0da63ffc9a1325e3e9bfea6bb0ce15fe61e943b3))
+- 💡 Changing ZObject type from string to ZObjectType ([9dfac7ecc76b2b7](https://github.com/Zernikalos/Zernikalos/commit/9dfac7ecc76b2b7739e69edaa8a8b28408a198e0))
+
+
+
+
+
+
+### Chore
+
+- 🤖 Fixing current next-release workflow ([4904a43017e72ca](https://github.com/Zernikalos/Zernikalos/commit/4904a43017e72ca601b29df9120c120a73d84a53))
+- 🤖 Create GitHub Release on workflows ([ce04398ed0d98b2](https://github.com/Zernikalos/Zernikalos/commit/ce04398ed0d98b2c0f594fd2307cb5023cb330ce))
+- 🤖 Small improvements on documentation generation ([ed223487ba5d238](https://github.com/Zernikalos/Zernikalos/commit/ed223487ba5d23851cd9b2372c8b343474afecf1))
+- 🤖 Small improvements on CI scripts ([877e5e2e43d2bd9](https://github.com/Zernikalos/Zernikalos/commit/877e5e2e43d2bd982bae0bee9b824a3b56bef09a))
+
 ## [v0.7.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.7.0) (2026-01-17)
 
 ### Added
