@@ -8,7 +8,12 @@
 
 package zernikalos.math
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.utils.toByteArray
@@ -22,7 +27,7 @@ import kotlin.math.tan
  * A 4x4 matrix implementation.
  */
 @JsExport
-@Serializable
+@Serializable(with = ZMatrix4Serializer::class)
 class ZMatrix4(): ZAlgebraObject {
     override val dataType: ZDataType
         get() = ZTypes.MAT4F
@@ -726,4 +731,40 @@ class ZMatrix4(): ZAlgebraObject {
 
     }
 
+}
+
+@Serializable
+private data class ZMatrix4Surrogate(
+    @ProtoNumber(10)
+    val floatArray: FloatArray
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as ZMatrix4Surrogate
+
+        if (!floatArray.contentEquals(other.floatArray)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return floatArray.contentHashCode()
+    }
+}
+
+class ZMatrix4Serializer: KSerializer<ZMatrix4> {
+    private val serializer = ZMatrix4Surrogate.serializer()
+    override val descriptor: SerialDescriptor = serializer.descriptor
+
+    override fun deserialize(decoder: Decoder): ZMatrix4 {
+        val surrogate = serializer.deserialize(decoder)
+        return ZMatrix4(surrogate.floatArray)
+    }
+
+    override fun serialize(encoder: Encoder, value: ZMatrix4) {
+        val surrogate = ZMatrix4Surrogate(value.floatArray)
+        encoder.encodeSerializableValue(serializer, surrogate)
+    }
 }

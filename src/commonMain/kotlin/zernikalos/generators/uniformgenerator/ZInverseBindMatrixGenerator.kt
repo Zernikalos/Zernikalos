@@ -20,11 +20,14 @@ val ZInverseBindMatrixGenerator: ZUniformGenerator = { sceneContext, obj ->
     val skeleton = obj.skeleton!!
     val bones = skeleton.bones
 
+    val skinning = obj.skinning!!
+
     // Sort bones according to the order defined in the skinning's boneIds array
-    val boneIdsList = obj.skinning!!.boneIds.toList()
+    val boneIdsList = skinning.boneIds.toList()
+    val skinningInverseBindMatrices = skinning.inverseBindMatrices
     val sortedBones = bones.sortedBy { bone -> boneIdsList.indexOf(bone.id) }
-    val boneMatrices = sortedBones.map {
-        it.inverseBindMatrix
+    val boneMatrices = sortedBones.mapIndexed { index, bone ->
+        skinningInverseBindMatrices.getOrNull(index) ?: bone.inverseBindMatrix
     }
 
     val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)
