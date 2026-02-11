@@ -113,14 +113,17 @@ class VersionManager(BaseScript):
                 error_message="Failed to push changes to remote"
             )
     
-    def calculate_next_version(self) -> Optional[VersionInfo]:
+    def calculate_next_version(self, silent: bool = False) -> Optional[VersionInfo]:
         """
         Calculate next version based on Conventional Commits
+        
+        Args:
+            silent: If True, do not print project version (for machine-readable output)
         
         Returns:
             VersionInfo with calculated version details or None if error
         """
-        base_version = self.get_project_version()
+        base_version = self.get_project_version(silent=silent)
         if not base_version:
             return None
         

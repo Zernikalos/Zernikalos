@@ -27,6 +27,12 @@ def add_publish_arguments(parser: argparse.ArgumentParser) -> None:
     add_common_arguments(parser)
 
 
+def add_publish_next_arguments(parser: argparse.ArgumentParser) -> None:
+    """Add publish-next subcommand arguments"""
+    from .common_args import add_common_arguments
+    add_common_arguments(parser)
+
+
 def add_status_arguments(parser: argparse.ArgumentParser) -> None:
     """Add status subcommand arguments"""
     # No arguments needed for status, but function for consistency
@@ -198,6 +204,42 @@ def handle_publish_command(args, project_root: Path = None) -> int:
     else:
         base.print_error("No publish target specified")
         return 1
+
+
+def handle_publish_next_command(args, project_root: Path = None) -> int:
+    """
+    Handle publish-next subcommand: compute next version, build, publish Maven + npm (tag next).
+
+    Args:
+        args: Parsed command line arguments
+        project_root: Root directory of the project
+
+    Returns:
+        Exit code (0 for success, 1 for failure)
+    """
+    base = BaseScript("Zernikalos Publisher")
+    if project_root:
+        base.project_root = project_root
+
+    if not base.check_directory():
+        return 1
+
+    credentials = get_credentials_from_args(args, base)
+    if not credentials:
+        return 1
+
+    base.print_header("PUBLISHING NEXT (PRE-RELEASE)")
+    manager = PublisherManager(project_root)
+    result = manager.publish_next(credentials)
+
+    if result.success:
+        base.print_success("Next release published successfully!")
+        if result.details:
+            base.print_status(f"Maven: {result.details.get('maven_version', '')}")
+            base.print_status(f"npm (tag next): {result.details.get('npm_version', '')}")
+    else:
+        show_publish_result(base, result)
+    return 0 if result.success else 1
 
 
 def handle_status_command(project_root: Path = None) -> int:

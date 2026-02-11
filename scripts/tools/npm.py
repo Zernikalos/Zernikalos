@@ -106,16 +106,48 @@ class NpmTool:
         
         return packages
     
-    def publish_workspace(self, workspace_dir: Path, package_filter: Optional[str] = None, 
-                         show_output: bool = True) -> Tuple[bool, Optional[str], Optional[str]]:
+    def set_workspace_version(self, workspace_dir: Path, version: str,
+                              workspace_package: Optional[str] = None) -> Tuple[bool, Optional[str], Optional[str]]:
         """
-        Publish packages using npm workspace
-        
+        Set version for the workspace or a specific workspace package (no git tag).
+
+        Args:
+            workspace_dir: Directory containing the workspace (e.g. build/js)
+            version: Version string to set
+            workspace_package: Optional package name (e.g. '@zernikalos/zernikalos'). If None, sets root version.
+
+        Returns:
+            Tuple of (success: bool, stdout: Optional[str], stderr: Optional[str])
+        """
+        if not workspace_dir.exists():
+            return False, None, f"Workspace directory not found: {workspace_dir}"
+        try:
+            env = self.get_auth_env()
+            cmd = ['npm', 'version', version, '--no-git-tag-version']
+            if workspace_package:
+                cmd.extend(['--workspace', workspace_package])
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                env=env,
+                cwd=workspace_dir
+            )
+            return result.returncode == 0, result.stdout, result.stderr
+        except Exception as e:
+            return False, None, str(e)
+
+    def publish_workspace(self, workspace_dir: Path, package_filter: Optional[str] = None,
+                         tag: Optional[str] = None, show_output: bool = True) -> Tuple[bool, Optional[str], Optional[str]]:
+        """
+        Publish packages using npm workspace.
+
         Args:
             workspace_dir: Directory containing the workspace
             package_filter: Optional package name filter (e.g., 'zernikalos')
+            tag: Optional dist-tag (e.g. 'next' for pre-release)
             show_output: Whether to print output to console (default: True)
-            
+
         Returns:
             Tuple of (success: bool, stdout: Optional[str], stderr: Optional[str])
         """
@@ -125,6 +157,9 @@ class NpmTool:
         try:
             env = self.get_auth_env()
             cmd = ['npm', 'publish']
+            
+            if tag:
+                cmd.extend(['--tag', tag])
             
             # Add workspace filter
             if package_filter:

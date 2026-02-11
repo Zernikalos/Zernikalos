@@ -227,21 +227,27 @@ class GradleTool:
         )
         return success
     
-    def publish_all_publications(self, user: str, access_token: str) -> bool:
+    def publish_all_publications(self, user: str, access_token: str, version: Optional[str] = None) -> bool:
         """
         Publish ALL publications to Maven Repository
-        
+
         Args:
             user: GitHub user/organization
             access_token: GitHub access token
-            
+            version: Optional project version (e.g. 0.8.0-SNAPSHOT). If set, passes -Pversion= to Gradle.
+
         Returns:
             True if successful, False otherwise
         """
-        success, _, _ = self.run_command(
-            'publishAllPublicationsToMavenRepository',
+        args = [
             f'-Puser={user}',
             f'-Paccess_token={access_token}',
+        ]
+        if version:
+            args.append(f'-Pversion={version}')
+        success, _, _ = self.run_command(
+            'publishAllPublicationsToMavenRepository',
+            *args,
             show_output=True
         )
         return success

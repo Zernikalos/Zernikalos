@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from cli import create_parser
 from cli.version_cli import handle_version_command, handle_release_command
-from cli.publisher_cli import handle_publish_command, handle_status_command, handle_info_command
+from cli.publisher_cli import handle_publish_command, handle_publish_next_command, handle_status_command, handle_info_command
 from common import BaseScript
 
 
@@ -36,7 +36,8 @@ def main():
     
     elif args.command == 'publish':
         return handle_publish_command(args, base.project_root)
-    
+    elif args.command == 'publish-next':
+        return handle_publish_next_command(args, base.project_root)
     elif args.command == 'release':
         return handle_release_command(args, base.project_root)
     

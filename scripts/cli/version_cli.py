@@ -4,6 +4,7 @@ Command-line interface for version management commands
 """
 
 import argparse
+import sys
 from pathlib import Path
 from common import BaseScript, validate_version
 from versioning import VersionManager
@@ -21,6 +22,8 @@ def add_version_arguments(parser: argparse.ArgumentParser) -> None:
                        help='Create local release without pushing to remote')
     parser.add_argument('--show-next', action='store_true',
                        help='Show calculated next version based on Conventional Commits')
+    parser.add_argument('--output', choices=['human', 'github'], default='human',
+                       help='Output format for --show-next: human (default) or github (key=value for GITHUB_OUTPUT)')
 
 
 def add_release_arguments(parser: argparse.ArgumentParser) -> None:
@@ -151,12 +154,20 @@ def handle_version_command(args, project_root: Path = None) -> int:
     
     # Handle --show-next flag
     if args.show_next:
-        version_info = manager.calculate_next_version()
+        machine_output = getattr(args, 'output', 'human') == 'github'
+        version_info = manager.calculate_next_version(silent=machine_output)
         if not version_info:
             base.print_error("Could not calculate next version")
             return 1
         
-        show_next_version_info(base, version_info)
+        if args.output == 'github':
+            # Machine-readable output for GitHub Actions (append to GITHUB_OUTPUT)
+            print(f"maven_version={version_info.maven_version}")
+            print(f"npm_version={version_info.npm_version}")
+            print(f"Publishing Maven version: {version_info.maven_version}", file=sys.stderr)
+            print(f"Publishing npm version: {version_info.npm_version}", file=sys.stderr)
+        else:
+            show_next_version_info(base, version_info)
         return 0
     
     # Determine version (either from --auto or explicit version)

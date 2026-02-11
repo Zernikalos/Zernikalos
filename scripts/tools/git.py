@@ -256,18 +256,20 @@ class GitTool:
     
     def get_current_commit_hash(self, short: bool = True) -> Optional[str]:
         """
-        Get the current commit hash
-        
+        Get the current commit hash.
+
         Args:
-            short: If True, return short hash (7 chars), otherwise full hash
-            
+            short: If True, return short hash (7 chars via --short), otherwise full hash.
+
         Returns:
-            Commit hash or None if error
+            Commit hash or None if error.
         """
         try:
-            format_str = '%h' if short else '%H'
+            cmd = ['git', 'rev-parse', 'HEAD']
+            if short:
+                cmd.insert(2, '--short')
             result = subprocess.run(
-                ['git', 'rev-parse', format_str, 'HEAD'],
+                cmd,
                 capture_output=True,
                 text=True,
                 check=True,

@@ -71,6 +71,23 @@ Tag vX.Y.Z → Release Workflow → Automatic Publication
               (Android + JS)      GitHub Packages
 ```
 
+### Next Release Workflow (.github/workflows/next-release.yml)
+
+The **Next Release** workflow publishes pre-release artifacts (Maven `-SNAPSHOT`, npm `-next.<commit>`) without creating a version tag. It is triggered manually via **workflow_dispatch**.
+
+- **Version calculation**: Uses the same logic as the scripts — `zmanager.py version --show-next --output=github` — so the next version is derived from Conventional Commits (based on commits since the last tag). For example, if the current version is `0.7.0`, the next release might be `0.8.0-SNAPSHOT` / `0.8.0-next.<commit>`.
+- **Artifacts**: Published with the `next` tag on npm; Maven artifacts use the `-SNAPSHOT` suffix.
+
+To run it: Actions → **Zernikalos Next Release** → **Run workflow**.
+
+You can run the same flow locally with Zernikalos Manager:
+
+```bash
+python3 scripts/zmanager.py publish-next
+```
+
+This computes the next version (Conventional Commits), builds, and publishes Maven + npm (tag `next`). See [Zernikalos Manager Reference](zmanager-reference.md#publish-next-command).
+
 ## Creating a Release
 
 ### Recommended: Using Zernikalos Manager

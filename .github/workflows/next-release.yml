@@ -24,17 +24,15 @@ jobs:
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-env
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Generate Next Version
         id: version
         run: |
-          BASE_VERSION=$(cat VERSION.txt)
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          MAVEN_VERSION="${BASE_VERSION}-SNAPSHOT"
-          NPM_VERSION="${BASE_VERSION}-next.${COMMIT_HASH}"
-          echo "maven_version=$MAVEN_VERSION" >> $GITHUB_OUTPUT
-          echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
-          echo "Publishing Maven version: $MAVEN_VERSION"
-          echo "Publishing npm version: $NPM_VERSION"
+          python3 scripts/zmanager.py version --show-next --output=github >> $GITHUB_OUTPUT
 
       - name: Verify Version Configuration
         run: ./gradlew printVersion -Pversion=${{ steps.version.outputs.maven_version }}
