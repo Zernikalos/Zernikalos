@@ -10,6 +10,7 @@ from .npm_publisher import NpmPublisher
 from .maven_publisher import MavenPublisher
 from .types import PublishResult, StatusInfo, PublishInfo
 from tools import GradleTool, NpmTool
+from versioning import VersionManager
 
 
 class PublisherManager:
@@ -142,7 +143,104 @@ class PublisherManager:
                 }
             }
         )
-        
+
+    def publish_next(self, credentials: GitHubCredentials) -> PublishResult:
+        """
+        Publish next (pre-release) artifacts: compute next version from Conventional Commits,
+        build with that version, publish Maven (SNAPSHOT) and npm (next tag).
+
+        Args:
+            credentials: GitHub credentials for authentication
+
+        Returns:
+            PublishResult with success status and details
+        """
+        gradle_available, _ = self.gradle.check_available()
+        if not gradle_available:
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="Gradle wrapper not found or not executable"
+            )
+        npm_available, _ = self.npm.check_available()
+        if not npm_available:
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="npm is not installed or not in PATH"
+            )
+
+        version_manager = VersionManager(self.project_root)
+        version_info = version_manager.calculate_next_version(silent=True)
+        if not version_info:
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="Could not calculate next version (check VERSION.txt and git history)"
+            )
+
+        maven_version = version_info.maven_version
+        npm_version = version_info.npm_version
+
+        # Build with next version (does not modify VERSION.txt)
+        if not self.gradle.build(f'-Pversion={maven_version}'):
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="Gradle build failed"
+            )
+
+        # Publish Maven with next version
+        if not self.gradle.publish_all_publications(
+            credentials.user, credentials.token, version=maven_version
+        ):
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="Maven publish failed",
+                details={"maven_version": maven_version, "npm_version": npm_version}
+            )
+
+        # Set npm package version and publish with tag 'next'
+        workspace_dir = self.project_root / "build" / "js"
+        if not workspace_dir.exists():
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message="build/js not found (run build first)",
+                details={"maven_version": maven_version, "npm_version": npm_version}
+            )
+        self.npm.set_auth_token(credentials.token)
+        ok, _, err = self.npm.set_workspace_version(
+            workspace_dir, npm_version, workspace_package='@zernikalos/zernikalos'
+        )
+        if not ok:
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message=f"Failed to set npm version: {err}",
+                details={"maven_version": maven_version, "npm_version": npm_version}
+            )
+        ok, _, err = self.npm.publish_workspace(
+            workspace_dir, package_filter=None, tag='next', show_output=True
+        )
+        if not ok:
+            return PublishResult(
+                success=False,
+                target='all',
+                error_message=f"npm publish failed: {err}",
+                details={"maven_version": maven_version, "npm_version": npm_version}
+            )
+
+        return PublishResult(
+            success=True,
+            target='all',
+            details={
+                "maven_version": maven_version,
+                "npm_version": npm_version,
+            }
+        )
+
     def get_status(self) -> StatusInfo:
         """
         Get current project status

@@ -29,7 +29,8 @@ Examples:
   python3 zmanager.py publish --all
   python3 zmanager.py publish --npm
   python3 zmanager.py publish --maven
-  
+  python3 zmanager.py publish-next
+
   # Release (version + optional publish)
   python3 zmanager.py release 0.6.0
   python3 zmanager.py release 0.6.0 --no-publish
@@ -49,7 +50,7 @@ Examples:
     
     # Import argument functions from handlers
     from .version_cli import add_version_arguments, add_release_arguments
-    from .publisher_cli import add_publish_arguments, add_status_arguments, add_info_arguments
+    from .publisher_cli import add_publish_arguments, add_publish_next_arguments, add_status_arguments, add_info_arguments
     
     # Version subcommand
     version_parser = subparsers.add_parser('version', help='Version management commands')
@@ -58,6 +59,10 @@ Examples:
     # Publish subcommand
     publish_parser = subparsers.add_parser('publish', help='Publishing commands')
     add_publish_arguments(publish_parser)
+    
+    # Publish-next subcommand (pre-release using Conventional Commits version)
+    publish_next_parser = subparsers.add_parser('publish-next', help='Publish next (pre-release): build and publish Maven SNAPSHOT + npm with tag next')
+    add_publish_next_arguments(publish_next_parser)
     
     # Release subcommand
     release_parser = subparsers.add_parser('release', help='Complete release (version + optional publish)')

@@ -116,7 +116,7 @@ class BaseScript:
             self.print_error("Please ensure gradlew is present and executable")
             return False
             
-    def get_project_version(self) -> Optional[str]:
+    def get_project_version(self, silent: bool = False) -> Optional[str]:
         """Get the current project version from VERSION.txt"""
         version_file = self.project_root / "VERSION.txt"
         if not version_file.exists():
@@ -125,7 +125,8 @@ class BaseScript:
             
         try:
             version = version_file.read_text().strip()
-            self.print_status(f"Project version: {version}")
+            if not silent:
+                self.print_status(f"Project version: {version}")
             return version
         except IOError as e:
             self.print_error(f"Failed to read VERSION.txt: {e}")

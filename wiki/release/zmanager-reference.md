@@ -44,15 +44,19 @@ Manages version creation and updates with support for auto-versioning from Conve
 
 Publishes NPM packages and Maven artifacts to GitHub Packages.
 
-### 3. `release` - Complete Release
+### 3. `publish-next` - Next (Pre-release) Publishing
+
+Computes the next version from Conventional Commits, builds the project with that version, and publishes Maven (SNAPSHOT) and npm (with tag `next`). Same logic as the **Next Release** GitHub Actions workflow, but run locally.
+
+### 4. `release` - Complete Release
 
 Combines versioning and publishing in a single command.
 
-### 4. `status` - Project Status
+### 5. `status` - Project Status
 
 Shows current project status and available artifacts.
 
-### 5. `info` - Detailed Information
+### 6. `info` - Detailed Information
 
 Displays detailed information about packages and artifacts.
 
@@ -73,6 +77,7 @@ python3 scripts/zmanager.py version [VERSION] [OPTIONS]
 **Options:**
 - `--auto`: Automatically calculate version from Conventional Commits
 - `--show-next`: Show next calculated version without creating it
+- `--output {human|github}`: With `--show-next`, output format: `human` (default) or `github` (key=value for GitHub Actions `GITHUB_OUTPUT`)
 - `--no-push`: Create local version without pushing (no CI/CD trigger)
 
 **Examples:**
@@ -162,6 +167,34 @@ For Maven:
 2. Checks that Gradle wrapper is available
 3. Builds project if `build` directory doesn't exist
 4. Publishes all publications to GitHub Packages Maven Repository
+
+### `publish-next` Command
+
+Publishes a **next** (pre-release) build: computes the next version from Conventional Commits, builds with that version, then publishes Maven (SNAPSHOT) and npm with tag `next`. Does not modify `VERSION.txt` or create a git tag.
+
+**Syntax:**
+```bash
+python3 scripts/zmanager.py publish-next [OPTIONS]
+```
+
+**Options:**
+- `--user USER`: GitHub username/organization
+- `--token TOKEN`: GitHub access token (or set `GITHUB_TOKEN`)
+
+**Examples:**
+```bash
+# Publish next (uses GITHUB_ACTOR and GITHUB_TOKEN if set)
+python3 scripts/zmanager.py publish-next
+
+# With explicit credentials
+python3 scripts/zmanager.py publish-next --user Zernikalos --token ghp_xxx
+```
+
+**What it does:**
+1. Computes next version from Conventional Commits (same as `version --show-next`)
+2. Runs `./gradlew build -Pversion=<maven_version>`
+3. Publishes all Maven publications with that version
+4. Sets npm package version to `<next_version>-next.<commit>` and publishes with `--tag next`
 
 ### `release` Command
 
