@@ -6,7 +6,9 @@ For most users, the recommended approach is to use the [Zernikalos Manager](zman
 
 ## Overview
 
-Gradle provides several custom tasks for version management and release preparation. These tasks can be used independently or as part of a manual release process.
+Gradle provides several custom tasks for version management and release preparation. These tasks are defined in the `buildLogic` convention plugin (`zernikalos.release-conventions`) and applied to the engine module. They can be used independently or as part of a manual release process.
+
+**Note:** `VERSION.txt` is located at the project root. All version-related paths are relative to the repository root unless otherwise noted.
 
 ## Version Management Tasks
 
@@ -51,7 +53,7 @@ Generates all version-dependent files using the current version from `VERSION.tx
 - Does NOT create commits or tags
 
 **Generated Files:**
-- `src/commonMain/kotlin/zernikalos/ZVersion.kt` - Kotlin version constants
+- `engine/src/commonMain/kotlin/zernikalos/ZVersion.kt` - Kotlin version constants
 - iOS podspec version
 - JavaScript package.json version
 
@@ -75,7 +77,7 @@ Creates `ZVersion.kt` file with current version number. This task runs automatic
 
 **Behavior:**
 - Creates `ZVersion.kt` with current version
-- Location: `src/commonMain/kotlin/zernikalos/ZVersion.kt`
+- Location: `engine/src/commonMain/kotlin/zernikalos/ZVersion.kt`
 - Reads version from `VERSION.txt` or `-Pversion` parameter
 - Runs automatically before compilation tasks (via task dependencies)
 
@@ -122,6 +124,7 @@ Creates a release commit and Git tag.
 - Stages all changes
 - Creates commit with format: `release: 🚀 vX.Y.Z`
 - Creates annotated Git tag: `vX.Y.Z`
+- Regenerates `CHANGELOG.md` with `gitChangelog` and amends the commit
 - Depends on `updateVersion` (runs it automatically if needed)
 - Does NOT push changes (you must push manually)
 
@@ -162,7 +165,7 @@ Here is a complete example of using Gradle tasks for a manual release:
 cat VERSION.txt
 
 # Check generated version constants
-cat src/commonMain/kotlin/zernikalos/ZVersion.kt
+cat engine/src/commonMain/kotlin/zernikalos/ZVersion.kt
 
 # Check package.json versions (after build)
 cat build/js/packages/@zernikalos/zernikalos/package.json | grep version

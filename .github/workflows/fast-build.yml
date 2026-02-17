@@ -25,4 +25,4 @@ jobs:
           cache-read-only: false
 
       - name: Build Android and JS
-        run: ./gradlew assembleDebug jsDevelopmentExecutableCompileSync --build-cache
+        run: ./gradlew build --build-cache
