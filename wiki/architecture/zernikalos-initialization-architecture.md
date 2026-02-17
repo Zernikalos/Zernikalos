@@ -52,24 +52,22 @@ ZContext(
 ```
 createSurfaceViewEventHandler(context, stateHandler)
     ↓
-ZSurfaceViewEventHandlerImpl
-    ↓
-InitializationProcess (State machine)
+ZSurfaceViewEventHandlerImpl (internal InitState)
 ```
 
 ### Phase 3: Asynchronous Initialization Process
 
-#### InitializationProcess States:
+#### InitState (4 states):
 1. **NOT_STARTED** → Initial state
-2. **SCENE_HANDLER_INITIALIZING** → Initializing scene handler
-3. **RENDERER_INITIALIZING** → Initializing renderer
+2. **SCENE_INIT** → Waiting for stateHandler.onReady() callback
+3. **RENDERER_INIT** → Renderer initialization on next progressInitialization
 4. **READY** → System ready for rendering
 
 #### Event Flow:
 ```
-onReady() → progressInitialization() → stateHandler.onReady()
+onReady() / onRender() → progressInitialization()
     ↓
-onRender() → progressInitialization() → renderer.initialize()
+stateHandler.onReady() callback → renderer.initialize() → READY
     ↓
 System ready for rendering
 ```
@@ -108,7 +106,7 @@ class ZContext(
 - `createDefaultContextCreator()` provides default implementation
 
 ### 2. State Machine Pattern
-- `InitializationProcess` handles sequential initialization states
+- `ZSurfaceViewEventHandlerImpl` uses an internal `InitState` enum for sequential initialization
 - States can only progress forward, never backward
 
 ### 3. Strategy Pattern
@@ -122,10 +120,10 @@ class ZContext(
 ## Resize Handling During Initialization
 
 ```kotlin
-// If resize occurs during initialization
-if (initProcess.hasResizeRequest) {
+// If resize occurs during initialization, applied in stateHandler.onReady callback
+if (pendingResize) {
     applyResize(context.screenWidth, context.screenHeight)
-    initProcess.clearResizeRequest()
+    pendingResize = false
 }
 ```
 
@@ -146,7 +144,7 @@ if (initProcess.hasResizeRequest) {
 
 ## Refactoring Recommendations
 
-1. **Simplify InitializationProcess**: Reduce number of states
+1. ~~**Simplify InitializationProcess**: Reduce number of states~~ ✓ Done
 2. **Add error handling**: Rollback in case of failure
 3. **Improve logging**: More information during the process
 4. **Create sequence diagrams**: For each specific platform

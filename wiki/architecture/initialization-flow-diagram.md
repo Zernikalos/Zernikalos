@@ -6,43 +6,39 @@
 graph TD
     A[User calls Zernikalos.initialize] --> B[Platform-specific Zernikalos]
     B --> C[ZernikalosBase.internalInitialize]
-    
+
     C --> D[Create ZSurfaceView]
     C --> E[Create ZContextCreator]
     C --> F[Create ZSceneStateHandler]
-    
+
     E --> G[contextCreator.createContext]
     G --> H[Create ZSceneContext]
     G --> I[Create ZRenderingContext]
-    
+
     H --> J[ZContext]
     I --> J
-    
+
     C --> K[createSurfaceViewEventHandler]
     K --> L[ZSurfaceViewEventHandlerImpl]
-    L --> M[InitializationProcess]
-    
-    M --> N{Current state?}
-    N -->|NOT_STARTED| O[SCENE_HANDLER_INITIALIZING]
-    N -->|SCENE_HANDLER_INITIALIZING| P[RENDERER_INITIALIZING]
-    N -->|RENDERER_INITIALIZING| Q[READY]
+
+    L --> N{InitState?}
+    N -->|NOT_STARTED| O[SCENE_INIT]
+    N -->|SCENE_INIT| O
     N -->|READY| R[Operating system]
-    
-    O --> S[stateHandler.onReady]
-    S --> P
-    
-    P --> T[renderer.initialize]
-    T --> Q
-    
+
+    O --> S[stateHandler.onReady callback]
+    S --> T[renderer.initialize]
+    T --> Q[READY]
+
     Q --> U[Rendering events]
     U --> V[onRender, onResize]
-    
+
     V --> W[performRender]
     V --> X[applyResize]
-    
+
     W --> Y[stateHandler.onRender]
     Y --> Z[renderer.render]
-    
+
     X --> AA[stateHandler.onResize]
     AA --> BB[renderer.onViewportResize]
 ```
@@ -52,9 +48,9 @@ graph TD
 ```mermaid
 stateDiagram-v2
     [*] --> NOT_STARTED
-    NOT_STARTED --> SCENE_HANDLER_INITIALIZING : onReady() called
-    SCENE_HANDLER_INITIALIZING --> RENDERER_INITIALIZING : stateHandler.onReady() completed
-    RENDERER_INITIALIZING --> READY : renderer.initialize() completed
+    NOT_STARTED --> SCENE_INIT : progressInitialization()
+    SCENE_INIT --> RENDERER_INIT : stateHandler.onReady() callback
+    RENDERER_INIT --> READY : renderer.initialize()
     READY --> READY : Rendering events
     READY --> READY : Resize events
 ```
@@ -70,46 +66,46 @@ graph LR
         D[Zernikalos Metal]
         E[Zernikalos OpenGL]
     end
-    
+
     subgraph "Common Core"
         F[ZernikalosBase]
         G[ZContext]
         H[ZSurfaceView]
         I[ZSceneStateHandler]
     end
-    
+
     subgraph "Contexts"
         J[ZSceneContext]
         K[ZRenderingContext]
         L[ZContextCreator]
     end
-    
+
     subgraph "Events and States"
         M[ZSurfaceViewEventHandler]
-        N[InitializationProcess]
+        N[InitState]
         O[ZRenderer]
     end
-    
+
     A --> F
     B --> F
     C --> F
     D --> F
     E --> F
-    
+
     F --> G
     F --> H
     F --> I
-    
+
     G --> J
     G --> K
-    
+
     L --> J
     L --> K
-    
+
     F --> M
     M --> N
     M --> O
-    
+
     I --> M
     G --> M
 ```
@@ -124,40 +120,31 @@ sequenceDiagram
     participant CC as ZContextCreator
     participant ZC as ZContext
     participant EH as EventHandler
-    participant IP as InitProcess
     participant SH as StateHandler
     participant R as Renderer
-    
+
     U->>Z: initialize(view, stateHandler)
     Z->>ZB: internalInitialize(surfaceView, contextCreator, stateHandler)
-    
+
     ZB->>CC: createContext(surfaceView)
     CC->>ZC: new ZContext(sceneContext, renderingContext)
     CC-->>ZB: context
-    
+
     ZB->>EH: createSurfaceViewEventHandler(context, stateHandler)
     ZB->>EH: surfaceView.eventHandler = eventHandler
-    
-    Note over EH: EventHandler configured
-    
-    EH->>IP: NOT_STARTED state
-    
-    Note over EH: onReady() event received
-    EH->>IP: goToStateSceneHandlerInitialization()
-    IP->>IP: SCENE_HANDLER_INITIALIZING state
-    
+
+    Note over EH: EventHandler configured, InitState = NOT_STARTED
+
+    Note over EH: onReady() or onRender() event received
+    EH->>EH: InitState = SCENE_INIT
     EH->>SH: onReady(context)
     SH-->>EH: Callback completed
-    EH->>IP: goToStateRendererInitialization()
-    IP->>IP: RENDERER_INITIALIZING state
-    
+    EH->>EH: InitState = RENDERER_INIT
     EH->>R: initialize()
-    R-->>EH: Renderer initialized
-    EH->>IP: goToStateReady()
-    IP->>IP: READY state
-    
+    EH->>EH: InitState = READY
+
     Note over EH: System ready for rendering
-    
+
     loop Rendering events
         EH->>SH: onRender(context)
         SH-->>EH: Callback completed
@@ -176,25 +163,25 @@ graph TD
         D[scenestatehandler/]
         E[statehandler/]
     end
-    
+
     subgraph "Zernikalos/src/androidMain/kotlin/zernikalos"
         F[Zernikalos.kt]
         G[ui/ZAndroidSurfaceView.kt]
     end
-    
+
     subgraph "Zernikalos/src/webgpuMain/kotlin/zernikalos"
         H[Zernikalos.kt]
         I[context/ZContextCreator.kt]
     end
-    
+
     A --> B
     A --> C
     A --> D
     A --> E
-    
+
     F --> A
     G --> C
-    
+
     H --> A
     I --> B
 ```
