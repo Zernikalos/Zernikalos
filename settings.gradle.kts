@@ -7,12 +7,22 @@
  */
 
 rootProject.name = "zernikalos"
-//include(":zernikalos")
+
+include(":engine")
+
+includeBuild("buildLogic")
 
 pluginManagement {
     repositories {
         google()
         gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
         mavenCentral()
     }
 }
