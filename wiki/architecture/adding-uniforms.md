@@ -14,6 +14,8 @@ Adding a uniform to the engine requires changes in multiple locations to ensure 
 
 ### 1. Uniform Descriptors (`ZUniformDescriptor.kt`)
 
+File: `engine/src/commonMain/kotlin/zernikalos/components/shader/ZUniformDescriptor.kt`.
+
 Add the new uniform identifiers and names:
 
 ```kotlin
@@ -36,11 +38,11 @@ val ZUniformNewUniform: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.NEW_UNIFORM_ID, "u_newUniform", 1, ZTypes.VEC4F)
 ```
 
-Create the uniform block:
+Create the uniform block (type is `ZUniform`, not `ZUniformBlock`):
 
 ```kotlin
-val ZNewMaterialBlock: ZUniformBlock
-    get() = ZUniformBlock(UNIFORM_IDS.BLOCK_NEW_MATERIAL, "u_newMaterialBlock", listOf(
+val ZNewMaterialBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_NEW_MATERIAL, "u_newMaterialBlock", listOf(
         UNIFORM_NAMES.NEW_UNIFORM_NAME to ZUniformNewUniform
         // Add all other uniforms in the block
     ))
@@ -60,13 +62,15 @@ If the uniform is related to a specific component (like materials, lights, etc.)
 
 #### 3.1 Adding the New Flag (`ZShaderProgramParameters.kt`)
 
-Add the new uniform flag:
+File: `engine/src/commonMain/kotlin/zernikalos/generators/shadergenerator/ZShaderProgramParameters.kt`.
+
+Add the new uniform flag (it is a `class`, not a `data class`):
 
 ```kotlin
-data class ZShaderProgramParameters(
+class ZShaderProgramParameters() {
     // ... existing properties ...
     var useNewUniform: Boolean = false
-)
+}
 ```
 
 #### 3.2 Integration in Component Logic
@@ -86,13 +90,15 @@ private fun buildShaderParameters(): ZShaderProgramParameters {
 
 #### 3.3 Add to Shader Generator (`ZShaderGenerator.kt`)
 
-Update the uniform addition logic:
+File: `engine/src/commonMain/kotlin/zernikalos/generators/shadergenerator/ZShaderGenerator.kt`.
+
+Update the uniform addition logic. Use `addUniform` (not `addUniformBlock`); the first argument is a logical name for the uniform/block:
 
 ```kotlin
 private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
     // ... existing uniforms ...
     if (params.useNewUniform) {
-        shaderProgram.addUniformBlock("NewUniform", ZNewUniformBlock)
+        shaderProgram.addUniform("NewUniform", ZNewMaterialBlock)
     }
 }
 ```
@@ -101,42 +107,41 @@ private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram:
 
 #### 4.1 Create Individual Generators
 
-Create individual uniform generators for each uniform in the block in the `generators/uniformgenerator/` folder:
+Create one generator **per uniform in the block** in `engine/src/commonMain/kotlin/zernikalos/generators/uniformgenerator/`. `ZUniformGenerator` is a type alias: `(ZSceneContext, ZObject) -> ZAlgebraObject`. Use a lambda or top-level function:
 
 ```kotlin
-class ZNewUniformGenerator: ZUniformGenerator {
-    override fun compute(
-        sceneContext: ZSceneContext,
-        obj: ZObject
-    ): ZAlgebraObject {
-        // Return the appropriate value for this uniform
-        return computeUniformValue(sceneContext, obj)
-    }
+val ZNewUniformGenerator: ZUniformGenerator = { sceneContext, obj ->
+    // Return the appropriate value (e.g. ZMatrix4, ZAlgebraObjectCollection, etc.)
+    computeUniformValue(sceneContext, obj)
 }
 ```
 
-#### 4.2 Add Generator to Context
+#### 4.2 Register Generators in Context
 
-Register the new uniform generators in the rendering context `ZSceneContext.kt`. This typically involves updating the context initialization to recognize and use the new generators.
+Register each generator in **`ZSceneContext.kt`** (`engine/src/commonMain/kotlin/zernikalos/context/ZSceneContext.kt`) inside `ZSceneContextDefault` (the class that extends `ZSceneContext`). The **key must match the uniform name used in the block**: use `UNIFORM_NAMES.XXX` (the same name as in the block's `listOf(UNIFORM_NAMES.XXX to ZUniform...)`). At render time, the engine looks up generators by these member names to fill each slot in the block.
+
+```kotlin
+addUniformGenerator(UNIFORM_NAMES.NEW_UNIFORM_NAME, ZNewUniformGenerator)
+```
 
 ### 5. Shader Source Files
 
-**Critical**: You must update shader source files for **ALL** supported platforms:
+**Critical**: You must update shader source files for **ALL** supported platforms. Paths are under `engine/src/<platform>Main/kotlin/zernikalos/generators/shadergenerator/libs/`:
 
-- **Android/OpenGL**: `ZDefaultShader.android.kt`
-- **Metal**: `ZDefaultShader.metal.kt` 
-- **WebGPU**: `ZDefaultShader.wgpu.kt`
+- **Android/OpenGL**: `androidMain/.../libs/ZDefaultShader.android.kt`
+- **Metal**: `metalMain/.../libs/ZDefaultShader.metal.kt`
+- **WebGPU**: `webgpuMain/.../libs/ZDefaultShader.wgpu.kt`
 
 Each platform requires:
-- Uniform block definitions
+- Uniform block definitions (matching the block name and members from `ZUniformDescriptor.kt`)
 - Shader logic implementation
-- Proper preprocessor directives
+- Proper preprocessor directives (e.g. `#ifdef USE_SKINNING`)
 
-**Note**: Currently, Metal and WebGPU shaders are incomplete and need to be updated to match the Android implementation.
+The platform-specific **shader generator** (e.g. `ZDefaultShaderGenerator.android.kt`) builds the final shader source from these libs and the `ZShaderProgramParameters` flags; ensure any new `#ifdef` is driven from a flag in `ZShaderProgramParameters` and from `buildShaderSource` / preprocessor on each platform.
 
 ### 6. Proto Definitions (ZKBuilder)
 
-If the uniform is used in the ZKBuilder pipeline, update the proto definitions:
+If the uniform is used in the ZKBuilder pipeline, update the proto definitions under **`ZKBuilder/packages/zkbuilder/proto/`** (e.g. `material.proto`, `model.proto`, etc.):
 
 ```protobuf
 message ZkNewUniform {
@@ -152,37 +157,42 @@ message ZkComponent {
 
 ## Implementation Checklist
 
-- [ ] Add uniform names and IDs to `ZUniformDescriptor.kt`
-- [ ] Create individual uniform data objects in `ZUniformDescriptor.kt`
-- [ ] Create uniform block definition in `ZUniformDescriptor.kt`
-- [ ] Add uniform flag to shader parameters in `ZShaderProgramParameters.kt`
-- [ ] Update component integration logic (if applicable) - varies by component
-- [ ] Add to shader generator in `ZShaderGenerator.kt`
-- [ ] Create uniform generators for each uniform in `generators/uniformgenerator/` folder
-- [ ] Add generators to the rendering context in `ZSceneContext.kt`
-- [ ] Update Android shader source files in `ZDefaultShader.android.kt`
-- [ ] Update Metal shader source files in `ZDefaultShader.metal.kt`
-- [ ] Update WebGPU shader source files in `ZDefaultShader.wgpu.kt`
+- [ ] Add uniform names to `UNIFORM_NAMES` and IDs to `UNIFORM_IDS` in `engine/.../components/shader/ZUniformDescriptor.kt`
+- [ ] Create individual `ZUniformData` (or array helpers like `ZBonesMatrixArray`) in `ZUniformDescriptor.kt`
+- [ ] Create the uniform block with `ZUniform(...)` in `ZUniformDescriptor.kt`
+- [ ] Add a flag (e.g. `useNewUniform`) in `engine/.../generators/shadergenerator/ZShaderProgramParameters.kt`
+- [ ] Set that flag in component logic (e.g. `ZModel.buildShaderParameters()`) when the uniform is needed
+- [ ] In `ZShaderGenerator.addRequiredUniforms()`, call `shaderProgram.addUniform("LogicalName", ZNewMaterialBlock)` when the flag is true
+- [ ] Create one uniform generator per block member in `engine/.../generators/uniformgenerator/` (lambda returning `ZAlgebraObject`)
+- [ ] In `ZSceneContext.kt`, inside `ZSceneContextDefault`, register each generator with `addUniformGenerator(UNIFORM_NAMES.XXX, ZXxxGenerator)` (key = name used in the block)
+- [ ] Update Android shader in `engine/.../androidMain/.../libs/ZDefaultShader.android.kt` (block layout + logic)
+- [ ] Update Metal shader in `engine/.../metalMain/.../libs/ZDefaultShader.metal.kt`
+- [ ] Update WebGPU shader in `engine/.../webgpuMain/.../libs/ZDefaultShader.wgpu.kt`
 - [ ] Update proto definitions (if applicable) in `ZKBuilder/packages/zkbuilder/proto/`
 - [ ] Test uniform binding and rendering
 - [ ] Verify shader compilation on all platforms
 
 ## Important Notes
 
-1. **Unique IDs**: Ensure all uniform IDs and block IDs are unique across the system
-2. **Proto Numbers**: Choose unique proto numbers for serialization
-3. **Platform Consistency**: All shader implementations must be consistent across platforms
-4. **Manual Construction**: Remember that uniform blocks must be manually constructed due to generator limitations
-5. **Testing**: Test on all target platforms to ensure compatibility
+1. **Unique IDs**: Ensure all `UNIFORM_IDS` and block IDs are unique across the system.
+2. **Generator key = block member name**: When registering generators in `ZSceneContextDefault`, the key must be the same as the name used in the block (e.g. `UNIFORM_NAMES.BONES`). The render loop iterates over uniform entries and looks up `getUniform(name)`; for blocks, members are also stored by their names, so each member is filled by the generator registered under that name.
+3. **Proto Numbers**: Choose unique proto numbers for serialization.
+4. **Platform consistency**: Uniform block layout and names in shaders must match the engine’s block definition.
+5. **Manual construction**: Uniform block content is filled per member via generators; there is no single “block generator” unless the block has only one member.
+6. **Testing**: Test on all target platforms to ensure compatibility.
 
 ## Example Implementation
 
-See the Phong material implementation as a reference for component-specific uniforms:
-- `ZPhongMaterialData` in `ZMaterial.kt`
-- `ZUniformPhongMaterialBlock` in `ZUniformDescriptor.kt`
-- Phong shader logic in shader source files
-- `ZPhongDiffuseGenerator` and related generators
+**Component-specific uniforms (e.g. material):**
+- Phong: `ZUniformPhongMaterialBlock` and `ZUniformPhongAmbient`, etc., in `ZUniformDescriptor.kt`
+- `ZShaderProgramParameters.usePhongMaterial` and `addUniform("PhongMaterial", ZUniformPhongMaterialBlock)` in `ZShaderGenerator.kt`
+- `addUniformGenerator(UNIFORM_NAMES.PHONG_AMBIENT, ZPhongAmbientGenerator)` (and similar) in `ZSceneContext.kt`
+- Phong shader logic in `ZDefaultShader.android.kt` (and Metal/WebGPU)
 
-For standalone uniforms, see the scene matrix uniforms as reference:
-- `ZModelViewProjectionMatrixBlock` in `ZUniformDescriptor.kt`
-- Scene matrix handling in shader source files
+**Block with multiple members (scene matrix):**
+- `ZModelViewProjectionMatrixBlock` in `ZUniformDescriptor.kt` with members `ProjectionMatrix`, `ViewMatrix`, `ModelViewProjectionMatrix`
+- Generators registered as `UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX`, `UNIFORM_NAMES.VIEW_MATRIX`, `UNIFORM_NAMES.PROJECTION_MATRIX` in `ZSceneContextDefault`
+
+**Skinning (block with arrays):**
+- `ZSkinningMatrixBlock` with `BONES` and `INVERSE_BIND_MATRIX`; generators `ZBoneMatrixGenerator`, `ZInverseBindMatrixGenerator` registered under those `UNIFORM_NAMES`
+- Optional `ZModelSkinningMatrixBlock` and `ZModelSkinningMatrixGenerator` / `ZInverseModelSkinningMatrixGenerator` for mesh-level bind matrix

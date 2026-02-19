@@ -54,6 +54,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         shaderProgram.addUniform("SceneMatrix", ZModelViewProjectionMatrixBlock)
 
         if (params.useSkinning) {
+            shaderProgram.addUniform("ModelSkinningUniforms", ZModelSkinningMatrixBlock)
             shaderProgram.addUniform("SkinningUniforms", ZSkinningMatrixBlock)
         }
         if (params.usePbrMaterial) {
