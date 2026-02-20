@@ -52,6 +52,14 @@ typedef struct
     matrix_float4x4 bones[100];
     matrix_float4x4 invBindMatrix[100];
 } SkinningUniforms;
+
+#ifdef USE_SKINNING
+typedef struct
+{
+    matrix_float4x4 modelSkinBindMatrix;
+    matrix_float4x4 modelSkinBindMatrixInverse;
+} ModelSkinningUniforms;
+#endif
 """
 
 val shaderVertexDefinitions = """
@@ -81,27 +89,34 @@ val shaderVertexMain = """
 ColorInOut computeOutColor(Vertex in, constant Uniforms &uniforms, float4 finalPosition, float3 normal);
 
 #ifdef USE_SKINNING
+/*
+ * Computes skinned position in mesh local space.
+ * 1. modelSkinBindMatrix * position -> skeleton space
+ * 2. Weighted blend of (bones[i] * invBindMatrix[i]) * posInSkeletonSpace
+ * 3. modelSkinBindMatrixInverse * blended -> mesh space
+ */
 float4 calculateSkinnedPosition(
     float3 basePosition,
     float4 boneIndices,
     float4 boneWeights,
-    constant SkinningUniforms &skinUniforms
+    constant SkinningUniforms &skinUniforms,
+    constant ModelSkinningUniforms &modelSkinning
 ) {
+    float4 posInSkeletonSpace = modelSkinning.modelSkinBindMatrix * float4(basePosition, 1.0);
     float4 skinnedPosition = float4(0.0);
     float totalWeight = 0.0;
 
     for (int i = 0; i < 4; ++i) {
         if (boneWeights[i] > 0.0) {
             int boneID = int(boneIndices[i]);
-            // The skinning matrix is the product of the bone's current transform
-            // and its inverse bind matrix.
             matrix_float4x4 skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
-            skinnedPosition += skinMatrix * float4(basePosition, 1.0) * boneWeights[i];
+            skinnedPosition += skinMatrix * posInSkeletonSpace * boneWeights[i];
             totalWeight += boneWeights[i];
         }
     }
-    // Normalize the position by the total weight to average the influence
-    return totalWeight > 0.0 ? skinnedPosition / totalWeight : float4(basePosition, 1.0);
+
+    float4 blended = totalWeight > 0.0 ? skinnedPosition / totalWeight : posInSkeletonSpace;
+    return modelSkinning.modelSkinBindMatrixInverse * blended;
 }
 #endif
 
@@ -109,6 +124,7 @@ vertex ColorInOut vertexShader(Vertex in [[stage_in]],
                                constant Uniforms &uniforms [[buffer(${UNIFORM_IDS.BLOCK_SCENE_MATRIX})]]
                                #ifdef USE_SKINNING
                                , constant SkinningUniforms &skinUniforms [[buffer(${UNIFORM_IDS.BLOCK_SKINNING_MATRIX})]]
+                               , constant ModelSkinningUniforms &modelSkinning [[buffer(${UNIFORM_IDS.BLOCK_MODEL_SKINNING_MATRIX})]]
                                #endif
                               )
 {
@@ -116,7 +132,7 @@ vertex ColorInOut vertexShader(Vertex in [[stage_in]],
     float3 finalNormal;
 
     #ifdef USE_SKINNING
-        finalPosition = calculateSkinnedPosition(in.position, in.boneIndices, in.boneWeights, skinUniforms);
+        finalPosition = calculateSkinnedPosition(in.position, in.boneIndices, in.boneWeights, skinUniforms, modelSkinning);
         // For normals, we'd typically transform them with the inverse transpose of the bone matrix.
         // This is complex to do per-vertex. A common simplification is to use the model-view matrix,
         // but for skinned meshes, a more accurate approach involves the skinning matrix without translation.
