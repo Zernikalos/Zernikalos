@@ -15,8 +15,11 @@ import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.ZSceneContext
+import zernikalos.generators.uniformgenerator.ZUniformGenerator
 import zernikalos.logger.logger
 import zernikalos.math.*
+import zernikalos.objects.ZObject
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -56,6 +59,8 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
     @JsName("init")
     constructor(): this(ZUniformBlockData())
 
+    val generators: HashMap<String, ZUniformGenerator> = hashMapOf()
+
     val uniforms: MutableMap<String, ZUniformData> by data::uniforms
 
     override val id: Int by data::id
@@ -69,6 +74,13 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
 
     val singleElement: ZUniformData?
         get() = if (isSingleUniform) uniforms.values.firstOrNull() else null
+
+
+    fun addGenerators(gens: Map<String, ZUniformGenerator>) {
+        gens.forEach { (name, generator) ->
+            generators[name] = generator
+        }
+    }
 
     override fun createRenderer(ctx: ZRenderingContext): ZUniformRenderer {
         return ZUniformRenderer(ctx, data)
@@ -85,6 +97,16 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
 
     override fun toString(): String {
         return data.toString()
+    }
+
+    fun computeValue(context: ZSceneContext, obj: ZObject) {
+        val gen = generators
+        if (gen.isEmpty()) return
+        for ((name, member) in uniforms) {
+            val generator = gen[name] ?: continue
+            val v = generator(context, obj)
+            member.value = v
+        }
     }
 
 }
@@ -104,7 +126,7 @@ data class ZUniformData(
 data class ZUniformBlockData(
     val id: Int = -1,
     val uniformBlockName: String = "",
-    val uniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
+    val uniforms: LinkedHashMap<String, ZUniformData> = LinkedHashMap(),
 ): ZComponentData() {
 
     val count: Int = uniforms.size
@@ -126,6 +148,7 @@ data class ZUniformBlockData(
         set(value) {
             _value = value as ZAlgebraObjectCollection
         }
+
 }
 
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRenderer {

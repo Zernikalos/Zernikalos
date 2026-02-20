@@ -136,7 +136,7 @@ The main `ZMaterial` class supports both systems:
 class ZMaterial {
     var pbr: ZPbrMaterialData? by data::pbr
     var phong: ZPhongMaterialData? by data::phong
-    
+
     val usesPbr: Boolean get() = pbr != null
     val usesPhong: Boolean get() = phong != null
 }
@@ -158,10 +158,10 @@ Materials automatically select the appropriate shader path:
 
 ### Uniform Blocks
 
-Each material system has its own uniform block:
+Each material system has its own uniform block (see [Adding Uniforms](adding-uniforms.md)):
 
-- **PBR**: `u_pbrMaterialBlock` (ID: 102)
-- **Phong**: `u_phongMaterialBlock` (ID: 103)
+- **PBR**: `u_pbrMaterialBlock` (block key: `UNIFORM_KEYS.BLOCK_PBR_MATERIAL`, ID: 16)
+- **Phong**: `u_phongMaterialBlock` (block key: `UNIFORM_KEYS.BLOCK_PHONG_MATERIAL`, ID: 17)
 
 ## Shader Generation
 
