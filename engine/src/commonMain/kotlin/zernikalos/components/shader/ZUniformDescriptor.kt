@@ -15,6 +15,9 @@ object UNIFORM_NAMES {
     const val VIEW_MATRIX = "ViewMatrix"
     const val MODEL_MATRIX = "ModelMatrix"
     const val MODEL_VIEW_PROJECTION_MATRIX = "ModelViewProjectionMatrix"
+
+    const val MODEL_SKINNING_MATRIX = "ModelSkinningMatrix"
+    const val INVERSE_MODEL_SKINNING_MATRIX = "InverseModelSkinningMatrix"
     const val BONES = "Bones"
     const val BIND_MATRIX = "BindMatrix"
     const val INVERSE_BIND_MATRIX = "InverseBindMatrix"
@@ -37,6 +40,7 @@ object UNIFORM_IDS {
     // TODO: On Metal there could be a clash if using same ids as attributes
     // So taking higher numbers for the time being is required
     const val BLOCK_SCENE_MATRIX = 14
+    const val BLOCK_MODEL_SKINNING_MATRIX = 13
     const val BLOCK_SKINNING_MATRIX = 15
     const val BLOCK_PBR_MATERIAL = 16
     const val BLOCK_PHONG_MATERIAL = 17
@@ -45,6 +49,8 @@ object UNIFORM_IDS {
     const val VIEW_MATRIX = 1
     const val MODEL_VIEW_PROJECTION_MATRIX = 2
 
+    const val MODEL_SKINNING_MATRIX = 3
+    const val INVERSE_MODEL_SKINNING_MATRIX = 4
     const val BONES = 5
     const val INVERSE_BIND_MATRIX = 6
 
@@ -67,6 +73,11 @@ val ZUniformViewMatrix: ZUniformData
 val ZUniformModelViewProjectionMatrix: ZUniformData
     get() = ZUniformData(UNIFORM_IDS.MODEL_VIEW_PROJECTION_MATRIX, "u_mvpMatrix", 1, ZTypes.MAT4F)
 
+val ZModelSkinningMatrix: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.MODEL_SKINNING_MATRIX, "u_modelSkinningMatrix", 1, ZTypes.MAT4F)
+val ZInverseModelSkinningMatrix: ZUniformData
+    get() = ZUniformData(UNIFORM_IDS.INVERSE_MODEL_SKINNING_MATRIX, "u_modelSkinningMatrixInverse", 1, ZTypes.MAT4F)
+
 fun ZBonesMatrixArray(count: Int): ZUniformData {
     return ZUniformData(UNIFORM_IDS.BONES, "u_bones", count, ZTypes.MAT4F)
 }
@@ -86,6 +97,12 @@ val ZSkinningMatrixBlock: ZUniform
     get() = ZUniform(UNIFORM_IDS.BLOCK_SKINNING_MATRIX, "u_skinningMatrixBlock", listOf(
         UNIFORM_NAMES.BONES to ZBonesMatrixArray(100),
         UNIFORM_NAMES.INVERSE_BIND_MATRIX to ZInverseBindMatrixArray(100)
+    ))
+
+val ZModelSkinningMatrixBlock: ZUniform
+    get() = ZUniform(UNIFORM_IDS.BLOCK_MODEL_SKINNING_MATRIX, "u_modelSkinningMatrixBlock", listOf(
+        UNIFORM_NAMES.MODEL_SKINNING_MATRIX to ZModelSkinningMatrix,
+        UNIFORM_NAMES.INVERSE_MODEL_SKINNING_MATRIX to ZInverseModelSkinningMatrix
     ))
 
 val ZUniformPbrColor: ZUniformData

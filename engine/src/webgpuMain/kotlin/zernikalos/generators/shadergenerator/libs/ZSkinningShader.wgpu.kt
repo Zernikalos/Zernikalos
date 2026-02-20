@@ -28,6 +28,12 @@ struct SkinningUniforms {
     invBindMatrix : array<mat4x4<f32>, 100>
 }
 @binding(${UNIFORM_IDS.BLOCK_SKINNING_MATRIX}) @group(0) var<uniform> skinUniforms : SkinningUniforms;
+
+struct ModelSkinningUniforms {
+    modelSkinBindMatrix : mat4x4<f32>,
+    modelSkinBindMatrixInverse : mat4x4<f32>
+}
+@binding(${UNIFORM_IDS.BLOCK_MODEL_SKINNING_MATRIX}) @group(0) var<uniform> modelSkinning : ModelSkinningUniforms;
 //#endif
 
 //#ifdef USE_PBR_MATERIAL
@@ -81,7 +87,11 @@ struct VertexOutput {
 }
 
 //#ifdef USE_SKINNING
+// 1. modelSkinBindMatrix * position -> skeleton space
+// 2. Weighted blend of (bones[i] * invBindMatrix[i]) * posInSkeletonSpace
+// 3. modelSkinBindMatrixInverse * blended -> mesh space
 fn calcSkinnedPosition(position: vec3<f32>, boneWeights: vec4<f32>, boneIndices: vec4<u32>) -> vec4<f32> {
+    let posInSkeletonSpace = modelSkinning.modelSkinBindMatrix * vec4<f32>(position, 1.0);
     var skinnedPosition = vec4<f32>(0.0);
     var totalWeight = 0.0;
 
@@ -89,16 +99,16 @@ fn calcSkinnedPosition(position: vec3<f32>, boneWeights: vec4<f32>, boneIndices:
         if (boneWeights[i] > 0.0) {
             let boneID = boneIndices[i];
             let skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
-            skinnedPosition = skinnedPosition + skinMatrix * vec4<f32>(position, 1.0) * boneWeights[i];
+            skinnedPosition = skinnedPosition + skinMatrix * posInSkeletonSpace * boneWeights[i];
             totalWeight = totalWeight + boneWeights[i];
         }
     }
 
+    var blended = posInSkeletonSpace;
     if (totalWeight > 0.0) {
-        return skinnedPosition / totalWeight;
-    } else {
-        return vec4<f32>(position, 1.0);
+        blended = skinnedPosition / totalWeight;
     }
+    return modelSkinning.modelSkinBindMatrixInverse * blended;
 }
 //#endif
 

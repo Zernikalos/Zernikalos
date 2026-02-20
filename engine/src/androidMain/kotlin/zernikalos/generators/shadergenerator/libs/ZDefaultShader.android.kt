@@ -23,6 +23,12 @@ uniform u_sceneMatrixBlock
         mat4 bones[100];
         mat4 invBindMatrix[100];
     } skinUniforms;
+
+    uniform u_modelSkinningMatrixBlock
+    {
+        mat4 modelSkinBindMatrix;
+        mat4 modelSkinBindMatrixInverse;
+    } u_modelSkinningMatrix;
 #endif
 
 #ifdef USE_SKINNING
@@ -44,23 +50,33 @@ uniform u_sceneMatrixBlock
 in vec3 a_position;
 
 #ifdef USE_SKINNING
+/*
+ * Computes the skinned position in mesh local space.
+ *
+ * Pipeline:
+ * 1. Transform vertex to skeleton space: modelSkinBindMatrix * position
+ *    (when mesh and skeleton share the same node, modelSkinBindMatrix is identity)
+ * 2. Apply weighted blend of per-bone skin matrices (bones[i] * invBindMatrix[i])
+ * 3. Transform back to mesh space: modelSkinBindMatrixInverse * blended
+ *
+ * Formula: mvpMatrix * (modelSkinBindMatrixInverse * sum(weight * bones[i] * invBindMatrix[i] * modelSkinBindMatrix * position))
+ */
 vec4 calcSkinnedPosition() {
+    vec4 posInSkeletonSpace = u_modelSkinningMatrix.modelSkinBindMatrix * vec4(a_position, 1.0);
     vec4 skinnedPosition = vec4(0.0);
     float totalWeight = 0.0;
 
-     // Sum the transformations from each influencing bone
     for (int i = 0; i < 4; ++i) {
         if (a_boneWeight[i] > 0.0) {
             int boneID = int(a_boneIndices[i]);
             mat4 skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
-            vec4 posedPosition = skinMatrix * vec4(a_position, 1.0);
-
-            skinnedPosition += a_boneWeight[i] * posedPosition;
+            skinnedPosition += a_boneWeight[i] * skinMatrix * posInSkeletonSpace;
             totalWeight += a_boneWeight[i];
         }
     }
 
-    return totalWeight > 0.0 ? skinnedPosition / totalWeight : vec4(a_position, 1.0);
+    vec4 blended = totalWeight > 0.0 ? skinnedPosition / totalWeight : posInSkeletonSpace;
+    return u_modelSkinningMatrix.modelSkinBindMatrixInverse * blended;
 }
 #endif
 
