@@ -6,6 +6,10 @@ class ZUniformCollection(): MutableMap<String, ZBaseUniform> {
 
     private val uniformDatas: LinkedHashMap<String, ZUniformData> = LinkedHashMap()
 
+    /** Block-level uniforms only (excludes flattened member entries). Use for filling via [ZUniform.computeValue]. */
+    val blocks: Map<String, ZUniform>
+        get() = uniforms
+
     val all: Iterator<ZUniform>
         get() = uniforms.values.iterator()
 
@@ -20,6 +24,9 @@ class ZUniformCollection(): MutableMap<String, ZBaseUniform> {
 
     override val entries: MutableSet<MutableMap.MutableEntry<String, ZBaseUniform>>
         get() = (uniforms.entries + uniformDatas.entries) as MutableSet<MutableMap.MutableEntry<String, ZBaseUniform>>
+
+    val dataEntries: Iterator<MutableMap.MutableEntry<String, ZUniformData>>
+        get() = uniformDatas.entries.iterator()
 
     override val size: Int
         get() = uniforms.size

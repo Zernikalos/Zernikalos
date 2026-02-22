@@ -51,17 +51,17 @@ internal abstract class ZShaderGenerator(): ZLoggable {
     }
 
     private fun addRequiredUniforms(params: ZShaderProgramParameters, shaderProgram: ZShaderProgram) {
-        shaderProgram.addUniform("SceneMatrix", ZModelViewProjectionMatrixBlock)
+        shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_SCENE_MATRIX.name, ZModelViewProjectionMatrixBlock)
 
         if (params.useSkinning) {
-            shaderProgram.addUniform("ModelSkinningUniforms", ZModelSkinningMatrixBlock)
-            shaderProgram.addUniform("SkinningUniforms", ZSkinningMatrixBlock)
+            shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_MODEL_SKINNING_MATRIX.name, ZModelSkinningMatrixBlock)
+            shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_SKINNING_MATRIX.name, ZSkinningMatrixBlock)
         }
         if (params.usePbrMaterial) {
-            shaderProgram.addUniform("PbrMaterial", ZPbrMaterialBlock)
+            shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_PBR_MATERIAL.name, ZPbrMaterialBlock)
         }
         if (params.usePhongMaterial) {
-            shaderProgram.addUniform("PhongMaterial", ZUniformPhongMaterialBlock)
+            shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_PHONG_MATERIAL.name, ZUniformPhongMaterialBlock)
         }
     }
 

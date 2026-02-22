@@ -11,13 +11,7 @@ package zernikalos.generators.uniformgenerator
 import zernikalos.math.ZMatrix4
 
 val ZModelViewProjectionMatrixGenerator: ZUniformGenerator = { sceneContext, obj ->
-    val modelMatrixGenerator = sceneContext.getUniform("ModelMatrix")
+    val modelMatrix = ZModelMatrixGenerator(sceneContext, obj) as ZMatrix4
     val viewProjectionMatrix = sceneContext.activeCamera?.viewProjectionMatrix ?: ZMatrix4.Identity
-
-    if (modelMatrixGenerator == null) {
-        viewProjectionMatrix
-    } else {
-        val modelMatrix = modelMatrixGenerator(sceneContext, obj) as ZMatrix4
-        viewProjectionMatrix * modelMatrix
-    }
+    viewProjectionMatrix * modelMatrix
 }

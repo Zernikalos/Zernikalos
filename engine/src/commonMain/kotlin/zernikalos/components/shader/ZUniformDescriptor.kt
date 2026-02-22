@@ -9,142 +9,148 @@
 package zernikalos.components.shader
 
 import zernikalos.ZTypes
+import zernikalos.generators.uniformgenerator.*
 
-object UNIFORM_NAMES {
-    const val PROJECTION_MATRIX = "ProjectionMatrix"
-    const val VIEW_MATRIX = "ViewMatrix"
-    const val MODEL_MATRIX = "ModelMatrix"
-    const val MODEL_VIEW_PROJECTION_MATRIX = "ModelViewProjectionMatrix"
+/**
+ * Unified key for a uniform: holds both id and name in a single source of truth.
+ */
+data class UniformKey(val id: Int, val name: String)
 
-    const val MODEL_SKINNING_MATRIX = "ModelSkinningMatrix"
-    const val INVERSE_MODEL_SKINNING_MATRIX = "InverseModelSkinningMatrix"
-    const val BONES = "Bones"
-    const val BIND_MATRIX = "BindMatrix"
-    const val INVERSE_BIND_MATRIX = "InverseBindMatrix"
+object UNIFORM_KEYS {
+    // Block keys (higher ids for binding)
+    val BLOCK_SCENE_MATRIX = UniformKey(14, "SceneMatrix")
+    val BLOCK_MODEL_SKINNING_MATRIX = UniformKey(13, "ModelSkinningUniforms")
+    val BLOCK_SKINNING_MATRIX = UniformKey(15, "SkinningUniforms")
+    val BLOCK_PBR_MATERIAL = UniformKey(16, "PbrMaterial")
+    val BLOCK_PHONG_MATERIAL = UniformKey(17, "PhongMaterial")
 
-    const val PBR_COLOR = "PBRColor"
-    const val PBR_EMISSIVE = "PBREmissive"
-    const val PBR_EMISSIVE_INTENSITY = "PBREmissiveIntensity"
-    const val PBR_METALNESS = "PBRMetalness"
-    const val PBR_ROUGHNESS = "PBRRoughness"
+    // Member keys
+    val PROJECTION_MATRIX = UniformKey(0, "ProjectionMatrix")
+    val VIEW_MATRIX = UniformKey(1, "ViewMatrix")
+    val MODEL_MATRIX = UniformKey(-1, "ModelMatrix")
+    val MODEL_VIEW_PROJECTION_MATRIX = UniformKey(2, "ModelViewProjectionMatrix")
 
-    const val PHONG_AMBIENT = "PhongAmbient"
-    const val PHONG_DIFFUSE = "PhongDiffuse"
-    const val PHONG_SPECULAR = "PhongSpecular"
-    const val PHONG_SHININESS = "PhongShininess"
+    val MODEL_SKINNING_MATRIX = UniformKey(3, "ModelSkinningMatrix")
+    val INVERSE_MODEL_SKINNING_MATRIX = UniformKey(4, "InverseModelSkinningMatrix")
+    val BONES = UniformKey(5, "Bones")
+    val BIND_MATRIX = UniformKey(-1, "BindMatrix")
+    val INVERSE_BIND_MATRIX = UniformKey(6, "InverseBindMatrix")
+
+    val PBR_COLOR = UniformKey(7, "PBRColor")
+    val PBR_EMISSIVE = UniformKey(7, "PBREmissive")
+    val PBR_EMISSIVE_INTENSITY = UniformKey(8, "PBREmissiveIntensity")
+    val PBR_METALNESS = UniformKey(8, "PBRMetalness")
+    val PBR_ROUGHNESS = UniformKey(9, "PBRRoughness")
+
+    val PHONG_AMBIENT = UniformKey(10, "PhongAmbient")
+    val PHONG_DIFFUSE = UniformKey(11, "PhongDiffuse")
+    val PHONG_SPECULAR = UniformKey(12, "PhongSpecular")
+    val PHONG_SHININESS = UniformKey(13, "PhongShininess")
 }
 
+/** @deprecated Use UNIFORM_KEYS.BLOCK_*.id - Kept for shader binding references (WGSL/Metal). */
 object UNIFORM_IDS {
-    // Blocks have different binding so they can
-    // reuse IDs
-    // TODO: On Metal there could be a clash if using same ids as attributes
-    // So taking higher numbers for the time being is required
-    const val BLOCK_SCENE_MATRIX = 14
-    const val BLOCK_MODEL_SKINNING_MATRIX = 13
-    const val BLOCK_SKINNING_MATRIX = 15
-    const val BLOCK_PBR_MATERIAL = 16
-    const val BLOCK_PHONG_MATERIAL = 17
-
-    const val PROJECTION_MATRIX = 0
-    const val VIEW_MATRIX = 1
-    const val MODEL_VIEW_PROJECTION_MATRIX = 2
-
-    const val MODEL_SKINNING_MATRIX = 3
-    const val INVERSE_MODEL_SKINNING_MATRIX = 4
-    const val BONES = 5
-    const val INVERSE_BIND_MATRIX = 6
-
-    const val PBR_COLOR = 7
-    const val PBR_EMISSIVE = 7
-    const val PBR_EMISSIVE_INTENSITY = 8
-    const val PBR_METALNESS = 8
-    const val PBR_ROUGHNESS = 9
-
-    const val PHONG_AMBIENT = 10
-    const val PHONG_DIFFUSE = 11
-    const val PHONG_SPECULAR = 12
-    const val PHONG_SHININESS = 13
+    val BLOCK_SCENE_MATRIX get() = UNIFORM_KEYS.BLOCK_SCENE_MATRIX.id
+    val BLOCK_MODEL_SKINNING_MATRIX get() = UNIFORM_KEYS.BLOCK_MODEL_SKINNING_MATRIX.id
+    val BLOCK_SKINNING_MATRIX get() = UNIFORM_KEYS.BLOCK_SKINNING_MATRIX.id
+    val BLOCK_PBR_MATERIAL get() = UNIFORM_KEYS.BLOCK_PBR_MATERIAL.id
+    val BLOCK_PHONG_MATERIAL get() = UNIFORM_KEYS.BLOCK_PHONG_MATERIAL.id
 }
 
-val ZUniformProjectionMatrix: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PROJECTION_MATRIX, "u_projMatrix", 1, ZTypes.MAT4F)
-val ZUniformViewMatrix: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.VIEW_MATRIX, "u_viewMatrix", 1, ZTypes.MAT4F)
-val ZUniformModelViewProjectionMatrix: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.MODEL_VIEW_PROJECTION_MATRIX, "u_mvpMatrix", 1, ZTypes.MAT4F)
-
-val ZModelSkinningMatrix: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.MODEL_SKINNING_MATRIX, "u_modelSkinningMatrix", 1, ZTypes.MAT4F)
-val ZInverseModelSkinningMatrix: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.INVERSE_MODEL_SKINNING_MATRIX, "u_modelSkinningMatrixInverse", 1, ZTypes.MAT4F)
-
-fun ZBonesMatrixArray(count: Int): ZUniformData {
-    return ZUniformData(UNIFORM_IDS.BONES, "u_bones", count, ZTypes.MAT4F)
-}
-
-fun ZInverseBindMatrixArray(count: Int): ZUniformData {
-    return ZUniformData(UNIFORM_IDS.INVERSE_BIND_MATRIX, "u_invBindMatrix", count, ZTypes.MAT4F)
-}
+/** Declarative definition of the scene matrix uniform block. */
+object SceneMatrixUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_SCENE_MATRIX,
+    glslName = "u_sceneMatrixBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.PROJECTION_MATRIX, ZTypes.MAT4F, count = 1, glslName = "u_projMatrix"),
+        UniformMember(UNIFORM_KEYS.VIEW_MATRIX, ZTypes.MAT4F, count = 1, glslName = "u_viewMatrix"),
+        UniformMember(UNIFORM_KEYS.MODEL_VIEW_PROJECTION_MATRIX, ZTypes.MAT4F, count = 1, glslName = "u_mvpMatrix")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.PROJECTION_MATRIX.name to ZProjectionMatrixGenerator,
+        UNIFORM_KEYS.VIEW_MATRIX.name to ZViewMatrixGenerator,
+        UNIFORM_KEYS.MODEL_VIEW_PROJECTION_MATRIX.name to ZModelViewProjectionMatrixGenerator
+    )
+)
 
 val ZModelViewProjectionMatrixBlock: ZUniform
-    get() = ZUniform(UNIFORM_IDS.BLOCK_SCENE_MATRIX, "u_sceneMatrixBlock", listOf(
-        UNIFORM_NAMES.PROJECTION_MATRIX to ZUniformProjectionMatrix,
-        UNIFORM_NAMES.VIEW_MATRIX to ZUniformViewMatrix,
-        UNIFORM_NAMES.MODEL_VIEW_PROJECTION_MATRIX to ZUniformModelViewProjectionMatrix
-    ))
+    get() = SceneMatrixUniforms.toZUniform()
+
+/** Declarative definition of the skinning uniform block. Single source for layout and generators. */
+object SkinningUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_SKINNING_MATRIX,
+    glslName = "u_skinningMatrixBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.BONES, ZTypes.MAT4F, count = 100, glslName = "u_bones"),
+        UniformMember(UNIFORM_KEYS.INVERSE_BIND_MATRIX, ZTypes.MAT4F, count = 100, glslName = "u_invBindMatrix")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.BONES.name to ZBoneMatrixGenerator,
+        UNIFORM_KEYS.INVERSE_BIND_MATRIX.name to ZInverseBindMatrixGenerator
+    )
+)
 
 val ZSkinningMatrixBlock: ZUniform
-    get() = ZUniform(UNIFORM_IDS.BLOCK_SKINNING_MATRIX, "u_skinningMatrixBlock", listOf(
-        UNIFORM_NAMES.BONES to ZBonesMatrixArray(100),
-        UNIFORM_NAMES.INVERSE_BIND_MATRIX to ZInverseBindMatrixArray(100)
-    ))
+    get() = SkinningUniforms.toZUniform()
+
+/** Declarative definition of the model skinning uniform block. */
+object ModelSkinningUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_MODEL_SKINNING_MATRIX,
+    glslName = "u_modelSkinningMatrixBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.MODEL_SKINNING_MATRIX, ZTypes.MAT4F, count = 1, glslName = "u_modelSkinningMatrix"),
+        UniformMember(UNIFORM_KEYS.INVERSE_MODEL_SKINNING_MATRIX, ZTypes.MAT4F, count = 1, glslName = "u_modelSkinningMatrixInverse")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.MODEL_SKINNING_MATRIX.name to ZModelSkinningMatrixGenerator,
+        UNIFORM_KEYS.INVERSE_MODEL_SKINNING_MATRIX.name to ZInverseModelSkinningMatrixGenerator
+    )
+)
 
 val ZModelSkinningMatrixBlock: ZUniform
-    get() = ZUniform(UNIFORM_IDS.BLOCK_MODEL_SKINNING_MATRIX, "u_modelSkinningMatrixBlock", listOf(
-        UNIFORM_NAMES.MODEL_SKINNING_MATRIX to ZModelSkinningMatrix,
-        UNIFORM_NAMES.INVERSE_MODEL_SKINNING_MATRIX to ZInverseModelSkinningMatrix
-    ))
+    get() = ModelSkinningUniforms.toZUniform()
 
-val ZUniformPbrColor: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PBR_COLOR, "u_pbrColor", 1, ZTypes.VEC4F)
-
-val ZUniformPbrEmissive: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PBR_EMISSIVE, "u_pbrEmissive", 1, ZTypes.VEC4F)
-
-val ZUniformPbrEmissiveIntensity: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PBR_EMISSIVE_INTENSITY, "u_pbrEmissiveIntensity", 1, ZTypes.FLOAT)
-
-val ZUniformPbrMetalness: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PBR_METALNESS, "u_pbrMetalness", 1, ZTypes.FLOAT)
-
-val ZUniformPbrRoughness: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PBR_ROUGHNESS, "u_pbrRoughness", 1, ZTypes.FLOAT)
+/** Declarative definition of the PBR material uniform block. */
+object PbrMaterialUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_PBR_MATERIAL,
+    glslName = "u_pbrMaterialBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.PBR_COLOR, ZTypes.VEC4F, count = 1, glslName = "u_pbrColor"),
+        UniformMember(UNIFORM_KEYS.PBR_EMISSIVE, ZTypes.VEC4F, count = 1, glslName = "u_pbrEmissive"),
+        UniformMember(UNIFORM_KEYS.PBR_EMISSIVE_INTENSITY, ZTypes.FLOAT, count = 1, glslName = "u_pbrEmissiveIntensity"),
+        UniformMember(UNIFORM_KEYS.PBR_METALNESS, ZTypes.FLOAT, count = 1, glslName = "u_pbrMetalness"),
+        UniformMember(UNIFORM_KEYS.PBR_ROUGHNESS, ZTypes.FLOAT, count = 1, glslName = "u_pbrRoughness")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.PBR_COLOR.name to ZPbrColorGenerator,
+        UNIFORM_KEYS.PBR_EMISSIVE.name to ZPbrEmissiveGenerator,
+        UNIFORM_KEYS.PBR_EMISSIVE_INTENSITY.name to ZPbrEmissiveIntensityGenerator,
+        UNIFORM_KEYS.PBR_METALNESS.name to ZPbrMetalnessGenerator,
+        UNIFORM_KEYS.PBR_ROUGHNESS.name to ZPbrRoughnessGenerator
+    )
+)
 
 val ZPbrMaterialBlock: ZUniform
-    get() = ZUniform(UNIFORM_IDS.BLOCK_PBR_MATERIAL, "u_pbrMaterialBlock", listOf(
-        UNIFORM_NAMES.PBR_COLOR to ZUniformPbrColor,
-        UNIFORM_NAMES.PBR_EMISSIVE to ZUniformPbrEmissive,
-        UNIFORM_NAMES.PBR_EMISSIVE_INTENSITY to ZUniformPbrEmissiveIntensity,
-        UNIFORM_NAMES.PBR_METALNESS to ZUniformPbrMetalness,
-        UNIFORM_NAMES.PBR_ROUGHNESS to ZUniformPbrRoughness
-    ))
+    get() = PbrMaterialUniforms.toZUniform()
 
-val ZUniformPhongAmbient: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PHONG_AMBIENT, "u_phongAmbient", 1, ZTypes.VEC4F)
-
-val ZUniformPhongDiffuse: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PHONG_DIFFUSE, "u_phongDiffuse", 1, ZTypes.VEC4F)
-
-val ZUniformPhongSpecular: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PHONG_SPECULAR, "u_phongSpecular", 1, ZTypes.VEC4F)
-
-val ZUniformPhongShininess: ZUniformData
-    get() = ZUniformData(UNIFORM_IDS.PHONG_SHININESS, "u_phongShininess", 1, ZTypes.FLOAT)
+/** Declarative definition of the Phong material uniform block. */
+object PhongMaterialUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_PHONG_MATERIAL,
+    glslName = "u_phongMaterialBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.PHONG_AMBIENT, ZTypes.VEC4F, count = 1, glslName = "u_phongAmbient"),
+        UniformMember(UNIFORM_KEYS.PHONG_DIFFUSE, ZTypes.VEC4F, count = 1, glslName = "u_phongDiffuse"),
+        UniformMember(UNIFORM_KEYS.PHONG_SPECULAR, ZTypes.VEC4F, count = 1, glslName = "u_phongSpecular"),
+        UniformMember(UNIFORM_KEYS.PHONG_SHININESS, ZTypes.FLOAT, count = 1, glslName = "u_phongShininess")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.PHONG_AMBIENT.name to ZPhongAmbientGenerator,
+        UNIFORM_KEYS.PHONG_DIFFUSE.name to ZPhongDiffuseGenerator,
+        UNIFORM_KEYS.PHONG_SPECULAR.name to ZPhongSpecularGenerator,
+        UNIFORM_KEYS.PHONG_SHININESS.name to ZPhongShininessGenerator
+    )
+)
 
 val ZUniformPhongMaterialBlock: ZUniform
-    get() = ZUniform(UNIFORM_IDS.BLOCK_PHONG_MATERIAL, "u_phongMaterialBlock", listOf(
-        UNIFORM_NAMES.PHONG_AMBIENT to ZUniformPhongAmbient,
-        UNIFORM_NAMES.PHONG_DIFFUSE to ZUniformPhongDiffuse,
-        UNIFORM_NAMES.PHONG_SPECULAR to ZUniformPhongSpecular,
-        UNIFORM_NAMES.PHONG_SHININESS to ZUniformPhongShininess
-    ))
+    get() = PhongMaterialUniforms.toZUniform()
+
