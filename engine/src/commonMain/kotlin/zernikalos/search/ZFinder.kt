@@ -8,10 +8,7 @@
 
 package zernikalos.search
 
-import zernikalos.objects.ZCamera
-import zernikalos.objects.ZModel
-import zernikalos.objects.ZObject
-import zernikalos.objects.ZObjectType
+import zernikalos.objects.*
 import kotlin.js.JsExport
 
 /**
@@ -46,4 +43,15 @@ fun findFirstModel(root: ZObject): ZModel? {
 @JsExport
 fun findFirstCamera(root: ZObject): ZCamera? {
     return findInTree(root) {it.type == ZObjectType.CAMERA} as ZCamera?
+}
+
+/**
+ * Finds the first [ZLight] in a given [ZObject] tree starting at [root].
+ *
+ * @param root The root [ZObject] from which to start the search.
+ * @return The first [ZLight] object found within the tree, or null if no [ZLight] object is found.
+ */
+@JsExport
+fun findFirstLight(root: ZObject): ZLight? {
+    return findInTree(root) {it.type == ZObjectType.LIGHT} as ZLight?
 }

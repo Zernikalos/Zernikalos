@@ -123,6 +123,9 @@ class ZModel: ZObject() {
         if (material?.usesPhong == true) {
             shaderParameters.usePhongMaterial = true
         }
+        if (shaderParameters.useNormals && (shaderParameters.usePbrMaterial || shaderParameters.usePhongMaterial)) {
+            shaderParameters.useLighting = true
+        }
         return shaderParameters
     }
 

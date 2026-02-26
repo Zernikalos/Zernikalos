@@ -60,6 +60,21 @@ typedef struct
     matrix_float4x4 modelSkinBindMatrixInverse;
 } ModelSkinningUniforms;
 #endif
+
+#ifdef USE_LIGHTING
+typedef struct
+{
+    float4 direction;
+    float4 position;
+    float4 color;
+    float intensity;
+    float type;
+    float range;
+    float decay;
+    float innerAngle;
+    float outerAngle;
+} LightUniforms;
+#endif
 """
 
 val shaderVertexDefinitions = """
@@ -207,6 +222,42 @@ float3 applyTonemapping(float3 color) {
     return pow(color, float3(1.0/2.2));
 }
 
+#ifdef USE_LIGHTING
+// Computes the light direction vector and attenuation factor for any light type.
+// type: 0 = directional, 1 = point, 2 = spot
+void computeLightContribution(
+    constant LightUniforms &light,
+    float3 fragPosition,
+    thread float3 &outLightDir,
+    thread float &outAttenuation
+) {
+    outAttenuation = 1.0;
+
+    if (light.type < 0.5) {
+        // Directional light: direction is constant
+        outLightDir = normalize(-light.direction.xyz);
+    } else {
+        // Point / Spot light: direction depends on fragment position
+        float3 toLight = light.position.xyz - fragPosition;
+        float dist = length(toLight);
+        outLightDir = normalize(toLight);
+
+        // Distance attenuation
+        float maxRange = max(light.range, 0.0001);
+        outAttenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(light.decay, 1.0));
+
+        if (light.type > 1.5) {
+            // Spot light: cone attenuation
+            float cosAngle = dot(-outLightDir, normalize(light.direction.xyz));
+            float cosInner = cos(light.innerAngle);
+            float cosOuter = cos(light.outerAngle);
+            float spotFactor = clamp((cosAngle - cosOuter) / (cosInner - cosOuter + 0.0001), 0.0, 1.0);
+            outAttenuation *= spotFactor;
+        }
+    }
+}
+#endif
+
 #if defined(USE_PBR_MATERIAL) && defined(USE_NORMALS)
 // Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
 float DistributionGGX(float3 N, float3 H, float roughness) {
@@ -248,12 +299,10 @@ float3 calculatePBRColor(
     float4 baseColor,
     float3 normal,
     float3 viewPosition,
-    constant PBRMaterialUniforms &pbrMaterial
+    constant PBRMaterialUniforms &pbrMaterial,
+    float3 lightDir,
+    float3 lightColor
 ) {
-    // Basic lighting properties (hardcoded for now)
-    float3 lightPos = float3(5.0, 5.0, 5.0);
-    float3 lightColor = float3(1.0, 1.0, 1.0) * 2.0; // Light intensity
-
     // Material properties from uniform
     float3 albedo = pbrMaterial.color.rgb * baseColor.rgb;
     float metalness = pbrMaterial.metalness;
@@ -262,7 +311,7 @@ float3 calculatePBRColor(
     // Vector calculations
     float3 N = normalize(normal);
     float3 V = normalize(-viewPosition);
-    float3 L = normalize(lightPos); // For a directional light
+    float3 L = lightDir;
     float3 H = normalize(V + L);
 
     // Fresnel at normal incidence (F0)
@@ -279,7 +328,7 @@ float3 calculatePBRColor(
     kD *= 1.0 - metalness;
 
     float3 numerator = NDF * G * F;
-    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // Add epsilon
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
     float3 specular = numerator / denominator;
 
     // Add light contribution
@@ -300,12 +349,10 @@ float3 calculateBlinnPhongColor(
     float4 baseColor,
     float3 normal,
     float3 viewPosition,
-    constant PhongMaterialUniforms &phongMaterial
+    constant PhongMaterialUniforms &phongMaterial,
+    float3 lightDir,
+    float3 lightColor
 ) {
-    // Basic lighting properties (hardcoded for now)
-    float3 lightPos = float3(5.0, -5.0, 5.0);
-    float3 lightColor = float3(1.0, 1.0, 1.0) * 2.0; // Light intensity
-
     // Material properties from uniform
     float3 ambient = phongMaterial.ambient.rgb;
     float3 diffuse = phongMaterial.diffuse.rgb * baseColor.rgb;
@@ -314,9 +361,9 @@ float3 calculateBlinnPhongColor(
 
     // Vector calculations
     float3 N = normalize(normal);
-    float3 V = normalize(-viewPosition); // View direction
-    float3 L = normalize(lightPos); // For a directional light
-    float3 H = normalize(V + L); // Halfway vector for Blinn-Phong
+    float3 V = normalize(-viewPosition);
+    float3 L = lightDir;
+    float3 H = normalize(V + L);
 
     // Ambient component
     float3 ambientComponent = ambient * baseColor.rgb;
@@ -331,7 +378,7 @@ float3 calculateBlinnPhongColor(
 
     // Combine all components
     float3 finalColor = ambientComponent + diffuseComponent + specularComponent;
-    
+
     return finalColor;
 }
 #endif
@@ -356,6 +403,9 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
                                #if defined(USE_PHONG_MATERIAL)
                                , constant PhongMaterialUniforms &phongMaterial [[buffer(${UNIFORM_IDS.BLOCK_PHONG_MATERIAL})]]
                                #endif
+                               #if defined(USE_LIGHTING)
+                               , constant LightUniforms &light [[buffer(${UNIFORM_IDS.BLOCK_LIGHT})]]
+                               #endif
                                #if defined(USE_TEXTURE)
                                , texture2d<half> colorMap     [[ texture(0) ]]
                                , sampler colorSampler         [[ sampler(0) ]]
@@ -370,13 +420,24 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
         baseColor = float4(in.color, 1.0);
     #endif
 
+    // Compute light direction and color (with attenuation)
+    #if defined(USE_LIGHTING) && defined(USE_NORMALS)
+        float3 lightDir;
+        float attenuation;
+        computeLightContribution(light, in.viewPosition, lightDir, attenuation);
+        float3 lightColor = light.color.rgb * light.intensity * attenuation;
+    #endif
+
     #if defined(USE_PBR_MATERIAL)
         // WORKAROUND: Emissive disabled until emissive maps are supported (see GitHub issue)
         // Without emissive maps, models with emissive=[1,1,1] wash out to white
         float3 emissive = pbrMaterial.emissive.rgb * min(pbrMaterial.emissiveIntensity, 0.0);
 
-        #if defined(USE_NORMALS)
-            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial);
+        #if defined(USE_NORMALS) && defined(USE_LIGHTING)
+            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial, lightDir, lightColor);
+        #elif defined(USE_NORMALS)
+            // Fallback: no light uniform available, use default
+            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial, normalize(float3(5.0, 5.0, 5.0)), float3(2.0));
         #else
             float3 litColor = baseColor.rgb;
         #endif
@@ -384,8 +445,12 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
         float3 finalColor = applyTonemapping(litColor + emissive);
         return float4(finalColor, baseColor.a);
     #elif defined(USE_PHONG_MATERIAL)
-        #if defined(USE_NORMALS)
-            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial);
+        #if defined(USE_NORMALS) && defined(USE_LIGHTING)
+            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial, lightDir, lightColor);
+            return float4(phongColor, baseColor.a);
+        #elif defined(USE_NORMALS)
+            // Fallback: no light uniform available, use default
+            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial, normalize(float3(5.0, -5.0, 5.0)), float3(2.0));
             return float4(phongColor, baseColor.a);
         #else
             return baseColor;

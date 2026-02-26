@@ -10,6 +10,7 @@ class ZShaderProgramParameters() {
     var usePhongMaterial: Boolean = false
     var useTextures: Boolean = false
     var useSkinning: Boolean = false
+    var useLighting: Boolean = false
     var flipTextureY: Boolean = false
 
     var maxBones: Int = 0
