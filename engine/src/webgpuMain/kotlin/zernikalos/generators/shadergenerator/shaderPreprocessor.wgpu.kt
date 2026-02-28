@@ -38,6 +38,7 @@ private fun buildDefinesSet(enabler: ZShaderProgramParameters): Set<String> {
         if (enabler.useSkinning) add("USE_SKINNING")
         if (enabler.usePbrMaterial) add("USE_PBR_MATERIAL")
         if (enabler.usePhongMaterial) add("USE_PHONG_MATERIAL")
+        if (enabler.useLighting) add("USE_LIGHTING")
         if (enabler.flipTextureY) add("FLIP_TEXTURE_Y")
     }
 }

@@ -47,6 +47,9 @@ uniform u_sceneMatrixBlock
     in vec3 a_color;
     out vec3 v_color;
 #endif
+#ifdef USE_LIGHTING
+    out vec3 v_viewPosition;
+#endif
 in vec3 a_position;
 
 #ifdef USE_SKINNING
@@ -81,14 +84,20 @@ vec4 calcSkinnedPosition() {
 #endif
 
 void main() {
+    vec4 finalPosition;
     #ifdef USE_SKINNING
-        gl_Position = u_sceneMatrix.mvpMatrix * calcSkinnedPosition();
+        finalPosition = calcSkinnedPosition();
     #else
-        gl_Position = u_sceneMatrix.mvpMatrix * vec4(a_position,1);
+        finalPosition = vec4(a_position, 1.0);
     #endif
+
+    gl_Position = u_sceneMatrix.mvpMatrix * finalPosition;
 
 #ifdef USE_NORMALS
     v_normal = mat3(transpose(inverse(u_sceneMatrix.viewMatrix))) * a_normal;
+#endif
+#ifdef USE_LIGHTING
+    v_viewPosition = (u_sceneMatrix.viewMatrix * finalPosition).xyz;
 #endif
 #ifdef USE_TEXTURES
     #ifdef FLIP_TEXTURE_Y
@@ -138,6 +147,22 @@ uniform u_phongMaterialBlock
 } u_phongMaterial;
 #endif
 
+#ifdef USE_LIGHTING
+uniform u_lightBlock
+{
+    vec4 direction;
+    vec4 position;
+    vec4 color;
+    float intensity;
+    float type;
+    float range;
+    float decay;
+    float innerAngle;
+    float outerAngle;
+} u_light;
+in vec3 v_viewPosition;
+#endif
+
 #ifdef USE_TEXTURES
     uniform sampler2D u_texture;
     smooth in vec2 v_uv;
@@ -154,6 +179,35 @@ vec3 applyTonemapping(vec3 color) {
     color = color / (color + vec3(1.0));
     return pow(color, vec3(1.0/2.2));
 }
+
+#ifdef USE_LIGHTING
+// Computes light direction and attenuation for any light type.
+void computeLightContribution(vec3 fragPosition, out vec3 outLightDir, out float outAttenuation) {
+    outAttenuation = 1.0;
+
+    if (u_light.type < 0.5) {
+        // Directional light
+        outLightDir = normalize(-u_light.direction.xyz);
+    } else {
+        // Point / Spot light
+        vec3 toLight = u_light.position.xyz - fragPosition;
+        float dist = length(toLight);
+        outLightDir = normalize(toLight);
+
+        float maxRange = max(u_light.range, 0.0001);
+        outAttenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(u_light.decay, 1.0));
+
+        if (u_light.type > 1.5) {
+            // Spot light cone attenuation
+            float cosAngle = dot(-outLightDir, normalize(u_light.direction.xyz));
+            float cosInner = cos(u_light.innerAngle);
+            float cosOuter = cos(u_light.outerAngle);
+            float spotFactor = clamp((cosAngle - cosOuter) / (cosInner - cosOuter + 0.0001), 0.0, 1.0);
+            outAttenuation *= spotFactor;
+        }
+    }
+}
+#endif
 
 #ifdef USE_PBR_MATERIAL
     // Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
@@ -192,11 +246,7 @@ vec3 applyTonemapping(vec3 color) {
         return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
     }
 
-    vec3 calculatePBRColor(vec4 baseColor, vec3 normal) {
-        // Basic lighting properties (hardcoded for now)
-        vec3 lightPos = vec3(5.0, 5.0, 5.0);
-        vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
-
+    vec3 calculatePBRColor(vec4 baseColor, vec3 normal, vec3 viewPos, vec3 lightDir, vec3 lightColor) {
         // Material properties from uniform
         vec3 albedo = u_pbrMaterial.color.rgb * baseColor.rgb;
         float metalness = u_pbrMaterial.metalness;
@@ -204,8 +254,8 @@ vec3 applyTonemapping(vec3 color) {
 
         // Vector calculations
         vec3 N = normalize(normal);
-        vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
-        vec3 L = normalize(lightPos); // For a directional light
+        vec3 V = normalize(-viewPos);
+        vec3 L = lightDir;
         vec3 H = normalize(V + L);
 
         // Fresnel at normal incidence (F0)
@@ -222,14 +272,14 @@ vec3 applyTonemapping(vec3 color) {
         kD *= 1.0 - metalness;
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // Add epsilon to avoid division by zero
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
         vec3 specular = numerator / denominator;
 
         // Add light contribution
         float NdotL = max(dot(N, L), 0.0);
         vec3 Lo = (kD * albedo / PI + specular) * lightColor * NdotL;
 
-        // Ambient light (a simple approximation)
+        // Ambient light
         vec3 ambient = vec3(0.03) * albedo;
         vec3 color = ambient + Lo;
 
@@ -239,11 +289,7 @@ vec3 applyTonemapping(vec3 color) {
 
 #ifdef USE_PHONG_MATERIAL
     // Blinn-Phong lighting calculation
-    vec3 calculateBlinnPhongColor(vec4 baseColor, vec3 normal) {
-        // Basic lighting properties (hardcoded for now)
-        vec3 lightPos = vec3(5.0, -5.0, 5.0);
-        vec3 lightColor = vec3(1.0, 1.0, 1.0) * 2.0; // Light intensity
-
+    vec3 calculateBlinnPhongColor(vec4 baseColor, vec3 normal, vec3 viewPos, vec3 lightDir, vec3 lightColor) {
         // Material properties from uniform
         vec3 ambient = u_phongMaterial.ambient.rgb;
         vec3 diffuse = u_phongMaterial.diffuse.rgb * baseColor.rgb;
@@ -252,9 +298,9 @@ vec3 applyTonemapping(vec3 color) {
 
         // Vector calculations
         vec3 N = normalize(normal);
-        vec3 V = normalize(inverse(mat3(u_sceneMatrix.viewMatrix))[2]); // View direction
-        vec3 L = normalize(lightPos); // For a directional light
-        vec3 H = normalize(V + L); // Halfway vector for Blinn-Phong
+        vec3 V = normalize(-viewPos);
+        vec3 L = lightDir;
+        vec3 H = normalize(V + L);
 
         // Ambient component
         vec3 ambientComponent = ambient * baseColor.rgb;
@@ -269,7 +315,7 @@ vec3 applyTonemapping(vec3 color) {
 
         // Combine all components
         vec3 finalColor = ambientComponent + diffuseComponent + specularComponent;
-        
+
         return finalColor;
     }
 #endif
@@ -289,7 +335,15 @@ void main() {
         vec3 emissive = u_pbrMaterial.emissive.rgb * min(u_pbrMaterial.emissiveIntensity, 0.0);
 
         #if defined(USE_NORMALS)
-            vec3 litColor = calculatePBRColor(baseColor, v_normal);
+            #if defined(USE_LIGHTING)
+                vec3 lDir;
+                float lAtten;
+                computeLightContribution(v_viewPosition, lDir, lAtten);
+                vec3 lColor = u_light.color.rgb * u_light.intensity * lAtten;
+                vec3 litColor = calculatePBRColor(baseColor, v_normal, v_viewPosition, lDir, lColor);
+            #else
+                vec3 litColor = calculatePBRColor(baseColor, v_normal, vec3(0.0), normalize(vec3(5.0, 5.0, 5.0)), vec3(2.0));
+            #endif
         #else
             vec3 litColor = baseColor.rgb;
         #endif
@@ -298,7 +352,15 @@ void main() {
         f_color = vec4(finalColor, baseColor.a);
     #elif defined(USE_PHONG_MATERIAL)
         #if defined(USE_NORMALS)
-            vec3 phongColor = calculateBlinnPhongColor(baseColor, v_normal);
+            #if defined(USE_LIGHTING)
+                vec3 lDir;
+                float lAtten;
+                computeLightContribution(v_viewPosition, lDir, lAtten);
+                vec3 lColor = u_light.color.rgb * u_light.intensity * lAtten;
+                vec3 phongColor = calculateBlinnPhongColor(baseColor, v_normal, v_viewPosition, lDir, lColor);
+            #else
+                vec3 phongColor = calculateBlinnPhongColor(baseColor, v_normal, vec3(0.0), normalize(vec3(5.0, 5.0, 5.0)), vec3(2.0));
+            #endif
             f_color = vec4(phongColor, baseColor.a);
         #else
             f_color = baseColor;

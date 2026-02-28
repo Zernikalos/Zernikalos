@@ -30,7 +30,7 @@ internal class ZUniformBlockRenderer(
         val uniformBlockIndex = ctx.getUniformBlockIndex(programId, data.uniformBlockName)
 
         if (!uniformBlockIndex.isValid || uniformBlockIndex.id == -1) {
-            throw Error("Uniform block index is not valid")
+            throw Error("Uniform block index is not valid for uniform block ${data.uniformBlockName}")
         }
         ubo = ctx.createBuffer()
 

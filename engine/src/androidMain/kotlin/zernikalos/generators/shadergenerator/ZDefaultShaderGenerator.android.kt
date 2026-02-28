@@ -36,6 +36,7 @@ internal class ZDefaultShaderGenerator(): ZShaderGenerator() {
         if (enabler.useSkinning) shaderSource = "#define USE_SKINNING\n$shaderSource"
         if (enabler.usePbrMaterial) shaderSource = "#define USE_PBR_MATERIAL\n$shaderSource"
         if (enabler.usePhongMaterial) shaderSource = "#define USE_PHONG_MATERIAL\n$shaderSource"
+        if (enabler.useLighting) shaderSource = "#define USE_LIGHTING\n$shaderSource"
 
         shaderSource = "#version 300 es\n$shaderSource"
 

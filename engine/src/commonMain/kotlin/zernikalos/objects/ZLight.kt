@@ -40,6 +40,9 @@ class ZLight: ZObject() {
     var spotLamp: ZSpotLamp? = null
 
     override fun internalInitialize(ctx: ZContext) {
+        if (ctx.sceneContext.activeLight == null) {
+            ctx.sceneContext.activeLight = this
+        }
     }
 
     override fun internalRender(ctx: ZContext) {
