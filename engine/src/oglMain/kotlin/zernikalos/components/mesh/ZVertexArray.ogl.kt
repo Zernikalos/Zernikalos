@@ -9,34 +9,17 @@
 package zernikalos.components.mesh
 
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
-import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.logger.ZLoggable
 import zernikalos.logger.logger
 
-class ZVertexArray(): ZRenderizableComponent<ZVertexArrayRenderer>(), ZBindeable {
+class ZVertexArray(private val ctx: ZRenderingContext): ZLoggable, ZBindeable {
 
-    override fun createRenderer(ctx: ZRenderingContext): ZVertexArrayRenderer {
-        return ZVertexArrayRenderer(ctx)
-    }
+    private var vao: GLWrap
 
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-        renderer.unbind()
-    }
-
-}
-
-class ZVertexArrayRenderer(ctx: ZRenderingContext): ZComponentRenderer(ctx) {
-
-    private lateinit var vao: GLWrap
-
-    override fun initialize() {
+    init {
         ctx as ZGLRenderingContext
 
         val auxVao = ctx.createVertexArray()

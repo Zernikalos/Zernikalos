@@ -11,17 +11,14 @@ package zernikalos.components.mesh
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
-import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZRenderizableComponent
+import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBufferContentSerializer::class)
-class ZBufferContent internal constructor(private val data: ZBufferContentData): ZRenderizableComponent<ZBufferContentRenderer>(), ZBindeable {
+class ZBufferContent internal constructor(data: ZBufferContentData): ZDataRenderComponent<ZBufferContentData, ZBufferContentRenderer>(data), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBufferContent` class.
@@ -82,7 +79,7 @@ data class ZBufferContentData(
     var id: Int = -1,
     @ProtoNumber(2)
     var dataArray: ByteArray = byteArrayOf()
-)
+): ZComponentData()
 
 expect class ZBufferContentRenderer(ctx: ZRenderingContext, data: ZBufferContentData): ZComponentRenderer {
     override fun initialize()
@@ -99,4 +96,3 @@ class ZBufferContentSerializer: ZComponentSerializer<ZBufferContent, ZBufferCont
         return ZBufferContent(data)
     }
 }
-

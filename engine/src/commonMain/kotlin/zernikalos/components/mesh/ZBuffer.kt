@@ -12,7 +12,7 @@ import zernikalos.ZDataType
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentRenderer
-import zernikalos.components.ZRenderizableComponent
+import zernikalos.components.ZDataRenderComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
@@ -23,7 +23,7 @@ import kotlin.js.JsName
  * Notice that ZBufferKey will only address one ZBufferContent, however one ZBufferContent can be addressed by more than one ZBufferKey
  */
 @JsExport
-class ZBuffer internal constructor(private val data: ZBufferData): ZRenderizableComponent<ZBufferRenderer>(), ZBindeable {
+class ZBuffer internal constructor(data: ZBufferData): ZDataRenderComponent<ZBufferData, ZBufferRenderer>(data), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBuffer` class.

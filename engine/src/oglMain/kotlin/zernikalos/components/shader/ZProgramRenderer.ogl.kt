@@ -9,36 +9,15 @@
 package zernikalos.components.shader
 
 import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
-import zernikalos.components.ZRenderizableComponent
 import zernikalos.context.GLWrap
 import zernikalos.context.ZGLRenderingContext
 import zernikalos.context.ZRenderingContext
 
-class ZProgram(): ZRenderizableComponent<ZProgramRenderer>(), ZBindeable {
-
-    override fun createRenderer(ctx: ZRenderingContext): ZProgramRenderer {
-        return ZProgramRenderer(ctx)
-    }
-
-    override fun bind() {
-        renderer.bind()
-    }
-
-    override fun unbind() {
-    }
-
-    fun link() {
-        renderer.link()
-    }
-
-}
-
-class ZProgramRenderer(ctx: ZRenderingContext): ZComponentRenderer(ctx) {
+class ZProgram(private val ctx: ZRenderingContext): ZBindeable {
 
     lateinit var programId: GLWrap
 
-    override fun initialize() {
+    fun initialize() {
         ctx as ZGLRenderingContext
 
         val p = ctx.createProgram()
@@ -54,6 +33,12 @@ class ZProgramRenderer(ctx: ZRenderingContext): ZComponentRenderer(ctx) {
         ctx as ZGLRenderingContext
 
         ctx.useProgram(programId)
+    }
+
+    override fun unbind() {
+        ctx as ZGLRenderingContext
+
+        // ctx.useProgram()
     }
 
     fun link() {

@@ -13,17 +13,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZDataType
 import zernikalos.ZTypes
-import zernikalos.components.ZBindeable
-import zernikalos.components.ZComponentRenderer
-import zernikalos.components.ZComponentSerializer
-import zernikalos.components.ZRenderizableComponent
+import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
 @Serializable(with = ZBufferKeySerializer::class)
-class ZBufferKey internal constructor(private val data: ZBufferKeyData): ZRenderizableComponent<ZBufferKeyRenderer>(), ZBindeable {
+class ZBufferKey internal constructor(data: ZBufferKeyData): ZDataRenderComponent<ZBufferKeyData, ZBufferKeyRenderer>(data), ZBindeable {
 
     /**
      * Initializes a new instance of `ZBufferKey` class.
@@ -152,7 +149,7 @@ data class ZBufferKeyData(
     var isIndexBuffer: Boolean = false,
     @ProtoNumber(10)
     var bufferId: Int = -1
-)
+): ZComponentData()
 
 expect class ZBufferKeyRenderer(ctx: ZRenderingContext, data: ZBufferKeyData): ZComponentRenderer {
     override fun initialize()
@@ -169,4 +166,3 @@ class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData>() {
         return ZBufferKey(data)
     }
 }
-
