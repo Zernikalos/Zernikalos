@@ -20,10 +20,10 @@ actual class ZMeshRenderer
 internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData): ZComponentRenderer(ctx) {
 
     @Transient
-    val vao: ZVertexArray = ZVertexArray()
+    lateinit var vao: ZVertexArray
 
     actual override fun initialize() {
-        vao.initialize(ctx)
+        vao = ZVertexArray(ctx)
 
         data.buffers.values.filter {buff ->
             buff.enabled

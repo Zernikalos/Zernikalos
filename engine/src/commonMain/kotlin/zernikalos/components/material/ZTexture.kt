@@ -81,7 +81,7 @@ enum class ZTextureColorSpace {
  *
  */
 @JsExport
-class ZTexture internal constructor(private val data: ZTextureData): ZRenderizableComponent<ZTextureRenderer>(), ZBindeable {
+class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())

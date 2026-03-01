@@ -20,12 +20,13 @@ enum class ZGlShaderType(val value: Int) {
 
 actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, private val data: ZShaderProgramData): ZComponentRenderer(ctx) {
 
-    val program: ZProgram = ZProgram()
+    lateinit var program: ZProgram
 
     actual override fun initialize() {
         ctx as ZGLRenderingContext
 
-        program.initialize(ctx)
+        program = ZProgram(ctx)
+        program.initialize()
 
         data.vertexShader.initialize(ctx)
         data.vertexShader.initialize(data.shaderSource)
@@ -37,7 +38,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 
         data.attributes.values.forEach { attr ->
             attr.initialize(ctx)
-            attr.renderer.bindLocation(program.renderer.programId)
+            attr.renderer.bindLocation(program.programId)
         }
 
         program.link()
@@ -51,7 +52,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 
         data.uniforms.all.forEach { uniform ->
             uniform.initialize(ctx)
-            uniform.renderer.bindLocation(program.renderer.programId)
+            uniform.renderer.bindLocation(program.programId)
         }
     }
 
@@ -69,7 +70,7 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
     private fun attachShader(shader: ZShader) {
         ctx as ZGLRenderingContext
 
-        ctx.attachShader(program.renderer.programId, shader.renderer.shader)
+        ctx.attachShader(program.programId, shader.renderer.shader)
     }
 
 }

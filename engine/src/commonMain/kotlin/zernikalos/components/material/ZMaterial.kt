@@ -32,8 +32,8 @@ import kotlin.math.max
 @JsExport
 @Serializable(with = ZMaterialSerializer::class)
 class ZMaterial
-internal constructor(private val data: ZMaterialData):
-    ZRenderizableComponent<ZMaterialRenderer>(), ZBindeable {
+internal constructor(data: ZMaterialData):
+    ZDataRenderComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZMaterialData())

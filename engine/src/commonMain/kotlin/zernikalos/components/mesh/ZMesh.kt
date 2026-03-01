@@ -24,8 +24,8 @@ import kotlin.js.JsName
  * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
  */
 @JsExport
-class ZMesh internal constructor(private val data: ZMeshData):
-    ZRenderizableComponent<ZMeshRenderer>(),
+class ZMesh internal constructor(data: ZMeshData):
+    ZDataRenderComponent<ZMeshData, ZMeshRenderer>(data),
     ZBindeable,
     ZRenderizable {
 

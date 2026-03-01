@@ -23,7 +23,7 @@ import kotlin.js.JsName
 @Serializable(with = ZViewportSerializer::class)
 class ZViewport
 internal constructor(data: ZViewportData):
-    ZOmniComponent<ZViewportData, ZViewportRenderer>(data),
+    ZDataRenderComponent<ZViewportData, ZViewportRenderer>(data),
     ZRenderizable, ZResizable {
 
     @JsName("init")
