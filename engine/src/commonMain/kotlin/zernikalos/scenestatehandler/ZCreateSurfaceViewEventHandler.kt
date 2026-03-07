@@ -45,6 +45,7 @@ private class ZSurfaceViewEventHandlerImpl(
     override fun onRender() {
         progressInitialization()
         if (initState == InitState.READY) {
+            if (context.screenWidth <= 0 || context.screenHeight <= 0) return
             performRender()
         }
     }
