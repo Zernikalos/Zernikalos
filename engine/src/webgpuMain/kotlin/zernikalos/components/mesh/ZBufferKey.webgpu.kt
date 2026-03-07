@@ -24,4 +24,7 @@ actual class ZBufferKeyRenderer actual constructor(
 
     actual override fun unbind() {
     }
+
+    actual override fun dispose() {
+    }
 }

@@ -66,4 +66,8 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
         val indices = data.indexBuffer!!
         ctx.renderPass?.drawIndexed(indices.count)
     }
+
+    actual override fun dispose() {
+        data.buffers.values.filter { it.enabled }.forEach { it.dispose() }
+    }
 }

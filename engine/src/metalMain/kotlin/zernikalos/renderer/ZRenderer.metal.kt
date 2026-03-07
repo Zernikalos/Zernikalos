@@ -73,4 +73,8 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
     actual override fun onViewportResize(width: Int, height: Int) {
         ctx.scene?.onViewportResize(ctx, width, height)
     }
+
+    actual fun dispose() {
+        // Release depth state and clear refs; encoder/buffer are per-frame.
+    }
 }

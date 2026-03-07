@@ -12,4 +12,5 @@ internal interface ZUniformInternalRenderer {
     fun initialize()
     fun bind()
     fun unbind()
+    fun dispose() {}
 }

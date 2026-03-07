@@ -72,6 +72,8 @@ class ZAttribute internal constructor(private val data: ZAttributeData): ZRender
         }
         return data == other.data
     }
+
+    override fun internalDispose() = renderer.dispose()
 }
 
 data class ZAttributeData(

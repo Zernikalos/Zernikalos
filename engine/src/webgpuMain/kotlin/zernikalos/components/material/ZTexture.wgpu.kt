@@ -118,6 +118,14 @@ actual class ZTextureRenderer actual constructor(
 
     override fun unbind() {}
 
+    actual override fun dispose() {
+        texture?.destroy()
+        texture = null
+        textureBindGroup = null
+        textureBindGroupLayout = null
+        sampler = null
+    }
+
 }
 
 private fun mapFilterMode(filter: ZTextureFilterMode): String {

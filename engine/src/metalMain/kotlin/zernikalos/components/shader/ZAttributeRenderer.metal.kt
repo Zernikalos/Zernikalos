@@ -15,4 +15,7 @@ actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, priva
     actual override fun initialize() {
     }
 
+    override fun dispose() {
+    }
+
 }

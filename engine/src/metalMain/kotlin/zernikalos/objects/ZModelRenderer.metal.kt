@@ -74,4 +74,8 @@ actual class ZModelRenderer actual constructor(
         }
     }
 
+    actual fun dispose() {
+        pipelineState = null
+    }
+
 }

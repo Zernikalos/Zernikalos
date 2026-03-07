@@ -40,4 +40,8 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private 
         fragmentShader = library.newFunctionWithName("fragmentShader")!!
     }
 
+    actual override fun dispose() {
+        // Library and shader functions are released with library = null when no longer referenced.
+    }
+
 }

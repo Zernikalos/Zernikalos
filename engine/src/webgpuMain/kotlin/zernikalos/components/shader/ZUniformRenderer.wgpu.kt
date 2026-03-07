@@ -88,4 +88,11 @@ actual class ZUniformRenderer actual constructor(
 
     override fun unbind() {
     }
+
+    actual override fun dispose() {
+        uniformBuffer?.destroy()
+        uniformBuffer = null
+        bindGroupLayoutEntry = null
+        bindGroupEntry = null
+    }
 }

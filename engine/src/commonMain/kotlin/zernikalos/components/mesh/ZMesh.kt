@@ -145,6 +145,8 @@ class ZMesh internal constructor(data: ZMeshData):
 
     override fun render() = renderer.render()
 
+    override fun internalDispose() = renderer.dispose()
+
 }
 
 /**
@@ -210,6 +212,8 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
     override fun initialize()
 
     override fun render()
+
+    override fun dispose()
 }
 
 /**

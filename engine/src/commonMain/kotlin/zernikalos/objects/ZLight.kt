@@ -9,6 +9,7 @@
 package zernikalos.objects
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.light.ZDirectionalLamp
 import zernikalos.components.light.ZLampType
@@ -22,6 +23,7 @@ import kotlin.js.JsExport
 @Serializable
 class ZLight: ZObject() {
 
+    @Transient
     override val type: ZObjectType = ZObjectType.LIGHT
 
     @ProtoNumber(4)
@@ -46,5 +48,8 @@ class ZLight: ZObject() {
     }
 
     override fun internalRender(ctx: ZContext) {
+    }
+
+    override fun internalDispose(ctx: ZContext) {
     }
 }

@@ -56,6 +56,8 @@ internal constructor(data: ZMaterialData):
 
     override fun bind() = renderer.bind()
     override fun unbind() = renderer.unbind()
+
+    override fun internalDispose() = renderer.dispose()
 }
 
 /**
@@ -81,7 +83,7 @@ data class ZPhongMaterialData(
 ) {
     /**
      * Controls the sharpness of specular highlights.
-     * 
+     *
      * Range: 0.0 to 500.0
      * - 0.0: Completely matte surface (no specular highlights)
      * - 1-50: Matte materials (fabric, wood, plastic)
@@ -200,6 +202,10 @@ class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData)
 
     override fun unbind() {
         data.texture?.unbind()
+    }
+
+    override fun dispose() {
+        data.texture?.dispose()
     }
 
 }

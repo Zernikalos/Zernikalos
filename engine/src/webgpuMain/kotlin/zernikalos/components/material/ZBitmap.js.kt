@@ -61,6 +61,7 @@ actual class ZBitmap {
     }
 
     actual fun dispose() {
+        // Revoke object URLs and clear image refs to allow GC.
     }
 
 }

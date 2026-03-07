@@ -64,6 +64,11 @@ actual class ZTextureRenderer actual constructor(
     override fun unbind() {
     }
 
+    actual override fun dispose() {
+        ctx as ZGLRenderingContext
+        ctx.deleteTexture(textureHandler)
+    }
+
 }
 
 private fun mapFilterMode(filter: ZTextureFilterMode): Int {

@@ -49,4 +49,8 @@ actual class ZBufferKeyRenderer actual constructor(ctx: ZRenderingContext, priva
     actual override fun unbind() {
     }
 
+    actual override fun dispose() {
+        // No GPU object owned; attribute state is per-context.
+    }
+
 }

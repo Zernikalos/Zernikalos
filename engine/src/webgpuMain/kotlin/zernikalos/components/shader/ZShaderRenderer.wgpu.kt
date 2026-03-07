@@ -22,4 +22,7 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private 
     actual fun initialize(source: ZShaderSource) {
         // TODO: Implement shader initialization from source
     }
+
+    actual override fun dispose() {
+    }
 }

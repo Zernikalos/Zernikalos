@@ -51,6 +51,11 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         return GLWrap(id)
     }
 
+    actual fun deleteProgram(program: GLWrap) {
+        val id = program.id as Int
+        GLES30.glDeleteProgram(id)
+    }
+
     actual fun useProgram(program: GLWrap) {
         GLES30.glUseProgram(program.id as Int)
     }
@@ -133,6 +138,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         GLES30.glBindBuffer(targetType.value, buffer.id as Int)
     }
 
+    actual fun deleteBuffer(buffer: GLWrap) {
+        GLES30.glDeleteBuffers(1, intArrayOf(buffer.id as Int), 0)
+    }
+
     actual fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType) {
         val buffer = ByteBuffer.allocateDirect(dataArray.size)
         buffer.put(dataArray)
@@ -171,6 +180,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
         }
     }
 
+    actual fun deleteVertexArray(vao: GLWrap) {
+        GLES30.glDeleteVertexArrays(1, intArrayOf(vao.id as Int), 0)
+    }
+
     actual fun drawArrays(mode: Int, first: Int, count: Int) {
         GLES30.glDrawArrays(mode, first, count)
     }
@@ -193,6 +206,10 @@ actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceVie
 
     actual fun bindTexture(texture: GLWrap) {
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texture.id as Int)
+    }
+
+    actual fun deleteTexture(texture: GLWrap) {
+        GLES30.glDeleteTextures(1, intArrayOf(texture.id as Int), 0)
     }
 
     actual fun texParameterMinFilter(filter: Int) {

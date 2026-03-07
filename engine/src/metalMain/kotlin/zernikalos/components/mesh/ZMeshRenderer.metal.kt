@@ -78,6 +78,10 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
         )
     }
 
+    actual override fun dispose() {
+        data.buffers.values.filter { it.enabled }.forEach { it.dispose() }
+    }
+
 }
 
 fun convertDrawMode(drawMode: ZDrawMode): ULong = when (drawMode) {

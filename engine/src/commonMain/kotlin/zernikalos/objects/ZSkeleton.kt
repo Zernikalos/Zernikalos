@@ -43,6 +43,10 @@ class ZSkeleton: ZObject() {
 
     override fun internalRender(ctx: ZContext) {
     }
+
+    override fun internalDispose(ctx: ZContext) {
+    }
+
 }
 
 @Serializable

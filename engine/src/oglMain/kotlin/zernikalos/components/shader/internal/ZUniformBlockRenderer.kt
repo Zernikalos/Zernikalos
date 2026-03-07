@@ -67,6 +67,20 @@ internal class ZUniformBlockRenderer(
         //ctx?.bindBufferBase(BufferTargetType.UNIFORM_BUFFER, bindingPoint, 0)
     }
 
+    override fun dispose() {
+        ubo?.let { b ->
+            if (b.isValid) {
+                ctx as ZGLRenderingContext
+                ctx.deleteBuffer(b)
+            }
+        }
+        ubo = null
+        if (bindingPoint >= 0) {
+            ZUniformBlockRenderer.removeBindingPoint(bindingPoint)
+            bindingPoint = -1
+        }
+    }
+
     companion object {
         private val usedBindingPoints = mutableSetOf<Int>()
 
@@ -76,6 +90,10 @@ internal class ZUniformBlockRenderer(
 
         fun addBindingPoint(bindingPoint: Int) {
             usedBindingPoints.add(bindingPoint)
+        }
+
+        fun removeBindingPoint(bindingPoint: Int) {
+            usedBindingPoints.remove(bindingPoint)
         }
     }
 }

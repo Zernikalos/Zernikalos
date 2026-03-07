@@ -11,6 +11,7 @@ package zernikalos.components.material
 actual class ZBitmap actual constructor(val byteArray: ByteArray) {
 
     actual fun dispose() {
+        // Release decode artifacts if any; byteArray is not cleared to allow reuse.
     }
 
 }

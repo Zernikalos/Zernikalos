@@ -42,6 +42,8 @@ internal constructor (private val data: ZShaderData): ZRenderizableComponent<ZSh
         return ZShaderRenderer(ctx, data)
     }
 
+    override fun internalDispose() = renderer.dispose()
+
 }
 
 data class ZShaderData(
@@ -53,5 +55,7 @@ expect class ZShaderRenderer(ctx: ZRenderingContext, data: ZShaderData): ZCompon
     override fun initialize()
 
     fun initialize(source: ZShaderSource)
+
+    override fun dispose()
 
 }

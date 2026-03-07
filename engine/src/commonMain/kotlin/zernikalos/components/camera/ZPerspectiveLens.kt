@@ -66,6 +66,10 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
         data.setDimensions(width, height)
     }
 
+    override fun internalDispose() {
+        // Release any internal cached matrices if retained; projection lives in data.
+    }
+
 }
 
 @Serializable

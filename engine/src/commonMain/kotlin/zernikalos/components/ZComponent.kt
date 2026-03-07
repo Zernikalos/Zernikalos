@@ -80,6 +80,8 @@ interface ZComponent: ZRef {
      * @see ZRenderingContext
      */
     fun initialize(ctx: ZRenderingContext)
+
+    fun dispose()
 }
 
 /**
@@ -132,6 +134,23 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
     private var initialized: Boolean = false
     final override val isInitialized: Boolean
         get() = initialized
+
+    private var _disposed = false
+
+    /**
+     * Disposes the component and releases resources. Idempotent: multiple calls are safe.
+     * Subclasses with own state to release should override [internalDispose].
+     */
+    final override fun dispose() {
+        if (_disposed) return
+        _disposed = true
+        internalDispose()
+    }
+
+    /**
+     * Override in subclasses to release component-owned resources. Called at most once by [dispose].
+     */
+    protected open fun internalDispose() {}
 
     final override val isRenderizable: Boolean
         get() = this is ZRenderCapability
@@ -344,6 +363,8 @@ internal constructor(protected val ctx: ZRenderingContext): ZLoggable {
     open fun unbind() {}
 
     open fun render() {}
+
+    open fun dispose() {}
 }
 
 /**

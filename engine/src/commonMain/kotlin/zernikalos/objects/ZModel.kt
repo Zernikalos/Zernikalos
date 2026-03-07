@@ -137,6 +137,16 @@ class ZModel: ZObject() {
 
         renderer.render()
     }
+
+    override fun internalDispose(ctx: ZContext) {
+        skeleton?.dispose(ctx)
+
+        shaderProgram.dispose()
+        mesh.dispose()
+        material?.dispose()
+        skinning?.dispose()
+        renderer.dispose()
+    }
 }
 
 expect class ZModelRenderer(ctx: ZRenderingContext, model: ZModel) {
@@ -144,4 +154,6 @@ expect class ZModelRenderer(ctx: ZRenderingContext, model: ZModel) {
     fun initialize()
 
     fun render()
+
+    fun dispose()
 }
