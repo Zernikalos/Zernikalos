@@ -110,16 +110,19 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
     }
 
     override fun dispose() {
-        _eventHandler?.dispose()
-        _eventHandler = null
+        // Stop render loop first so no onRender() runs after we start cleanup
         val rendererIntervalId = this.rendererIntervalId
         if (rendererIntervalId != null) {
             window.clearInterval(rendererIntervalId)
+            this.rendererIntervalId = null
         }
         val animationFrameRequestId = this.animationFrameRequestId
         if (animationFrameRequestId != null) {
             window.cancelAnimationFrame(animationFrameRequestId)
+            this.animationFrameRequestId = null
         }
+        _eventHandler?.dispose()
+        _eventHandler = null
         resizeObserver.disconnect()
         inputEventManager.dispose()
     }
@@ -128,6 +131,8 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
      * Handles resize events from ResizeObserver.
      * Updates canvas dimensions with proper device pixel ratio scaling
      * and notifies the event handler.
+     * Skips update when width or height is 0 (e.g. tab hidden) to avoid
+     * WebGPU swapchain texture of size 0 errors.
      *
      * @param entries Array of ResizeObserverEntry objects containing resize information
      */
@@ -142,6 +147,10 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
 
                         val width: Int = (contentRect.width as Double * dpr).toInt()
                         val height: Int = (contentRect.height as Double * dpr).toInt()
+
+                        if (width <= 0 || height <= 0) {
+                            return@requestAnimationFrame
+                        }
 
                         canvas.width = width
                         canvas.height = height

@@ -52,6 +52,11 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
     private fun createRenderPassDescriptor() {
         ctx as ZWebGPURenderingContext
 
+        if (data.viewBox.width <= 0 || data.viewBox.height <= 0) {
+            renderPassDescriptor = null
+            return
+        }
+
         val textureView = ctx.webGPUContext?.getCurrentTexture()?.createView()
         val depthView = depthTexture?.createView()
 

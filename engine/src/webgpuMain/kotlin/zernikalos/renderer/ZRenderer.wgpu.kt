@@ -33,7 +33,10 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
         // TODO: Remove this thing from here
         ctx.scene!!.viewport.render()
 
-        gpuCtx.createRenderPass(ctx.scene!!.viewport.renderer.renderPassDescriptor!!.toGpu())
+        val descriptor = ctx.scene!!.viewport.renderer.renderPassDescriptor
+        if (descriptor == null) return
+
+        gpuCtx.createRenderPass(descriptor.toGpu())
         ctx.scene!!.render(ctx)
         gpuCtx.renderPass?.end()
 
