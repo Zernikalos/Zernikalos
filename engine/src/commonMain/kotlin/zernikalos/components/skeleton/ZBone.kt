@@ -95,6 +95,10 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
         bone._parent = this
     }
 
+    override fun internalDispose() {
+        data.children.forEach { it.dispose() }
+    }
+
     override fun internalInitialize(ctx: ZRenderingContext) {
         if (isRoot) {
             computeInverseBindMatrix(ZMatrix4.Identity)

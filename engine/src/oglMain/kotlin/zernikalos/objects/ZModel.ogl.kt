@@ -29,4 +29,8 @@ actual class ZModelRenderer actual constructor(
         model.shaderProgram.unbind()
     }
 
+    actual fun dispose() {
+        // OpenGL: no pipeline state object; components own their resources.
+    }
+
 }

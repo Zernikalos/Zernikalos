@@ -41,4 +41,8 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
 
     actual override fun unbind() {
     }
+
+    actual override fun dispose() {
+        shaderModule = null
+    }
 }

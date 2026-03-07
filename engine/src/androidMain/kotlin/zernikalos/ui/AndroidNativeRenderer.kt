@@ -34,6 +34,7 @@ class AndroidNativeRenderer: GLSurfaceView.Renderer {
     }
 
     fun dispose() {
+        eventHandler?.dispose()
         eventHandler = null
     }
 }

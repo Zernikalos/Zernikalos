@@ -177,6 +177,7 @@ class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZT
 
     override fun bind() = renderer.bind()
     override fun unbind() = renderer.unbind()
+    override fun internalDispose() = renderer.dispose()
 }
 
 /**
@@ -249,6 +250,7 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 
     override fun render()
 
+    override fun dispose()
 }
 
 /**

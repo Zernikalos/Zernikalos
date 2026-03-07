@@ -137,6 +137,11 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
         children.forEach { child -> child.render(ctx) }
     }
 
+    fun dispose(ctx: ZContext) {
+        internalDispose(ctx)
+        children.forEach { child -> child.dispose(ctx) }
+    }
+
     /**
      * Adds a child object to this object, establishing a parent-child relationship. The child object will be rendered relative to this object's transform.
      *
@@ -206,6 +211,13 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
      * @param ctx The context of the current scene, providing necessary information and services for rendering.
      */
     protected abstract fun internalRender(ctx: ZContext)
+
+    /**
+     * Abstract method to be implemented by subclasses for specific disposal behaviors. This method is called by the `dispose` method.
+     * It should be used to release any resources or perform any cleanup operations associated with the object.
+     * @param ctx The context of the current scene, providing necessary information and services for disposal.
+     */
+    protected abstract fun internalDispose(ctx: ZContext)
 
     /**
      * Resizes the object and its children to the specified width and height.

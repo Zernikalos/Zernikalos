@@ -32,4 +32,9 @@ class ZScene(): ZObject() {
     override fun internalOnViewportResize(ctx: ZContext, width: Int, height: Int) {
         viewport.onViewportResize(width, height)
     }
+
+    override fun internalDispose(ctx: ZContext) {
+        viewport.dispose()
+    }
+
 }

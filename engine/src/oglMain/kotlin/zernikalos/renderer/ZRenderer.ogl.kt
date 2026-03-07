@@ -24,4 +24,8 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
     actual override fun onViewportResize(width: Int, height: Int) {
         ctx.scene?.onViewportResize(ctx, width, height)
     }
+
+    actual fun dispose() {
+        // No persistent encoder/context refs to clear; OpenGL state is per-frame.
+    }
 }

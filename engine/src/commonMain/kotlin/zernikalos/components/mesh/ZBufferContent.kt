@@ -63,6 +63,8 @@ class ZBufferContent internal constructor(data: ZBufferContentData): ZDataRender
 
     override fun unbind() = renderer.unbind()
 
+    override fun internalDispose() = renderer.dispose()
+
     override fun toString(): String {
         return "ZBufferContent(id=${data.id}, size=${data.dataArray.size})"
     }
@@ -87,6 +89,8 @@ expect class ZBufferContentRenderer(ctx: ZRenderingContext, data: ZBufferContent
     override fun bind()
 
     override fun unbind()
+
+    override fun dispose()
 }
 
 class ZBufferContentSerializer: ZComponentSerializer<ZBufferContent, ZBufferContentData>() {

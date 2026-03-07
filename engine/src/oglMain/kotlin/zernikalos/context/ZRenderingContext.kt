@@ -60,6 +60,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun getAttribLocation(program: GLWrap, attrName: String): Int
 
+    fun deleteProgram(program: GLWrap)
+
     /** UNIFORMS **/
 
     fun getUniformLocation(program: GLWrap, uniformName: String): GLWrap
@@ -80,6 +82,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun bindBuffer(targetType: BufferTargetType, buffer: GLWrap)
 
+    fun deleteBuffer(buffer: GLWrap)
+
     fun bufferData(targetType: BufferTargetType, dataArray: ByteArray, usageType: BufferUsageType)
 
     fun bufferData(targetType: BufferTargetType, byteSize: Int, usageType: BufferUsageType)
@@ -96,6 +100,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
 
     fun bindVertexArray(vao: GLWrap?)
 
+    fun deleteVertexArray(vao: GLWrap)
+
     /** Draw **/
 
     fun drawArrays(mode: Int, first: Int, count: Int)
@@ -109,6 +115,8 @@ expect class ZGLRenderingContext(surfaceView: ZSurfaceView): ZRenderingContext {
     fun activeTexture()
 
     fun bindTexture(texture: GLWrap)
+
+    fun deleteTexture(texture: GLWrap)
 
     fun texParameterMinFilter(filter: Int)
 

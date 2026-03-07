@@ -85,4 +85,10 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
         ctx as ZWebGPURenderingContext
         createDepthTexture()
     }
+
+    override fun dispose() {
+        depthTexture?.destroy()
+        depthTexture = null
+        renderPassDescriptor = null
+    }
 }

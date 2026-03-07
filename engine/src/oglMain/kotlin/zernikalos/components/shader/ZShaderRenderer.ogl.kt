@@ -71,4 +71,11 @@ actual class ZShaderRenderer actual constructor(ctx: ZRenderingContext, private 
         }
     }
 
+    actual override fun dispose() {
+        if (shader.isValid) {
+            ctx as ZGLRenderingContext
+            ctx.deleteShader(shader)
+        }
+    }
+
 }

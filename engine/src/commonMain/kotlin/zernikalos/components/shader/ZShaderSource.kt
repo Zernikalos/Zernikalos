@@ -33,6 +33,10 @@ class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializable
 
     var wgpuShaderSource: String by _wgpuShaderSource::shaderSource
 
+    override fun internalDispose() {
+        // Shader source strings live in data; no explicit clear to allow reuse/hot-reload.
+    }
+
 }
 
 @JsExport

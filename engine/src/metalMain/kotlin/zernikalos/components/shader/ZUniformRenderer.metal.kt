@@ -70,4 +70,8 @@ actual class ZUniformRenderer actual constructor(
     override fun unbind() {
     }
 
+    actual override fun dispose() {
+        uniformBuffer = null
+    }
+
 }

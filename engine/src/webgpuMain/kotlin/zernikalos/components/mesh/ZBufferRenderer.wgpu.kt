@@ -61,4 +61,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     actual override fun unbind() {
         // Typically not needed in WebGPU
     }
+
+    actual override fun dispose() {
+        data.content.dispose()
+        data.key.dispose()
+    }
 }

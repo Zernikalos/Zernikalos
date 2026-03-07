@@ -47,4 +47,8 @@ actual class ZUniformRenderer actual constructor(
             is ZUniformBlockRenderer -> internalRenderer.bindLocation(programId)
         }
     }
+
+    actual override fun dispose() {
+        internalRenderer.dispose()
+    }
 }

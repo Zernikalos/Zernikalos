@@ -38,4 +38,8 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
         )
     }
 
+    override fun dispose() {
+        // No explicit GL objects to release (viewport state is per-frame).
+    }
+
 }

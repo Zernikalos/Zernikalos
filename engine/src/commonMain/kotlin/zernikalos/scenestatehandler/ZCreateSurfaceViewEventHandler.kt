@@ -17,7 +17,8 @@ private enum class InitState {
     NOT_STARTED,
     SCENE_INIT,
     RENDERER_INIT,
-    READY
+    READY,
+    DISPOSED
 }
 
 /**
@@ -59,6 +60,13 @@ private class ZSurfaceViewEventHandlerImpl(
         }
     }
 
+    override fun dispose() {
+        if (initState == InitState.DISPOSED) return
+        initState = InitState.DISPOSED
+        context.scene?.dispose(context)
+        renderer.dispose()
+    }
+
     private fun progressInitialization() {
         when (initState) {
             InitState.NOT_STARTED -> {
@@ -75,7 +83,7 @@ private class ZSurfaceViewEventHandlerImpl(
                     pendingResize = false
                 }
             }
-            InitState.SCENE_INIT, InitState.READY -> { /* no-op */ }
+            InitState.SCENE_INIT, InitState.READY, InitState.DISPOSED -> { /* no-op */ }
         }
     }
 

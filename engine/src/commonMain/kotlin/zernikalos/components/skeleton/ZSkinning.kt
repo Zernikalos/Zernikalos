@@ -76,6 +76,10 @@ class ZSkinning internal constructor(data: ZSkinningData): ZSerializableComponen
         data.inverseBindMatrices.add(idx, matrix)
     }
 
+    override fun internalDispose() {
+        // Large CPU arrays (boneIds, inverseBindMatrices) live in data; no explicit clear API yet.
+    }
+
 }
 
 /**

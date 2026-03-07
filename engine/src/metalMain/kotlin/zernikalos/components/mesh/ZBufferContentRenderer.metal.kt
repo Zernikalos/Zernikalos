@@ -49,4 +49,8 @@ actual class ZBufferContentRenderer actual constructor(
 
     actual override fun unbind() {
     }
+
+    actual override fun dispose() {
+        buffer = null
+    }
 }

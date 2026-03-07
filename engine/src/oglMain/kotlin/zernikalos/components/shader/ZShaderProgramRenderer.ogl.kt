@@ -73,4 +73,8 @@ actual class ZShaderProgramRenderer actual constructor(ctx: ZRenderingContext, p
         ctx.attachShader(program.programId, shader.renderer.shader)
     }
 
+    actual override fun dispose() {
+        program.dispose()
+    }
+
 }

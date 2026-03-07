@@ -115,6 +115,9 @@ class ZCamera(): ZObject() {
         lens.onViewportResize(width, height)
     }
 
+    override fun internalDispose(ctx: ZContext) {
+    }
+
     companion object {
         /**
          * Represents a default perspective camera. This camera provides a perspective view of the scene.

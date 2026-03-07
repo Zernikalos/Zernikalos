@@ -42,4 +42,9 @@ class ZVertexArray(private val ctx: ZRenderingContext): ZLoggable, ZBindeable {
         ctx.bindVertexArray(null)
     }
 
+    fun dispose() {
+        ctx as ZGLRenderingContext
+        ctx.deleteVertexArray(vao)
+    }
+
 }

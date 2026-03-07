@@ -108,4 +108,9 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
         model.mesh.bind()
         model.mesh.render()
     }
+
+    actual fun dispose() {
+        pipeline = null
+        bindGroup = null
+    }
 }

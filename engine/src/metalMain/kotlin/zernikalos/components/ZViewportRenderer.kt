@@ -20,4 +20,7 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
     actual fun onViewportResize(width: Int, height: Int) {
     }
 
+    override fun dispose() {
+    }
+
 }

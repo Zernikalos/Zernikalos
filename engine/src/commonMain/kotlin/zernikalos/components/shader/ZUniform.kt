@@ -95,6 +95,8 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
 
     override fun unbind() = renderer.unbind()
 
+    override fun internalDispose() = renderer.dispose()
+
     override fun toString(): String {
         return data.toString()
     }
@@ -154,6 +156,8 @@ data class ZUniformBlockData(
 expect class ZUniformRenderer(ctx: ZRenderingContext, data: ZUniformBlockData): ZComponentRenderer {
 
     override fun initialize()
+
+    override fun dispose()
 }
 
 // TODO: This need to be reimplemented somehow

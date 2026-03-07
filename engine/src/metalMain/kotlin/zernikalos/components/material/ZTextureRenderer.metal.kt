@@ -78,6 +78,11 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private
         samplerState = ctx.device.newSamplerStateWithDescriptor(descriptor)
     }
 
+    actual override fun dispose() {
+        texture = null
+        samplerState = null
+    }
+
 }
 
 private fun mapFilterMode(filter: ZTextureFilterMode): ULong {

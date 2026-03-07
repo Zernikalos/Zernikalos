@@ -62,6 +62,8 @@ internal constructor(data: ZViewportData):
 
     override fun render() = renderer.render()
 
+    override fun internalDispose() = renderer.dispose()
+
 }
 
 @Serializable
@@ -78,7 +80,6 @@ expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZCo
     override fun render()
 
     fun onViewportResize(width: Int, height: Int)
-
 }
 
 class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData>() {

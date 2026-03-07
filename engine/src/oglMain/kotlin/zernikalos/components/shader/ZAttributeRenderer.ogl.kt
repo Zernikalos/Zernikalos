@@ -25,4 +25,8 @@ actual class ZAttributeRenderer actual constructor(ctx: ZRenderingContext, priva
         ctx.bindAttribLocation(programId, data.id, data.attributeName)
     }
 
+    override fun dispose() {
+        // No GPU object owned; attribute location is per-program.
+    }
+
 }

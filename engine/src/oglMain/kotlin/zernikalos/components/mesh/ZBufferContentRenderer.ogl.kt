@@ -51,4 +51,9 @@ actual class ZBufferContentRenderer actual constructor(ctx: ZRenderingContext, p
     actual override fun unbind() {
     }
 
+    actual override fun dispose() {
+        ctx as ZGLRenderingContext
+        ctx.deleteBuffer(buffer)
+    }
+
 }

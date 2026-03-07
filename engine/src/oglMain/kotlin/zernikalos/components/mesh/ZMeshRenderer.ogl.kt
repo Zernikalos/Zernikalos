@@ -53,6 +53,11 @@ internal actual constructor(ctx: ZRenderingContext, internal val data: ZMeshData
         vao.unbind()
     }
 
+    actual override fun dispose() {
+        vao.dispose()
+        data.buffers.values.filter { it.enabled }.forEach { it.dispose() }
+    }
+
 }
 
 fun convertDrawMode(drawMode: ZDrawMode): DrawModes = when (drawMode) {

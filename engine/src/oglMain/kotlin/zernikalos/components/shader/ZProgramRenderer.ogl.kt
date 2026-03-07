@@ -47,4 +47,10 @@ class ZProgram(private val ctx: ZRenderingContext): ZBindeable {
         ctx.linkProgram(programId)
     }
 
+    fun dispose() {
+        ctx as ZGLRenderingContext
+
+        ctx.deleteProgram(programId)
+    }
+
 }

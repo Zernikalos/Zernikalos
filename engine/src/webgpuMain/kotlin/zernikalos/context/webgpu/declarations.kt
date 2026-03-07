@@ -497,7 +497,9 @@ external interface GPUMultisampleState {
 
 external class GPURenderPipeline
 
-external class GPUBuffer
+external class GPUBuffer {
+    fun destroy()
+}
 
 external class GPUQueue {
     fun writeBuffer(buffer: GPUBuffer, offset: Int, data: Any)
@@ -546,6 +548,7 @@ external class GPUSwapChain
 
 external interface GPUTexture {
     fun createView(): GPUTextureView
+    fun destroy()
 }
 
 

@@ -110,6 +110,8 @@ class ZJsSurfaceView(val canvas: HTMLCanvasElement): ZSurfaceView {
     }
 
     override fun dispose() {
+        _eventHandler?.dispose()
+        _eventHandler = null
         val rendererIntervalId = this.rendererIntervalId
         if (rendererIntervalId != null) {
             window.clearInterval(rendererIntervalId)

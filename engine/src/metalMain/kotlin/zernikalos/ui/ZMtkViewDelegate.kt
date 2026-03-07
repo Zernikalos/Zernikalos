@@ -39,6 +39,7 @@ class ZMtkViewDelegate() : NSObject(), MTKViewDelegateProtocol {
     }
 
     fun dispose() {
+        eventHandler?.dispose()
         eventHandler = null
     }
 

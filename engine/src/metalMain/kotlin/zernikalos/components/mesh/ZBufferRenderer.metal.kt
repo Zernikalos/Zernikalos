@@ -52,4 +52,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
         data.key.initialize(ctx)
     }
 
+    actual override fun dispose() {
+        data.content.dispose()
+        data.key.dispose()
+    }
+
 }
