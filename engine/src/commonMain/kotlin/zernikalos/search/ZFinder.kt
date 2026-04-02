@@ -55,3 +55,23 @@ fun findFirstCamera(root: ZObject): ZCamera? {
 fun findFirstLight(root: ZObject): ZLight? {
     return findInTree(root) {it.type == ZObjectType.LIGHT} as ZLight?
 }
+
+/**
+ * Finds every [ZLight] in a [ZObject] tree starting at [root], in depth-first preorder
+ * (same order as [treeTraverse]).
+ *
+ * @param root The root [ZObject] from which to start the search.
+ * @return All [ZLight] instances found; empty if there are none.
+ */
+@JsExport
+fun findAllLights(root: ZObject): List<ZLight> {
+    val out = arrayListOf<ZLight>()
+    val it = treeTraverse(root)
+    while (it.hasNext()) {
+        val node = it.next()
+        if (node.type == ZObjectType.LIGHT) {
+            out.add(node as ZLight)
+        }
+    }
+    return out
+}

@@ -19,6 +19,12 @@ struct Uniforms {
 }
 @binding(${UNIFORM_IDS.BLOCK_SCENE_MATRIX}) @group(0) var<uniform> uniforms : Uniforms;
 
+struct AmbientLightUniforms {
+    ambientColor : vec4<f32>,
+    ambientIntensity : f32
+}
+@binding(${UNIFORM_IDS.BLOCK_AMBIENT_LIGHT}) @group(0) var<uniform> ambientLight : AmbientLightUniforms;
+
 @group(1) @binding(0) var t_diffuse: texture_2d<f32>;
 @group(1) @binding(1) var s_diffuse: sampler;
 

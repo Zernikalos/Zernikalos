@@ -28,6 +28,9 @@ open class ZSceneContext {
 
     var activeLight: ZLight? = null
 
+    /** First ambient [ZLight] registered during scene init; superseded by scene-graph collection in a later phase. */
+    var activeAmbientLight: ZLight? = null
+
     private val uniformsGeneratorMap = HashMap<String, ZUniformGenerator>()
 
     val isInitialized: Boolean

@@ -11,10 +11,7 @@ package zernikalos.objects
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.light.ZDirectionalLamp
-import zernikalos.components.light.ZLampType
-import zernikalos.components.light.ZPointLamp
-import zernikalos.components.light.ZSpotLamp
+import zernikalos.components.light.*
 import zernikalos.context.ZContext
 import zernikalos.math.ZColor
 import kotlin.js.JsExport
@@ -40,10 +37,21 @@ class ZLight: ZObject() {
     var pointLamp: ZPointLamp? = null
     @ProtoNumber(12)
     var spotLamp: ZSpotLamp? = null
+    @ProtoNumber(13)
+    var ambientLamp: ZAmbientLamp? = null
 
     override fun internalInitialize(ctx: ZContext) {
-        if (ctx.sceneContext.activeLight == null) {
-            ctx.sceneContext.activeLight = this
+        when (lampType) {
+            ZLampType.AMBIENT -> {
+                if (ctx.sceneContext.activeAmbientLight == null) {
+                    ctx.sceneContext.activeAmbientLight = this
+                }
+            }
+            else -> {
+                if (ctx.sceneContext.activeLight == null) {
+                    ctx.sceneContext.activeLight = this
+                }
+            }
         }
     }
 

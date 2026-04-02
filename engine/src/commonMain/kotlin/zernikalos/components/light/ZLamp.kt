@@ -17,7 +17,8 @@ import kotlin.js.JsExport
 enum class ZLampType {
     DIRECTIONAL,
     POINT,
-    SPOT
+    SPOT,
+    AMBIENT,
 }
 
 @JsExport
@@ -28,7 +29,7 @@ abstract class ZLamp {
 
 @JsExport
 @Serializable
-class ZDirectionalLamp: ZLamp() {
+class ZDirectionalLamp(): ZLamp() {
 }
 
 @JsExport
@@ -52,3 +53,7 @@ class ZSpotLamp: ZLamp() {
     @ProtoNumber(4)
     var outerAngle: Float = 0.0f
 }
+
+@JsExport
+@Serializable
+class ZAmbientLamp : ZLamp() {}

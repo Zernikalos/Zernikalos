@@ -24,6 +24,7 @@ object UNIFORM_KEYS {
     val BLOCK_PBR_MATERIAL = UniformKey(16, "PbrMaterial")
     val BLOCK_PHONG_MATERIAL = UniformKey(17, "PhongMaterial")
     val BLOCK_LIGHT = UniformKey(18, "LightUniforms")
+    val BLOCK_AMBIENT_LIGHT = UniformKey(19, "AmbientLightUniforms")
 
     // Member keys
     val PROJECTION_MATRIX = UniformKey(0, "ProjectionMatrix")
@@ -48,16 +49,13 @@ object UNIFORM_KEYS {
     val PHONG_SPECULAR = UniformKey(12, "PhongSpecular")
     val PHONG_SHININESS = UniformKey(13, "PhongShininess")
 
-    // Light member keys
-    val LIGHT_DIRECTION = UniformKey(20, "LightDirection")
-    val LIGHT_POSITION = UniformKey(21, "LightPosition")
-    val LIGHT_COLOR = UniformKey(22, "LightColor")
-    val LIGHT_INTENSITY = UniformKey(23, "LightIntensity")
-    val LIGHT_TYPE = UniformKey(24, "LightType")
-    val LIGHT_RANGE = UniformKey(25, "LightRange")
-    val LIGHT_DECAY = UniformKey(26, "LightDecay")
-    val LIGHT_INNER_ANGLE = UniformKey(27, "LightInnerAngle")
-    val LIGHT_OUTER_ANGLE = UniformKey(28, "LightOuterAngle")
+    /** Packed `DirectLight lights[]` blob; size = [MAX_DIRECT_LIGHTS] * [DIRECT_LIGHT_FLOAT_COUNT] floats. */
+    val DIRECT_LIGHTS = UniformKey(20, "DirectLights")
+    val LIGHT_DIRECT_COUNT = UniformKey(25, "LightDirectCount")
+    /** `AmbientLight.color` in the lighting UBO. */
+    val AMBIENT_LIGHT_COLOR = UniformKey(29, "AmbientLightColor")
+    /** `AmbientLight.intensity` in the lighting UBO. */
+    val AMBIENT_LIGHT_PARAMS = UniformKey(30, "AmbientLightParams")
 }
 
 /** @deprecated Use UNIFORM_KEYS.BLOCK_*.id - Kept for shader binding references (WGSL/Metal). */
@@ -68,6 +66,7 @@ object UNIFORM_IDS {
     val BLOCK_PBR_MATERIAL get() = UNIFORM_KEYS.BLOCK_PBR_MATERIAL.id
     val BLOCK_PHONG_MATERIAL get() = UNIFORM_KEYS.BLOCK_PHONG_MATERIAL.id
     val BLOCK_LIGHT get() = UNIFORM_KEYS.BLOCK_LIGHT.id
+    val BLOCK_AMBIENT_LIGHT get() = UNIFORM_KEYS.BLOCK_AMBIENT_LIGHT.id
 }
 
 /** Declarative definition of the scene matrix uniform block. */
@@ -167,34 +166,42 @@ object PhongMaterialUniforms : UniformBlockDef(
 val ZUniformPhongMaterialBlock: ZUniform
     get() = PhongMaterialUniforms.toZUniform()
 
-/** Declarative definition of the light uniform block. */
+/** Declarative definition of the light uniform block (direct lights only). */
 object LightUniformsDef : UniformBlockDef(
     blockKey = UNIFORM_KEYS.BLOCK_LIGHT,
     glslName = "u_lightBlock",
     members = listOf(
-        UniformMember(UNIFORM_KEYS.LIGHT_DIRECTION, ZTypes.VEC4F, count = 1, glslName = "u_lightDirection"),
-        UniformMember(UNIFORM_KEYS.LIGHT_POSITION, ZTypes.VEC4F, count = 1, glslName = "u_lightPosition"),
-        UniformMember(UNIFORM_KEYS.LIGHT_COLOR, ZTypes.VEC4F, count = 1, glslName = "u_lightColor"),
-        UniformMember(UNIFORM_KEYS.LIGHT_INTENSITY, ZTypes.FLOAT, count = 1, glslName = "u_lightIntensity"),
-        UniformMember(UNIFORM_KEYS.LIGHT_TYPE, ZTypes.FLOAT, count = 1, glslName = "u_lightType"),
-        UniformMember(UNIFORM_KEYS.LIGHT_RANGE, ZTypes.FLOAT, count = 1, glslName = "u_lightRange"),
-        UniformMember(UNIFORM_KEYS.LIGHT_DECAY, ZTypes.FLOAT, count = 1, glslName = "u_lightDecay"),
-        UniformMember(UNIFORM_KEYS.LIGHT_INNER_ANGLE, ZTypes.FLOAT, count = 1, glslName = "u_lightInnerAngle"),
-        UniformMember(UNIFORM_KEYS.LIGHT_OUTER_ANGLE, ZTypes.FLOAT, count = 1, glslName = "u_lightOuterAngle")
+        UniformMember(
+            UNIFORM_KEYS.DIRECT_LIGHTS,
+            ZTypes.FLOAT,
+            count = MAX_DIRECT_LIGHTS * DIRECT_LIGHT_FLOAT_COUNT,
+            glslName = "lights"
+        ),
+        UniformMember(UNIFORM_KEYS.LIGHT_DIRECT_COUNT, ZTypes.FLOAT, count = 1, glslName = "directCount")
     ),
     generators = mapOf(
-        UNIFORM_KEYS.LIGHT_DIRECTION.name to ZLightDirectionGenerator,
-        UNIFORM_KEYS.LIGHT_POSITION.name to ZLightPositionGenerator,
-        UNIFORM_KEYS.LIGHT_COLOR.name to ZLightColorGenerator,
-        UNIFORM_KEYS.LIGHT_INTENSITY.name to ZLightIntensityGenerator,
-        UNIFORM_KEYS.LIGHT_TYPE.name to ZLightTypeGenerator,
-        UNIFORM_KEYS.LIGHT_RANGE.name to ZLightRangeGenerator,
-        UNIFORM_KEYS.LIGHT_DECAY.name to ZLightDecayGenerator,
-        UNIFORM_KEYS.LIGHT_INNER_ANGLE.name to ZLightInnerAngleGenerator,
-        UNIFORM_KEYS.LIGHT_OUTER_ANGLE.name to ZLightOuterAngleGenerator
+        UNIFORM_KEYS.DIRECT_LIGHTS.name to ZDirectLightsArrayGenerator,
+        UNIFORM_KEYS.LIGHT_DIRECT_COUNT.name to ZLightDirectCountGenerator
     )
 )
 
 val ZLightUniformBlock: ZUniform
     get() = LightUniformsDef.toZUniform()
+
+/** Declarative definition of the ambient light uniform block. */
+object AmbientLightUniforms : UniformBlockDef(
+    blockKey = UNIFORM_KEYS.BLOCK_AMBIENT_LIGHT,
+    glslName = "u_ambientLightBlock",
+    members = listOf(
+        UniformMember(UNIFORM_KEYS.AMBIENT_LIGHT_COLOR, ZTypes.VEC4F, count = 1, glslName = "ambientColor"),
+        UniformMember(UNIFORM_KEYS.AMBIENT_LIGHT_PARAMS, ZTypes.FLOAT, count = 1, glslName = "ambientIntensity")
+    ),
+    generators = mapOf(
+        UNIFORM_KEYS.AMBIENT_LIGHT_COLOR.name to ZAmbientLightColorGenerator,
+        UNIFORM_KEYS.AMBIENT_LIGHT_PARAMS.name to ZAmbientLightParamsGenerator
+    )
+)
+
+val ZAmbientLightUniformBlock: ZUniform
+    get() = AmbientLightUniforms.toZUniform()
 
