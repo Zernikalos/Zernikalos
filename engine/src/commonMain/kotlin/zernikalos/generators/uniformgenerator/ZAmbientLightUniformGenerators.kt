@@ -10,18 +10,30 @@ package zernikalos.generators.uniformgenerator
 
 import zernikalos.math.ZColor
 import zernikalos.math.ZScalar
+import zernikalos.search.findAmbientLight
 
 /**
- * Ambient light color generator. When no ambient light is registered, returns black.
+ * Ambient light color generator. When no enabled ambient light exists in the scene, returns black.
  */
 val ZAmbientLightColorGenerator: ZUniformGenerator = { sceneContext, _ ->
-    sceneContext.activeAmbientLight?.color ?: ZColor.BLACK
+    val scene = sceneContext.scene
+    if (scene == null) {
+        ZColor.BLACK
+    } else {
+        findAmbientLight(scene)?.color ?: ZColor.BLACK
+    }
 }
 
 /**
  * Ambient intensity (`AmbientLight.intensity` in shaders).
- * When no ambient [zernikalos.objects.ZLight] is registered, use 0.0 so direct lights dominate.
+ * When no enabled ambient [zernikalos.objects.ZLight] exists in the scene, use 0.0 so direct lights dominate.
  */
 val ZAmbientLightParamsGenerator: ZUniformGenerator = { sceneContext, _ ->
-    ZScalar(sceneContext.activeAmbientLight?.intensity ?: 0.0f)
+    val scene = sceneContext.scene
+    val intensity = if (scene == null) {
+        0.0f
+    } else {
+        findAmbientLight(scene)?.intensity ?: 0.0f
+    }
+    ZScalar(intensity)
 }

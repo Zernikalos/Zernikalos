@@ -24,7 +24,7 @@ class ZLight: ZObject() {
     override val type: ZObjectType = ZObjectType.LIGHT
 
     @ProtoNumber(4)
-    var lampType: ZLampType = ZLampType.DIRECTIONAL
+    var _lampType: ZLampType = ZLampType.DIRECTIONAL
 
     @ProtoNumber(5)
     var color: ZColor = ZColor.WHITE
@@ -40,19 +40,20 @@ class ZLight: ZObject() {
     @ProtoNumber(13)
     var ambientLamp: ZAmbientLamp? = null
 
-    override fun internalInitialize(ctx: ZContext) {
-        when (lampType) {
-            ZLampType.AMBIENT -> {
-                if (ctx.sceneContext.activeAmbientLight == null) {
-                    ctx.sceneContext.activeAmbientLight = this
-                }
-            }
-            else -> {
-                if (ctx.sceneContext.activeLight == null) {
-                    ctx.sceneContext.activeLight = this
-                }
+    val lampType: ZLampType
+        get() {
+            return when {
+                directionalLamp != null -> ZLampType.DIRECTIONAL
+                pointLamp != null -> ZLampType.POINT
+                spotLamp != null -> ZLampType.SPOT
+                ambientLamp != null -> ZLampType.AMBIENT
+                else -> throw IllegalStateException("No lamp type specified for light")
             }
         }
+
+    override fun internalInitialize(ctx: ZContext) {
+        // Lighting is now discovered via findAllLights()/findAllDirectLights()/findAmbientLight()
+        // from the scene graph each frame. No registration in context needed.
     }
 
     override fun internalRender(ctx: ZContext) {

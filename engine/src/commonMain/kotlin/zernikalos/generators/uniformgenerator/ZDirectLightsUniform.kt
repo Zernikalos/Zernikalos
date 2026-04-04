@@ -8,10 +8,9 @@
 
 package zernikalos.generators.uniformgenerator
 
-import zernikalos.components.light.ZLampType
 import zernikalos.context.ZSceneContext
 import zernikalos.objects.ZLight
-import zernikalos.search.findAllLights
+import zernikalos.search.findAllDirectLights
 
 /** Max directional/point/spot lights sent to the GPU (ambient excluded). Must match shader `MAX_DIRECT_LIGHTS`. */
 const val MAX_DIRECT_LIGHTS = 4
@@ -21,7 +20,5 @@ internal const val DIRECT_LIGHT_FLOAT_COUNT = 20
 
 internal fun collectDirectLights(sceneContext: ZSceneContext): List<ZLight> {
     val scene = sceneContext.scene ?: return emptyList()
-    return findAllLights(scene)
-        .filter { it.lampType != ZLampType.AMBIENT }
-        .take(MAX_DIRECT_LIGHTS)
+    return findAllDirectLights(scene).take(MAX_DIRECT_LIGHTS)
 }

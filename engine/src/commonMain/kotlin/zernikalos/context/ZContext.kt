@@ -11,7 +11,6 @@ package zernikalos.context
 import zernikalos.events.ZEventQueue
 import zernikalos.events.ZInputState
 import zernikalos.objects.ZCamera
-import zernikalos.objects.ZLight
 import zernikalos.objects.ZScene
 import zernikalos.utils.genRefId
 import kotlin.js.JsExport
@@ -28,7 +27,6 @@ class ZContext(val sceneContext: ZSceneContext, val renderingContext: ZRendering
     var scene: ZScene? by sceneContext::scene
 
     var activeCamera: ZCamera? by sceneContext::activeCamera
-    var activeLight: ZLight? by sceneContext::activeLight
 
     val isInitialized: Boolean by sceneContext::isInitialized
 
