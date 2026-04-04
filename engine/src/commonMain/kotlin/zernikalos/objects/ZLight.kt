@@ -8,10 +8,12 @@
 
 package zernikalos.objects
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.light.*
+import zernikalos.components.light.ZLamp
+import zernikalos.components.light.ZLampType
 import zernikalos.context.ZContext
 import zernikalos.math.ZColor
 import kotlin.js.JsExport
@@ -23,33 +25,17 @@ class ZLight: ZObject() {
     @Transient
     override val type: ZObjectType = ZObjectType.LIGHT
 
-    @ProtoNumber(4)
-    var _lampType: ZLampType = ZLampType.DIRECTIONAL
-
     @ProtoNumber(5)
     var color: ZColor = ZColor.WHITE
     @ProtoNumber(6)
     var intensity: Float = 1.0f
 
     @ProtoNumber(10)
-    var directionalLamp: ZDirectionalLamp? = null
-    @ProtoNumber(11)
-    var pointLamp: ZPointLamp? = null
-    @ProtoNumber(12)
-    var spotLamp: ZSpotLamp? = null
-    @ProtoNumber(13)
-    var ambientLamp: ZAmbientLamp? = null
+    @Contextual
+    var lamp: ZLamp? = null
 
     val lampType: ZLampType
-        get() {
-            return when {
-                directionalLamp != null -> ZLampType.DIRECTIONAL
-                pointLamp != null -> ZLampType.POINT
-                spotLamp != null -> ZLampType.SPOT
-                ambientLamp != null -> ZLampType.AMBIENT
-                else -> throw IllegalStateException("No lamp type specified for light")
-            }
-        }
+        get() = lamp?.lampType ?: throw IllegalStateException("No lamp type specified for light")
 
     override fun internalInitialize(ctx: ZContext) {
         // Lighting is now discovered via findAllLights()/findAllDirectLights()/findAmbientLight()

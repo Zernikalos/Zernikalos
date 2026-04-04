@@ -9,6 +9,8 @@
 package zernikalos.generators.uniformgenerator
 
 import zernikalos.ZTypes
+import zernikalos.components.light.ZPointLamp
+import zernikalos.components.light.ZSpotLamp
 import zernikalos.math.ZAlgebraObjectCollection
 import zernikalos.math.ZScalar
 import zernikalos.objects.ZLight
@@ -18,10 +20,19 @@ private fun packDirectLight(light: ZLight): FloatArray {
     val f = light.transform.forward
     val p = light.transform.position
     val c = light.color.floatArray
-    val range = light.pointLamp?.range ?: light.spotLamp?.range ?: 0f
-    val decay = light.pointLamp?.decay ?: light.spotLamp?.decay ?: 0f
-    val inner = light.spotLamp?.innerAngle ?: 0f
-    val outer = light.spotLamp?.outerAngle ?: 0f
+    val lamp = light.lamp
+    val range = when (lamp) {
+        is ZPointLamp -> lamp.range
+        is ZSpotLamp -> lamp.range
+        else -> 0f
+    }
+    val decay = when (lamp) {
+        is ZPointLamp -> lamp.decay
+        is ZSpotLamp -> lamp.decay
+        else -> 0f
+    }
+    val inner = (lamp as? ZSpotLamp)?.innerAngle ?: 0f
+    val outer = (lamp as? ZSpotLamp)?.outerAngle ?: 0f
     return floatArrayOf(
         f.x, f.y, f.z, 0f,
         p.x, p.y, p.z, 0f,
