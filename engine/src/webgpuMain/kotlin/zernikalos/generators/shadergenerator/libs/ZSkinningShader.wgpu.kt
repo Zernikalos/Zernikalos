@@ -64,10 +64,14 @@ struct DirectLight {
 struct LightUniforms {
     lights: array<DirectLight, 4>,
     directCount: f32,
+}
+@binding(${UNIFORM_IDS.BLOCK_LIGHT}) @group(0) var<uniform> light: LightUniforms;
+
+struct AmbientLightUniforms {
     ambientColor: vec4<f32>,
     ambientIntensity: f32,
 }
-@binding(${UNIFORM_IDS.BLOCK_LIGHT}) @group(0) var<uniform> light: LightUniforms;
+@binding(${UNIFORM_IDS.BLOCK_AMBIENT_LIGHT}) @group(0) var<uniform> ambientLight: AmbientLightUniforms;
 //#endif
 
 //#ifdef USE_TEXTURES
@@ -237,7 +241,7 @@ fn calculatePBRAmbient(baseColor: vec4<f32>) -> vec3<f32> {
     var F0 = vec3<f32>(0.04);
     F0 = mix(F0, albedo, metalness);
     let kD = (vec3<f32>(1.0) - F0) * (1.0 - metalness);
-    return light.ambientColor.rgb * light.ambientIntensity * albedo * kD;
+    return ambientLight.ambientColor.rgb * ambientLight.ambientIntensity * albedo * kD;
 }
 //#endif
 
