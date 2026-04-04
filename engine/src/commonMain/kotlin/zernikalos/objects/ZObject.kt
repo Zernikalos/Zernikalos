@@ -92,6 +92,16 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     val isInitialized: Boolean
         get() = _initialized
 
+    @Transient
+    private var _enabled: Boolean = true
+    val isEnabled: Boolean
+        get() = _enabled
+
+    @Transient
+    private var _visible: Boolean = true
+    val isVisible: Boolean
+        get() = _visible
+
     /**
      * Event manager for this object, providing access to listener management functionality.
      */
@@ -133,7 +143,10 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
      * @param ctx The context of the current scene, providing necessary information and services for rendering.
      */
     fun render(ctx: ZContext) {
-        internalRender(ctx)
+        if (!isEnabled) return
+        if (isVisible) {
+            internalRender(ctx)
+        }
         children.forEach { child -> child.render(ctx) }
     }
 
@@ -196,6 +209,22 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
      */
     fun translate(x: Float, y: Float, z: Float) {
         transform.translate(x, y, z)
+    }
+
+    fun enable() {
+        _enabled = true
+    }
+
+    fun disable() {
+        _enabled = false
+    }
+
+    fun show() {
+        _visible = true
+    }
+
+    fun hide() {
+        _visible = false
     }
 
     /**
