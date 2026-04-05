@@ -6,17 +6,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+@file:OptIn(kotlin.js.ExperimentalJsExport::class)
+
 package zernikalos.objects
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.light.ZLamp
-import zernikalos.components.light.ZLampType
+import zernikalos.components.light.*
 import zernikalos.context.ZContext
 import zernikalos.math.ZColor
 import kotlin.js.JsExport
+import kotlin.jvm.JvmStatic
 
 @JsExport
 @Serializable
@@ -46,5 +48,19 @@ class ZLight: ZObject() {
     }
 
     override fun internalDispose(ctx: ZContext) {
+    }
+
+    companion object {
+        @JvmStatic
+        fun createAmbientLight(): ZLight = ZLight().apply { lamp = ZAmbientLamp() }
+
+        @JvmStatic
+        fun createDirectionalLight(): ZLight = ZLight().apply { lamp = ZDirectionalLamp() }
+
+        @JvmStatic
+        fun createPointLight(): ZLight = ZLight().apply { lamp = ZPointLamp() }
+
+        @JvmStatic
+        fun createSpotLight(): ZLight = ZLight().apply { lamp = ZSpotLamp() }
     }
 }
