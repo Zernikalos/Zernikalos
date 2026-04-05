@@ -2,6 +2,52 @@
 
 All notable changes to the Zernikalos Engine will be documented in this file.
 
+## [v0.9.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.9.0) (2026-04-05)
+
+### Added
+
+- 🎸 Default scene builder ([89fa08e06759b38](https://github.com/Zernikalos/Zernikalos/commit/89fa08e06759b3818702bae247cd9ffbdbfca34e))
+- 🎸 Add builder functions ([f933dd8d9c50c76](https://github.com/Zernikalos/Zernikalos/commit/f933dd8d9c50c76775a686d34ed5328205932c07))
+- 🎸 Adding basic ambient light support ([dad8720c2fda253](https://github.com/Zernikalos/Zernikalos/commit/dad8720c2fda2533a8387abc97a68fad23556c7c))
+- 🎸 Support for enable-disable objects in scene ([a6da5714a12ba41](https://github.com/Zernikalos/Zernikalos/commit/a6da5714a12ba41342c0d60fc9eb1124e6b1b8ab))
+- 🎸 Disposal methods added to the hierarchy ([05f1b8c63718a88](https://github.com/Zernikalos/Zernikalos/commit/05f1b8c63718a88e9f6f1fe014d6f1dafd3250d8))
+- 🎸 Really basic interactive light ([b95f994b41fa909](https://github.com/Zernikalos/Zernikalos/commit/b95f994b41fa90937986adf7c7b79f07b0896940))
+- 🎸 Adding support for Skin bind matrix on Metal and WebGPU ([a74f5e66245232e](https://github.com/Zernikalos/Zernikalos/commit/a74f5e66245232ee791af9624e31445b504cca6a))
+- 🎸 Adding support for Skin bind matrix on models ([9420c174017543d](https://github.com/Zernikalos/Zernikalos/commit/9420c174017543d9bda9f3fb4271216d02b27a10))
+- 🎸 Upgrade ZKO to v0.16.0 ([df6d698f4f578cc](https://github.com/Zernikalos/Zernikalos/commit/df6d698f4f578ccde9db661f62a9aab6e067f061))
+
+### Fixed
+
+- 🐛 Small issue on WebGPU for ambient light ([c154d199c4a8582](https://github.com/Zernikalos/Zernikalos/commit/c154d199c4a8582d0ed1c158d7f9220ec1816046))
+- 🐛 Errors when disposing webgpu instances ([25a9eb79ffd713a](https://github.com/Zernikalos/Zernikalos/commit/25a9eb79ffd713ae10d5eb5e44f906ad1671acb0))
+
+
+### Changed
+
+- 💡 Improving current ZLamp format ([8c6ac95845b6c32](https://github.com/Zernikalos/Zernikalos/commit/8c6ac95845b6c32055e06a5d89bed0597fac2732))
+- 💡 Remove of context limited lightning format ([570b41ae69a453d](https://github.com/Zernikalos/Zernikalos/commit/570b41ae69a453dbfbdc5c89be97a92b875f27ae))
+- 💡 Remove old generators ([f45a9258ee1762f](https://github.com/Zernikalos/Zernikalos/commit/f45a9258ee1762ff80378ed049235f3c693a170a))
+- 💡 UA Parser removal ([1d29e748cc2811e](https://github.com/Zernikalos/Zernikalos/commit/1d29e748cc2811e374419ddb2fee0330686ffe32))
+- 💡 Components simplification ([e0687a66461cb16](https://github.com/Zernikalos/Zernikalos/commit/e0687a66461cb16dc65b1ede52cc3ddbdd322f28))
+- 💡 Big improvements to the uniform creation workflow ([9ff76ee1a9f0bb2](https://github.com/Zernikalos/Zernikalos/commit/9ff76ee1a9f0bb2ef141d75edffb3e42411385a2))
+- 💡 Small improvements on the ZSurfaceViewEventHandlerImpl and state ([60135883d0c68d0](https://github.com/Zernikalos/Zernikalos/commit/60135883d0c68d0db7012e161ca2e7bf3f337613))
+
+### Documentation
+
+- 📖 Improving README ([c4e127a674ffbfb](https://github.com/Zernikalos/Zernikalos/commit/c4e127a674ffbfb72813eb21f88b35ec78aaf265))
+- 📖 Moving docs to docs folder ([c26ba8947a14680](https://github.com/Zernikalos/Zernikalos/commit/c26ba8947a1468006975750e3c562e0ab5caa84b))
+- 📖 Updating documentation ([59e09c6ced7a412](https://github.com/Zernikalos/Zernikalos/commit/59e09c6ced7a4128ac4976347347324a68b809dc))
+
+
+
+
+
+### Chore
+
+- 🤖 Upgrade dependencies ([e0504bd22d41516](https://github.com/Zernikalos/Zernikalos/commit/e0504bd22d41516debb85f88e137b17149fe1f79))
+- 🤖 Modifying dokka configs ([4d65f6569b829da](https://github.com/Zernikalos/Zernikalos/commit/4d65f6569b829da46f407078d306da539626b905))
+- 🤖 Adopt library-format ([026309027754d63](https://github.com/Zernikalos/Zernikalos/commit/026309027754d637d1b19e00fcfeacb8cb3aa576))
+
 ## [v0.8.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.8.0) (2026-02-11)
 
 ### Added
