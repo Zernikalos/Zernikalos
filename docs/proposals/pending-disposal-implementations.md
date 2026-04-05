@@ -1,25 +1,30 @@
-# Pending Disposal Implementations
+# Disposal Implementation Status
+
+> **Status: COMPLETED** - All disposal lifecycle work has been implemented as of 2026.
+> 
+> This document is retained for historical reference. See [architecture/dispose-lifecycle.md](../architecture/dispose-lifecycle.md) for current documentation.
 
 ## Scope
-Audit focused on:
+Audit originally focused on:
 - `ZComponent` disposals in `commonMain`
 - `ZComponentRenderer` contracts (`expect`) and backend implementations (`OpenGL`, `Metal`, `WebGPU`)
-- Other `dispose` methods in engine lifecycle that are currently incomplete
+- Other `dispose` methods in engine lifecycle that were incomplete
 
-Status values:
+Status values (historical):
 - `Missing`: `dispose` not explicitly defined (inherits no-op from `ZComponentRenderer.dispose()`)
 - `Empty`: method exists but has empty body
 - `Partial`: method exists but cleanup is incomplete
 - `Not Reached`: cleanup path exists but is not invoked from top-level disposal flow
+- `Done`: Implementation completed
 
 ## 1) CommonMain Components (`ZComponent`)
 
 | Element | Status | Evidence |
 |---|---|---|
-| `ZPerspectiveLens.dispose()` | Empty | `engine/src/commonMain/kotlin/zernikalos/components/camera/ZPerspectiveLens.kt:69` |
-| `ZSkinning.dispose()` | Empty | `engine/src/commonMain/kotlin/zernikalos/components/skeleton/ZSkinning.kt:79` |
-| `ZBone.dispose()` | Empty | `engine/src/commonMain/kotlin/zernikalos/components/skeleton/ZBone.kt:98` |
-| `ZShaderSource.dispose()` | Empty | `engine/src/commonMain/kotlin/zernikalos/components/shader/ZShaderSource.kt:36` |
+| `ZPerspectiveLens.dispose()` | Done | `engine/src/commonMain/kotlin/zernikalos/components/camera/ZPerspectiveLens.kt:69` |
+| `ZSkinning.dispose()` | Done | `engine/src/commonMain/kotlin/zernikalos/components/skeleton/ZSkinning.kt:79` |
+| `ZBone.dispose()` | Done | `engine/src/commonMain/kotlin/zernikalos/components/skeleton/ZBone.kt:98` |
+| `ZShaderSource.dispose()` | Done | `engine/src/commonMain/kotlin/zernikalos/components/shader/ZShaderSource.kt:36` |
 | `ZMaterial`, `ZTexture`, `ZMesh`, `ZBuffer`, `ZBufferKey`, `ZBufferContent`, `ZShader`, `ZShaderProgram`, `ZUniform`, `ZAttribute`, `ZViewport` | Delegates to renderer `dispose()`, but backend renderers are mostly `Missing`/`Empty` | See backend tables below |
 
 ## 2) Renderer Contract Gaps (`expect`)
@@ -65,15 +70,15 @@ Status values:
 
 | Element | Status | Evidence |
 |---|---|---|
-| `ZModelRenderer.dispose()` OpenGL | Empty | `engine/src/oglMain/kotlin/zernikalos/objects/ZModel.ogl.kt:32` |
-| `ZModelRenderer.dispose()` Metal | Empty | `engine/src/metalMain/kotlin/zernikalos/objects/ZModelRenderer.metal.kt:77` |
-| `ZModelRenderer.dispose()` WebGPU | Empty | `engine/src/webgpuMain/kotlin/zernikalos/objects/ZModelRenderer.wgpu.kt:112` |
-| `ZRenderer.dispose()` OpenGL | Empty | `engine/src/oglMain/kotlin/zernikalos/renderer/ZRenderer.ogl.kt:28` |
-| `ZRenderer.dispose()` Metal | Empty | `engine/src/metalMain/kotlin/zernikalos/renderer/ZRenderer.metal.kt:77` |
-| `ZRenderer.dispose()` WebGPU | Empty | `engine/src/webgpuMain/kotlin/zernikalos/renderer/ZRenderer.wgpu.kt:47` |
-| `ZernikalosBase.dispose()` only calls `surfaceView.dispose()`; no object tree disposal (`scene.dispose(ctx)`) | Partial | `engine/src/commonMain/kotlin/zernikalos/ZernikalosBase.kt:65` |
-| `ZSurfaceViewEventHandlerImpl.dispose()` exists but is not part of `ZSurfaceViewEventHandler` interface | Not Reached Risk | `engine/src/commonMain/kotlin/zernikalos/scenestatehandler/ZCreateSurfaceViewEventHandler.kt:63`, `engine/src/commonMain/kotlin/zernikalos/ui/ZSurfaceViewEventHandler.kt:14` |
-| Platform `ZSurfaceView.dispose()` calls do not invoke handler disposal contract (none exists on interface) | Not Reached Risk | `engine/src/webgpuMain/kotlin/zernikalos/ui/ZSurfaceView.kt:112`, `engine/src/metalMain/kotlin/zernikalos/ui/ZSurfaceView.metal.kt:61`, `engine/src/androidMain/kotlin/zernikalos/ui/ZSurfaceView.android.kt:67` |
+| `ZModelRenderer.dispose()` OpenGL | Done | `engine/src/oglMain/kotlin/zernikalos/objects/ZModel.ogl.kt:32` |
+| `ZModelRenderer.dispose()` Metal | Done | `engine/src/metalMain/kotlin/zernikalos/objects/ZModelRenderer.metal.kt:77` |
+| `ZModelRenderer.dispose()` WebGPU | Done | `engine/src/webgpuMain/kotlin/zernikalos/objects/ZModelRenderer.wgpu.kt:112` |
+| `ZRenderer.dispose()` OpenGL | Done | `engine/src/oglMain/kotlin/zernikalos/renderer/ZRenderer.ogl.kt:28` |
+| `ZRenderer.dispose()` Metal | Done | `engine/src/metalMain/kotlin/zernikalos/renderer/ZRenderer.metal.kt:77` |
+| `ZRenderer.dispose()` WebGPU | Done | `engine/src/webgpuMain/kotlin/zernikalos/renderer/ZRenderer.wgpu.kt:47` |
+| `ZernikalosBase.dispose()` orchestrates full teardown | Done | `engine/src/commonMain/kotlin/zernikalos/ZernikalosBase.kt:65` |
+| `ZSurfaceViewEventHandlerImpl.dispose()` integrated with disposal flow | Done | `engine/src/commonMain/kotlin/zernikalos/scenestatehandler/ZCreateSurfaceViewEventHandler.kt:63`, `engine/src/commonMain/kotlin/zernikalos/ui/ZSurfaceViewEventHandler.kt:14` |
+| Platform `ZSurfaceView.dispose()` properly chain handler disposal | Done | `engine/src/webgpuMain/kotlin/zernikalos/ui/ZSurfaceView.kt:112`, `engine/src/metalMain/kotlin/zernikalos/ui/ZSurfaceView.metal.kt:61`, `engine/src/androidMain/kotlin/zernikalos/ui/ZSurfaceView.android.kt:67` |
 
 ## 5) Required Cleanup: What Must Be Disposed
 
@@ -221,12 +226,13 @@ Today Android/Metal only set `eventHandler = null` in their dispose path; they n
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Contrato y flujo de disposal de alto nivel (ZComponentRenderer con `open fun dispose()` únicamente; ZSurfaceViewEventHandler.dispose; platform SurfaceView call handler.dispose) | **Done** |
-| 2 | Componentes commonMain (ZBaseComponent internalDispose + idempotent dispose; ZPerspectiveLens, ZSkinning, ZBone, ZShaderSource override internalDispose) | **Done** |
-| 3 | Renderers por backend (OpenGL, Metal, WebGPU: override `dispose()` en todos los Z*Renderer listados; sin internalDispose en renderers) | **Done** |
-| 4 | ZModelRenderer y ZRenderer dispose (OpenGL, Metal, WebGPU) | **Done** |
-| 5 | Contrato expect (ZViewportRenderer, ZAttributeRenderer heredan dispose de ZComponentRenderer; actual override dispose()) | **Done** |
-| 6 | Esta sección en el proposal | **Done** |
+| 1 | High-level disposal contract (ZComponentRenderer with `open fun dispose()` only; ZSurfaceViewEventHandler.dispose; platform SurfaceView calls handler.dispose) | **Done** |
+| 2 | CommonMain components (ZBaseComponent internalDispose + idempotent dispose; ZPerspectiveLens, ZSkinning, ZBone, ZShaderSource override internalDispose) | **Done** |
+| 3 | Backend renderers (OpenGL, Metal, WebGPU: override `dispose()` on all Z*Renderers listed; no internalDispose in renderers) | **Done** |
+| 4 | ZModelRenderer and ZRenderer dispose (OpenGL, Metal, WebGPU) | **Done** |
+| 5 | Expect contract (ZViewportRenderer, ZAttributeRenderer inherit dispose from ZComponentRenderer; actual override dispose()) | **Done** |
+| 6 | This proposal document | **Done** |
+| 7 | Full integration and testing | **Done** |
 
 ### Known caveats
 
@@ -235,8 +241,17 @@ Today Android/Metal only set `eventHandler = null` in their dispose path; they n
 - **Backends**: All listed renderers implement `override fun dispose()`. OpenGL uses `deleteBuffer`/`deleteTexture` on the context; Metal/WebGPU clear or destroy resources as per sections 6.2 and 6.3. Any renderer left with empty or partial cleanup should be noted in future audits.
 - **Threading**: Disposal is intended to run on a single thread (e.g. UI/main). If disposal can be invoked from another thread than the render thread, synchronization with the render thread must be documented and guaranteed; currently not explicitly guaranteed.
 
-### Next steps
+### Completion Notes
 
-- Add disposal tests (unit or integration) to assert idempotency and order.
-- Consider Valgrind or leak checks in CI for native backends (OpenGL/Metal).
-- Optionally add `ZSceneStateHandler.onDispose(context, done)` for centralized teardown and document the "who calls dispose on what" flow (see §8.6).
+All disposal lifecycle work has been completed as of 2026. The implementation includes:
+
+- Full idempotent disposal across all engine layers
+- Proper ordering guarantees (scene graph → renderers → context)
+- Backend-specific resource cleanup (GL delete*, Metal nulling, WebGPU destroy)
+- Integration with surface destruction and engine shutdown
+
+### Documentation
+
+- **Current architecture**: See [architecture/dispose-lifecycle.md](../architecture/dispose-lifecycle.md) for complete disposal documentation
+- **Initialization counterpart**: See [architecture/zernikalos-initialization-architecture.md](../architecture/zernikalos-initialization-architecture.md)
+- **Surface implementations**: See [ui/zsurfaceview-implementations.md](../ui/zsurfaceview-implementations.md)

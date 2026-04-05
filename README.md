@@ -1,94 +1,78 @@
 <h2 align="center">Zernikalos Engine</h2>
 
 <div align="center">
-<img src="docsAssets/logo-icon.svg" alt="Logo" width="124" height="124">
+  <img src="dokkaAssets/logo-icon.svg" alt="Zernikalos logo" width="124" height="124">
 
   <p align="center">
-    Zernikalos is a lightweight and fast game engine developed entirely in Kotlin for Android, iOS, and Web. Built with a simple yet powerful API, it facilitates efficient game development, ensuring a seamless experience across platforms.
+    Kotlin-first 3D engine for Android, iOS, and Web.
+    <br />
+    Build one rendering and gameplay core, then ship it across platforms with native surfaces and a shared scene model.
+  </p>
+
+  <p align="center">
+    <a href="https://zernikalos.dev/docs/quick-start"><strong>Quick Start</strong></a>
+    ·
+    <a href="https://zernikalos.dev/demos"><strong>Live Demos</strong></a>
+    ·
+    <a href="https://zernikalos.dev/api"><strong>API Reference</strong></a>
   </p>
 </div>
 
-## 🚀 Quick Start
+## What Is Zernikalos?
 
-### Building the Project
+Zernikalos is a Kotlin Multiplatform 3D engine for real-time graphics and cross-platform experimentation. It provides a unified API that compiles to native Android, Apple, and Web targets from a single codebase.
 
-For building the project across all platforms:
+The engine is currently best suited to prototyping and experimentation. See the [live demos](https://zernikalos.dev/demos) and [documentation](https://zernikalos.dev/docs) for the current workflow and capabilities.
+
+## Features
+
+- **Kotlin Multiplatform** — One codebase, native performance on Android, iOS, macOS, and Web
+- **Scene graph** — Hierarchical composition of cameras, lights, models, and transforms
+- **Asset pipeline** — Import from standard formats (GLB, glTF, FBX, OBJ) and bundle for runtime
+- **Skeletal animation** — Playback and control of rigged character animations
+- **Platform backends** — OpenGL (Android), Metal (Apple), WebGPU/WebGL (Web)
+
+## Getting Started
+
+### Documentation
+
+- [Quick Start](https://zernikalos.dev/docs/quick-start)
+- [Documentation](https://zernikalos.dev/docs)
+- [API Reference](https://zernikalos.dev/api)
+
 ```bash
 ./gradlew build
 ```
 
-### Platform-Specific Builds
+## Repository Structure
 
-**Android:**
-```bash
-./gradlew assembleAndroidRelease
-```
+| Directory | Contents |
+|-----------|----------|
+| `engine/` | Kotlin Multiplatform engine source |
+| `docs/` | API reference and architecture documentation |
 
-**iOS:**
-```bash
-./gradlew assembleZernikalosXCFramework
-```
-*Note: Requires Xcode installed on macOS*
+For detailed architecture docs, see [`docs/architecture/`](docs/architecture/).
 
-**Web:**
-```bash
-./gradlew jsBrowserWebpack
-```
-
-## 📦 Release Process
-
-### Creating a New Version
-
-To upgrade to version X.Y.Z and publish:
-
-```bash
-# 1. Set new version
-./gradlew setVersion -PnewVersion=X.Y.Z
-
-# 2. Generate version files
-./gradlew updateVersion
-
-# 3. Create release commit and tag
-./gradlew releaseCommit
-
-# 4. Push to trigger automated build and publish
-git push origin main --tags
-```
-
-The system automatically:
-- Builds all platforms
-- Publishes to GitHub Packages (Maven + NPM)
-- Creates GitHub Release
-
-
-## 🛠️ Development
+## Development
 
 ### Prerequisites
-- **Gradle**: Latest version
-- **Kotlin**: Multiplatform support
-- **Android**: Android SDK (for Android builds)
-- **iOS**: Xcode (for iOS builds)
-- **Web**: Node.js (for web builds)
 
-### Available Gradle Tasks
-See [gradle/libs.versions.toml](gradle/libs.versions.toml) for all available tasks and dependencies.
+- JDK 17+
+- Android SDK (for Android builds)
+- Xcode and CocoaPods (for Apple targets)
+- Node.js (for Web/JS tooling)
 
-## 🤝 Contributing
+### Published packages
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+Packages are published to GitHub Packages in this repository:
 
-### Contributors
+- **Maven:** `dev.zernikalos:zernikalos` — [View on GitHub Packages](https://github.com/aarongarcia/zernikalos/packages)
+- **npm:** `@zernikalos/zernikalos` — [View on GitHub Packages](https://github.com/aarongarcia/zernikalos/packages)
 
-- **Aarón Negrín** - Lead Developer & Creator
+## Contributing
 
-## 📄 License
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
-This project is licensed under the Mozilla Public License 2.0 (MPL 2.0). See the [LICENSE](LICENSE) file for details.
+## License
 
-## 🔗 Links
-
-- **Website**: [zernikalos.dev](https://zernikalos.dev)
-- **GitHub**: [Zernikalos/Zernikalos](https://github.com/Zernikalos/Zernikalos)
-- **Packages**: 
-  - Maven: `dev.zernikalos:zernikalos`
-  - NPM: `@zernikalos/zernikalos`
+This project is licensed under the Mozilla Public License 2.0. See [LICENSE](LICENSE) for details.

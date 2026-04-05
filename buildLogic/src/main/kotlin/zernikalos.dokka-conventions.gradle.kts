@@ -53,9 +53,9 @@ dokka {
     }
 
     pluginsConfiguration.html {
-        templatesDir = project.file("../docs/dokkaTemplates")
-        customStyleSheets.from(project.file("../docsAssets/zk-docs-styles.css"))
-        customAssets.from(project.file("../docsAssets/logo-icon.svg"))
+        templatesDir = project.file("../dokkaAssets/dokkaTemplates")
+        customStyleSheets.from(project.file("../dokkaAssets/zk-docs-styles.css"))
+        customAssets.from(project.file("../dokkaAssets/logo-icon.svg"))
         footerMessage.set("© ${Year.now()} $zernikalosNameCapital")
     }
 }
