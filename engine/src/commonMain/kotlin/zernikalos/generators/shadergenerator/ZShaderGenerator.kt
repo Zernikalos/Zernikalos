@@ -65,6 +65,7 @@ internal abstract class ZShaderGenerator(): ZLoggable {
         }
         if (params.useLighting) {
             shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_LIGHT.name, ZLightUniformBlock)
+            shaderProgram.addUniform(UNIFORM_KEYS.BLOCK_AMBIENT_LIGHT.name, ZAmbientLightUniformBlock)
         }
     }
 

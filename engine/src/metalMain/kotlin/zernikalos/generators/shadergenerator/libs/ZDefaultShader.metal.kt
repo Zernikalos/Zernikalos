@@ -62,18 +62,32 @@ typedef struct
 #endif
 
 #ifdef USE_LIGHTING
+// MAX_DIRECT_LIGHTS must match Kotlin MAX_DIRECT_LIGHTS.
+#define MAX_DIRECT_LIGHTS 4
 typedef struct
 {
     float4 direction;
     float4 position;
     float4 color;
     float intensity;
-    float type;
+    float lampType;
     float range;
     float decay;
     float innerAngle;
     float outerAngle;
+} DirectLight;
+
+typedef struct
+{
+    DirectLight lights[MAX_DIRECT_LIGHTS];
+    float directCount;
 } LightUniforms;
+
+typedef struct
+{
+    float4 ambientColor;
+    float ambientIntensity;
+} AmbientLightUniforms;
 #endif
 """
 
@@ -105,10 +119,16 @@ ColorInOut computeOutColor(Vertex in, constant Uniforms &uniforms, float4 finalP
 
 #ifdef USE_SKINNING
 /*
- * Computes skinned position in mesh local space.
- * 1. modelSkinBindMatrix * position -> skeleton space
- * 2. Weighted blend of (bones[i] * invBindMatrix[i]) * posInSkeletonSpace
- * 3. modelSkinBindMatrixInverse * blended -> mesh space
+ * Computes the skinned position in mesh local space.
+ *
+ * Pipeline:
+ * 1. Transform vertex to skeleton space: modelSkinBindMatrix * position
+ *    (when mesh and skeleton share the same node, modelSkinBindMatrix is identity)
+ * 2. Apply weighted blend of per-bone skin matrices (bones[i] * invBindMatrix[i])
+ * 3. Transform back to mesh space: modelSkinBindMatrixInverse * blended
+ *
+ * Formula: modelSkinBindMatrixInverse * blended, where blended is the weighted sum of
+ * (bones[i] * invBindMatrix[i] * posInSkeletonSpace) and posInSkeletonSpace = modelSkinBindMatrix * position.
  */
 float4 calculateSkinnedPosition(
     float3 basePosition,
@@ -224,33 +244,35 @@ float3 applyTonemapping(float3 color) {
 
 #ifdef USE_LIGHTING
 // Computes the light direction vector and attenuation factor for any light type.
-// type: 0 = directional, 1 = point, 2 = spot
+// lampType: 0 = directional, 1 = point, 2 = spot
 void computeLightContribution(
     constant LightUniforms &light,
+    int idx,
     float3 fragPosition,
     thread float3 &outLightDir,
     thread float &outAttenuation
 ) {
+    DirectLight L = light.lights[idx];
     outAttenuation = 1.0;
 
-    if (light.type < 0.5) {
+    if (L.lampType < 0.5) {
         // Directional light: direction is constant
-        outLightDir = normalize(-light.direction.xyz);
+        outLightDir = normalize(-L.direction.xyz);
     } else {
         // Point / Spot light: direction depends on fragment position
-        float3 toLight = light.position.xyz - fragPosition;
+        float3 toLight = L.position.xyz - fragPosition;
         float dist = length(toLight);
         outLightDir = normalize(toLight);
 
         // Distance attenuation
-        float maxRange = max(light.range, 0.0001);
-        outAttenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(light.decay, 1.0));
+        float maxRange = max(L.range, 0.0001);
+        outAttenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(L.decay, 1.0));
 
-        if (light.type > 1.5) {
+        if (L.lampType > 1.5) {
             // Spot light: cone attenuation
-            float cosAngle = dot(-outLightDir, normalize(light.direction.xyz));
-            float cosInner = cos(light.innerAngle);
-            float cosOuter = cos(light.outerAngle);
+            float cosAngle = dot(-outLightDir, normalize(L.direction.xyz));
+            float cosInner = cos(L.innerAngle);
+            float cosOuter = cos(L.outerAngle);
             float spotFactor = clamp((cosAngle - cosOuter) / (cosInner - cosOuter + 0.0001), 0.0, 1.0);
             outAttenuation *= spotFactor;
         }
@@ -295,7 +317,20 @@ float3 fresnelSchlick(float cosTheta, float3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-float3 calculatePBRColor(
+#if defined(USE_LIGHTING)
+// Indirect / ambient term from global AmbientLight (separate from direct lights[]).
+float3 calculatePBRAmbient(float4 baseColor, constant PBRMaterialUniforms &pbrMaterial, constant AmbientLightUniforms &ambientLight) {
+    // Material properties from uniform
+    float3 albedo = pbrMaterial.color.rgb * baseColor.rgb;
+    float metalness = pbrMaterial.metalness;
+    float3 F0 = float3(0.04);
+    F0 = mix(F0, albedo, metalness);
+    float3 kD = (float3(1.0) - F0) * (1.0 - metalness);
+    return ambientLight.ambientColor.rgb * ambientLight.ambientIntensity * albedo * kD;
+}
+#endif
+
+float3 calculatePBRLoDirect(
     float4 baseColor,
     float3 normal,
     float3 viewPosition,
@@ -335,17 +370,71 @@ float3 calculatePBRColor(
     float NdotL = max(dot(N, L), 0.0);
     float3 Lo = (kD * albedo / PI + specular) * lightColor * NdotL;
 
+    return Lo;
+}
+
+float3 calculatePBRColorNoLighting(
+    float4 baseColor,
+    float3 normal,
+    float3 viewPosition,
+    constant PBRMaterialUniforms &pbrMaterial,
+    float3 lightDir,
+    float3 lightColor
+) {
+    // Material properties from uniform
+    float3 albedo = pbrMaterial.color.rgb * baseColor.rgb;
+
     // Ambient light
     float3 ambient = float3(0.03) * albedo;
-    float3 color = ambient + Lo;
+    float3 color = ambient + calculatePBRLoDirect(baseColor, normal, viewPosition, pbrMaterial, lightDir, lightColor);
 
     return color;
 }
 #endif
 
 #if defined(USE_PHONG_MATERIAL) && defined(USE_NORMALS)
+#if defined(USE_LIGHTING)
+// Global ambient from AmbientLight * material ambient * base color.
+float3 calculatePhongAmbient(float4 baseColor, constant PhongMaterialUniforms &phongMaterial, constant AmbientLightUniforms &ambientLight) {
+    return ambientLight.ambientColor.rgb * ambientLight.ambientIntensity * phongMaterial.ambient.rgb * baseColor.rgb;
+}
+
+float3 calculatePhongDirect(
+    float4 baseColor,
+    float3 normal,
+    float3 viewPosition,
+    constant PhongMaterialUniforms &phongMaterial,
+    float3 lightDir,
+    float3 lightColor
+) {
+    // Material properties from uniform
+    float3 diffuse = phongMaterial.diffuse.rgb * baseColor.rgb;
+    float3 specular = phongMaterial.specular.rgb;
+    float shininess = phongMaterial.shininess;
+
+    // Vector calculations
+    float3 N = normalize(normal);
+    float3 V = normalize(-viewPosition);
+    float3 L = lightDir;
+    float3 H = normalize(V + L);
+
+    // Diffuse component
+    float NdotL = max(dot(N, L), 0.0);
+    float3 diffuseComponent = diffuse * lightColor * NdotL;
+
+    // Specular component (Blinn-Phong)
+    float NdotH = max(dot(N, H), 0.0);
+    float3 specularComponent = specular * lightColor * pow(NdotH, shininess);
+
+    // Combine all components
+    float3 finalColor = diffuseComponent + specularComponent;
+
+    return finalColor;
+}
+#endif
+
 // Blinn-Phong lighting calculation
-float3 calculateBlinnPhongColor(
+float3 calculateBlinnPhongColorNoLighting(
     float4 baseColor,
     float3 normal,
     float3 viewPosition,
@@ -405,6 +494,7 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
                                #endif
                                #if defined(USE_LIGHTING)
                                , constant LightUniforms &light [[buffer(${UNIFORM_IDS.BLOCK_LIGHT})]]
+                               , constant AmbientLightUniforms &ambientLight [[buffer(${UNIFORM_IDS.BLOCK_AMBIENT_LIGHT})]]
                                #endif
                                #if defined(USE_TEXTURE)
                                , texture2d<half> colorMap     [[ texture(0) ]]
@@ -420,24 +510,27 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
         baseColor = float4(in.color, 1.0);
     #endif
 
-    // Compute light direction and color (with attenuation)
-    #if defined(USE_LIGHTING) && defined(USE_NORMALS)
-        float3 lightDir;
-        float attenuation;
-        computeLightContribution(light, in.viewPosition, lightDir, attenuation);
-        float3 lightColor = light.color.rgb * light.intensity * attenuation;
-    #endif
-
     #if defined(USE_PBR_MATERIAL)
         // WORKAROUND: Emissive disabled until emissive maps are supported (see GitHub issue)
         // Without emissive maps, models with emissive=[1,1,1] wash out to white
         float3 emissive = pbrMaterial.emissive.rgb * min(pbrMaterial.emissiveIntensity, 0.0);
 
         #if defined(USE_NORMALS) && defined(USE_LIGHTING)
-            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial, lightDir, lightColor);
+            // Direct lights: ambient term once + sum of per-light Cook-Torrance contributions.
+            int n = (int)(light.directCount + 0.5f);
+            float3 directSum = float3(0.0);
+            for (int i = 0; i < MAX_DIRECT_LIGHTS; i++) {
+                if (i >= n) break;
+                float3 lightDir;
+                float attenuation;
+                computeLightContribution(light, i, in.viewPosition, lightDir, attenuation);
+                float3 lightColor = light.lights[i].color.rgb * light.lights[i].intensity * attenuation;
+                directSum += calculatePBRLoDirect(baseColor, in.normal, in.viewPosition, pbrMaterial, lightDir, lightColor);
+            }
+            float3 litColor = calculatePBRAmbient(baseColor, pbrMaterial, ambientLight) + directSum;
         #elif defined(USE_NORMALS)
             // Fallback: no light uniform available, use default
-            float3 litColor = calculatePBRColor(baseColor, in.normal, in.viewPosition, pbrMaterial, normalize(float3(5.0, 5.0, 5.0)), float3(2.0));
+            float3 litColor = calculatePBRColorNoLighting(baseColor, in.normal, in.viewPosition, pbrMaterial, normalize(float3(5.0, 5.0, 5.0)), float3(2.0));
         #else
             float3 litColor = baseColor.rgb;
         #endif
@@ -446,11 +539,22 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
         return float4(finalColor, baseColor.a);
     #elif defined(USE_PHONG_MATERIAL)
         #if defined(USE_NORMALS) && defined(USE_LIGHTING)
-            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial, lightDir, lightColor);
+            // Direct lights: global ambient + sum of diffuse/specular per light.
+            int n = (int)(light.directCount + 0.5f);
+            float3 directSum = float3(0.0);
+            for (int i = 0; i < MAX_DIRECT_LIGHTS; i++) {
+                if (i >= n) break;
+                float3 lightDir;
+                float attenuation;
+                computeLightContribution(light, i, in.viewPosition, lightDir, attenuation);
+                float3 lightColor = light.lights[i].color.rgb * light.lights[i].intensity * attenuation;
+                directSum += calculatePhongDirect(baseColor, in.normal, in.viewPosition, phongMaterial, lightDir, lightColor);
+            }
+            float3 phongColor = calculatePhongAmbient(baseColor, phongMaterial, ambientLight) + directSum;
             return float4(phongColor, baseColor.a);
         #elif defined(USE_NORMALS)
             // Fallback: no light uniform available, use default
-            float3 phongColor = calculateBlinnPhongColor(baseColor, in.normal, in.viewPosition, phongMaterial, normalize(float3(5.0, -5.0, 5.0)), float3(2.0));
+            float3 phongColor = calculateBlinnPhongColorNoLighting(baseColor, in.normal, in.viewPosition, phongMaterial, normalize(float3(5.0, -5.0, 5.0)), float3(2.0));
             return float4(phongColor, baseColor.a);
         #else
             return baseColor;

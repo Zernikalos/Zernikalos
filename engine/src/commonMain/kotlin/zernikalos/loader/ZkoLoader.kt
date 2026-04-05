@@ -14,6 +14,7 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
 import zernikalos.action.ZSkeletalAction
+import zernikalos.components.light.*
 import zernikalos.components.material.ZTexture
 import zernikalos.components.material.ZTextureSerializer
 import zernikalos.components.mesh.ZMesh
@@ -34,6 +35,13 @@ fun createZerializerModule(): SerializersModule {
             subclass(ZCamera::class)
             subclass(ZSkeleton::class)
             defaultDeserializer { ZGroup.serializer() }
+        }
+
+        polymorphic(ZLamp::class) {
+            subclass(ZDirectionalLamp::class)
+            subclass(ZPointLamp::class)
+            subclass(ZSpotLamp::class)
+            subclass(ZAmbientLamp::class)
         }
 
         contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}

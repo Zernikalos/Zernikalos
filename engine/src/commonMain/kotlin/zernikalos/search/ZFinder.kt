@@ -8,6 +8,7 @@
 
 package zernikalos.search
 
+import zernikalos.components.light.ZLampType
 import zernikalos.objects.*
 import kotlin.js.JsExport
 
@@ -54,4 +55,51 @@ fun findFirstCamera(root: ZObject): ZCamera? {
 @JsExport
 fun findFirstLight(root: ZObject): ZLight? {
     return findInTree(root) {it.type == ZObjectType.LIGHT} as ZLight?
+}
+
+/**
+ * Finds every [ZLight] in a [ZObject] tree starting at [root], in depth-first preorder
+ * (same order as [treeTraverse]).
+ *
+ * @param root The root [ZObject] from which to start the search.
+ * @return All [ZLight] instances found; empty if there are none.
+ */
+@JsExport
+fun findAllLights(root: ZObject): List<ZLight> {
+    val out = arrayListOf<ZLight>()
+    val it = treeTraverse(root)
+    while (it.hasNext()) {
+        val node = it.next()
+        if (node.type == ZObjectType.LIGHT) {
+            out.add(node as ZLight)
+        }
+    }
+    return out
+}
+
+/**
+ * Finds all direct lights (directional, point, spot) in a [ZObject] tree starting at [root],
+ * excluding ambient lights. Returns only enabled lights.
+ *
+ * @param root The root [ZObject] from which to start the search.
+ * @return All enabled direct [ZLight] instances found; empty if there are none.
+ */
+@JsExport
+fun findAllDirectLights(root: ZObject): List<ZLight> {
+    return findAllLights(root).filter {
+        it.isEnabled && it.lampType != ZLampType.AMBIENT
+    }
+}
+
+/**
+ * Finds the first enabled ambient light in a [ZObject] tree starting at [root].
+ *
+ * @param root The root [ZObject] from which to start the search.
+ * @return The first enabled ambient [ZLight] found, or null if none exists.
+ */
+@JsExport
+fun findAmbientLight(root: ZObject): ZLight? {
+    return findAllLights(root).firstOrNull {
+        it.isEnabled && it.lampType == ZLampType.AMBIENT
+    }
 }

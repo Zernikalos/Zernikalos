@@ -6,18 +6,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+@file:OptIn(kotlin.js.ExperimentalJsExport::class)
+
 package zernikalos.objects
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.light.ZDirectionalLamp
-import zernikalos.components.light.ZLampType
-import zernikalos.components.light.ZPointLamp
-import zernikalos.components.light.ZSpotLamp
+import zernikalos.components.light.*
 import zernikalos.context.ZContext
 import zernikalos.math.ZColor
 import kotlin.js.JsExport
+import kotlin.jvm.JvmStatic
 
 @JsExport
 @Serializable
@@ -26,30 +27,40 @@ class ZLight: ZObject() {
     @Transient
     override val type: ZObjectType = ZObjectType.LIGHT
 
-    @ProtoNumber(4)
-    var lampType: ZLampType = ZLampType.DIRECTIONAL
-
     @ProtoNumber(5)
     var color: ZColor = ZColor.WHITE
     @ProtoNumber(6)
     var intensity: Float = 1.0f
 
     @ProtoNumber(10)
-    var directionalLamp: ZDirectionalLamp? = null
-    @ProtoNumber(11)
-    var pointLamp: ZPointLamp? = null
-    @ProtoNumber(12)
-    var spotLamp: ZSpotLamp? = null
+    @Contextual
+    var lamp: ZLamp? = null
+
+    val lampType: ZLampType
+        get() = lamp?.lampType ?: throw IllegalStateException("No lamp type specified for light")
 
     override fun internalInitialize(ctx: ZContext) {
-        if (ctx.sceneContext.activeLight == null) {
-            ctx.sceneContext.activeLight = this
-        }
+        // Lighting is now discovered via findAllLights()/findAllDirectLights()/findAmbientLight()
+        // from the scene graph each frame. No registration in context needed.
     }
 
     override fun internalRender(ctx: ZContext) {
     }
 
     override fun internalDispose(ctx: ZContext) {
+    }
+
+    companion object {
+        @JvmStatic
+        fun createAmbientLight(): ZLight = ZLight().apply { lamp = ZAmbientLamp() }
+
+        @JvmStatic
+        fun createDirectionalLight(): ZLight = ZLight().apply { lamp = ZDirectionalLamp() }
+
+        @JvmStatic
+        fun createPointLight(): ZLight = ZLight().apply { lamp = ZPointLamp() }
+
+        @JvmStatic
+        fun createSpotLight(): ZLight = ZLight().apply { lamp = ZSpotLamp() }
     }
 }

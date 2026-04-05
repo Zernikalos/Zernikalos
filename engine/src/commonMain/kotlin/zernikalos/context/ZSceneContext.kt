@@ -10,7 +10,6 @@ package zernikalos.context
 
 import zernikalos.generators.uniformgenerator.ZUniformGenerator
 import zernikalos.objects.ZCamera
-import zernikalos.objects.ZLight
 import zernikalos.objects.ZScene
 import kotlin.js.JsExport
 
@@ -25,8 +24,6 @@ open class ZSceneContext {
         }
 
     var activeCamera: ZCamera? = null
-
-    var activeLight: ZLight? = null
 
     private val uniformsGeneratorMap = HashMap<String, ZUniformGenerator>()
 

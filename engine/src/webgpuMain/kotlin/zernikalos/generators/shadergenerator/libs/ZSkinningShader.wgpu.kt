@@ -48,18 +48,30 @@ struct PBRMaterialUniforms {
 //#endif
 
 //#ifdef USE_LIGHTING
-struct LightUniforms {
+// MAX_DIRECT_LIGHTS must match Kotlin MAX_DIRECT_LIGHTS.
+const MAX_DIRECT_LIGHTS: u32 = 4u;
+struct DirectLight {
     direction: vec4<f32>,
     position: vec4<f32>,
     color: vec4<f32>,
     intensity: f32,
-    lightType: f32,
+    lampType: f32,
     range: f32,
     decay: f32,
     innerAngle: f32,
-    outerAngle: f32
+    outerAngle: f32,
+}
+struct LightUniforms {
+    lights: array<DirectLight, 4>,
+    directCount: f32,
 }
 @binding(${UNIFORM_IDS.BLOCK_LIGHT}) @group(0) var<uniform> light: LightUniforms;
+
+struct AmbientLightUniforms {
+    ambientColor: vec4<f32>,
+    ambientIntensity: f32,
+}
+@binding(${UNIFORM_IDS.BLOCK_AMBIENT_LIGHT}) @group(0) var<uniform> ambientLight: AmbientLightUniforms;
 //#endif
 
 //#ifdef USE_TEXTURES
@@ -106,9 +118,18 @@ struct VertexOutput {
 }
 
 //#ifdef USE_SKINNING
-// 1. modelSkinBindMatrix * position -> skeleton space
-// 2. Weighted blend of (bones[i] * invBindMatrix[i]) * posInSkeletonSpace
-// 3. modelSkinBindMatrixInverse * blended -> mesh space
+/*
+ * Computes the skinned position in mesh local space.
+ *
+ * Pipeline:
+ * 1. Transform vertex to skeleton space: modelSkinBindMatrix * position
+ *    (when mesh and skeleton share the same node, modelSkinBindMatrix is identity)
+ * 2. Apply weighted blend of per-bone skin matrices (bones[i] * invBindMatrix[i])
+ * 3. Transform back to mesh space: modelSkinBindMatrixInverse * blended
+ *
+ * Formula: modelSkinBindMatrixInverse * blended, where blended is the weighted sum of
+ * (bones[i] * invBindMatrix[i] * posInSkeletonSpace) and posInSkeletonSpace = modelSkinBindMatrix * position.
+ */
 fn calcSkinnedPosition(position: vec3<f32>, boneWeights: vec4<f32>, boneIndices: vec4<u32>) -> vec4<f32> {
     let posInSkeletonSpace = modelSkinning.modelSkinBindMatrix * vec4<f32>(position, 1.0);
     var skinnedPosition = vec4<f32>(0.0);
@@ -176,29 +197,31 @@ fn vs_main(input: VertexInput) -> VertexOutput {
 }
 
 //#ifdef USE_LIGHTING
-// Computes light direction and attenuation for any light type.
+// Computes light direction and attenuation for any light type (per entry in light.lights[idx]).
 // Returns: vec4 where xyz = light direction, w = attenuation
-fn computeLightContribution(fragPosition: vec3<f32>) -> vec4<f32> {
+// lampType: 0 = directional, 1 = point, 2 = spot
+fn computeLightContribution(idx: u32, fragPosition: vec3<f32>) -> vec4<f32> {
     var lightDir: vec3<f32>;
     var attenuation: f32 = 1.0;
+    let L = light.lights[idx];
 
-    if (light.lightType < 0.5) {
+    if (L.lampType < 0.5) {
         // Directional light
-        lightDir = normalize(-light.direction.xyz);
+        lightDir = normalize(-L.direction.xyz);
     } else {
         // Point / Spot light
-        let toLight = light.position.xyz - fragPosition;
+        let toLight = L.position.xyz - fragPosition;
         let dist = length(toLight);
         lightDir = normalize(toLight);
 
-        let maxRange = max(light.range, 0.0001);
-        attenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(light.decay, 1.0));
+        let maxRange = max(L.range, 0.0001);
+        attenuation = pow(clamp(1.0 - dist / maxRange, 0.0, 1.0), max(L.decay, 1.0));
 
-        if (light.lightType > 1.5) {
+        if (L.lampType > 1.5) {
             // Spot light cone attenuation
-            let cosAngle = dot(-lightDir, normalize(light.direction.xyz));
-            let cosInner = cos(light.innerAngle);
-            let cosOuter = cos(light.outerAngle);
+            let cosAngle = dot(-lightDir, normalize(L.direction.xyz));
+            let cosInner = cos(L.innerAngle);
+            let cosOuter = cos(L.outerAngle);
             let spotFactor = clamp((cosAngle - cosOuter) / (cosInner - cosOuter + 0.0001), 0.0, 1.0);
             attenuation = attenuation * spotFactor;
         }
@@ -209,6 +232,20 @@ fn computeLightContribution(fragPosition: vec3<f32>) -> vec4<f32> {
 //#endif
 
 //#ifdef USE_PBR_MATERIAL
+//#ifdef USE_LIGHTING
+// Indirect / ambient term from global AmbientLight (separate from direct lights[]).
+fn calculatePBRAmbient(baseColor: vec4<f32>) -> vec3<f32> {
+    // Material properties from uniform
+    let albedo = pbrMaterial.color.rgb * baseColor.rgb;
+    let metalness = pbrMaterial.metalness;
+    var F0 = vec3<f32>(0.04);
+    F0 = mix(F0, albedo, metalness);
+    let kD = (vec3<f32>(1.0) - F0) * (1.0 - metalness);
+    return ambientLight.ambientColor.rgb * ambientLight.ambientIntensity * albedo * kD;
+}
+//#endif
+
+// Calculates the distribution of microfacets using the Trowbridge-Reitz GGX formula.
 fn DistributionGGX(N: vec3<f32>, H: vec3<f32>, roughness: f32) -> f32 {
     let a = roughness * roughness;
     let a2 = a * a;
@@ -221,6 +258,7 @@ fn DistributionGGX(N: vec3<f32>, H: vec3<f32>, roughness: f32) -> f32 {
     return nom / denom;
 }
 
+// Calculates the geometric obstruction of microfacets.
 fn GeometrySchlickGGX(NdotV: f32, roughness: f32) -> f32 {
     let r = roughness + 1.0;
     let k = (r * r) / 8.0;
@@ -229,6 +267,7 @@ fn GeometrySchlickGGX(NdotV: f32, roughness: f32) -> f32 {
     return nom / denom;
 }
 
+// Calculates the geometry factor for both direct and view vectors.
 fn GeometrySmith(N: vec3<f32>, V: vec3<f32>, L: vec3<f32>, roughness: f32) -> f32 {
     let NdotV = max(dot(N, V), 0.0);
     let NdotL = max(dot(N, L), 0.0);
@@ -237,23 +276,28 @@ fn GeometrySmith(N: vec3<f32>, V: vec3<f32>, L: vec3<f32>, roughness: f32) -> f3
     return ggx1 * ggx2;
 }
 
+// Calculates the Fresnel effect, which describes the ratio of reflected light.
 fn fresnelSchlick(cosTheta: f32, F0: vec3<f32>) -> vec3<f32> {
     return F0 + (vec3<f32>(1.0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-fn calculatePBRColor(baseColor: vec4<f32>, normal: vec3<f32>, viewPosition: vec3<f32>, lightDir: vec3<f32>, lightColor: vec3<f32>) -> vec3<f32> {
+fn calculatePBRLoDirect(baseColor: vec4<f32>, normal: vec3<f32>, viewPosition: vec3<f32>, lightDir: vec3<f32>, lightColor: vec3<f32>) -> vec3<f32> {
+    // Material properties from uniform
     let albedo = pbrMaterial.color.rgb * baseColor.rgb;
     let metalness = pbrMaterial.metalness;
     let roughness = pbrMaterial.roughness;
 
+    // Vector calculations
     let N = normalize(normal);
     let V = normalize(-viewPosition);
     let L = lightDir;
     let H = normalize(V + L);
 
+    // Fresnel at normal incidence (F0)
     var F0 = vec3<f32>(0.04);
     F0 = mix(F0, albedo, metalness);
 
+    // Cook-Torrance BRDF
     let NDF = DistributionGGX(N, H, roughness);
     let G = GeometrySmith(N, V, L, roughness);
     let F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -266,11 +310,18 @@ fn calculatePBRColor(baseColor: vec4<f32>, normal: vec3<f32>, viewPosition: vec3
     let denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
     let specular = numerator / denominator;
 
+    // Add light contribution
     let NdotL = max(dot(N, L), 0.0);
-    let Lo = (kD * albedo / PI + specular) * lightColor * NdotL;
+    return (kD * albedo / PI + specular) * lightColor * NdotL;
+}
 
+fn calculatePBRColorNoLighting(baseColor: vec4<f32>, normal: vec3<f32>, viewPosition: vec3<f32>, lightDir: vec3<f32>, lightColor: vec3<f32>) -> vec3<f32> {
+    // Material properties from uniform
+    let albedo = pbrMaterial.color.rgb * baseColor.rgb;
+
+    // Ambient light (fallback when USE_LIGHTING is off)
     let ambient = vec3<f32>(0.03) * albedo;
-    return ambient + Lo;
+    return ambient + calculatePBRLoDirect(baseColor, normal, viewPosition, lightDir, lightColor);
 }
 //#endif
 
@@ -299,19 +350,29 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
 //#ifdef USE_PBR_MATERIAL
     //#ifdef USE_NORMALS
         //#ifdef USE_LIGHTING
-    let lightResult = computeLightContribution(input.viewPosition);
-    let lDir = lightResult.xyz;
-    let lAtten = lightResult.w;
-    let lColor = light.color.rgb * light.intensity * lAtten;
-    let pbrColor = calculatePBRColor(baseColor, input.normal, input.viewPosition, lDir, lColor);
+    // Direct lights: ambient term once + sum of per-light Cook-Torrance contributions.
+    let n = i32(light.directCount + 0.5);
+    var directSum = vec3<f32>(0.0);
+    for (var i = 0; i < 4; i = i + 1) {
+        if (i >= n) {
+            break;
+        }
+        let lightResult = computeLightContribution(u32(i), input.viewPosition);
+        let lDir = lightResult.xyz;
+        let lAtten = lightResult.w;
+        let lColor = light.lights[u32(i)].color.rgb * light.lights[u32(i)].intensity * lAtten;
+        directSum = directSum + calculatePBRLoDirect(baseColor, input.normal, input.viewPosition, lDir, lColor);
+    }
+    let pbrColor = calculatePBRAmbient(baseColor) + directSum;
         //#else
-    let pbrColor = calculatePBRColor(baseColor, input.normal, input.viewPosition, normalize(vec3<f32>(5.0, 5.0, 5.0)), vec3<f32>(2.0));
+    let pbrColor = calculatePBRColorNoLighting(baseColor, input.normal, input.viewPosition, normalize(vec3<f32>(5.0, 5.0, 5.0)), vec3<f32>(2.0));
         //#endif
     //#else
     let pbrColor = baseColor.rgb * pbrMaterial.color.rgb;
     //#endif
 
-    // WORKAROUND: Emissive disabled until emissive maps are supported
+    // WORKAROUND: Emissive disabled until emissive maps are supported (see GitHub issue)
+    // Without emissive maps, models with emissive=[1,1,1] wash out to white
     let emissive = pbrMaterial.emissive.rgb * min(pbrMaterial.emissiveIntensity, 0.0);
     let finalColor = applyTonemapping(pbrColor + emissive);
     return vec4<f32>(finalColor, baseColor.a);
