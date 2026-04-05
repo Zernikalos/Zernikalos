@@ -51,6 +51,10 @@ class ZLight: ZObject() {
     }
 
     companion object {
+
+        val DefaultAmbientLight
+            get() = createAmbientLight()
+
         @JvmStatic
         fun createAmbientLight(): ZLight = ZLight().apply { lamp = ZAmbientLamp() }
 
