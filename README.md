@@ -1,7 +1,7 @@
 <h2 align="center">Zernikalos Engine</h2>
 
 <div align="center">
-<img src="docsAssets/logo-icon.svg" alt="Logo" width="124" height="124">
+<img src="dokkaAssets/logo-icon.svg" alt="Logo" width="124" height="124">
 
   <p align="center">
     Zernikalos is a lightweight and fast game engine developed entirely in Kotlin for Android, iOS, and Web. Built with a simple yet powerful API, it facilitates efficient game development, ensuring a seamless experience across platforms.
