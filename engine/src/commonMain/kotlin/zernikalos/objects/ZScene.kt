@@ -37,4 +37,16 @@ class ZScene(): ZObject() {
         viewport.dispose()
     }
 
+    companion object {
+
+        fun defaultScene(): ZScene {
+            val scene = ZScene()
+            scene.name = "DefaultScene"
+            scene.addChild(ZCamera.DefaultPerspectiveCamera)
+            scene.addChild(ZLight.DefaultAmbientLight)
+            return scene
+        }
+
+    }
+
 }
