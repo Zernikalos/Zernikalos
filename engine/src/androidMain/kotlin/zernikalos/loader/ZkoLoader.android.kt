@@ -9,13 +9,27 @@
 package zernikalos.loader
 
 import android.content.Context
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 
-suspend fun loadFromFile(context: Context, fileName: String): ZKo = coroutineScope {
-    val loaded = async<ZKo> {
-        val content = context.openFileInput(fileName).buffered().readBytes()
-        return@async loadFromProto(content)
-    }
-    loaded.await()
+/**
+ * Loads a ZKo from the app's private file store ([Context.openFileInput]), not from assets or arbitrary paths.
+ *
+ * **Threading:** Performs blocking I/O and decoding on the caller's coroutine context. Do not call from the
+ * main thread unless the call site wraps the invocation in `withContext` with a background dispatcher
+ * (for example `Dispatchers.IO` from kotlinx.coroutines).
+ */
+suspend fun loadFromInternalFile(context: Context, fileName: String): ZKo {
+    val content = context.openFileInput(fileName).buffered().readBytes()
+    return loadFromProto(content)
+}
+
+/**
+ * Loads a ZKo from [Context.getAssets] using a path relative to the assets root (e.g. `"gltf/model.zko"`).
+ *
+ * **Threading:** Performs blocking I/O and decoding on the caller's coroutine context. Do not call from the
+ * main thread unless the call site wraps the invocation in `withContext` with a background dispatcher
+ * (for example `Dispatchers.IO` from kotlinx.coroutines).
+ */
+suspend fun loadFromAssets(context: Context, assetPath: String): ZKo {
+    val content = context.assets.open(assetPath).use { it.readBytes() }
+    return loadFromProto(content)
 }
