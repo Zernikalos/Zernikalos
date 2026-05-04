@@ -23,13 +23,9 @@ val ZBoneMatrixGenerator: ZUniformGenerator = { sceneContext, obj ->
     // Sort bones according to the order defined in the skinning's boneIds array
     val boneIdsList = obj.skinning!!.boneIds.toList()
     val sortedBones = bones.sortedBy { bone -> boneIdsList.indexOf(bone.id) }
-    val boneMatrices = sortedBones.map {
-        if (obj.action == null) {
-            it.bindMatrix
-        } else {
-            it.poseMatrix
-        }
-    }
+    // Joint palette order follows [ZSkinning.boneIds]; matrices are world poses committed by
+    // [ZSkeleton.applyKeyFrame] (rest pose is committed at model init — see [ZModel.internalInitialize]).
+    val boneMatrices = sortedBones.map { it.poseMatrix }
 
     val boneCollection = ZAlgebraObjectCollection(ZTypes.MAT4F, bones.size)
     boneCollection.copyAll(boneMatrices)

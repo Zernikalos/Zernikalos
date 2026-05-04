@@ -14,9 +14,12 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.action.ZKeyFrame
 import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZContext
 import zernikalos.loader.ZLoaderContext
+import zernikalos.math.ZMatrix4
+import zernikalos.math.ZTransform
 import zernikalos.search.findInTree
 import zernikalos.search.treeAsList
 import kotlin.js.JsExport
@@ -35,6 +38,38 @@ class ZSkeleton: ZObject() {
 
     fun findBoneByName(name: String): ZBone? {
         return findInTree(root) { bone: ZBone -> bone.name == name }
+    }
+
+    /**
+     * Writes [keyFrame] into this skeleton’s [root] hierarchy as world [ZBone.poseMatrix] values.
+     *
+     * **Merge rule (per bone, TRS channels):** each bone starts from its rest [ZBone.transform].
+     * For every channel (position, rotation, scale), if [keyFrame] carries a value for that bone,
+     * the sampled value **replaces** the rest value for that channel only; omitted channels keep
+     * the rest pose. This is not additive delta blending (future multi-clip blending would define
+     * its own rules on top of this baseline).
+     *
+     * @param keyFrame Sampled local overrides per bone id (typically from [zernikalos.action.ZSkeletalAction.sampleAt]).
+     * @param parentWorldPose Parent world matrix for [root]; use identity when [root] is the scene root.
+     */
+    fun applyKeyFrame(keyFrame: ZKeyFrame, parentWorldPose: ZMatrix4 = ZMatrix4.Identity) {
+        applyKeyFrameToBone(root, keyFrame, parentWorldPose)
+    }
+
+    private fun applyKeyFrameToBone(bone: ZBone, keyFrame: ZKeyFrame, parentWorldPose: ZMatrix4) {
+        val boneTransform = keyFrame.getBoneTransform(bone.id)
+        // Merge rest transform with any animated components from the sample (per-channel replace).
+        val merged = ZTransform(bone.transform.position, bone.transform.rotation, bone.transform.scale)
+        if (boneTransform != null) {
+            boneTransform.position?.let { merged.position = it }
+            boneTransform.rotation?.let { merged.rotation = it }
+            boneTransform.scale?.let { merged.scale = it }
+        }
+        val localPoseMat = merged.matrix
+        ZMatrix4.mult(bone.poseMatrix, parentWorldPose, localPoseMat)
+        for (child in bone.children) {
+            applyKeyFrameToBone(child, keyFrame, bone.poseMatrix)
+        }
     }
 
     override fun internalInitialize(ctx: ZContext) {

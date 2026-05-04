@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2025. Aarón Negrín - Zernikalos Engine.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package zernikalos.action
 
 import zernikalos.math.ZMatrix4
-import zernikalos.objects.ZModel
+import zernikalos.objects.ZSkeleton
 import kotlin.js.JsExport
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
@@ -13,89 +21,104 @@ import kotlin.time.ExperimentalTime
 fun System.currentTimeMillis(): Long = System.now().toEpochMilliseconds()
 
 /**
- * Class that allows playback of skeletal actions stored in ZSkeletalAction.
- * Provides playback control such as play, pause, and retrieving the current state
- * of the animation at a specific moment.
+ * Allows playback of skeletal actions stored in [ZSkeletalAction].
+ *
+ * Playback is bound to a [ZSkeleton]: this class owns the clock (time, speed, loop, play state)
+ * while sampling the clip and committing poses to bones are separate steps. Advance time with
+ * [update] or [updateWithDeltaTime], then call [applyCurrentPose] before skinning or render.
  */
 @OptIn(ExperimentalTime::class)
 @JsExport
 class ZActionPlayer {
     private var currentAction: ZSkeletalAction? = null
-    private var currentTime: Float = 0f
-    private var isPlaying: Boolean = false
+
+    /** Current playback time in seconds (writable only inside this player). */
+    var currentTime: Float = 0f
+        private set
+
+    /** Whether the action is currently playing (writable only inside this player). */
+    var isPlaying: Boolean = false
+        private set
     private var playbackSpeed: Float = 1f
     private var isLooping: Boolean = false
-    private var obj: ZModel? = null
+    private var skeleton: ZSkeleton? = null
 
-    // Variables for internal time handling
+    /** Wall-clock reference for [update]; reset when starting playback or calling [resetTimer]. */
     private var lastUpdateTimeMs: Long = 0L
 
+    /** Total duration of the current action in seconds, or 0 if none. */
+    val duration: Float
+        get() = currentAction?.duration ?: 0f
+
     /**
-     * Sets the action to be played
-     * @param action The skeletal action to play
+     * Sets the skeleton and clip to play, resets playback time to zero, and applies the pose at
+     * time 0 so the skeleton matches the start of the clip immediately.
+     *
+     * @param skeleton Target bone hierarchy for this player.
+     * @param action The skeletal action (clip) to play.
      */
-    fun setAction(obj: ZModel, action: ZSkeletalAction) {
-        this.obj = obj
-        obj.action = action
+    fun setAction(skeleton: ZSkeleton, action: ZSkeletalAction) {
+        this.skeleton = skeleton
         currentAction = action
         currentTime = 0f
         lastUpdateTimeMs = System.currentTimeMillis()
-
+        applyCurrentPose()
     }
 
     /**
-     * Starts playing the action
-     * @param loop Whether the action should loop
+     * Starts playing the current action.
+     *
+     * @param loop Whether the action should loop when time passes [ZSkeletalAction.duration].
      */
     fun play(loop: Boolean = false) {
         if (currentAction == null) return
         if (!isPlaying) {
-            // Reset reference time when starting playback
             lastUpdateTimeMs = System.currentTimeMillis()
         }
         isPlaying = true
         isLooping = loop
+        applyCurrentPose()
     }
 
-    /**
-     * Pauses playback
-     */
+    /** Pauses playback without resetting [currentTime]. */
     fun pause() {
         isPlaying = false
     }
 
     /**
-     * Stops playback and resets the time
+     * Stops playback, resets time to the start of the clip, and reapplies the pose at time 0.
      */
     fun stop() {
         isPlaying = false
         currentTime = 0f
         lastUpdateTimeMs = System.currentTimeMillis()
+        applyCurrentPose()
     }
 
     /**
-     * Updates the playback state by automatically calculating the time elapsed
-     * since the last call.
+     * Updates playback using elapsed wall time since the last call (seconds).
+     *
+     * Does not modify bone matrices; call [applyCurrentPose] afterwards so the skeleton matches
+     * the new time.
      */
     fun update() {
         val currentTimeMs = System.currentTimeMillis()
-        val deltaTime = (currentTimeMs - lastUpdateTimeMs) / 1000f // Convert to seconds
+        val deltaTime = (currentTimeMs - lastUpdateTimeMs) / 1000f
         lastUpdateTimeMs = currentTimeMs
-
         updateWithDeltaTime(deltaTime)
     }
 
     /**
-     * Updates the playback state based on the provided elapsed time
-     * @param deltaTime Time elapsed since the last update in seconds
+     * Advances [currentTime] by [deltaTime] scaled by [playbackSpeed] when playing.
+     * Handles loop / end-of-clip stopping. Does not write bone matrices.
+     *
+     * @param deltaTime Elapsed time in seconds since the last call.
      */
     private fun updateWithDeltaTime(deltaTime: Float) {
         if (!isPlaying || currentAction == null) return
 
         currentTime += deltaTime * playbackSpeed
-        getCurrentKeyFrame()
 
-        // Loop or finish control
         if (currentTime > currentAction!!.duration) {
             if (isLooping) {
                 currentTime %= currentAction!!.duration
@@ -107,60 +130,57 @@ class ZActionPlayer {
     }
 
     /**
-     * Gets the current keyframe based on playback time
-     * @return The keyframe corresponding to the current time
+     * Samples the active clip at [currentTime] into a [ZKeyFrame] without mutating any [ZBone].
+     *
+     * @return The keyframe for the current time, or `null` if there is no active clip.
      */
-    fun getCurrentKeyFrame(): ZKeyFrame? {
-        val kf = currentAction?.getKeyFrame(currentTime)!!
-        obj?.skeleton?.root?.computePoseFromKeyFrame(kf, ZMatrix4.Identity)
+    fun sampleCurrent(): ZKeyFrame? =
+        currentAction?.sampleAt(currentTime)
 
-        return kf
+    /**
+     * Commits the current sampled clip pose onto [skeleton] via [ZSkeleton.applyKeyFrame].
+     * No-op if there is no active clip or no skeleton.
+     */
+    fun applyCurrentPose() {
+        val kf = sampleCurrent() ?: return
+        val sk = skeleton ?: return
+        sk.applyKeyFrame(kf, ZMatrix4.Identity)
     }
 
     /**
-     * Sets the playback speed
-     * @param speed Speed factor (1.0 = normal, 2.0 = double speed, etc.)
+     * Sets the playback speed multiplier.
+     *
+     * @param speed 1.0 = normal speed; 2.0 = double speed, etc.
      */
     fun setPlaybackSpeed(speed: Float) {
         playbackSpeed = speed
     }
 
     /**
-     * Jumps to a specific point in time
-     * @param time Time to jump to
+     * Seeks to [time] (clamped to the clip range) and reapplies the pose at that time.
+     *
+     * @param time Time in seconds within the active clip.
      */
     fun seek(time: Float) {
         if (currentAction == null) return
         currentTime = time.coerceIn(0f, currentAction!!.duration)
+        applyCurrentPose()
     }
 
     /**
-     * @return Whether the action is currently playing
-     */
-    fun isPlaying(): Boolean = isPlaying
-
-    /**
-     * @return The current playback time
-     */
-    fun getCurrentTime(): Float = currentTime
-
-    /**
-     * @return The total duration of the current action
-     */
-    fun getDuration(): Float = currentAction?.duration ?: 0f
-
-    /**
-     * @return The percentage of playback completion (0.0 to 1.0)
+     * @return Normalized progress in `[0, 1]` (current time divided by duration), or 0 if
+     * duration is zero.
      */
     fun getProgress(): Float {
-        val duration = getDuration()
-        return if (duration > 0) currentTime / duration else 0f
+        val d = duration
+        return if (d > 0) currentTime / d else 0f
     }
 
     /**
-     * Resets the internal time counter.
-     * Useful when a lot of time has passed since the last update
-     * and we don't want a large jump in the animation.
+     * Resets the internal wall-clock baseline used by [update].
+     *
+     * Useful when a long pause occurred and the next [update] should not apply a large jump in
+     * animation time.
      */
     fun resetTimer() {
         lastUpdateTimeMs = System.currentTimeMillis()

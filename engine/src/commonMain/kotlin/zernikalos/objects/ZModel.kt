@@ -12,7 +12,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.action.ZSkeletalAction
+import zernikalos.action.ZKeyFrame
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
@@ -25,6 +25,7 @@ import zernikalos.generators.shadergenerator.ZShaderGeneratorType
 import zernikalos.generators.shadergenerator.ZShaderProgramParameters
 import zernikalos.generators.shadergenerator.createShaderGenerator
 import zernikalos.logger.logger
+import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 
 @JsExport
@@ -60,9 +61,6 @@ class ZModel: ZObject() {
     @Transient
     lateinit var renderer: ZModelRenderer
 
-    @Transient
-    var action: ZSkeletalAction? = null
-
     override fun internalInitialize(ctx: ZContext) {
         renderer = ZModelRenderer(ctx.renderingContext, this)
 
@@ -70,6 +68,9 @@ class ZModel: ZObject() {
 
         if (hasSkeleton) {
             skeleton?.initialize(ctx)
+            // Commit rest pose into poseMatrix so the joint palette (e.g. ZBoneMatrixGenerator)
+            // always reads consistent world matrices, not a mix of bind vs pose.
+            skeleton?.applyKeyFrame(ZKeyFrame(0f), ZMatrix4.Identity)
         }
 
         val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)

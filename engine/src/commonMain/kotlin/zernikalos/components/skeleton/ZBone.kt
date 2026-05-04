@@ -12,7 +12,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.action.ZKeyFrame
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZSerializableComponent
@@ -59,7 +58,11 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     var inverseBindMatrix: ZMatrix4 = ZMatrix4.Identity
 
     /**
-     * Returns the pose matrix of this bone.
+     * Returns the world pose matrix of this bone for the current frame (rest or animated).
+     *
+     * Populated when the host applies a sampled clip via [zernikalos.objects.ZSkeleton.applyKeyFrame]
+     * (see [zernikalos.action.ZActionPlayer.applyCurrentPose]) or when the model commits the rest
+     * pose at initialization.
      */
     var poseMatrix: ZMatrix4 = ZMatrix4.Identity
 
@@ -102,30 +105,6 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
     override fun internalInitialize(ctx: ZRenderingContext) {
         if (isRoot) {
             computeInverseBindMatrix(ZMatrix4.Identity)
-        }
-    }
-
-    /**
-     * Compute the pose matrix for this bone and its children from the given keyframe.
-     * @param keyFrame the keyframe to compute the pose from
-     * @param parentPoseMatrix the pose matrix of the parent bone
-     */
-    fun computePoseFromKeyFrame(keyFrame: ZKeyFrame, parentPoseMatrix: ZMatrix4) {
-        val boneTransform = keyFrame.getBoneTransform(id)
-
-        // Merge rest transform with any animated components
-        val merged = ZTransform(transform.position, transform.rotation, transform.scale)
-        if (boneTransform != null) {
-            boneTransform.position?.let { merged.position = it }
-            boneTransform.rotation?.let { merged.rotation = it }
-            boneTransform.scale   ?.let { merged.scale    = it }
-        }
-        val localPoseMat = merged.matrix
-
-        ZMatrix4.mult(poseMatrix, parentPoseMatrix, localPoseMat)
-
-        for (child in children) {
-            child.computePoseFromKeyFrame(keyFrame, poseMatrix)
         }
     }
 
