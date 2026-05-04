@@ -1,0 +1,6 @@
+# Normalize all text files to LF in the repository (cross-platform default).
+* text=auto eol=lf
+
+# Windows-native scripts keep CRLF when checked out on Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf

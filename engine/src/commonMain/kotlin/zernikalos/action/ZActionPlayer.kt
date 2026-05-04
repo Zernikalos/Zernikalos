@@ -110,11 +110,11 @@ class ZActionPlayer {
 
     /**
      * Advances [currentTime] by [deltaTime] scaled by [playbackSpeed] when playing.
-     * Handles loop / end-of-clip stopping. Does not write bone matrices.
+     * Handles loop / end-of-clip stopping.
      *
      * @param deltaTime Elapsed time in seconds since the last call.
      */
-    private fun updateWithDeltaTime(deltaTime: Float) {
+     fun updateWithDeltaTime(deltaTime: Float) {
         if (!isPlaying || currentAction == null) return
 
         currentTime += deltaTime * playbackSpeed

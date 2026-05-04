@@ -3,6 +3,7 @@ ktlint_code_style = official
 ktlint_croot = true
 
 [*]
+end_of_line = lf
 indent_size = 4
 tab_width = 4
 indent_style = space
@@ -11,3 +12,6 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_size = 4 # possible values: number (e.g. 2), "unset" (makes ktlint ignore indentation completely)
 indent_style = space # or "tab"
+
+[*.{bat,cmd}]
+end_of_line = crlf
