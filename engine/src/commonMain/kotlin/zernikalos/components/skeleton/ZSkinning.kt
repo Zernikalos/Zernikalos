@@ -18,6 +18,13 @@ import kotlin.js.JsName
  * do not share the same transform (e.g. in glTF when skin and mesh are on different nodes).
  *
  * Typically created by loaders/exporters and attached to a [ZModel] together with a [ZSkeleton].
+ *
+ * **GPU joint order (per skinned [ZModel]):** [boneIds] defines the row order of the joint
+ * palette for that mesh. [ZBoneMatrixGenerator] collects each joint’s current world pose
+ * ([ZBone.poseMatrix]) in that same order. [ZInverseBindMatrixGenerator] fills the matching
+ * inverse-bind uniform from [inverseBindMatrices] by index, or falls back to [ZBone.inverseBindMatrix]
+ * when a skin entry is missing — loaders should keep [boneIds] and [inverseBindMatrices] aligned.
+ * [ZModelSkinningMatrixGenerator] supplies [modelSkinBindMatrix] / mesh–skeleton node offset separately.
  */
 @JsExport
 @Serializable(with = ZSkinningSerializer::class)

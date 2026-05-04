@@ -15,7 +15,12 @@ import zernikalos.math.ZVector3
 import kotlin.js.JsExport
 import kotlin.math.abs
 
-
+/**
+ * Skeletal animation clip: a set of bone tracks sampled over time into [ZKeyFrame] maps.
+ *
+ * This type holds serialized / loaded clip data only; it does not advance a clock or write
+ * [zernikalos.components.skeleton.ZBone.poseMatrix]. Use [zernikalos.action.ZActionPlayer] for playback.
+ */
 @JsExport
 @Serializable
 class ZSkeletalAction(
@@ -30,11 +35,23 @@ class ZSkeletalAction(
     val tracks: Array<ZBoneTrack>
         get() = _tracks.toTypedArray()
 
+    /**
+     * Adds a bone track to this clip.
+     *
+     * @param track Track containing keyed channels for one bone.
+     */
     fun addTrack(track: ZBoneTrack) {
         _tracks.add(track)
     }
 
-    fun getKeyFrame(time: Float): ZKeyFrame {
+    /**
+     * Evaluates all tracks at [time] and returns a sampled [ZKeyFrame] (bone id → partial local
+     * overrides). Does not read or modify the runtime skeleton.
+     *
+     * @param time Sample time in seconds, usually within `[0, duration]`.
+     * @return A new keyframe instance holding the evaluated pose samples.
+     */
+    fun sampleAt(time: Float): ZKeyFrame {
         val kf = ZKeyFrame(time)
 
         for (track in tracks) {
