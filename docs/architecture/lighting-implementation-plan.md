@@ -1,6 +1,6 @@
 # Lighting system implementation plan (Zernikalos engine)
 
-This document is the **engine-facing implementation plan** for ambient lighting and multiple direct lights. It complements [`lighting-system.md`](./lighting-system.md), which specifies the GLSL-oriented shading model. Here we map that intent onto **today's Zernikalos architecture**: **`ZScene` graph**, uniform blocks, per-backend shader generators, and render-time data flow — with lighting **decoupled** from `ZSceneContext.activeLight` in favor of **collecting enabled `ZLight` nodes from the scene** (see §2.1).
+This document is the **engine-facing implementation plan** for ambient lighting and multiple direct lights. It complements [`lighting-shading-model.md`](./lighting-shading-model.md), which specifies the GLSL-oriented shading model. Here we map that intent onto **today's Zernikalos architecture**: **`ZScene` graph**, uniform blocks, per-backend shader generators, and render-time data flow.
 
 ---
 
@@ -10,7 +10,7 @@ This document is the **engine-facing implementation plan** for ambient lighting 
 2. **Multiple direct lights** — Forward accumulation of up to `MAX_LIGHTS` directional / point / spot lights per frame, with a dynamic `lightCount`.
 3. **Single coherent contract** — Light positions, directions, and fragment attributes evaluated in **one linear space** (recommended: **view space**, matching `v_viewPosition` / `in.viewPosition` today).
 
-Non-goals for this phase: shadows, IBL, probes, deferred or clustered lighting, light culling (see `lighting-system.md` §7).
+Non-goals for this phase: shadows, IBL, probes, deferred or clustered lighting, light culling (see `lighting-shading-model.md` §7).
 
 ---
 

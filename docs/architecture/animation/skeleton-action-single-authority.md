@@ -1,6 +1,6 @@
 # Proposal: Single Authority for Skeleton Pose vs Skeletal Actions
 
-**Status**: Draft  
+**Status**: Implemented  
 **Created**: 2026  
 **Related**: [Implementation plan (detailed)](./skeleton-action-single-authority-implementation.md) · `engine/src/commonMain/kotlin/zernikalos/action/`, `engine/src/commonMain/kotlin/zernikalos/components/skeleton/`, `engine/src/commonMain/kotlin/zernikalos/objects/ZModel.kt`, `engine/src/commonMain/kotlin/zernikalos/objects/ZSkeleton.kt`
 
