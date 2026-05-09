@@ -53,9 +53,10 @@ class ZTransform() {
         get() = _forward
         set(value) {
             _forward = value.normalized
-            ZVector3.cross(_right, _forward, _up)
+            // RH: right = up x forward, up = forward x right (Forward x Right == Up)
+            ZVector3.cross(_right, _up, _forward)
             _right.normalize()
-            ZVector3.cross(_up, _right, _forward)
+            ZVector3.cross(_up, _forward, _right)
             _up.normalize()
         }
 
@@ -63,9 +64,9 @@ class ZTransform() {
         get() = _right
         set(value) {
             _right = value.normalized
-            ZVector3.cross(_up, _right, _forward)
+            ZVector3.cross(_up, _forward, _right)
             _up.normalize()
-            ZVector3.cross(_forward, _up, _right)
+            ZVector3.cross(_forward, _right, _up)
             _forward.normalize()
         }
 
@@ -73,9 +74,9 @@ class ZTransform() {
         get() = _up
         set(value) {
             _up = value.normalized
-            ZVector3.cross(_forward, _up, _right)
+            ZVector3.cross(_forward, _right, _up)
             _forward.normalize()
-            ZVector3.cross(_right, _forward, _up)
+            ZVector3.cross(_right, _up, _forward)
             _right.normalize()
         }
 

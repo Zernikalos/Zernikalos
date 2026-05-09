@@ -149,77 +149,51 @@ class ZMatrix4Test {
     }
 
     @Test
-    fun testLookAt() {
-        val eye = ZVector3(0f, 0f, 5f)
-        val center = ZVector3(0f, 0f, 0f)
-        val up = ZVector3(0f, 1f, 0f)
-        val viewMatrix = ZMatrix4()
-        ZMatrix4.lookAt(viewMatrix, eye, center, up)
-
+    fun testLookAtAlongPositiveZ() {
+        val eye = ZVector3.Zero
+        val look = ZVector3(0f, 0f, 3f)
+        val up = ZVector3.Up
+        val m = ZMatrix4()
+        ZMatrix4.lookAt(m, eye, look, up)
         val expected = ZMatrix4(floatArrayOf(
             1f, 0f, 0f, 0f,
             0f, 1f, 0f, 0f,
             0f, 0f, 1f, 0f,
-            0f, 0f, -5f, 1f
+            0f, 0f, 0f, 1f
         ))
-
-        assertMatrixEquals(expected, viewMatrix)
+        assertMatrixEquals(expected, m)
     }
 
     @Test
-    @Ignore
-    fun testLookAtDifferentPositon() {
-        var eye = ZVector3(10f, 10f, 10f)
-        var center = ZVector3(0f, 0f, 0f)
-        var up = ZVector3(0f, 1f, 0f)
-        var viewMatrix = ZMatrix4()
-        ZMatrix4.lookAt(viewMatrix, eye, center, up)
-
-        var expected = ZMatrix4(floatArrayOf(
-            -0.70710677f, -0.40824828f, 0.57735026f, 0f,
-            0f, 0.81649655f, 0.57735026f, 0f,
-            -0.70710677f, 0.40824828f, -0.57735026f, 0f,
-            0f, 0f, -17.320508f, 1f
+    fun testLookAtAlongPositiveX() {
+        val eye = ZVector3.Zero
+        val look = ZVector3(10f, 0f, 0f)
+        val up = ZVector3.Up
+        val m = ZMatrix4()
+        ZMatrix4.lookAt(m, eye, look, up)
+        val expected = ZMatrix4(floatArrayOf(
+            0f, 0f, -1f, 0f,
+            0f, 1f, 0f, 0f,
+            1f, 0f, 0f, 0f,
+            0f, 0f, 0f, 1f
         ))
-
-        assertMatrixEquals(expected, viewMatrix, 0.0001f)
+        assertMatrixEquals(expected, m)
     }
 
     @Test
-    fun testLookAtDifferentUpVector() {
-        var eye = ZVector3(0f, 0f, 5f)
-        var center = ZVector3(0f, 0f, 0f)
-        var up = ZVector3(0f, -1f, 0f)
-        var viewMatrix = ZMatrix4()
-        ZMatrix4.lookAt(viewMatrix, eye, center, up)
-
-        var expected = ZMatrix4(floatArrayOf(
-            -1f, 0f, 0f, 0f,
-            0f, -1f, 0f, 0f,
-            0f, 0f, 1f, 0f,
-            0f, 0f, -5f, 1f
-        ))
-
-        assertMatrixEquals(expected, viewMatrix)
-    }
-
-    @Test
-    @Ignore
-    fun testLookAtNotOrigin() {
-        var eye = ZVector3(5f, 5f, 5f)
-        var center = ZVector3(1f, 1f, 1f)
-        var up = ZVector3.Up
-        var viewMatrix = ZMatrix4()
-        ZMatrix4.lookAt(viewMatrix, eye, center, up)
-
-        var expected = ZMatrix4(floatArrayOf(
-            -0.70710677f, -0.40824828f, 0.57735026f, 0f,
-            0f, 0.81649655f, 0.57735026f, 0f,
-            -0.70710677f, 0.40824828f, -0.57735026f, 0f,
-            0f, 0f, -6.928203f, 1f
-        ))
-
-        assertMatrixEquals(expected, viewMatrix, 0.0001f)
+    fun testLookAtRightHandedTriple() {
+        val eye = ZVector3(1f, 2f, 3f)
+        val look = ZVector3(1f, 2f, 8f)
+        val up = ZVector3(0.3f, 0.9f, 0.1f)
+        val m = ZMatrix4()
+        ZMatrix4.lookAt(m, eye, look, up)
+        val r = ZVector3(m[0, 0], m[1, 0], m[2, 0])
+        val u = ZVector3(m[0, 1], m[1, 1], m[2, 1])
+        val f = ZVector3(m[0, 2], m[1, 2], m[2, 2])
+        val rCrossU = ZVector3()
+        ZVector3.cross(rCrossU, r, u)
+        val triple = ZVector3.dot(f, rCrossU)
+        assertTrue(triple > 0.99f, "Forward should align with Right × Up for a right-handed basis")
     }
 
     @Test

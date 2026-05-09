@@ -602,51 +602,86 @@ class ZMatrix4(): ZAlgebraObject {
         }
 
         /**
-         * Sets up a view transformation matrix to represent a camera looking at a specified target.
+         * Builds a **rotation-only** orthonormal **right-handed** 4x4 matrix suitable for object orientation:
+         * column 0 = world direction of local **+X** ([ZVector3.Right]),
+         * column 1 = world direction of local **+Y** ([ZVector3.Up]),
+         * column 2 = world direction of local **+Z** ([ZVector3.Forward]): normalized `(look - eye)`.
          *
-         * @param result The matrix to store the result of the lookAt operation.
-         * @param eye The position of the camera.
-         * @param center The point the camera is looking at.
-         * @param up The up direction from the camera's point of view.
+         * Satisfies **Forward × Right = Up** in world space (matches engine basis).
+         * The [up] hint is projected onto the plane perpendicular to forward (Gram–Schmidt); if it is
+         * parallel to forward, a stable fallback axis is used.
+         *
+         * Translation is cleared; last row is `(0, 0, 0, 1)`. For a degenerate direction (`look` ≈ [eye]),
+         * [result] is set to identity.
+         *
+         * @param result Output matrix.
+         * @param eye World position of the object (used only to compute the view direction `look - eye`).
+         * @param look World point to face.
+         * @param up World up hint (need not be unit or orthogonal to the view direction).
          */
-        fun lookAt(result: ZMatrix4, eye: ZVector3, center: ZVector3, up: ZVector3) {
-            // See the OpenGL GLUT documentation for gluLookAt for a description
-            // of the algorithm. We implement it in a straightforward way:
-            val f = center - eye
-
-            // Normalize f
+        fun lookAt(result: ZMatrix4, eye: ZVector3, look: ZVector3, up: ZVector3) {
+            val f = ZVector3()
+            ZVector3.subtract(f, look, eye)
+            if (ZVector3.dot(f, f) <= 1e-20f) {
+                identity(result)
+                return
+            }
             f.normalize()
 
-            // compute s = f x up (x means "cross product")
-            val s = ZVector3()
-            ZVector3.cross(s, f, up)
+            val upOrtho = ZVector3(up.x, up.y, up.z)
+            var upDotF = ZVector3.dot(upOrtho, f)
+            upOrtho.x -= f.x * upDotF
+            upOrtho.y -= f.y * upDotF
+            upOrtho.z -= f.z * upDotF
 
-            // and normalize s
-            s.normalize()
+            if (ZVector3.dot(upOrtho, upOrtho) <= 1e-20f) {
+                upOrtho.copy(ZVector3.Up)
+                upDotF = ZVector3.dot(upOrtho, f)
+                upOrtho.x -= f.x * upDotF
+                upOrtho.y -= f.y * upDotF
+                upOrtho.z -= f.z * upDotF
+            }
+            if (ZVector3.dot(upOrtho, upOrtho) <= 1e-20f) {
+                upOrtho.copy(ZVector3.Right)
+                upDotF = ZVector3.dot(upOrtho, f)
+                upOrtho.x -= f.x * upDotF
+                upOrtho.y -= f.y * upDotF
+                upOrtho.z -= f.z * upDotF
+            }
+            if (ZVector3.dot(upOrtho, upOrtho) <= 1e-20f) {
+                identity(result)
+                return
+            }
+            upOrtho.normalize()
 
-            // compute u = s x f
+            val r = ZVector3()
+            ZVector3.cross(r, upOrtho, f)
+            r.normalize()
+
             val u = ZVector3()
-            ZVector3.cross(u, s, f)
+            ZVector3.cross(u, f, r)
+            u.normalize()
 
-            result[0] = s.x
-            result[4] = s.y
-            result[8] = s.z
-            result[12] = -ZVector3.dot(s, eye)
+            identity(result)
+            result[0] = r.x
+            result[1] = r.y
+            result[2] = r.z
+            result[3] = 0f
 
-            result[1] = u.x
+            result[4] = u.x
             result[5] = u.y
-            result[9] = u.z
-            result[13] = -ZVector3.dot(u, eye)
+            result[6] = u.z
+            result[7] = 0f
 
-            result[2] = -f.x
-            result[6] = -f.y
-            result[10] = -f.z
-            result[14] = ZVector3.dot(f, eye)
+            result[8] = f.x
+            result[9] = f.y
+            result[10] = f.z
+            result[11] = 0f
 
-            result[3] = 0.0f
-            result[7] = 0.0f
-            result[11] = 0.0f
-            result[15] = 1.0f
+            result[12] = 0f
+            result[13] = 0f
+            result[14] = 0f
+            result[15] = 1f
         }
 
         @JsName("fromQuaternionIp")
