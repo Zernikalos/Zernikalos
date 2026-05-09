@@ -132,6 +132,19 @@ class ZVector3Test {
         assertVectorEquals(ZVector3(5f, 5f, 5f), result)
     }
 
+    @Test
+    fun testWorldAxisConstants() {
+        assertVectorEquals(ZVector3(1f, 0f, 0f), ZVector3.Right)
+        assertVectorEquals(ZVector3(-1f, 0f, 0f), ZVector3.Left)
+        assertVectorEquals(ZVector3(0f, 1f, 0f), ZVector3.Up)
+        assertVectorEquals(ZVector3(0f, -1f, 0f), ZVector3.Down)
+        assertVectorEquals(ZVector3(0f, 0f, 1f), ZVector3.Forward)
+        assertVectorEquals(ZVector3(0f, 0f, -1f), ZVector3.Back)
+        val cross = ZVector3()
+        ZVector3.cross(cross, ZVector3.Forward, ZVector3.Right)
+        assertVectorEquals(ZVector3.Up, cross)
+    }
+
 //    @Test
 //    fun testRotation() {
 //        val v = ZVector3(1f, 0f, 0f)

@@ -164,14 +164,28 @@ class ZVector3(): ZAlgebraObject {
         val Ones: ZVector3
             get() = ZVector3(1.0f)
 
-        val Forward: ZVector3
-            get() = ZVector3(1f, 0f, 0f)
+        /**
+         * Right-handed world/model basis: +X right, +Y up, +Z forward (into the screen).
+         * [Forward] x [Right] == [Up].
+         */
 
         val Right: ZVector3
-            get() = ZVector3(0f, 1f, 0f)
+            get() = ZVector3(1f, 0f, 0f)
+
+        val Left: ZVector3
+            get() = ZVector3(-1f, 0f, 0f)
 
         val Up: ZVector3
+            get() = ZVector3(0f, 1f, 0f)
+
+        val Down: ZVector3
+            get() = ZVector3(0f, -1f, 0f)
+
+        val Forward: ZVector3
             get() = ZVector3(0f, 0f, 1f)
+
+        val Back: ZVector3
+            get() = ZVector3(0f, 0f, -1f)
 
         fun copy(result: ZVector3, v: ZVector3) {
             result.x = v.x

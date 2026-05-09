@@ -72,6 +72,7 @@ class ZCamera(): ZObject() {
         get() = projectionMatrix * viewMatrix
 
     init {
+        transform.translate(ZVector3.Back)
         transform.lookAt(ZVector3.Zero, ZVector3.Up)
         lens = ZPerspectiveLens.Default
     }
@@ -85,6 +86,7 @@ class ZCamera(): ZObject() {
      */
     @JsName("initWithLens")
     constructor(lookAt: ZVector3, up: ZVector3, lens: ZPerspectiveLens): this() {
+        transform.translate(ZVector3.Back)
         transform.lookAt(lookAt, up)
         this.lens = lens
     }
@@ -99,6 +101,7 @@ class ZCamera(): ZObject() {
      */
     @JsName("initWithLookUp")
     constructor(lookAt: ZVector3, up: ZVector3): this() {
+        transform.translate(ZVector3.Back)
         transform.lookAt(lookAt, up)
         lens = ZPerspectiveLens.Default
     }

@@ -1,6 +1,5 @@
 package zernikalos.math
 
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -69,7 +68,6 @@ class ZTransformTest {
     }
 
     @Test
-    @Ignore
     fun testLookAt() {
         val transform = ZTransform()
         val target = ZVector3(10f, 0f, 0f)
