@@ -733,14 +733,15 @@ class ZMatrix4(): ZAlgebraObject {
          * Computes the perspective projection matrix
          *
          * @param result Matrix where the result of the operation will be stored
-         * @param fov Angle in degrees providing the Field Of View
+         * @param fov Vertical field of view angle in radians (full angle, not half-angle)
          * @param aspect Desired aspect ratio
          * @param near Near clip plane
          * @param far Far clip plane
          */
         fun perspective(result: ZMatrix4, fov: Float, aspect: Float, near: Float, far: Float) {
             // Extracted from https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/opengl/java/android/opengl/Matrix.java
-            val f: Float = 1f / tan(fov * (PI / 360f)).toFloat()
+            val halfFov = fov * 0.5f
+            val f: Float = 1f / tan(halfFov.toDouble()).toFloat()
             val rangeReciprocal = 1.0f / (near - far)
 
             result[0] = f / aspect

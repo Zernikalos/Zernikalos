@@ -1,5 +1,7 @@
 package zernikalos.math
 
+import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.test.*
 
 class ZMatrix4Test {
@@ -199,18 +201,18 @@ class ZMatrix4Test {
     @Test
     fun testPerspective() {
         val m = ZMatrix4()
-        ZMatrix4.perspective(m, 90f, 1f, 0.1f, 100f)
+        ZMatrix4.perspective(m, (PI / 2.0).toFloat(), 1f, 0.1f, 100f)
         assertEquals(1f, m[0], epsilon)
         assertEquals(1f, m[5], epsilon)
-        assertTrue(kotlin.math.abs(m[10] - (-1.002)) < 0.001f)
+        assertTrue(abs(m[10] - (-1.002)) < 0.001f)
         assertEquals(-1f, m[11], epsilon)
-        assertTrue(kotlin.math.abs(m[14] - (-0.200)) < 0.001f)
+        assertTrue(abs(m[14] - (-0.200)) < 0.001f)
     }
 
     @Test
     fun testFromQuaternion() {
         val q = ZQuaternion()
-        q.fromAngleAxis(90f, 0f, 1f, 0f)
+        q.fromAngleAxis((PI / 2.0).toFloat(), 0f, 1f, 0f)
         val m = ZMatrix4.fromQuaternion(q)
 
         val v = ZVector4(1f, 0f, 0f, 1f)

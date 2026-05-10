@@ -1,5 +1,6 @@
 package zernikalos.math
 
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -90,7 +91,7 @@ class ZVector4Test {
     fun testNormalize() {
         val v = ZVector4(3f, 4f, 0f, 0f)
         v.normalize()
-        assertTrue(kotlin.math.abs(v.norm2 - 1f) < epsilon)
+        assertTrue(abs(v.norm2 - 1f) < epsilon)
         assertVectorEquals(ZVector4(0.6f, 0.8f, 0f, 0f), v)
     }
 

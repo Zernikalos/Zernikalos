@@ -14,21 +14,25 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZResizable
 import zernikalos.components.ZSerializableComponent
+import zernikalos.math.Angles
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
+import kotlin.math.PI
 
 /**
  * Represents a perspective lens used for rendering in Zernikalos.
  *
  * @param data The ZPerspectiveLensData associated with the lens
  *
- * @property fov The field of view angle for the lens
+ * @property fov Vertical field of view in radians
  * @property projectionMatrix The projection matrix for the lens
  *
  * @constructor Constructs a ZPerspectiveLens with the given data.
- * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and field of view angle.
- * @constructor Constructs a ZPerspectiveLens with the given near value, far value, field of view angle, and aspect ratio.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and vertical field of view in radians.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, vertical field of view in radians, and aspect ratio.
+ *
+ * For authoring in degrees, use [fromVerticalFovDegrees] or [setVerticalFovDegrees]; [fov] remains stored in radians.
  *
  * @see ZResizable
  */
@@ -44,11 +48,7 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
     constructor(near: Float, far: Float, fov: Float, aspectRatio: Float) : this(ZPerspectiveLensData(near, far, aspectRatio, fov))
 
     /**
-     * Represents the field of view angle for the lens in a ZPerspectiveLens.
-     *
-     * @property fov The field of view angle for the lens.
-     *     This angle determines the extent of the scene that is visible in the camera's view.
-     *     A larger angle will capture a wider view, while a smaller angle will capture a narrower view.
+     * Vertical field of view in radians. Larger values widen the view; smaller values narrow it.
      *
      * @see ZPerspectiveLens
      */
@@ -56,10 +56,30 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 
     val projectionMatrix: ZMatrix4 by data::projectionMatrix
 
-    companion object {
-        val Default: ZPerspectiveLens
-            get() = ZPerspectiveLens(1f, 100f, 45f)
+    /** Sets vertical field of view from [verticalFovDegrees]; [fov] is stored in radians. */
+    fun setVerticalFovDegrees(verticalFovDegrees: Float) {
+        fov = Angles.degreesToRadians(verticalFovDegrees)
+    }
 
+    companion object {
+        /** Default vertical FOV ≈ 45° expressed as π/4 radians. */
+        val Default: ZPerspectiveLens
+            get() = ZPerspectiveLens(1f, 100f, (PI / 4.0).toFloat())
+
+        /** Constructs a lens with vertical FOV given in degrees (stored as radians). */
+        @JsName("fromVerticalFovDegrees")
+        fun fromVerticalFovDegrees(near: Float, far: Float, verticalFovDegrees: Float): ZPerspectiveLens =
+            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees))
+
+        /** Constructs a lens with vertical FOV in degrees and explicit aspect ratio (stored as radians). */
+        @JsName("fromVerticalFovDegreesWithAspect")
+        fun fromVerticalFovDegrees(
+            near: Float,
+            far: Float,
+            verticalFovDegrees: Float,
+            aspectRatio: Float,
+        ): ZPerspectiveLens =
+            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees), aspectRatio)
     }
 
     override fun onViewportResize(width: Int, height: Int) {
@@ -75,9 +95,13 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 @Serializable
 class ZPerspectiveLensData(): ZLensData() {
 
+    /** Vertical field of view in radians (serialized value uses the same unit). */
     @ProtoNumber(4)
     var fov: Float = 0f
 
+    /**
+     * @param fov Vertical field of view in radians.
+     */
     constructor(
         near: Float = 0f,
         far: Float = 0f,
@@ -88,6 +112,9 @@ class ZPerspectiveLensData(): ZLensData() {
         this.fov = fov
     }
 
+    /**
+     * @param fov Vertical field of view in radians.
+     */
     constructor(
         near: Float = 0f,
         far: Float = 0f,

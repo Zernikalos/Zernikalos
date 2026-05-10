@@ -37,7 +37,8 @@ class ZCamera(): ZObject() {
      *
      * @property near The distance to the near clipping plane.
      * @property far The distance to the far clipping plane.
-     * @property fov The vertical field of view in degrees.
+     * @property fov The vertical field of view in radians (see [ZPerspectiveLens.setVerticalFovDegrees]
+     *   and [ZPerspectiveLens.fromVerticalFovDegrees] for degree-based authoring).
      * @property aspectRatio The aspect ratio (width/height)
      * */
     @ProtoNumber(4)
