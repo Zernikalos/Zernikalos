@@ -76,6 +76,16 @@ class ZEuler(): ZAlgebraObject {
         val Zero: ZEuler
             get() = ZEuler(0f, 0f, 0f)
 
+        /**
+         * Builds a [ZEuler] with [roll], [pitch], and [yaw] given in degrees; stored components are radians.
+         */
+        fun fromDegrees(roll: Float, pitch: Float, yaw: Float): ZEuler =
+            ZEuler(
+                Angles.degreesToRadians(roll),
+                Angles.degreesToRadians(pitch),
+                Angles.degreesToRadians(yaw),
+            )
+
         fun copy(result: ZEuler, e: ZEuler) {
             result.yaw = e.yaw
             result.pitch = e.pitch

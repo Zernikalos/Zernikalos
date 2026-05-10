@@ -127,6 +127,37 @@ class ZTransform() {
         get() = rotationEuler.roll
 
     /**
+     * Like [rotationEuler] but [ZEuler.roll], [ZEuler.pitch], and [ZEuler.yaw] are expressed in **degrees**
+     * on this API surface only. The returned [ZEuler] still uses the same fields as radian-backed [ZEuler]
+     * elsewhere—do not pass this value to APIs that expect radians (e.g. [ZQuaternion.fromEuler]) without
+     * converting via [Angles.degreesToRadians] per component or use [rotationEuler] instead.
+     */
+    var rotationEulerDegrees: ZEuler
+        get() {
+            val e = rotationEuler
+            return ZEuler(
+                Angles.radiansToDegrees(e.roll),
+                Angles.radiansToDegrees(e.pitch),
+                Angles.radiansToDegrees(e.yaw),
+            )
+        }
+        set(value) {
+            ZQuaternion.fromEuler(_rotation, ZEuler.fromDegrees(value.roll, value.pitch, value.yaw))
+        }
+
+    /** [yaw] expressed in degrees. */
+    val yawDegrees: Float
+        get() = Angles.radiansToDegrees(yaw)
+
+    /** [pitch] expressed in degrees. */
+    val pitchDegrees: Float
+        get() = Angles.radiansToDegrees(pitch)
+
+    /** [roll] expressed in degrees. */
+    val rollDegrees: Float
+        get() = Angles.radiansToDegrees(roll)
+
+    /**
      * Represents the scale of the object in a 3D space.
      *
      * @see ZVector3
@@ -263,6 +294,51 @@ class ZTransform() {
      */
     fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3) {
         rotateAround(angle, point, axis, _position)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    fun setRotationDegrees(angle: Float, x: Float, y: Float, z: Float) {
+        setRotation(Angles.degreesToRadians(angle), x, y, z)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    @JsName("setRotationDegreesByVector")
+    fun setRotationDegrees(angle: Float, axis: ZVector3) {
+        setRotation(Angles.degreesToRadians(angle), axis)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    fun rotateDegrees(angle: Float, x: Float, y: Float, z: Float) {
+        rotate(Angles.degreesToRadians(angle), x, y, z)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    @JsName("rotateDegreesByAngleAxisVector")
+    fun rotateDegrees(angle: Float, axis: ZVector3) {
+        rotate(Angles.degreesToRadians(angle), axis)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    @JsName("rotateAroundDegreesPointAxesThrough")
+    fun rotateAroundDegrees(angle: Float, point: ZVector3, axis: ZVector3, through: ZVector3) {
+        rotateAround(Angles.degreesToRadians(angle), point, axis, through)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     */
+    fun rotateAroundDegrees(angle: Float, point: ZVector3, axis: ZVector3) {
+        rotateAround(Angles.degreesToRadians(angle), point, axis)
     }
 
     /**

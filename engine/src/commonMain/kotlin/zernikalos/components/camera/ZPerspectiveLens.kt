@@ -14,6 +14,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentSerializer
 import zernikalos.components.ZResizable
 import zernikalos.components.ZSerializableComponent
+import zernikalos.math.Angles
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -30,6 +31,8 @@ import kotlin.math.PI
  * @constructor Constructs a ZPerspectiveLens with the given data.
  * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and vertical field of view in radians.
  * @constructor Constructs a ZPerspectiveLens with the given near value, far value, vertical field of view in radians, and aspect ratio.
+ *
+ * For authoring in degrees, use [fromVerticalFovDegrees] or [setVerticalFovDegrees]; [fov] remains stored in radians.
  *
  * @see ZResizable
  */
@@ -53,11 +56,30 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 
     val projectionMatrix: ZMatrix4 by data::projectionMatrix
 
+    /** Sets vertical field of view from [verticalFovDegrees]; [fov] is stored in radians. */
+    fun setVerticalFovDegrees(verticalFovDegrees: Float) {
+        fov = Angles.degreesToRadians(verticalFovDegrees)
+    }
+
     companion object {
         /** Default vertical FOV ≈ 45° expressed as π/4 radians. */
         val Default: ZPerspectiveLens
             get() = ZPerspectiveLens(1f, 100f, (PI / 4.0).toFloat())
 
+        /** Constructs a lens with vertical FOV given in degrees (stored as radians). */
+        @JsName("fromVerticalFovDegrees")
+        fun fromVerticalFovDegrees(near: Float, far: Float, verticalFovDegrees: Float): ZPerspectiveLens =
+            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees))
+
+        /** Constructs a lens with vertical FOV in degrees and explicit aspect ratio (stored as radians). */
+        @JsName("fromVerticalFovDegreesWithAspect")
+        fun fromVerticalFovDegrees(
+            near: Float,
+            far: Float,
+            verticalFovDegrees: Float,
+            aspectRatio: Float,
+        ): ZPerspectiveLens =
+            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees), aspectRatio)
     }
 
     override fun onViewportResize(width: Int, height: Int) {

@@ -81,6 +81,38 @@ class ZTransformTest {
     }
 
     @Test
+    fun setRotationDegrees_matchesRadianApi() {
+        val tDeg = ZTransform()
+        tDeg.setRotationDegrees(90f, ZVector3.Up)
+        val tRad = ZTransform()
+        tRad.setRotation(rad(90f), ZVector3.Up)
+        assertQuaternionEquals(tRad.rotation, tDeg.rotation)
+    }
+
+    @Test
+    fun rotateDegrees_matchesRadianApi() {
+        val tDeg = ZTransform()
+        tDeg.rotateDegrees(45f, ZVector3.Right)
+        val tRad = ZTransform()
+        tRad.rotate(rad(45f), ZVector3.Right)
+        assertQuaternionEquals(tRad.rotation, tDeg.rotation)
+    }
+
+    @Test
+    fun rotationEulerDegrees_setYawInDegrees() {
+        val t = ZTransform()
+        t.rotationEulerDegrees = ZEuler(0f, 0f, 90f)
+        assertEquals(90f, t.yawDegrees, 0.5f)
+    }
+
+    @Test
+    fun yawPitchRollDegrees_consistentWithRadians() {
+        val t = ZTransform()
+        t.setRotationDegrees(90f, ZVector3.Up)
+        assertEquals(Angles.radiansToDegrees(t.yaw), t.yawDegrees, 0.01f)
+    }
+
+    @Test
     fun testMatrix() {
         val position = ZVector3(1f, 2f, 3f)
         val rotation = ZQuaternion()
