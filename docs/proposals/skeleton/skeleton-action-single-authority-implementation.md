@@ -2,7 +2,8 @@
 
 **Status**: Draft  
 **Created**: 2026  
-**Parent proposal**: [skeleton-action-single-authority.md](./skeleton-action-single-authority.md)
+**Parent proposal**: [skeleton-action-single-authority.md](./skeleton-action-single-authority.md)  
+**Related**: [z-action-player-update-apply-unification.md](./z-action-player-update-apply-unification.md) — `ZActionPlayer.update` / `update(dt)` bundles clock + pose commit; sampling/commit helpers are private
 
 This document expands the parent proposal into **concrete types, call sequences, phased rollout, and verification**. It does not repeat the full problem statement; read the proposal first.
 
@@ -82,10 +83,9 @@ Optional split if the team prefers smaller files:
 | Method | Behavior |
 |--------|----------|
 | `setAction(skeleton: ZSkeleton, action: ZSkeletalAction)` | Assign skeleton + clip; reset time; **do not** set `ZModel.action`. |
-| `update()` / `updateWithDeltaTime(dt)` | Advance `currentTime` only. Optionally **no** automatic pose apply here (preferred): caller runs `apply` after update. |
-| `sampleCurrent(): ZKeyFrame?` | `currentAction?.sampleAt(currentTime)` — **pure**. |
-| `applyCurrentPose()` | `skeleton?.root?.let { SkeletonPoseApplier.apply(it, sampleCurrent()!!, parent = Identity) }` or delegate to applier. |
-| `seek(time)`, `play`, `pause`, `stop` | Unchanged semantics. |
+| `update()` / `update(deltaTimeSeconds)` | Advance `currentTime`, then commit sampled pose to `skeleton` (single host call per frame). |
+| `stepPlaybackClock`, `sampleCurrent`, `applyCurrentPose` | **Private** implementation detail (conceptual sample → commit split remains inside the player). |
+| `seek(time)`, `play`, `pause`, `stop` | Unchanged semantics (each applies pose where relevant). |
 
 ### 5.3 Deprecation of model-centric API
 
@@ -115,15 +115,9 @@ object SkeletonPoseApplier {
 Preferred explicit order:
 
 1. **Input / game logic** — optional `seek` on events.
-2. **`player.update(dt)`** — clock only.
-3. **`player.applyCurrentPose()`** — writes `poseMatrix` hierarchy (or batch later).
-4. **Skinning / uniform generators** — read `poseMatrix` + bind data per documented contract (§8).
-5. **Render** — unchanged.
-
-If a single-call convenience is needed for demos:
-
-- `fun ZActionPlayer.updateAndApplyPose(dt: Float)` = `updateWithDeltaTime(dt); applyCurrentPose()`  
-  Document that this is **not** the primitive for unit tests of sampling.
+2. **`player.update()`** (wall clock) **or** **`player.update(deltaTimeSeconds)`** (fixed step) — advances clock **and** writes `poseMatrix` via internal sample/commit.
+3. **Skinning / uniform generators** — read `poseMatrix` + bind data per documented contract (§8).
+4. **Render** — unchanged.
 
 ---
 
@@ -152,7 +146,7 @@ Then:
 
 ### Phase B — Separate clock from pose commit
 
-1. Refactor `updateWithDeltaTime` to **not** call `getCurrentKeyFrame()`.
+1. Refactor clock advance (today `stepPlaybackClock` / formerly delta-time step) to **not** call `getCurrentKeyFrame()`.
 2. Add `sampleCurrent()` and `applyCurrentPose()`; implement old `getCurrentKeyFrame` as deprecated wrapper that samples + applies (temporary).
 
 ### Phase C — Remove authority from `ZModel`
@@ -174,10 +168,10 @@ Then:
 |------|------|
 | `sampleAt` on a tiny clip with 2–3 bones | Deterministic map contents at `t = 0`, mid, end; **no** `ZBone` in fixture or assert bones untouched. |
 | `SkeletonPoseApplier` with fixed `ZKeyFrame` | Known `poseMatrix` on a trivial hierarchy (hand-calculated or golden). |
-| `ZActionPlayer` with fake clock | `update` advances time only; `applyCurrentPose` required for matrix change. |
+| `ZActionPlayer` with injected dt | `update(deltaTimeSeconds)` advances time and commits pose in one call. |
 | Integration smoke | One skinned model frame: same pixel or matrix hash as pre-refactor baseline (optional snapshot). |
 
-**Fake clock**: Prefer injecting `() -> Long` for millis or passing `deltaTime` only in `updateWithDeltaTime` (already private — consider `internal` test accessor or make `update(dt: Float)` public for deterministic tests).
+**Fake clock**: Use **`update(deltaTimeSeconds)`** for deterministic tests; wall-clock **`update()`** for production frame loops.
 
 ---
 
@@ -197,7 +191,6 @@ player.update()
 val skeleton = model.skeleton ?: error("Skinned model requires skeleton")
 player.setAction(skeleton, action)
 player.update()
-player.applyCurrentPose()
 ```
 
 Optional convenience (explicitly “sugar”):
@@ -211,7 +204,7 @@ fun ZModel.skeletalPlayer(): ZActionPlayer =
 
 ## 12. JS export and host facades
 
-- Export **`setAction(skeleton, action)`** and **`applyCurrentPose()`** on `@JsExport` types.
+- Export **`setAction(skeleton, action)`** and **`update` / `update(deltaTimeSeconds)`** on `@JsExport` types (pose commit is internal to `update`).
 - If TypeScript hosts still want “model + clip”, provide a **non-core** helper:
 
   `fun playSkeletalOnModel(model: ZModel, player: ZActionPlayer, action: ZSkeletalAction)`  
@@ -223,7 +216,7 @@ fun ZModel.skeletalPlayer(): ZActionPlayer =
 
 | Risk | Mitigation |
 |------|------------|
-| Callers forget `applyCurrentPose` | Document sequence; optional `updateAndApplyPose`; assert in debug if `poseMatrix` stale (heuristic — optional). |
+| Callers forget pose after clock | Addressed by **`update`** performing commit; document one call per frame. |
 | `ZModel.action` used for UI | Sync from player in editor layer only, or read `player.getCurrentAction()` once exposed. |
 | Semver / binary compatibility | Deprecation cycle on JVM/JS; changelog entry. |
 
@@ -235,7 +228,7 @@ fun ZModel.skeletalPlayer(): ZActionPlayer =
 - [ ] No getter named `get…` performs full skeleton pose writes without `apply` in the name.
 - [ ] `ZSkeletalAction` exposes a **documented pure** sample API used by tests without `ZRenderingContext`.
 - [ ] Skinning path has **one KDoc contract** aligned with generator code.
-- [ ] All in-repo skeletal demos updated to the explicit update + apply sequence (or documented wrapper).
+- [ ] All in-repo skeletal demos updated to a **single `update()`** (or `update(dt)`) per frame.
 
 ---
 

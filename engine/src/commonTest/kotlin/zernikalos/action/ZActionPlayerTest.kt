@@ -11,13 +11,12 @@ package zernikalos.action
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import zernikalos.components.skeleton.ZBone
-import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZSkeleton
 
 class ZActionPlayerTest {
 
     @Test
-    fun updateWithDeltaTime_doesNotCommitPoseUntilApply() {
+    fun update_withDeltaTimeCommitsPose() {
         val bone = ZBone().apply { id = "j" }
         val skeleton = ZSkeleton().apply { root = bone }
 
@@ -35,13 +34,8 @@ class ZActionPlayerTest {
 
         fun tx() = bone.poseMatrix.floatArray[12]
 
-        val afterStart = tx()
-        assertEquals(0f, afterStart, 1e-4f)
-
-        player.updateWithDeltaTime(0.5f)
-        assertEquals(afterStart, tx(), 1e-6f)
-
-        player.applyCurrentPose()
+        assertEquals(0f, tx(), 1e-4f)
+        player.update(0.5f)
         assertEquals(5f, tx(), 1e-3f)
     }
 }
