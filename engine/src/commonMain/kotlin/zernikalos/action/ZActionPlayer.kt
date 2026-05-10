@@ -11,6 +11,7 @@ package zernikalos.action
 import zernikalos.math.ZMatrix4
 import zernikalos.objects.ZSkeleton
 import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.time.Clock.System
 import kotlin.time.ExperimentalTime
 
@@ -24,8 +25,9 @@ fun System.currentTimeMillis(): Long = System.now().toEpochMilliseconds()
  * Allows playback of skeletal actions stored in [ZSkeletalAction].
  *
  * Playback is bound to a [ZSkeleton]: this class owns the clock (time, speed, loop, play state)
- * while sampling the clip and committing poses to bones are separate steps. Advance time with
- * [update] or [updateWithDeltaTime], then call [applyCurrentPose] before skinning or render.
+ * and commits the sampled clip pose to that skeleton inside [update] each frame (wall clock or
+ * explicit [update] with elapsed seconds). Typical host integration: call [update] once per frame
+ * before skinning or render.
  */
 @OptIn(ExperimentalTime::class)
 @JsExport
@@ -96,28 +98,40 @@ class ZActionPlayer {
     }
 
     /**
-     * Updates playback using elapsed wall time since the last call (seconds).
-     *
-     * Does not modify bone matrices; call [applyCurrentPose] afterwards so the skeleton matches
-     * the new time.
+     * Updates playback using elapsed wall time since the last call (seconds), then commits the
+     * sampled pose to [skeleton].
      */
     fun update() {
         val currentTimeMs = System.currentTimeMillis()
         val deltaTime = (currentTimeMs - lastUpdateTimeMs) / 1000f
         lastUpdateTimeMs = currentTimeMs
-        updateWithDeltaTime(deltaTime)
+        stepPlaybackClock(deltaTime)
+        applyCurrentPose()
     }
 
     /**
-     * Advances [currentTime] by [deltaTime] scaled by [playbackSpeed] when playing.
-     * Handles loop / end-of-clip stopping.
+     * Advances playback by [deltaTimeSeconds] (scaled by [playbackSpeed] when playing), then
+     * commits the sampled pose to [skeleton]. Use for fixed-step or injected delta time instead
+     * of wall-clock [update].
      *
-     * @param deltaTime Elapsed time in seconds since the last call.
+     * @param deltaTimeSeconds Elapsed time in seconds since the last call.
      */
-     fun updateWithDeltaTime(deltaTime: Float) {
+    @JsName("updateWithDelta")
+    fun update(deltaTimeSeconds: Float) {
+        stepPlaybackClock(deltaTimeSeconds)
+        applyCurrentPose()
+    }
+
+    /**
+     * Advances [currentTime] by [deltaSeconds] scaled by [playbackSpeed] when playing.
+     * Handles loop / end-of-clip stopping. Does not write bone matrices.
+     *
+     * @param deltaSeconds Elapsed time in seconds since the last call.
+     */
+    private fun stepPlaybackClock(deltaSeconds: Float) {
         if (!isPlaying || currentAction == null) return
 
-        currentTime += deltaTime * playbackSpeed
+        currentTime += deltaSeconds * playbackSpeed
 
         if (currentTime > currentAction!!.duration) {
             if (isLooping) {
@@ -129,19 +143,14 @@ class ZActionPlayer {
         }
     }
 
-    /**
-     * Samples the active clip at [currentTime] into a [ZKeyFrame] without mutating any [ZBone].
-     *
-     * @return The keyframe for the current time, or `null` if there is no active clip.
-     */
-    fun sampleCurrent(): ZKeyFrame? =
+    private fun sampleCurrent(): ZKeyFrame? =
         currentAction?.sampleAt(currentTime)
 
     /**
      * Commits the current sampled clip pose onto [skeleton] via [ZSkeleton.applyKeyFrame].
      * No-op if there is no active clip or no skeleton.
      */
-    fun applyCurrentPose() {
+    private fun applyCurrentPose() {
         val kf = sampleCurrent() ?: return
         val sk = skeleton ?: return
         sk.applyKeyFrame(kf, ZMatrix4.Identity)

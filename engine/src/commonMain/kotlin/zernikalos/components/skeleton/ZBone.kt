@@ -61,7 +61,7 @@ class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneD
      * Returns the world pose matrix of this bone for the current frame (rest or animated).
      *
      * Populated when the host applies a sampled clip via [zernikalos.objects.ZSkeleton.applyKeyFrame]
-     * (see [zernikalos.action.ZActionPlayer.applyCurrentPose]) or when the model commits the rest
+     * (typically after [zernikalos.action.ZActionPlayer.update]) or when the model commits the rest
      * pose at initialization.
      */
     var poseMatrix: ZMatrix4 = ZMatrix4.Identity
