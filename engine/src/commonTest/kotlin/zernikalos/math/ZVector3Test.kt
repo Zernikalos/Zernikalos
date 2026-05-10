@@ -150,7 +150,7 @@ class ZVector3Test {
 //        val v = ZVector3(1f, 0f, 0f)
 //        val q = ZQuaternion.fromAxisAngle(ZVector3(0f, 0f, 1f), 90f)
 //        v.rotate(q)
-//        // Rotation around Z by 90 degrees should move X to Y
+//        // Rotation around Z by π/2 radians should move X to Y
 //        assertTrue(v.x < 0.0001f && v.x > -0.0001f)
 //        assertEquals(1f, v.y, 0.0001f)
 //        assertEquals(0f, v.z, 0.0001f)

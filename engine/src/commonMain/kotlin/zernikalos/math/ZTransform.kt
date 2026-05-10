@@ -114,12 +114,15 @@ class ZTransform() {
             ZQuaternion.fromEuler(_rotation, value)
         }
 
+    /** Yaw component of [rotationEuler] in radians. */
     val yaw: Float
         get() = rotationEuler.yaw
 
+    /** Pitch component of [rotationEuler] in radians. */
     val pitch: Float
         get() = rotationEuler.pitch
 
+    /** Roll component of [rotationEuler] in radians. */
     val roll: Float
         get() = rotationEuler.roll
 
@@ -152,12 +155,18 @@ class ZTransform() {
         _position.setValues(x, y, z)
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     fun setRotation(angle: Float, x: Float, y: Float, z: Float) {
         ZQuaternion.fromAngleAxis(_rotation, angle, x, y, z)
         _rotation.normalize()
         updateLocalAxis()
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     @JsName("rotateByVector")
     fun setRotation(angle: Float, axis: ZVector3) {
         ZQuaternion.fromAngleAxis(_rotation, angle, axis)
@@ -210,17 +219,26 @@ class ZTransform() {
         updateLocalAxis()
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     fun rotate(angle: Float, x: Float, y: Float, z: Float) {
         val q = ZQuaternion()
         ZQuaternion.fromAngleAxis(q, angle, x, y, z)
         rotate(q)
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     @JsName("rotateByAngleAxisVector")
     fun rotate(angle: Float, axis: ZVector3) {
         rotate(angle, axis.x, axis.y, axis.z)
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     @JsName("rotateAroundPointAxesThrough")
     fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3, through: ZVector3) {
         val q = ZQuaternion()
@@ -240,6 +258,9 @@ class ZTransform() {
         updateLocalAxis()
     }
 
+    /**
+     * @param angle Rotation angle in radians.
+     */
     fun rotateAround(angle: Float, point: ZVector3, axis: ZVector3) {
         rotateAround(angle, point, axis, _position)
     }

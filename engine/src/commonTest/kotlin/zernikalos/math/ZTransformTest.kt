@@ -1,9 +1,12 @@
 package zernikalos.math
 
+import kotlin.math.PI
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ZTransformTest {
+
+    private fun rad(degrees: Float): Float = degrees * PI.toFloat() / 180f
 
     @Test
     fun testDefaultConstructor() {
@@ -17,7 +20,7 @@ class ZTransformTest {
     fun testInitWithArgs() {
         val position = ZVector3(1f, 2f, 3f)
         val rotation = ZQuaternion()
-        ZQuaternion.fromAngleAxis(rotation, 90f, ZVector3.Up)
+        ZQuaternion.fromAngleAxis(rotation, rad(90f), ZVector3.Up)
         val scale = ZVector3(2f, 2f, 2f)
         val transform = ZTransform(position, rotation, scale)
 
@@ -38,7 +41,7 @@ class ZTransformTest {
     fun testSetRotation() {
         val transform = ZTransform()
         val newRotation = ZQuaternion()
-        ZQuaternion.fromAngleAxis(newRotation, 45f, ZVector3.Right)
+        ZQuaternion.fromAngleAxis(newRotation, rad(45f), ZVector3.Right)
         transform.rotation = newRotation
         assertQuaternionEquals(newRotation, transform.rotation)
     }
@@ -62,7 +65,7 @@ class ZTransformTest {
     fun testRotate() {
         val transform = ZTransform()
         val rotation = ZQuaternion()
-        ZQuaternion.fromAngleAxis(rotation, 90f, ZVector3.Up)
+        ZQuaternion.fromAngleAxis(rotation, rad(90f), ZVector3.Up)
         transform.rotate(rotation)
         assertQuaternionEquals(rotation, transform.rotation)
     }
@@ -81,7 +84,7 @@ class ZTransformTest {
     fun testMatrix() {
         val position = ZVector3(1f, 2f, 3f)
         val rotation = ZQuaternion()
-        ZQuaternion.fromAngleAxis(rotation, 90f, ZVector3.Up)
+        ZQuaternion.fromAngleAxis(rotation, rad(90f), ZVector3.Up)
         val scale = ZVector3(2f, 2f, 2f)
         val transform = ZTransform(position, rotation, scale)
 

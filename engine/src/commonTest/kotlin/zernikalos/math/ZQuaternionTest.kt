@@ -1,11 +1,16 @@
 package zernikalos.math
 
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ZQuaternionTest {
+
+    private fun rad(degrees: Float): Float = degrees * PI.toFloat() / 180f
 
     @Test
     fun testDefaultConstructorIsIdentity() {
@@ -105,21 +110,21 @@ class ZQuaternionTest {
     @Test
     fun testFromAngleAxis() {
         val q = ZQuaternion()
-        val angle = 90f
+        val angle = rad(90f)
         val axis = ZVector3(0f, 1f, 0f)
         q.fromAngleAxis(angle, axis.x, axis.y, axis.z)
 
-        val halfAngle = (angle * (kotlin.math.PI / 180.0) / 2.0).toFloat()
-        assertEquals(kotlin.math.cos(halfAngle), q.w, epsilon)
-        assertEquals(axis.x * kotlin.math.sin(halfAngle), q.x, epsilon)
-        assertEquals(axis.y * kotlin.math.sin(halfAngle), q.y, epsilon)
-        assertEquals(axis.z * kotlin.math.sin(halfAngle), q.z, epsilon)
+        val halfAngle = angle * 0.5f
+        assertEquals(cos(halfAngle.toDouble()).toFloat(), q.w, epsilon)
+        assertEquals(axis.x * sin(halfAngle.toDouble()).toFloat(), q.x, epsilon)
+        assertEquals(axis.y * sin(halfAngle.toDouble()).toFloat(), q.y, epsilon)
+        assertEquals(axis.z * sin(halfAngle.toDouble()).toFloat(), q.z, epsilon)
     }
 
     @Test
     fun testToMatrix4AndBack() {
         val q = ZQuaternion()
-        q.fromAngleAxis(45f, 0f, 1f, 0f)
+        q.fromAngleAxis(rad(45f), 0f, 1f, 0f)
         val m = q.toMatrix4()
         val q2 = ZQuaternion()
         q2.fromMatrix4(m)
@@ -129,7 +134,7 @@ class ZQuaternionTest {
     @Test
     @Ignore
     fun testFromEulerAndBack() {
-        val euler = ZEuler(30f, 60f, 90f)
+        val euler = ZEuler(rad(30f), rad(60f), rad(90f))
         val q = ZQuaternion.fromEuler(euler)
         val eulerBack = q.toEuler()
 
@@ -144,12 +149,12 @@ class ZQuaternionTest {
     fun testSlerp() {
         val q1 = ZQuaternion(1f, 0f, 0f, 0f)
         val q2 = ZQuaternion()
-        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+        q2.fromAngleAxis(rad(90f), 0f, 1f, 0f)
 
         val result = ZQuaternion.slerp(0.5f, q1, q2)
 
         val expected = ZQuaternion()
-        expected.fromAngleAxis(45f, 0f, 1f, 0f)
+        expected.fromAngleAxis(rad(45f), 0f, 1f, 0f)
 
         assertQuaternionEquals(expected, result)
     }
@@ -213,10 +218,10 @@ class ZQuaternionTest {
     @Test
     fun testSlerpSphericalInterpolation() {
         val q1 = ZQuaternion()
-        q1.fromAngleAxis(30f, 1f, 0f, 0f)
+        q1.fromAngleAxis(rad(30f), 1f, 0f, 0f)
 
         val q2 = ZQuaternion()
-        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+        q2.fromAngleAxis(rad(90f), 0f, 1f, 0f)
 
         val result = ZQuaternion()
         ZQuaternion.slerp(result, 0.5f, q1, q2)
@@ -233,7 +238,7 @@ class ZQuaternionTest {
     fun testSlerpEdgeCases() {
         val q1 = ZQuaternion(1f, 0f, 0f, 0f)
         val q2 = ZQuaternion()
-        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+        q2.fromAngleAxis(rad(90f), 0f, 1f, 0f)
 
         // t = 0 should give q1
         val result0 = ZQuaternion()
@@ -347,7 +352,7 @@ class ZQuaternionTest {
     fun testOperationRotate() {
         val q = ZQuaternion(1f, 0f, 0f, 0f)
         val result = ZQuaternion()
-        val angle = 90f
+        val angle = rad(90f)
         val axis = ZVector3(0f, 1f, 0f)
         ZQuaternion.rotate(result, q, angle, axis)
 
@@ -368,16 +373,16 @@ class ZQuaternionTest {
     @Test
     fun testOperationFromAngleAxis() {
         val result = ZQuaternion()
-        val angle = 90f
+        val angle = rad(90f)
         val axis = ZVector3(0f, 1f, 0f)
         ZQuaternion.fromAngleAxis(result, angle, axis)
 
-        val halfAngle = (angle * (kotlin.math.PI / 180.0) / 2.0).toFloat()
+        val halfAngle = angle * 0.5f
         val expected = ZQuaternion(
-            kotlin.math.cos(halfAngle),
-            axis.x * kotlin.math.sin(halfAngle),
-            axis.y * kotlin.math.sin(halfAngle),
-            axis.z * kotlin.math.sin(halfAngle)
+            cos(halfAngle.toDouble()).toFloat(),
+            axis.x * sin(halfAngle.toDouble()).toFloat(),
+            axis.y * sin(halfAngle.toDouble()).toFloat(),
+            axis.z * sin(halfAngle.toDouble()).toFloat()
         )
         assertQuaternionEquals(expected, result)
     }
@@ -385,7 +390,7 @@ class ZQuaternionTest {
     @Test
     fun testOperationFromMatrix4() {
         val q = ZQuaternion()
-        q.fromAngleAxis(45f, 0f, 1f, 0f)
+        q.fromAngleAxis(rad(45f), 0f, 1f, 0f)
         val m = q.toMatrix4()
         val result = ZQuaternion()
         ZQuaternion.fromMatrix4(result, m)
@@ -395,7 +400,7 @@ class ZQuaternionTest {
     @Test
     @Ignore
     fun testOperationFromEuler() {
-        val euler = ZEuler(30f, 60f, 90f)
+        val euler = ZEuler(rad(30f), rad(60f), rad(90f))
         val result = ZQuaternion()
         ZQuaternion.fromEuler(result, euler)
         val eulerBack = result.toEuler()
@@ -409,12 +414,12 @@ class ZQuaternionTest {
     fun testOperationSlerp() {
         val q1 = ZQuaternion(1f, 0f, 0f, 0f)
         val q2 = ZQuaternion()
-        q2.fromAngleAxis(90f, 0f, 1f, 0f)
+        q2.fromAngleAxis(rad(90f), 0f, 1f, 0f)
         val result = ZQuaternion()
         ZQuaternion.slerp(result, 0.5f, q1, q2)
 
         val expected = ZQuaternion()
-        expected.fromAngleAxis(45f, 0f, 1f, 0f)
+        expected.fromAngleAxis(rad(45f), 0f, 1f, 0f)
 
         assertQuaternionEquals(expected, result)
     }

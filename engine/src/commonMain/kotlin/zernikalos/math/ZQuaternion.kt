@@ -141,6 +141,8 @@ class ZQuaternion(): ZAlgebraObject {
 
     /**
      * Rotates the quaternion by a specified angle around a specified axis.
+     *
+     * @param angle Rotation angle in radians.
      */
     fun rotate(angle: Float, axis: ZVector3) {
         rotate(this, this, angle, axis)
@@ -150,6 +152,11 @@ class ZQuaternion(): ZAlgebraObject {
         fromMatrix4(this, m)
     }
 
+    /**
+     * Sets this quaternion from an axis-angle rotation.
+     *
+     * @param angle Rotation angle in radians.
+     */
     fun fromAngleAxis(angle: Float, x: Float, y: Float, z: Float) {
         fromAngleAxis(this, angle, x, y, z)
     }
@@ -160,6 +167,9 @@ class ZQuaternion(): ZAlgebraObject {
         return m
     }
 
+    /**
+     * @return Euler angles (roll, pitch, yaw) in radians.
+     */
     fun toEuler(): ZEuler {
         val result = ZEuler()
         ZEuler.fromQuaternion(result, this)
@@ -258,6 +268,8 @@ class ZQuaternion(): ZAlgebraObject {
 
         /**
          * Rotates a quaternion by a specified angle around a specified axis.
+         *
+         * @param angle Rotation angle in radians.
          */
         fun rotate(result: ZQuaternion, q: ZQuaternion, angle: Float, axis: ZVector3) {
             val opRot = ZQuaternion()
@@ -272,10 +284,18 @@ class ZQuaternion(): ZAlgebraObject {
             result.z = v.z
         }
 
+        /**
+         * @param angle Rotation angle in radians.
+         */
         fun fromAngleAxis(result: ZQuaternion, angle: Float, axis: ZVector3) {
             fromAngleAxis(result, angle, axis.x, axis.y, axis.z)
         }
 
+        /**
+         * Builds a unit quaternion from axis-angle form.
+         *
+         * @param angle Rotation angle in radians.
+         */
         @JsName("fromAngleAxisPerValue")
         fun fromAngleAxis(result: ZQuaternion, angle: Float, x: Float, y: Float, z: Float) {
             //Axis normalization
@@ -285,10 +305,9 @@ class ZQuaternion(): ZAlgebraObject {
             val yn = y * norm
             val zn = z * norm
 
-            //Calc of cos(angle/2) and sin(angle/2)
-            val a: Float = angle / 2.0f * (PI.toFloat()/180) // Math.toRadians(angle / 2)
-            val c: Float = cos(a)
-            val s: Float = sin(a)
+            val halfAngle = angle * 0.5f
+            val c: Float = cos(halfAngle)
+            val s: Float = sin(halfAngle)
 
             //The values of the quaternion will be
             //[cos(angle/2), axis.x*sin(angle/2), axis.y*sin(angle/2), axis.z*sin(angle/2)]
@@ -360,18 +379,17 @@ class ZQuaternion(): ZAlgebraObject {
 
         /**
          * Converts Euler angles to quaternion using ZYX (yaw-pitch-roll) convention.
-         * @param result The quaternion to store the result in
-         * @param euler The Euler angles to convert from
+         *
+         * @param result The quaternion to store the result in.
+         * @param euler Euler angles with [ZEuler.roll], [ZEuler.pitch], and [ZEuler.yaw] in radians.
          */
         fun fromEuler(result: ZQuaternion, euler: ZEuler) {
-            val degToRad = (kotlin.math.PI / 180.0).toFloat()
-            // Convert angles to radians and divide by 2 as we need half angles
-            val cr = cos(euler.roll * degToRad * 0.5f)
-            val cp = cos(euler.pitch * degToRad * 0.5f)
-            val cy = cos(euler.yaw * degToRad * 0.5f)
-            val sr = sin(euler.roll * degToRad * 0.5f)
-            val sp = sin(euler.pitch * degToRad * 0.5f)
-            val sy = sin(euler.yaw * degToRad * 0.5f)
+            val cr = cos(euler.roll * 0.5f)
+            val cp = cos(euler.pitch * 0.5f)
+            val cy = cos(euler.yaw * 0.5f)
+            val sr = sin(euler.roll * 0.5f)
+            val sp = sin(euler.pitch * 0.5f)
+            val sy = sin(euler.yaw * 0.5f)
 
             result.w = cr * cp * cy + sr * sp * sy
             result.x = sr * cp * cy - cr * sp * sy
@@ -379,6 +397,7 @@ class ZQuaternion(): ZAlgebraObject {
             result.z = cr * cp * sy - sr * sp * cy
         }
 
+        /** @param euler Euler angles in radians. */
         @JsName("fromEulerIp")
         fun fromEuler(euler: ZEuler): ZQuaternion {
             val result = ZQuaternion()
@@ -387,11 +406,11 @@ class ZQuaternion(): ZAlgebraObject {
         }
 
         /**
-         * Creates a new quaternion from Euler angles.
-         * @param roll Rotation around X axis
-         * @param pitch Rotation around Y axis
-         * @param yaw Rotation around Z axis
-         * @return A new quaternion representing the rotation
+         * Creates a new quaternion from Euler angles (all components in radians).
+         *
+         * @param roll Rotation around X axis in radians.
+         * @param pitch Rotation around Y axis in radians.
+         * @param yaw Rotation around Z axis in radians.
          */
         @JsName("fromEulerWithValues")
         fun fromEuler(roll: Float, pitch: Float, yaw: Float): ZQuaternion {
@@ -477,7 +496,7 @@ class ZQuaternion(): ZAlgebraObject {
             val sinHalfTheta = sqrt(1.0f - cosHalfTheta * cosHalfTheta)
             val halfTheta = atan2(sinHalfTheta, cosHalfTheta)
 
-            // If theta = 180 degrees then result is not fully defined
+            // If theta = pi radians (half-turn) then result is not fully defined
             // We could rotate around any axis normal to qa or qb
             if (abs(sinHalfTheta) < 0.00001f) {
                 result.w = qa.w * 0.5f + qc.w * 0.5f

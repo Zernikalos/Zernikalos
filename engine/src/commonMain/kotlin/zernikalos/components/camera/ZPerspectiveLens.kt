@@ -17,18 +17,19 @@ import zernikalos.components.ZSerializableComponent
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
+import kotlin.math.PI
 
 /**
  * Represents a perspective lens used for rendering in Zernikalos.
  *
  * @param data The ZPerspectiveLensData associated with the lens
  *
- * @property fov The field of view angle for the lens
+ * @property fov Vertical field of view in radians
  * @property projectionMatrix The projection matrix for the lens
  *
  * @constructor Constructs a ZPerspectiveLens with the given data.
- * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and field of view angle.
- * @constructor Constructs a ZPerspectiveLens with the given near value, far value, field of view angle, and aspect ratio.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, and vertical field of view in radians.
+ * @constructor Constructs a ZPerspectiveLens with the given near value, far value, vertical field of view in radians, and aspect ratio.
  *
  * @see ZResizable
  */
@@ -44,11 +45,7 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
     constructor(near: Float, far: Float, fov: Float, aspectRatio: Float) : this(ZPerspectiveLensData(near, far, aspectRatio, fov))
 
     /**
-     * Represents the field of view angle for the lens in a ZPerspectiveLens.
-     *
-     * @property fov The field of view angle for the lens.
-     *     This angle determines the extent of the scene that is visible in the camera's view.
-     *     A larger angle will capture a wider view, while a smaller angle will capture a narrower view.
+     * Vertical field of view in radians. Larger values widen the view; smaller values narrow it.
      *
      * @see ZPerspectiveLens
      */
@@ -57,8 +54,9 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
     val projectionMatrix: ZMatrix4 by data::projectionMatrix
 
     companion object {
+        /** Default vertical FOV ≈ 45° expressed as π/4 radians. */
         val Default: ZPerspectiveLens
-            get() = ZPerspectiveLens(1f, 100f, 45f)
+            get() = ZPerspectiveLens(1f, 100f, (PI / 4.0).toFloat())
 
     }
 
@@ -75,9 +73,13 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 @Serializable
 class ZPerspectiveLensData(): ZLensData() {
 
+    /** Vertical field of view in radians (serialized value uses the same unit). */
     @ProtoNumber(4)
     var fov: Float = 0f
 
+    /**
+     * @param fov Vertical field of view in radians.
+     */
     constructor(
         near: Float = 0f,
         far: Float = 0f,
@@ -88,6 +90,9 @@ class ZPerspectiveLensData(): ZLensData() {
         this.fov = fov
     }
 
+    /**
+     * @param fov Vertical field of view in radians.
+     */
     constructor(
         near: Float = 0f,
         far: Float = 0f,
