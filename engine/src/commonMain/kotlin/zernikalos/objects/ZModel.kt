@@ -30,7 +30,7 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class ZModel: ZObject() {
+open class ZModel: ZObject() {
 
     @Transient
     override val type = ZObjectType.MODEL
