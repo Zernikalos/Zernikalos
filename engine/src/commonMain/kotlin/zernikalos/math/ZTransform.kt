@@ -342,6 +342,59 @@ class ZTransform() {
     }
 
     /**
+     * Rotates world position around [point] by [angle] (radians) about a **world-space** axis [axis],
+     * using the incremental rotation only on the offset `(through - point)` (Unity `Transform.RotateAround`-style).
+     *
+     * Unlike [rotateAround], this does **not** apply the transform's full orientation quaternion when
+     * updating position; it applies only the axis-angle delta [angle]/[axis] to that offset, then composes
+     * the same delta into [rotation] (`_rotation * q`).
+     *
+     * @param angle Rotation angle in radians.
+     * @param point Pivot in world space.
+     * @param axis Rotation axis in world space (zero-length is undefined; see [ZQuaternion.fromAngleAxis]).
+     * @param through Point whose offset from [point] is rotated; use default overload to orbit [position].
+     */
+    @JsName("rotateAroundWorldPointAxesThrough")
+    fun rotateAroundWorld(angle: Float, point: ZVector3, axis: ZVector3, through: ZVector3) {
+        val q = ZQuaternion()
+        ZQuaternion.fromAngleAxis(q, angle, axis)
+
+        val v = ZVector3()
+        ZVector3.subtract(v, through, point)
+        ZVector3.rotateVector(v, q, v)
+
+        ZVector3.add(_position, point, v)
+
+        ZQuaternion.mult(_rotation, _rotation, q)
+        _rotation.normalize()
+        updateLocalAxis()
+    }
+
+    /**
+     * @param angle Rotation angle in radians.
+     * @see rotateAroundWorld
+     */
+    fun rotateAroundWorld(angle: Float, point: ZVector3, axis: ZVector3) {
+        rotateAroundWorld(angle, point, axis, _position)
+    }
+
+    /**
+     * Same as [rotateAroundWorld] with [angle] in degrees.
+     */
+    @JsName("rotateAroundWorldDegreesPointAxesThrough")
+    fun rotateAroundWorldDegrees(angle: Float, point: ZVector3, axis: ZVector3, through: ZVector3) {
+        rotateAroundWorld(Angles.degreesToRadians(angle), point, axis, through)
+    }
+
+    /**
+     * @param angle Rotation angle in degrees.
+     * @see rotateAroundWorldDegrees
+     */
+    fun rotateAroundWorldDegrees(angle: Float, point: ZVector3, axis: ZVector3) {
+        rotateAroundWorldDegrees(angle, point, axis, _position)
+    }
+
+    /**
      * Adjusts the position of the object by panning it to the right and up directions.
      *
      * @param offsetRight the amount to pan to the right.
