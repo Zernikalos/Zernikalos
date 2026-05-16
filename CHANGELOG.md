@@ -2,6 +2,38 @@
 
 All notable changes to the Zernikalos Engine will be documented in this file.
 
+## [v0.10.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.10.0) (2026-05-16)
+
+### Added
+
+- 🎸 First basic geometries added ([b077bbeb9c20957](https://github.com/Zernikalos/Zernikalos/commit/b077bbeb9c209573ad1db08966e2c24b3514eeb8))
+- 🎸 Adding Degree related methods for simpler API ([b9be51c627d382d](https://github.com/Zernikalos/Zernikalos/commit/b9be51c627d382d180b7575164b16d5f55dad4c7))
+- 🎸 Improving android loader methods ([47f6d3d595820e5](https://github.com/Zernikalos/Zernikalos/commit/47f6d3d595820e5229b19acf2008faf036f68931))
+
+### Fixed
+
+- 🐛 Correcting lookAt method ([9292079c5a6d4c5](https://github.com/Zernikalos/Zernikalos/commit/9292079c5a6d4c5d6f460bb98cb95a84d24f12d5))
+
+
+### Changed
+
+- 💡 API improvements for buffer additions ([0820aa36b9a0a1c](https://github.com/Zernikalos/Zernikalos/commit/0820aa36b9a0a1cdea243f800ca8aa64bb6ee0f5))
+- 💡 Migrate math API to radians ([928439dcc5c644e](https://github.com/Zernikalos/Zernikalos/commit/928439dcc5c644e910414060f10bfcdd171ae8fd))
+- 💡 apply skeletal pose inside ZActionPlayer.update() ([1d9d95d3fc380e1](https://github.com/Zernikalos/Zernikalos/commit/1d9d95d3fc380e14d0b78901a8ffc7a3144bf864))
+- 💡 Improving skeletal animation structure ([ffaab8a018d4075](https://github.com/Zernikalos/Zernikalos/commit/ffaab8a018d4075d0df6317ecb21e5c6983e2b1b))
+
+### Documentation
+
+- 📖 Improving current internal documentation ([3be75a490eedefe](https://github.com/Zernikalos/Zernikalos/commit/3be75a490eedefeaa1c09b6e04f640c3aa1c0e03))
+
+
+
+
+
+### Chore
+
+- 🤖 Fixing some CI issues ([783edba7a8f6180](https://github.com/Zernikalos/Zernikalos/commit/783edba7a8f618004e8ecf42408f6a8ac421840b))
+
 ## [v0.9.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.9.0) (2026-04-05)
 
 ### Added
@@ -232,39 +264,6 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 - 🎸 Adding support for Phong on Metal ([b687b6a43107f24](https://github.com/Zernikalos/Zernikalos/commit/b687b6a43107f2475154ef0a09c948785ade501f))
 - 🎸 Upgrade ZKO to v0.12.0 ([9a89d3308ca504d](https://github.com/Zernikalos/Zernikalos/commit/9a89d3308ca504dc764654236665e34fe321cd96))
 - 🎸 Add support for Phong material on Android ([33dc3e50345f1ab](https://github.com/Zernikalos/Zernikalos/commit/33dc3e50345f1ab2beabb0dc348191b5db966679))
-
-### Fixed
-
-- 🐛 Fixes on material and shaders ([507fc31b4f942f3](https://github.com/Zernikalos/Zernikalos/commit/507fc31b4f942f3bb531f2a8ac56b32168911516))
-- 🐛 Fixing and improving some operations in math module ([c109cd277388c78](https://github.com/Zernikalos/Zernikalos/commit/c109cd277388c7830e54af35702d6973fba14cd9))
-- 🐛 Building a better way to compute binding points for uniform blocks ([163348f0b1f86de](https://github.com/Zernikalos/Zernikalos/commit/163348f0b1f86de368d7db59062eaa0835c3c0e0))
-- 🐛 Error on child deletion ([28a30c484103367](https://github.com/Zernikalos/Zernikalos/commit/28a30c484103367ecd91d91891f87a68c4a286ec))
-- 🐛 Error on WebGPU renderPass.end call not allowing to render multiple models ([e7cd2fcef485d41](https://github.com/Zernikalos/Zernikalos/commit/e7cd2fcef485d41df311a2c04d495fb183974329))
-- 🐛 Error on GL Uniform blocks due to global state corruption ([3023af6d9a76009](https://github.com/Zernikalos/Zernikalos/commit/3023af6d9a76009fc5d4d5717662f2ca604ebc73))
-- 🐛 Corrections for multiple issues on Ogl states ([b8383afa0df1112](https://github.com/Zernikalos/Zernikalos/commit/b8383afa0df111231d2169a383bb9368be87a806))
-
-
-
-### Documentation
-
-- ✏️ Updating documentation about the material system ([9e7260afb53f8e6](https://github.com/Zernikalos/Zernikalos/commit/9e7260afb53f8e6a537319a97387c894650fa175))
-- ✏️ Add extra documentation ([7e8b76bf1124f99](https://github.com/Zernikalos/Zernikalos/commit/7e8b76bf1124f99138977abf6dcc778cc3e65f35))
-
-
-### Tests
-
-- 🧪 Trying to improve MathTestUtils ([ec24efa39676d95](https://github.com/Zernikalos/Zernikalos/commit/ec24efa39676d95ffa2900f85ba5350a9d48e9cb))
-
-
-
-### Chore
-
-- 🤖 Unification of build and release workflows ([42e1ba0fe21048c](https://github.com/Zernikalos/Zernikalos/commit/42e1ba0fe21048ccfe6b4824320a825372bec133))
-
-## [v0.3.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.3.0) (2025-08-17)
-
-### Added
-
 - 🎸 Add support for PBR shader on WebGPU ([e33540991d5a7b8](https://github.com/Zernikalos/Zernikalos/commit/e33540991d5a7b82c98a0844aa2110b4eeb32b19))
 - 🎸 Add support for PBR shader on Metal ([2f9f5e61d95d09a](https://github.com/Zernikalos/Zernikalos/commit/2f9f5e61d95d09a2632bc954147e06ac8f40197d))
 - 🎸 Add support for PBR shader on OpenGL ([5031147901f59c2](https://github.com/Zernikalos/Zernikalos/commit/5031147901f59c2d888a7587f1fccbd8ccc5aee8))
@@ -375,6 +374,13 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 
 ### Fixed
 
+- 🐛 Fixes on material and shaders ([507fc31b4f942f3](https://github.com/Zernikalos/Zernikalos/commit/507fc31b4f942f3bb531f2a8ac56b32168911516))
+- 🐛 Fixing and improving some operations in math module ([c109cd277388c78](https://github.com/Zernikalos/Zernikalos/commit/c109cd277388c7830e54af35702d6973fba14cd9))
+- 🐛 Building a better way to compute binding points for uniform blocks ([163348f0b1f86de](https://github.com/Zernikalos/Zernikalos/commit/163348f0b1f86de368d7db59062eaa0835c3c0e0))
+- 🐛 Error on child deletion ([28a30c484103367](https://github.com/Zernikalos/Zernikalos/commit/28a30c484103367ecd91d91891f87a68c4a286ec))
+- 🐛 Error on WebGPU renderPass.end call not allowing to render multiple models ([e7cd2fcef485d41](https://github.com/Zernikalos/Zernikalos/commit/e7cd2fcef485d41df311a2c04d495fb183974329))
+- 🐛 Error on GL Uniform blocks due to global state corruption ([3023af6d9a76009](https://github.com/Zernikalos/Zernikalos/commit/3023af6d9a76009fc5d4d5717662f2ca604ebc73))
+- 🐛 Corrections for multiple issues on Ogl states ([b8383afa0df1112](https://github.com/Zernikalos/Zernikalos/commit/b8383afa0df111231d2169a383bb9368be87a806))
 - 🐛 Error handling could trigger NPE ([d223ab4e91b430b](https://github.com/Zernikalos/Zernikalos/commit/d223ab4e91b430b10a0df669275e6d8131cec5d3))
 - 🐛 Fixes and improvements on the PBR material setup ([f1f9f24211b4514](https://github.com/Zernikalos/Zernikalos/commit/f1f9f24211b451470c7d5a53153dcc5973d6b1cf))
 - 🐛 Error on JS Build ([f9a0254ed80db70](https://github.com/Zernikalos/Zernikalos/commit/f9a0254ed80db70c7eb4ca101bd7cdd0420723c9))
@@ -506,6 +512,8 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 
 ### Documentation
 
+- ✏️ Updating documentation about the material system ([9e7260afb53f8e6](https://github.com/Zernikalos/Zernikalos/commit/9e7260afb53f8e6a537319a97387c894650fa175))
+- ✏️ Add extra documentation ([7e8b76bf1124f99](https://github.com/Zernikalos/Zernikalos/commit/7e8b76bf1124f99138977abf6dcc778cc3e65f35))
 - ✏️ Setting Copyright note on webgpu files ([49c891bacdf769e](https://github.com/Zernikalos/Zernikalos/commit/49c891bacdf769e473afbb03897640d13b6a04dc))
 - ✏️ Added documentation for ZComponent.kt file ([9409c840411260a](https://github.com/Zernikalos/Zernikalos/commit/9409c840411260ad01a073d7850b37a6f05174b0))
 - ✏️ Improvements on documentation generation ([8b74e7248be7406](https://github.com/Zernikalos/Zernikalos/commit/8b74e7248be7406f9535b163ca9f33aee0726a4e))
@@ -521,11 +529,15 @@ All notable changes to the Zernikalos Engine will be documented in this file.
 
 - 💄 Minor changes done to the code + Licensing ([3200d6604da9539](https://github.com/Zernikalos/Zernikalos/commit/3200d6604da953983b2a113440b760bbca5a750c))
 
+### Tests
+
+- 🧪 Trying to improve MathTestUtils ([ec24efa39676d95](https://github.com/Zernikalos/Zernikalos/commit/ec24efa39676d95ffa2900f85ba5350a9d48e9cb))
 
 
 
 ### Chore
 
+- 🤖 Unification of build and release workflows ([42e1ba0fe21048c](https://github.com/Zernikalos/Zernikalos/commit/42e1ba0fe21048ccfe6b4824320a825372bec133))
 - 🤖 Improve release process documentation ([5ac43985751f4ff](https://github.com/Zernikalos/Zernikalos/commit/5ac43985751f4ff96234023c0629884af74b7de7))
 - 🤖 Fast build CI added ([301dfac8570debc](https://github.com/Zernikalos/Zernikalos/commit/301dfac8570debc13d9d58bc19c5fa9012cb09e9))
 - 🤖 Splitting CI in build and release ([5f29e81d0a74c31](https://github.com/Zernikalos/Zernikalos/commit/5f29e81d0a74c31611c85ba89aa079e9387e2561))

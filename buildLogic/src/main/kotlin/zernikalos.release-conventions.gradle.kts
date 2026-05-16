@@ -7,6 +7,8 @@
  */
 
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
+import org.gradle.internal.os.OperatingSystem
+import java.io.File
 
 plugins {
     id("se.bjurr.gitchangelog.git-changelog-gradle-plugin")
@@ -109,14 +111,17 @@ tasks.register("releaseCommit") {
     doLast {
         val version = project.extra["zernikalosVersion"] as String
 
-        val repoRoot = project.rootProject.rootDir
-        fun execCommand(command: String): Int {
-            val process = ProcessBuilder("sh", "-c", command)
-                .directory(repoRoot)
+        fun execCommand(command: String) {
+            val process = shellProcessBuilder(command, repoRoot)
                 .redirectErrorStream(true)
                 .start()
-            process.waitFor()
-            return process.exitValue()
+            val output = process.inputStream.bufferedReader().readText()
+            val exitCode = process.waitFor()
+            if (exitCode != 0) {
+                throw GradleException(
+                    "Command failed (exit $exitCode): $command\n$output"
+                )
+            }
         }
 
         execCommand(
@@ -145,4 +150,22 @@ tasks.register("releaseCommit") {
             """.trimIndent()
         )
     }
+}
+
+fun shellProcessBuilder(command: String, workingDir: File): ProcessBuilder {
+    if (!OperatingSystem.current().isWindows) {
+        return ProcessBuilder("sh", "-c", command).directory(workingDir)
+    }
+    val customShell = System.getenv("ZERNIKALOS_SHELL") // ej: C:\Program Files\Git\bin\sh.exe
+    val gitShCandidates = listOfNotNull(
+        customShell,
+        System.getenv("PROGRAMFILES")?.let { "$it\\Git\\bin\\sh.exe" },
+        System.getenv("PROGRAMFILES(X86)")?.let { "$it\\Git\\bin\\sh.exe" },
+        System.getenv("LOCALAPPDATA")?.let { "$it\\Programs\\Git\\bin\\sh.exe" },
+    ).map(::File).firstOrNull { it.isFile }
+    val shell = gitShCandidates
+        ?: throw GradleException(
+            "releaseCommit needs sh on Windows. Install Git for Windows or set ZERNIKALOS_SHELL to sh.exe"
+        )
+    return ProcessBuilder(shell.absolutePath, "-c", command).directory(workingDir)
 }
