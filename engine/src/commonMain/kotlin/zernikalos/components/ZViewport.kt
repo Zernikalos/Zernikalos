@@ -68,6 +68,7 @@ internal constructor(data: ZViewportData):
 
 @Serializable
 data class ZViewportData(
+    /** Default framebuffer clear (linear RGB, opaque). */
     var clearColor: ZColor = ZColor(.2f, .2f, .2f, 1.0f),
 //    var clearMask: Int = BufferBit.COLOR_BUFFER.value or BufferBit.DEPTH_BUFFER.value
 ): ZComponentData() {

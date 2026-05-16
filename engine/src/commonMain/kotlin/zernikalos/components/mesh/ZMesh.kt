@@ -12,10 +12,12 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
+import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -137,6 +139,71 @@ class ZMesh internal constructor(data: ZMeshData):
      */
     fun addBuffer(buffer: ZBuffer) {
         data.buffers[buffer.name] = buffer
+    }
+
+    /**
+     * Adds a tightly packed per-vertex vec3 attribute buffer.
+     * [ZBuffer.id] and [ZBuffer.bufferId] are set to [ZAttributeId.id] for the given [attr].
+     */
+    fun addVec3Buffer(attr: ZAttributeId, vertexCount: Int, data: FloatArray) {
+        addBuffer(
+            ZBuffer(
+                id = attr.id,
+                dataType = ZTypes.VEC3F,
+                name = attr.attrName,
+                size = 3,
+                count = vertexCount,
+                normalized = false,
+                offset = 0,
+                stride = 0,
+                isIndexBuffer = false,
+                bufferId = attr.id,
+                dataArray = data.toByteArray(),
+            ),
+        )
+    }
+
+    /**
+     * Adds a tightly packed per-vertex vec2 attribute buffer.
+     * [ZBuffer.id] and [ZBuffer.bufferId] are set to [ZAttributeId.id] for the given [attr].
+     */
+    fun addVec2Buffer(attr: ZAttributeId, vertexCount: Int, data: FloatArray) {
+        addBuffer(
+            ZBuffer(
+                id = attr.id,
+                dataType = ZTypes.VEC2F,
+                name = attr.attrName,
+                size = 2,
+                count = vertexCount,
+                normalized = false,
+                offset = 0,
+                stride = 0,
+                isIndexBuffer = false,
+                bufferId = attr.id,
+                dataArray = data.toByteArray(),
+            ),
+        )
+    }
+
+    /**
+     * Adds a 16-bit index buffer ([ZTypes.USHORT]) using [ZAttributeId.INDICES].
+     */
+    fun addUShortIndexBuffer(indices: ShortArray) {
+        addBuffer(
+            ZBuffer(
+                id = ZAttributeId.INDICES.id,
+                dataType = ZTypes.USHORT,
+                name = ZAttributeId.INDICES.attrName,
+                size = 1,
+                count = indices.size,
+                normalized = false,
+                offset = 0,
+                stride = 0,
+                isIndexBuffer = true,
+                bufferId = ZAttributeId.INDICES.id,
+                dataArray = indices.toByteArray(),
+            ),
+        )
     }
 
     override fun bind() = renderer.bind()

@@ -79,7 +79,7 @@ data class ZPhongMaterialData(
     @ProtoNumber(3)
     var specular: ZColor,
     @ProtoNumber(4)
-    var _shininess: Float
+    private var shiny: Float
 ) {
     /**
      * Controls the sharpness of specular highlights.
@@ -91,13 +91,13 @@ data class ZPhongMaterialData(
      * - 200-500: Very glossy materials (polished metal, mirrors)
      */
     var shininess: Float
-        get() = _shininess
+        get() = shiny
         set(value) {
-            _shininess = value.coerceIn(0f, 500f)
+            shiny = value.coerceIn(0f, 500f)
         }
 
     init {
-        this.shininess = this._shininess
+        this.shininess = this.shiny.coerceIn(0f, 500f)
     }
 }
 
