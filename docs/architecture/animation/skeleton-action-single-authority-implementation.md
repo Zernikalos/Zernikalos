@@ -1,6 +1,6 @@
 # Implementation Plan: Single Authority for Skeleton Pose vs Skeletal Actions
 
-**Status**: Draft  
+**Status**: Implemented  
 **Created**: 2026  
 **Parent proposal**: [skeleton-action-single-authority.md](./skeleton-action-single-authority.md)  
 **Related**: [z-action-player-update-apply-unification.md](./z-action-player-update-apply-unification.md) — `ZActionPlayer.update` / `update(dt)` bundles clock + pose commit; sampling/commit helpers are private
