@@ -473,10 +473,8 @@ float3 calculateBlinnPhongColorNoLighting(
 #endif
 
 #if defined(USE_TEXTURE)
-    float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<half> colorMap, sampler colorSampler) {
-        half4 colorSample = colorMap.sample(colorSampler, in.texCoord.xy);
-
-        return float4(colorSample);
+    float4 fragmentComputeColorOutFromTexture(ColorInOut in, texture2d<float> colorMap, sampler colorSampler) {
+        return colorMap.sample(colorSampler, in.texCoord.xy);
     }
 #endif
 
@@ -497,7 +495,7 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
                                , constant AmbientLightUniforms &ambientLight [[buffer(${UNIFORM_IDS.BLOCK_AMBIENT_LIGHT})]]
                                #endif
                                #if defined(USE_TEXTURE)
-                               , texture2d<half> colorMap     [[ texture(0) ]]
+                               , texture2d<float> colorMap     [[ texture(0) ]]
                                , sampler colorSampler         [[ sampler(0) ]]
                                #endif
                                )

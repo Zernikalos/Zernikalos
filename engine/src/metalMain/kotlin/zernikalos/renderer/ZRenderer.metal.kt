@@ -26,7 +26,8 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         depthState = renderingContext.device.newDepthStencilStateWithDescriptor(depthDescriptor)
 
         nativeView.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8//MTLPixelFormat.depth32Float_stencil8
-        nativeView.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB //MTLPixelFormat.bgra8Unorm_srgb
+        // Linear framebuffer: applyTonemapping already outputs sRGB via pow(1/2.2), matching Web/Android.
+        nativeView.colorPixelFormat = MTLPixelFormatBGRA8Unorm
         nativeView.sampleCount = 1u
     }
 
