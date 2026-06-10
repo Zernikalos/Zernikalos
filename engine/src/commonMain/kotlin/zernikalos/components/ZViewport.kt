@@ -62,8 +62,6 @@ internal constructor(data: ZViewportData):
 
     override fun render() = renderer.render()
 
-    override fun internalDispose() = renderer.dispose()
-
 }
 
 @Serializable

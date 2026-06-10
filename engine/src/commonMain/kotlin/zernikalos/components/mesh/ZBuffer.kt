@@ -143,8 +143,6 @@ class ZBuffer internal constructor(data: ZBufferData): ZDataRenderComponent<ZBuf
 
     override fun unbind() = renderer.unbind()
 
-    override fun internalDispose() = renderer.dispose()
-
     override fun toString(): String {
         return "ZBuffer(attributeId=${this.attributeId}, bufferId=${data.bufferId})"
     }

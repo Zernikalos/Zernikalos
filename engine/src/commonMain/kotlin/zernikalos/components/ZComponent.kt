@@ -136,12 +136,14 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
         get() = initialized
 
     private var _disposed = false
+    val isDisposed: Boolean
+        get() = _disposed
 
     /**
      * Disposes the component and releases resources. Idempotent: multiple calls are safe.
      * Subclasses with own state to release should override [internalDispose].
      */
-    final override fun dispose() {
+    override fun dispose() {
         if (_disposed) return
         _disposed = true
         internalDispose()
@@ -160,7 +162,7 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
      * This method ensures that initialization only occurs once.
      */
     private fun setupInitialize(): Boolean {
-        if (initialized) {
+        if (initialized || _disposed) {
             return false
         }
         initialized = true
@@ -208,6 +210,9 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
      */
     final override val renderer: R
         get() {
+            if (isDisposed) {
+                throw Error("The component has been disposed prior to access the renderer")
+            }
             if (!isInitialized) {
                 throw Error("The component has not been initialized prior to access the renderer")
             }
@@ -216,8 +221,27 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
 
     override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
+        if (!isInitialized) {
+            return
+        }
         if (_renderer == null) {
-            _renderer = createRenderer(ctx).also { it.initialize() }
+            val newRenderer = createRenderer(ctx)
+            _renderer = newRenderer
+            newRenderer.initialize()
+        }
+    }
+
+    final override fun dispose() {
+        if (isDisposed) {
+            return
+        }
+
+        val renderer = _renderer
+        try {
+            super.dispose()
+        } finally {
+            _renderer = null
+            renderer?.dispose()
         }
     }
 
@@ -282,6 +306,9 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
      */
     final override val renderer: R
         get() {
+            if (isDisposed) {
+                throw Error("The component has been disposed prior to access the renderer")
+            }
             if (!isInitialized) {
                 throw Error("The component has not been initialized prior to access the renderer")
             }
@@ -290,8 +317,27 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
 
     override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
+        if (!isInitialized) {
+            return
+        }
         if (_renderer == null) {
-            _renderer = createRenderer(ctx).also { it.initialize() }
+            val newRenderer = createRenderer(ctx)
+            _renderer = newRenderer
+            newRenderer.initialize()
+        }
+    }
+
+    final override fun dispose() {
+        if (isDisposed) {
+            return
+        }
+
+        val renderer = _renderer
+        try {
+            super.dispose()
+        } finally {
+            _renderer = null
+            renderer?.dispose()
         }
     }
 
