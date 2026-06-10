@@ -95,8 +95,6 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
 
     override fun unbind() = renderer.unbind()
 
-    override fun internalDispose() = renderer.dispose()
-
     override fun toString(): String {
         return data.toString()
     }

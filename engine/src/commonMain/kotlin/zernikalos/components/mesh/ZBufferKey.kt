@@ -117,8 +117,6 @@ class ZBufferKey internal constructor(data: ZBufferKeyData): ZDataRenderComponen
 
     override fun unbind() = renderer.unbind()
 
-    override fun internalDispose() = renderer.dispose()
-
     override fun toString(): String {
         return "ZBufferKey(id=${data.id}, name=${data.name}, bufferId=${data.bufferId})"
     }

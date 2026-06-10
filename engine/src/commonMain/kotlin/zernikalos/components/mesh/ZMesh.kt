@@ -212,8 +212,6 @@ class ZMesh internal constructor(data: ZMeshData):
 
     override fun render() = renderer.render()
 
-    override fun internalDispose() = renderer.dispose()
-
 }
 
 /**

@@ -57,7 +57,6 @@ internal constructor(data: ZMaterialData):
     override fun bind() = renderer.bind()
     override fun unbind() = renderer.unbind()
 
-    override fun internalDispose() = renderer.dispose()
 }
 
 /**
