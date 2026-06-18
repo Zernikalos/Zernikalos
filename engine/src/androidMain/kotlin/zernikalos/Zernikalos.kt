@@ -12,6 +12,7 @@ import android.opengl.GLSurfaceView
 import zernikalos.context.createDefaultContextCreator
 import zernikalos.scenestatehandler.ZSceneStateHandler
 import zernikalos.ui.ZAndroidSurfaceView
+import zernikalos.ui.ZernikalosVulkanView
 import zernikalos.ui.ZernikalosView
 
 class Zernikalos: ZernikalosBase() {
@@ -23,6 +24,11 @@ class Zernikalos: ZernikalosBase() {
     }
 
     fun initialize(view: ZernikalosView, stateHandler: ZSceneStateHandler) {
+        val contextCreator = createDefaultContextCreator()
+        internalInitialize(view, contextCreator, stateHandler)
+    }
+
+    fun initialize(view: ZernikalosVulkanView, stateHandler: ZSceneStateHandler) {
         val contextCreator = createDefaultContextCreator()
         internalInitialize(view, contextCreator, stateHandler)
     }

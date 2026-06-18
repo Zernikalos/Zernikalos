@@ -8,6 +8,15 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import java.util.Properties
+import javax.inject.Inject
 
 plugins {
     id("zernikalos.constants")
@@ -35,9 +44,144 @@ val publishUser = project.extra["publishUser"] as String
 val publishAccessToken = project.extra["publishAccessToken"] as String
 val zernikalosVersion = project.extra["zernikalosVersion"] as String
 
+abstract class BuildZernikalosVulkanJniLibsTask: DefaultTask() {
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @get:InputDirectory
+    abstract val sourceDir: DirectoryProperty
+
+    @TaskAction
+    fun build() {
+        val sdkDir = findAndroidSdkDir()
+        val cmake = findCmakeExecutable(sdkDir)
+        val ndkDir = findNdkDir(sdkDir)
+        val ndkBuild = findNdkBuildExecutable(ndkDir)
+        val toolchain = ndkDir.resolve("build/cmake/android.toolchain.cmake")
+        val sourceDir = sourceDir.get().asFile
+        val generatedJniLibs = outputDir.get().asFile
+        val buildRoot = project.layout.buildDirectory.dir("cmake/zernikalos-vulkan").get().asFile
+        val shadercSourceDir = ndkDir.resolve("sources/third_party/shaderc")
+        val shadercIncludeDir = shadercSourceDir.resolve("libshaderc/include")
+
+        generatedJniLibs.deleteRecursively()
+
+        listOf("arm64-v8a", "x86_64").forEach { abi ->
+            val abiBuildDir = buildRoot.resolve(abi)
+            val shadercObjDir = buildRoot.resolve("shaderc/obj/$abi")
+            val shadercLibsDir = buildRoot.resolve("shaderc/libs/$abi")
+            val shadercLib = shadercLibsDir.resolve("c++_static/$abi/libshaderc.a")
+
+            execOperations.exec {
+                commandLine(
+                    ndkBuild.absolutePath,
+                    "-C", shadercSourceDir.absolutePath,
+                    "APP_ABI=$abi",
+                    "APP_PLATFORM=android-24",
+                    "APP_STL=c++_static",
+                    "APP_BUILD_SCRIPT=${shadercSourceDir.resolve("Android.mk").absolutePath}",
+                    "NDK_PROJECT_PATH=${shadercSourceDir.absolutePath}",
+                    "NDK_OUT=${shadercObjDir.absolutePath}",
+                    "NDK_LIBS_OUT=${shadercLibsDir.absolutePath}",
+                    "libshaderc_combined",
+                )
+            }
+            if (!shadercLib.isFile) {
+                error("Expected shaderc static library was not produced: ${shadercLib.absolutePath}")
+            }
+
+            execOperations.exec {
+                commandLine(
+                    cmake.absolutePath,
+                    "-S", sourceDir.absolutePath,
+                    "-B", abiBuildDir.absolutePath,
+                    "-DCMAKE_TOOLCHAIN_FILE=${toolchain.absolutePath}",
+                    "-DANDROID_ABI=$abi",
+                    "-DANDROID_PLATFORM=android-24",
+                    "-DANDROID_STL=c++_static",
+                    "-DZK_SHADERC_LIB=${shadercLib.absolutePath}",
+                    "-DZK_SHADERC_INCLUDE=${shadercIncludeDir.absolutePath}",
+                )
+            }
+            execOperations.exec {
+                commandLine(cmake.absolutePath, "--build", abiBuildDir.absolutePath)
+            }
+
+            val nativeLib = abiBuildDir.resolve("libzernikalos_vulkan.so")
+            if (!nativeLib.isFile) {
+                error("Expected Vulkan native library was not produced: ${nativeLib.absolutePath}")
+            }
+            val abiOutputDir = generatedJniLibs.resolve(abi)
+            abiOutputDir.mkdirs()
+            nativeLib.copyTo(abiOutputDir.resolve(nativeLib.name), overwrite = true)
+        }
+    }
+
+    private fun findAndroidSdkDir(): File {
+        val localProperties = project.rootProject.file("local.properties")
+        if (localProperties.isFile) {
+            val properties = Properties()
+            localProperties.inputStream().use(properties::load)
+            properties.getProperty("sdk.dir")?.let { return File(it) }
+        }
+        System.getenv("ANDROID_HOME")?.let { return File(it) }
+        System.getenv("ANDROID_SDK_ROOT")?.let { return File(it) }
+        error("Android SDK not found. Set sdk.dir in local.properties or ANDROID_HOME.")
+    }
+
+    private fun findCmakeExecutable(sdkDir: File): File {
+        val cmakeRoot = sdkDir.resolve("cmake")
+        val executable = cmakeRoot.listFiles()
+            ?.filter { it.isDirectory }
+            ?.sortedBy { it.name }
+            ?.lastOrNull()
+            ?.resolve("bin/cmake")
+        if (executable?.isFile == true) return executable
+        error("CMake not found under ${cmakeRoot.absolutePath}")
+    }
+
+    private fun findNdkDir(sdkDir: File): File {
+        val ndkRoot = sdkDir.resolve("ndk")
+        val ndkDir = ndkRoot.listFiles()
+            ?.filter { it.isDirectory }
+            ?.sortedBy { it.name }
+            ?.lastOrNull()
+        if (ndkDir?.isDirectory == true) return ndkDir
+        error("NDK not found under ${ndkRoot.absolutePath}")
+    }
+
+    private fun findNdkBuildExecutable(ndkDir: File): File {
+        val executableName = if (System.getProperty("os.name").contains("Windows", ignoreCase = true)) {
+            "ndk-build.cmd"
+        } else {
+            "ndk-build"
+        }
+        val executable = ndkDir.resolve(executableName)
+        if (executable.isFile) return executable
+        error("ndk-build not found under ${ndkDir.absolutePath}")
+    }
+}
+
 allprojects {
     group = zernikalosGroup
     version = zernikalosVersion
+}
+
+val buildZernikalosVulkanJniLibs = tasks.register<BuildZernikalosVulkanJniLibsTask>("buildZernikalosVulkanJniLibs") {
+    outputDir.set(layout.buildDirectory.dir("generated/zernikalosVulkanJniLibs/androidMain"))
+    sourceDir.set(layout.projectDirectory.dir("src/androidMain/cpp"))
+}
+
+extensions.configure<KotlinMultiplatformAndroidComponentsExtension>("androidComponents") {
+    onVariants(selector().all()) { variant ->
+        variant.sources.jniLibs?.addGeneratedSourceDirectory(
+            buildZernikalosVulkanJniLibs,
+            BuildZernikalosVulkanJniLibsTask::outputDir,
+        )
+    }
 }
 
 repositories {
@@ -87,6 +231,7 @@ kotlin {
         lint {
             abortOnError = false
         }
+
     }
 
     js(IR) {
@@ -183,6 +328,11 @@ kotlin {
             dependsOn(commonMain.get())
         }
 
+        val vulkanMain by creating {
+            kotlin.srcDir("src/vulkanMain/kotlin")
+            dependsOn(commonMain.get())
+        }
+
         val metalMain by creating {
             kotlin.srcDir("src/metalMain/kotlin")
             dependsOn(commonMain.get())
@@ -195,7 +345,7 @@ kotlin {
 
         androidMain {
             kotlin.srcDir("src/androidMain/kotlin")
-            dependsOn(oglMain)
+            dependsOn(vulkanMain)
         }
 
         androidUnitTest {

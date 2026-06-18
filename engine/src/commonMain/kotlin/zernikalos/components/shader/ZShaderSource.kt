@@ -25,6 +25,8 @@ class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializable
 
     private var _wgpuShaderSource: ZWebGpuShaderSource by data::wgpu
 
+    private var _vulkanShaderSource: ZVulkanShaderSource by data::vulkan
+
     var glslVertexShaderSource: String by glslShaderSource::vertexShaderSource
 
     var glslFragmentShaderSource: String by glslShaderSource::fragmentShaderSource
@@ -32,6 +34,10 @@ class ZShaderSource internal constructor(data: ZShaderSourceData): ZSerializable
     var metalShaderSource: String by _metalShaderSource::shaderSource
 
     var wgpuShaderSource: String by _wgpuShaderSource::shaderSource
+
+    var vulkanVertexShaderSource: String by _vulkanShaderSource::vertexShaderSource
+
+    var vulkanFragmentShaderSource: String by _vulkanShaderSource::fragmentShaderSource
 
     override fun internalDispose() {
         // Shader source strings live in data; no explicit clear to allow reuse/hot-reload.
@@ -56,8 +62,15 @@ data class ZWebGpuShaderSource(
 )
 
 @JsExport
+data class ZVulkanShaderSource(
+    var vertexShaderSource: String = "",
+    var fragmentShaderSource: String = ""
+)
+
+@JsExport
 data class ZShaderSourceData(
     var glsl: ZGlSLShaderSource = ZGlSLShaderSource(),
     var metal: ZMetalShaderSource = ZMetalShaderSource(),
-    var wgpu: ZWebGpuShaderSource = ZWebGpuShaderSource()
+    var wgpu: ZWebGpuShaderSource = ZWebGpuShaderSource(),
+    var vulkan: ZVulkanShaderSource = ZVulkanShaderSource()
 ): ZComponentData()

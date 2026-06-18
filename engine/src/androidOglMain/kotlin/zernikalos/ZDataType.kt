@@ -28,5 +28,4 @@ actual object OglDataTypes {
     actual val MAT4: Int = GLES30.GL_FLOAT_MAT4
 
     actual val TEXTURE: Int = GLES30.GL_INT_SAMPLER_2D
-
 }
