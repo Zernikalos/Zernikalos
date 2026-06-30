@@ -9,6 +9,7 @@
 package zernikalos.context
 
 import platform.Metal.*
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.ui.ZMtlSurfaceView
 import zernikalos.ui.ZSurfaceView
 
@@ -20,7 +21,9 @@ class ZMtlRenderingContext(view: ZSurfaceView): ZRenderingContext {
     val commandQueue: MTLCommandQueueProtocol
 
     var commandBuffer: MTLCommandBufferProtocol? = null
-    var renderEncoder: MTLRenderCommandEncoderProtocol? = null
+    private var nativeRenderEncoder: MTLRenderCommandEncoderProtocol? = null
+
+    override var activePass: ZGpuRenderPass? = null
 
     init {
         device = surfaceView.nativeView.device!!
@@ -30,12 +33,28 @@ class ZMtlRenderingContext(view: ZSurfaceView): ZRenderingContext {
 
     }
 
-    fun makeCommandBuffer() {
+    override fun <R> withActivePass(pass: ZGpuRenderPass, block: () -> R): R {
+        val previous = activePass
+        activePass = pass
+        try {
+            return block()
+        } finally {
+            activePass = previous
+        }
+    }
+
+    internal fun makeCommandBuffer() {
         commandBuffer = commandQueue.commandBuffer()
     }
 
-    fun makeRenderCommandEncoder(renderPassDescriptor: MTLRenderPassDescriptor) {
-        renderEncoder = commandBuffer?.renderCommandEncoderWithDescriptor(renderPassDescriptor)
+    internal fun makeRenderCommandEncoder(renderPassDescriptor: MTLRenderPassDescriptor): MTLRenderCommandEncoderProtocol? {
+        nativeRenderEncoder = commandBuffer?.renderCommandEncoderWithDescriptor(renderPassDescriptor)
+        return nativeRenderEncoder
+    }
+
+    internal fun clearActivePass() {
+        activePass = null
+        nativeRenderEncoder = null
     }
 
 }

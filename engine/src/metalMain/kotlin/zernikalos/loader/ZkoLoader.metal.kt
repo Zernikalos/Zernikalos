@@ -22,50 +22,43 @@ import kotlin.experimental.ExperimentalObjCName
 class ZkoLoader {
 
     companion object {
+        /**
+         * Resolves a bundle resource path such as "Fox" or "gltf/Fox" (extension omitted).
+         */
+        @OptIn(ExperimentalForeignApi::class)
+        private fun bundleURLForZkoPath(path: String): platform.Foundation.NSURL? {
+            val normalized = path.trim('/')
+            val slash = normalized.lastIndexOf('/')
+            val name = if (slash >= 0) normalized.substring(slash + 1) else normalized
+            val subdirectory = if (slash >= 0) normalized.substring(0, slash) else null
+            return NSBundle.mainBundle.URLForResource(name, "zko", subdirectory)
+        }
+
+        @OptIn(ExperimentalForeignApi::class)
+        private fun loadZkoFromBundleURL(fileURL: platform.Foundation.NSURL?): ZKo? {
+            if (fileURL == null) {
+                println("Unable to find the file.")
+                return null
+            }
+            memScoped {
+                val data = NSData.dataWithContentsOfURL(fileURL)
+                if (data != null) {
+                    val byteArray = data.bytes!!.readBytes(data.length.toInt())
+                    return loadFromProto(byteArray)
+                }
+                println("Error loading the file.")
+            }
+            return null
+        }
+
         @OptIn(ExperimentalForeignApi::class)
         suspend fun loadFromMainBundlePath(fileName: String): ZKo? = coroutineScope {
-            // Get the URL for the file iOS
-            val fileURL = NSBundle.mainBundle.URLForResource(fileName, "zko")
-
-            if (fileURL != null) {
-                // Trying to load the file content
-                memScoped {
-                    val data = NSData.dataWithContentsOfURL(fileURL)
-                    if (data != null) {
-                        val byteArray = data.bytes!!.readBytes(data.length.toInt())
-                        return@coroutineScope loadFromProto(byteArray)
-                    } else {
-                        println("Error loading the file.")
-                    }
-                }
-            } else {
-                println("Unable to find the file.")
-            }
-
-            return@coroutineScope null
+            return@coroutineScope loadZkoFromBundleURL(bundleURLForZkoPath(fileName))
         }
 
         @OptIn(ExperimentalForeignApi::class)
         fun loadFromMainBundlePathSync(fileName: String): ZKo? {
-            // Get the URL for the file iOS
-            val fileURL = NSBundle.mainBundle.URLForResource(fileName, "zko")
-
-            if (fileURL != null) {
-                // Trying to load the file content
-                memScoped {
-                    val data = NSData.dataWithContentsOfURL(fileURL)
-                    if (data != null) {
-                        val byteArray = data.bytes!!.readBytes(data.length.toInt())
-                        return loadFromProto(byteArray)
-                    } else {
-                        println("Error loading the file.")
-                    }
-                }
-            } else {
-                println("Unable to find the file.")
-            }
-
-            return null
+            return loadZkoFromBundleURL(bundleURLForZkoPath(fileName))
         }
     }
 }

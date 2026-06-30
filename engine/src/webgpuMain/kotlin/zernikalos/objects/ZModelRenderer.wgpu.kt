@@ -14,11 +14,12 @@ package zernikalos.objects
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.*
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContext, private val model: ZModel) {
 
-    var pipeline: GPURenderPipeline? = null
-    var bindGroup: GPUBindGroup? = null
+    private var pipeline: GPURenderPipeline? = null
+    private var bindGroup: GPUBindGroup? = null
 
     actual fun initialize() {
         ctx as ZWebGPURenderingContext
@@ -90,18 +91,18 @@ actual class ZModelRenderer actual constructor(private val ctx: ZRenderingContex
     }
 
     actual fun render() {
-        ctx as ZWebGPURenderingContext
+        val pass = ctx.activePass ?: return
+        val gpuPipeline = pipeline ?: return
+        val uniformBindGroup = bindGroup ?: return
 
-        if (pipeline == null) {
-            return
-        }
-        ctx.renderPass?.setPipeline(pipeline!!)
+        pass.setPipeline(gpuPipeline)
         // TODO: hardcoded bind group slots
-        ctx.renderPass?.setBindGroup(0, bindGroup!!)
+        pass.setBindGroup(0, uniformBindGroup)
 
         val texture = model.material?.texture
         if (texture != null) {
-            ctx.renderPass?.setBindGroup(1, texture.renderer.textureBindGroup!!)
+            val textureBindGroup = texture.renderer.textureBindGroup ?: return
+            pass.setBindGroup(1, textureBindGroup)
         }
 
         model.shaderProgram.bind()

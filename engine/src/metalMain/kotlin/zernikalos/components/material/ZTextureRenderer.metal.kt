@@ -21,6 +21,7 @@ import zernikalos.ZBaseType
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private val data: ZTextureData) : ZComponentRenderer(ctx) {
 
@@ -35,10 +36,11 @@ actual class ZTextureRenderer actual constructor(ctx: ZRenderingContext, private
     }
 
     override fun bind() {
-        ctx as ZMtlRenderingContext
+        val pass = ctx.activePass ?: return
+        val gpuTexture = texture ?: return
+        val gpuSampler = samplerState ?: return
 
-        ctx.renderEncoder?.setFragmentTexture(texture, 0u)
-        ctx.renderEncoder?.setFragmentSamplerState(samplerState, 0u)
+        pass.setFragmentTexture(0, gpuTexture, gpuSampler)
     }
 
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)

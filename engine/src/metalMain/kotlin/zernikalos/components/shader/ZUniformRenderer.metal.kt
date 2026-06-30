@@ -15,6 +15,7 @@ import platform.posix.memcpy
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.components.shader.ZShaderType
 import zernikalos.logger.logger
 
 actual class ZUniformRenderer actual constructor(
@@ -50,6 +51,8 @@ actual class ZUniformRenderer actual constructor(
     @OptIn(ExperimentalForeignApi::class)
     override fun bind() {
         ctx as ZMtlRenderingContext
+        val pass = ctx.activePass ?: return
+        val buffer = uniformBuffer ?: return
 
         // Memory pointer where to copy the content from uniform pinned data
         val contentPointer = uniformBuffer?.contents().rawValue
@@ -63,8 +66,8 @@ actual class ZUniformRenderer actual constructor(
             )
         }
 
-        ctx.renderEncoder?.setVertexBuffer(uniformBuffer, 0u, data.id.toULong())
-        ctx.renderEncoder?.setFragmentBuffer(uniformBuffer, 0u, data.id.toULong())
+        pass.setUniformBuffer(ZShaderType.VERTEX_SHADER, data.id, buffer, 0L)
+        pass.setUniformBuffer(ZShaderType.FRAGMENT_SHADER, data.id, buffer, 0L)
     }
 
     override fun unbind() {

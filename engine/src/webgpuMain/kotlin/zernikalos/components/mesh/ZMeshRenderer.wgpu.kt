@@ -15,6 +15,7 @@ import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.GPUVertexBufferLayout
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private val data: ZMeshData): ZComponentRenderer(ctx) {
 
@@ -49,22 +50,19 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
     }
 
     override fun bind() {
-        ctx as ZWebGPURenderingContext
-        val indices = data.indexBuffer!!
-
         enabledVertexBuffers
             .sortedBy { it.id } // Use the same consistent order
             .forEach{ buff -> // Use index for the slot
                 buff.bind()
             }
+        val indices = data.indexBuffer!!
         indices.renderer.bindIndexBuffer()
     }
 
     actual override fun render() {
-        ctx as ZWebGPURenderingContext
-
+        val pass = ctx.activePass ?: return
         val indices = data.indexBuffer!!
-        ctx.renderPass?.drawIndexed(indices.count)
+        pass.drawIndexed(indices.count)
     }
 
     actual override fun dispose() {

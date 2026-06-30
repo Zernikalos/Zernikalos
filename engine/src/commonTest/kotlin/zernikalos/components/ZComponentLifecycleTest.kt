@@ -14,6 +14,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.ui.ZSurfaceView
 
 class ZComponentLifecycleTest {
@@ -104,6 +105,10 @@ private data class LifecycleCounters(
 )
 
 private object TestRenderingContext : ZRenderingContext {
+    override val activePass: ZGpuRenderPass? = null
+
+    override fun <R> withActivePass(pass: ZGpuRenderPass, block: () -> R): R = block()
+
     override fun initWithSurfaceView(surfaceView: ZSurfaceView) {}
 }
 

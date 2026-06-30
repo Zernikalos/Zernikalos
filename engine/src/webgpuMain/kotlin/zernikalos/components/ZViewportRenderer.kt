@@ -8,19 +8,25 @@
 
 package zernikalos.components
 
+import zernikalos.context.ZGpuRenderPassDescriptor
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
+import zernikalos.context.gpu.encodeWebGPURenderPassDescriptor
 import zernikalos.context.webgpu.*
 
 actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, private val data: ZViewportData): ZComponentRenderer(ctx) {
 
     var depthTexture: GPUTexture? = null
-    var renderPassDescriptor: GPURenderPassDescriptor? = null
+
+    private var cachedPassDescriptor: ZGpuRenderPassDescriptor? = null
+    private var colorAttachment: GPURenderPassColorAttachment? = null
+    private var depthAttachment: GPURenderPassDepthStencilAttachment? = null
+    private var lastSwapchainTexture: GPUTexture? = null
+    private var lastBuiltWidth: Int = -1
+    private var lastBuiltHeight: Int = -1
 
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
-
-        // Depth texture creation
         createDepthTexture()
     }
 
@@ -37,6 +43,7 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
             height = 100
         }
 
+        depthTexture?.destroy()
         depthTexture = ctx.device.createTexture(
             GPUTextureDescriptor(
                 size = GPUExtent3D(
@@ -47,43 +54,83 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
                 usage = GPUTextureUsage.RENDER_ATTACHMENT
             ).toGpu()
         )
+        invalidateDescriptorCache()
     }
 
-    private fun createRenderPassDescriptor() {
+    private fun invalidateDescriptorCache() {
+        lastSwapchainTexture = null
+        lastBuiltWidth = -1
+        lastBuiltHeight = -1
+        colorAttachment = null
+        depthAttachment = null
+        cachedPassDescriptor = null
+    }
+
+    actual fun buildRenderPassDescriptor(): ZGpuRenderPassDescriptor? {
         ctx as ZWebGPURenderingContext
 
         if (data.viewBox.width <= 0 || data.viewBox.height <= 0) {
-            renderPassDescriptor = null
-            return
+            cachedPassDescriptor = null
+            return null
         }
 
-        val textureView = ctx.webGPUContext?.getCurrentTexture()?.createView()
-        val depthView = depthTexture?.createView()
+        val swapchainTexture = ctx.webGPUContext?.getCurrentTexture() ?: run {
+            cachedPassDescriptor = null
+            return null
+        }
 
-        val clearColor = data.clearColor
-        val colorAttachment = GPURenderPassColorAttachment(
-            view = textureView!!,
-            loadOp = GPULoadOp.CLEAR,
-            storeOp = GPUStoreOp.STORE,
-            clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
-        )
+        val depthView = depthTexture?.createView() ?: run {
+            cachedPassDescriptor = null
+            return null
+        }
 
-        val depthAttachment = GPURenderPassDepthStencilAttachment(
-            view = depthView!!,
-            depthLoadOp = GPULoadOp.CLEAR,
-            depthStoreOp = GPUStoreOp.STORE,
-            depthClearValue = 1.0f
-        )
+        val passDescriptor = buildSwapchainPassDescriptor(data.clearColor)
+        val needsFullRebuild = cachedPassDescriptor == null
+            || lastSwapchainTexture !== swapchainTexture
+            || lastBuiltWidth != data.viewBox.width
+            || lastBuiltHeight != data.viewBox.height
+            || colorAttachment == null
+            || depthAttachment == null
 
-        renderPassDescriptor = GPURenderPassDescriptor(
-            colorAttachments = arrayOf(colorAttachment),
-            depthStencilAttachment = depthAttachment
-        )
+        if (needsFullRebuild) {
+            val textureView = swapchainTexture.createView()
+            val clearColor = passDescriptor.colorAttachments.first().clearValue
+            colorAttachment = GPURenderPassColorAttachment(
+                view = textureView,
+                loadOp = GPULoadOp.CLEAR,
+                storeOp = GPUStoreOp.STORE,
+                clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
+            )
+            // far plane = 1.0; +Z forward convention with LESS depth test (see gpu-rendering-pipeline-refactor §9.4)
+            depthAttachment = GPURenderPassDepthStencilAttachment(
+                view = depthView,
+                depthLoadOp = GPULoadOp.CLEAR,
+                depthStoreOp = GPUStoreOp.STORE,
+                depthClearValue = 1.0f
+            )
+            lastSwapchainTexture = swapchainTexture
+            lastBuiltWidth = data.viewBox.width
+            lastBuiltHeight = data.viewBox.height
+        } else {
+            val clearColor = passDescriptor.colorAttachments.first().clearValue
+            colorAttachment!!.view = swapchainTexture.createView()
+            colorAttachment!!.clearValue = GPUColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a)
+            depthAttachment!!.view = depthView
+        }
+
+        cachedPassDescriptor = passDescriptor
+        return cachedPassDescriptor
+    }
+
+    internal fun encodeNativeRenderPass(desc: ZGpuRenderPassDescriptor): GPURenderPassDescriptor? {
+        val color = colorAttachment ?: return null
+        val depth = depthAttachment ?: return null
+        return encodeWebGPURenderPassDescriptor(desc, color, depth)
     }
 
     actual override fun render() {
-        ctx as ZWebGPURenderingContext
-        createRenderPassDescriptor()
+        // No-op on WebGPU: descriptor is built in renderViewports via buildRenderPassDescriptor().
+        // ZScene still calls viewport.render() for API parity with OpenGL; clear is via pass loadOp.
     }
 
     actual fun onViewportResize(width: Int, height: Int) {
@@ -94,6 +141,6 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
     override fun dispose() {
         depthTexture?.destroy()
         depthTexture = null
-        renderPassDescriptor = null
+        invalidateDescriptorCache()
     }
 }

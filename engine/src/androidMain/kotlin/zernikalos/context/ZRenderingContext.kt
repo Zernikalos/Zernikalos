@@ -11,10 +11,15 @@ package zernikalos.context
 import android.opengl.GLES30
 import android.opengl.GLUtils
 import zernikalos.components.material.ZBitmap
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.ui.ZSurfaceView
 import java.nio.ByteBuffer
 
 actual class ZGLRenderingContext actual constructor(val surfaceView: ZSurfaceView): ZRenderingContext {
+
+    override val activePass: ZGpuRenderPass? = null
+
+    override fun <R> withActivePass(pass: ZGpuRenderPass, block: () -> R): R = block()
 
     actual override fun initWithSurfaceView(surfaceView: ZSurfaceView) {
     }

@@ -13,10 +13,10 @@ package zernikalos.components.mesh
 
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
-import zernikalos.context.ZWebGPURenderingContext
 import zernikalos.context.webgpu.GPUVertexAttribute
 import zernikalos.context.webgpu.GPUVertexBufferLayout
 import zernikalos.context.webgpu.GPUVertexStepMode
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
@@ -46,16 +46,15 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     }
 
     actual override fun bind() {
-        // In WebGPU, binding is typically done during render pass setup
-        // This method might be a no-op or used for specific binding requirements
-        ctx as ZWebGPURenderingContext
+        val pass = ctx.activePass ?: return
 
-        ctx.renderPass?.setVertexBuffer(data.attributeId.id, data.content.renderer.wgpuBuffer)
+        pass.setVertexBuffer(data.attributeId.id, data.content.renderer.wgpuBuffer)
     }
 
     fun bindIndexBuffer() {
-        ctx as ZWebGPURenderingContext
-        ctx.renderPass?.setIndexBuffer(data.content.renderer.wgpuBuffer, "uint16")
+        val pass = ctx.activePass ?: return
+
+        pass.setIndexBuffer(data.content.renderer.wgpuBuffer)
     }
 
     actual override fun unbind() {

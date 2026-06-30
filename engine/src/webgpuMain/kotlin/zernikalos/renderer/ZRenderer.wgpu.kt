@@ -12,13 +12,10 @@
 package zernikalos.renderer
 
 import zernikalos.context.ZContext
-import zernikalos.context.ZWebGPURenderingContext
+import zernikalos.context.gpu.ZGpuFrame
 
 actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
-
-    override fun initialize() {
-        ctx.scene!!.initialize(ctx)
-    }
+    private val gpuFrame = ZGpuFrame(ctx)
 
     actual fun bind() {
     }
@@ -27,27 +24,15 @@ actual class ZRenderer actual constructor(ctx: ZContext): ZRendererBase(ctx) {
     }
 
     actual fun render() {
-        val gpuCtx = ctx.renderingContext as ZWebGPURenderingContext
-
-        gpuCtx.createCommandEncoder()
-        // TODO: Remove this thing from here
-        ctx.scene!!.viewport.render()
-
-        val descriptor = ctx.scene!!.viewport.renderer.renderPassDescriptor
-        if (descriptor == null) return
-
-        gpuCtx.createRenderPass(descriptor.toGpu())
-        ctx.scene!!.render(ctx)
-        gpuCtx.renderPass?.end()
-
-        gpuCtx.queue.submit(arrayOf(gpuCtx.commandEncoder!!.finish()))
+        renderFrame()
     }
+
+    override fun createGpuFrame(): ZGpuFrame? = gpuFrame
 
     actual override fun onViewportResize(width: Int, height: Int) {
         ctx.scene?.viewport?.onViewportResize(width, height)
     }
 
     actual fun dispose() {
-        // Command encoder and pass are per-frame; no persistent refs to clear.
     }
 }
