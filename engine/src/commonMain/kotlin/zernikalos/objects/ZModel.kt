@@ -22,9 +22,8 @@ import zernikalos.components.skeleton.ZSkinning
 import zernikalos.context.ZContext
 import zernikalos.context.ZRenderingContext
 import zernikalos.generators.shadergenerator.ZShaderGeneratorType
-import zernikalos.generators.shadergenerator.ZShaderProgramParameters
 import zernikalos.generators.shadergenerator.createShaderGenerator
-import zernikalos.logger.logger
+import zernikalos.generators.shadergenerator.pipelineCapabilitiesBuilder
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 
@@ -64,7 +63,7 @@ open class ZModel: ZObject() {
     override fun internalInitialize(ctx: ZContext) {
         renderer = ZModelRenderer(ctx.renderingContext, this)
 
-        val shaderProgramParams = buildShaderParameters()
+        val shaderProgramParams = pipelineCapabilitiesBuilder(this, shaderProgram)
 
         if (hasSkeleton) {
             skeleton?.initialize(ctx)
@@ -76,58 +75,11 @@ open class ZModel: ZObject() {
         val shaderSourceGenerator = createShaderGenerator(ZShaderGeneratorType.DEFAULT)
         shaderSourceGenerator.generate(shaderProgramParams, shaderProgram)
 
-        enableRequiredBuffers(shaderProgramParams)
-
-        logger.debug("[$name] Enabled buffers:\n${
-            mesh.buffers.values.filter { it.enabled }.joinToString(separator = ",\n") { it.toString() }
-        }")
-
         shaderProgram.initialize(ctx.renderingContext)
         mesh.initialize(ctx.renderingContext)
         material?.initialize(ctx.renderingContext)
 
         renderer.initialize()
-    }
-
-    private fun enableRequiredBuffers(shaderParameters: ZShaderProgramParameters) {
-        // TODO: This might fail when the mesh is shared
-        mesh.indexBuffer?.enabled = true
-        mesh.position?.enabled = shaderParameters.usePosition
-        mesh.normal?.enabled = shaderParameters.useNormals
-        mesh.uv?.enabled = shaderParameters.useTextures
-        mesh.color?.enabled = shaderParameters.useColors
-
-        mesh.boneWeight?.enabled = shaderParameters.useSkinning
-        mesh.boneIndex?.enabled = shaderParameters.useSkinning
-    }
-
-    private fun buildShaderParameters(): ZShaderProgramParameters {
-        val shaderParameters = ZShaderProgramParameters(
-            mesh.attributeIds.intersect(shaderProgram.attributeIds)
-        )
-        shaderParameters.usePosition = ZAttributeId.POSITION in mesh
-        shaderParameters.useColors = ZAttributeId.COLOR in mesh
-        shaderParameters.useNormals = ZAttributeId.NORMAL in mesh
-        if (hasTextures) {
-            shaderParameters.useTextures = hasTextures
-            if (material?.texture?.flipY == true) {
-                shaderParameters.flipTextureY = true
-            }
-        }
-        if (hasSkeleton) {
-            shaderParameters.useSkinning = true
-            shaderParameters.maxBones = skeleton!!.bones.size
-        }
-        if (material?.usesPbr == true) {
-            shaderParameters.usePbrMaterial = true
-        }
-        if (material?.usesPhong == true) {
-            shaderParameters.usePhongMaterial = true
-        }
-        if (shaderParameters.useNormals && (shaderParameters.usePbrMaterial || shaderParameters.usePhongMaterial)) {
-            shaderParameters.useLighting = true
-        }
-        return shaderParameters
     }
 
     override fun internalRender(ctx: ZContext) {

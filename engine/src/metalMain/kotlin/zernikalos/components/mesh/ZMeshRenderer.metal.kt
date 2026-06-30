@@ -10,8 +10,8 @@ package zernikalos.components.mesh
 
 import platform.Metal.*
 import zernikalos.components.ZComponentRenderer
-import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private val data: ZMeshData) : ZComponentRenderer(ctx
 ) {
@@ -62,20 +62,18 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
                 processedBufferIds.add(bufferId)
             }
         }
+
+        val pass = ctx.activePass ?: return
+        val indices = data.indexBuffer ?: return
+        val indexBuffer = indices.renderer.buffer ?: return
+        pass.setIndexBuffer(indexBuffer)
     }
 
     actual override fun render() {
-        ctx as ZMtlRenderingContext
+        val pass = ctx.activePass ?: return
+        val indices = data.indexBuffer ?: return
 
-        val indices = data.indexBuffer!!
-
-        ctx.renderEncoder?.drawIndexedPrimitives(
-            convertDrawMode(data.drawMode),
-            indices.count.toULong(),
-            MTLIndexTypeUInt16,
-            indices.renderer.buffer!!,
-            0u
-        )
+        pass.drawIndexed(indices.count, data.drawMode)
     }
 
     actual override fun dispose() {

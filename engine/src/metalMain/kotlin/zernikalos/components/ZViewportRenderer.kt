@@ -8,6 +8,7 @@
 
 package zernikalos.components
 
+import zernikalos.context.ZGpuRenderPassDescriptor
 import zernikalos.context.ZRenderingContext
 
 actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, private val data: ZViewportData) : ZComponentRenderer(ctx) {
@@ -15,6 +16,13 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
     }
 
     actual override fun render() {
+    }
+
+    actual fun buildRenderPassDescriptor(): ZGpuRenderPassDescriptor? {
+        if (data.viewBox.width <= 0 || data.viewBox.height <= 0) {
+            return null
+        }
+        return buildSwapchainPassDescriptor(data.clearColor)
     }
 
     actual fun onViewportResize(width: Int, height: Int) {

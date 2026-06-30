@@ -28,6 +28,8 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
         ctx.clear(clearMask)
     }
 
+    actual fun buildRenderPassDescriptor(): ZGpuRenderPassDescriptor? = null
+
     actual fun onViewportResize(width: Int, height: Int) {
         ctx as ZGLRenderingContext
         ctx.viewport(

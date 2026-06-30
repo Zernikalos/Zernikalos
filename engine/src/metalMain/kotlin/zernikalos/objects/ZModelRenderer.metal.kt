@@ -14,6 +14,7 @@ import platform.Metal.MTLRenderPipelineDescriptor
 import platform.Metal.MTLRenderPipelineStateProtocol
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.gpu.ZGpuRenderPass
 
 actual class ZModelRenderer actual constructor(
     val ctx: ZRenderingContext,
@@ -27,9 +28,10 @@ actual class ZModelRenderer actual constructor(
     }
 
     actual fun render() {
-        ctx as ZMtlRenderingContext
+        val pass = ctx.activePass ?: return
+        val pipeline = pipelineState ?: return
 
-        ctx.renderEncoder?.setRenderPipelineState(pipelineState!!)
+        pass.setPipeline(pipeline)
 
         model.shaderProgram.bind()
         model.material?.bind()

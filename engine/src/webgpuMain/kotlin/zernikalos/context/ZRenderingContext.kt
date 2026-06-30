@@ -14,6 +14,7 @@ package zernikalos.context
 import kotlinx.browser.window
 import org.w3c.dom.HTMLCanvasElement
 import zernikalos.context.webgpu.*
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.ui.ZJsSurfaceView
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.Promise
@@ -26,8 +27,10 @@ class ZWebGPURenderingContext(val surfaceView: ZSurfaceView): ZRenderingContext 
     private var depthTexture: GPUTexture? = null
     private var depthTextureView: GPUTextureView? = null
     var commandEncoder: GPUCommandEncoder? = null
-    var renderPass: GPURenderPassEncoder? = null
+    private var nativeRenderPass: GPURenderPassEncoder? = null
     private var adapter: GPUAdapter? = null
+
+    override var activePass: ZGpuRenderPass? = null
 
     val device: ZWebGPUDevice
         get() = ZWebGPUDevice(nativeDevice!!)
@@ -85,94 +88,29 @@ class ZWebGPURenderingContext(val surfaceView: ZSurfaceView): ZRenderingContext 
         return adapter!!.requestDevice()
     }
 
-    fun createCommandEncoder(): GPUCommandEncoder? {
+    override fun <R> withActivePass(pass: ZGpuRenderPass, block: () -> R): R {
+        val previous = activePass
+        activePass = pass
+        try {
+            return block()
+        } finally {
+            activePass = previous
+        }
+    }
+
+    internal fun createCommandEncoder(): GPUCommandEncoder? {
         this.commandEncoder = device.createCommandEncoder()
         return commandEncoder
     }
 
-    fun createRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder? {
-        this.renderPass = commandEncoder?.beginRenderPass(descriptor)
-        return renderPass
+    internal fun beginRenderPass(descriptor: GPURenderPassDescriptor): GPURenderPassEncoder? {
+        nativeRenderPass = commandEncoder?.beginRenderPass(descriptor)
+        return nativeRenderPass
     }
-//
-//    fun makeCommandBuffer(): ZCommandBuffer {
-//        commandEncoder = device?.createCommandEncoder()
-//        return ZWebGPUCommandBuffer(commandEncoder!!)
-//    }
-//
-//    fun makeRenderCommandEncoder(descriptor: ZRenderPassDescriptor): ZRenderCommandEncoder {
-//        val gpuDescriptor = descriptor.toGPU()
-//        renderPassEncoder = commandEncoder?.beginRenderPass(gpuDescriptor)
-//        return ZWebGPURenderCommandEncoder(renderPassEncoder!!)
-//    }
-//
-//    fun getCurrentTextureView(): ZTextureView {
-//        return ZWebGPUTextureView(swapChain?.getCurrentTexture()?.createView()!!)
-//    }
-//
-//    fun resizeCanvas(width: Int, height: Int) {
-//        swapChain?.configure(
-//            device = device!!,
-//            format = GPUTextureFormat.BGRA8Unorm,
-//            usage = GPUTextureUsage.RENDER_ATTACHMENT,
-//            size = GPUExtent3D(width = width, height = height)
-//        )
-//    }
-//
-//    actual override fun destroy() {
-//        commandEncoder?.destroy()
-//        renderPassEncoder?.destroy()
-//        swapChain = null
-//        device = null
-//        queue = null
-//    }
-//
-//        val canvas = surfaceView.canvas
-//        webGPUContext = canvas.getContext("webgpu") as GPUCanvasContext?
-//
-//        window.navigator.gpu?.requestAdapter()?.then
-//        {
-//            adapter ->
-//            adapter.requestDevice().then { device ->
-//                this.device = device
-//                queue = device.queue
-//            }
-//        }
-//    }
 
-// OLDEST CODE
-
-//        // Configurar el swap chain
-//        swapChain = webGPUContext!!.configureSwapChain(
-//            device = device!!,
-//            format = GPUTextureFormat.BGRA8Unorm,
-//            usage = GPUTextureUsage.RENDER_ATTACHMENT,
-//            size = GPUExtent3D(width = canvas.width, height = canvas.height)
-//        )
-//
-//        // Crear textura de profundidad
-//        depthTexture = device!!.createTexture(
-//            GPUTextureDescriptor(
-//                dimension = GPUTextureDimension._2D,
-//                size = GPUExtent3D(width = canvas.width, height = canvas.height, depth = 1),
-//                format = GPUTextureFormat.Depth24Plus,
-//                usage = GPUTextureUsage.RENDER_ATTACHMENT
-//            )
-//        )
-//        depthTextureView = depthTexture!!.createView()
-
-//    fun makeCommandBuffer() {
-//        commandEncoder = device!!.createCommandEncoder()
-//    }
-//
-//    fun makeRenderCommandEncoder(renderPassDescriptor: GPURenderPassDescriptor) {
-//        renderPassEncoder = commandEncoder!!.beginRenderPass(renderPassDescriptor)
-//    }
-//
-//    fun submitCommands() {
-//        renderPassEncoder!!.end()
-//        val commandBuffer = commandEncoder!!.finish()
-//        queue!!.submit(arrayOf(commandBuffer))
-//    }
+    internal fun clearActivePass() {
+        activePass = null
+        nativeRenderPass = null
+    }
 }
 

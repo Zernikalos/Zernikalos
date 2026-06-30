@@ -10,6 +10,8 @@ package zernikalos.renderer
 
 import zernikalos.components.ZResizable
 import zernikalos.context.ZContext
+import zernikalos.context.gpu.ZGpuCommandEncoder
+import zernikalos.context.gpu.ZGpuFrame
 import zernikalos.logger.ZLoggable
 
 abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZResizable {
@@ -26,6 +28,50 @@ abstract class ZRendererBase(protected val ctx: ZContext): ZLoggable, ZResizable
         }
     }
 
+    protected open fun createGpuFrame(): ZGpuFrame? = null
+
+    protected fun renderFrame() {
+        val gpuFrame = createGpuFrame()
+        if (gpuFrame == null) {
+            // OpenGL stays on its immediate-mode path until the Phase F pass adapter lands.
+            renderScene()
+            return
+        }
+
+        if (!gpuFrame.begin()) return
+
+        try {
+            val encoder = gpuFrame.beginRecording() ?: return
+            renderViewports(encoder)
+            encoder.finish()
+            gpuFrame.submit(encoder)
+        } finally {
+            gpuFrame.end()
+        }
+    }
+
+    protected open fun renderViewports(encoder: ZGpuCommandEncoder) {
+        val viewport = ctx.scene?.viewport ?: return
+        val desc = viewport.buildRenderPassDescriptor() ?: return
+        val pass = encoder.beginRenderPass(desc) ?: return
+
+        try {
+            ctx.renderingContext.withActivePass(pass) {
+                configureRenderState()
+                renderScene()
+            }
+        } finally {
+            pass.end()
+        }
+    }
+
+    protected open fun configureRenderState() {
+    }
+
+    protected open fun renderScene() {
+        ctx.scene?.render(ctx)
+    }
+
 }
 
 expect class ZRenderer(ctx: ZContext): ZRendererBase {
@@ -35,4 +81,3 @@ expect class ZRenderer(ctx: ZContext): ZRendererBase {
     override fun onViewportResize(width: Int, height: Int)
     fun dispose()
 }
-

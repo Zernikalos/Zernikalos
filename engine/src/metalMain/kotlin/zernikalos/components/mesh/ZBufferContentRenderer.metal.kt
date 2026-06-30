@@ -15,6 +15,7 @@ import platform.Metal.MTLBufferProtocol
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZMtlRenderingContext
 import zernikalos.context.ZRenderingContext
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.logger.logger
 
 actual class ZBufferContentRenderer actual constructor(
@@ -41,10 +42,11 @@ actual class ZBufferContentRenderer actual constructor(
     }
 
     actual override fun bind() {
-        ctx as ZMtlRenderingContext
+        val pass = ctx.activePass ?: return
+        val gpuBuffer = buffer ?: return
         // Use bufferId as the buffer index - for interleaved buffers, this ensures all attributes
         // that share the same buffer are bound to the same buffer slot
-        ctx.renderEncoder?.setVertexBuffer(buffer, 0u, data.id.toULong())
+        pass.setVertexBuffer(data.id, gpuBuffer)
     }
 
     actual override fun unbind() {

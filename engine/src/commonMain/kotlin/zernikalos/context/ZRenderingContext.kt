@@ -8,10 +8,13 @@
 
 package zernikalos.context
 
+import zernikalos.context.gpu.ZGpuRenderPass
 import zernikalos.ui.ZSurfaceView
 import kotlin.js.JsExport
 
 @JsExport
 interface ZRenderingContext {
     fun initWithSurfaceView(surfaceView: ZSurfaceView)
+    val activePass: ZGpuRenderPass?
+    fun <R> withActivePass(pass: ZGpuRenderPass, block: () -> R): R
 }

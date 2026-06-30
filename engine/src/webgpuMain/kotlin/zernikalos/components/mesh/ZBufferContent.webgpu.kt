@@ -86,9 +86,9 @@ actual class ZBufferContentRenderer actual constructor(
     }
 
     actual override fun bind() {
-        ctx as ZWebGPURenderingContext
+        val pass = ctx.activePass ?: return
 
-        ctx.renderPass?.setVertexBuffer(attributeId, wgpuBuffer)
+        pass.setVertexBuffer(attributeId, wgpuBuffer)
     }
 
     actual override fun unbind() {
