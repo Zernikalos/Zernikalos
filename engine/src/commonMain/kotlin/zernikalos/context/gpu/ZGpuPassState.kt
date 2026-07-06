@@ -13,7 +13,7 @@ import zernikalos.context.ZDepthCompare
 import zernikalos.context.ZFrontFace
 
 data class ZGpuPassState(
-    val cullMode: ZCullMode = ZCullMode.Front,
+    val cullMode: ZCullMode = ZCullMode.None,
     val frontFace: ZFrontFace = ZFrontFace.CW,
     val depthTest: Boolean = true,
     val depthWrite: Boolean = true,
