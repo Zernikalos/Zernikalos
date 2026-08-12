@@ -6,6 +6,6 @@ import kotlin.js.JsName
 @JsExport
 @JsName("version")
 object Version {
-    const val VERSION = "0.10.0"
+    const val VERSION = "0.10.1"
     const val ZKO_VERSION = zernikalos.loader.ZKO_VERSION
 }

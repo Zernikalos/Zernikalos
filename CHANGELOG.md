@@ -2,6 +2,26 @@
 
 All notable changes to the Zernikalos Engine will be documented in this file.
 
+## [v0.10.1](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.10.1) (2026-08-12)
+
+
+### Fixed
+
+- 🐛 Fixing Projection matrices per backend ([d9708071d1d89ed](https://github.com/Zernikalos/Zernikalos/commit/d9708071d1d89ed8b7160e7cfd6cd3aed6c153dc))
+- 🐛 Improving current disposal flow ([43e356823adaab2](https://github.com/Zernikalos/Zernikalos/commit/43e356823adaab2550d07d45fa2110855dd025a0))
+- 🐛 Weird and pale colors on Metal ([6721085b43c90ef](https://github.com/Zernikalos/Zernikalos/commit/6721085b43c90efbbe5841d3cb76f1dc65058ed0))
+
+
+### Changed
+
+- 💡 Improvements to the internal class definition ([8c1838b93b5aa19](https://github.com/Zernikalos/Zernikalos/commit/8c1838b93b5aa19b8f64d59af51a4bd56a004d69))
+
+
+
+
+
+
+
 ## [v0.10.0](https://github.com/Zernikalos/Zernikalos/releases/tag/v0.10.0) (2026-05-16)
 
 ### Added
