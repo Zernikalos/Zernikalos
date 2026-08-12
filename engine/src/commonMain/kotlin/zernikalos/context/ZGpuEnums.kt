@@ -10,6 +10,12 @@ package zernikalos.context
 
 import zernikalos.math.ZColor
 
+enum class ZGraphicsApi {
+    OpenGL,
+    Metal,
+    WebGpu,
+}
+
 enum class ZCullMode {
     None,
     Front,

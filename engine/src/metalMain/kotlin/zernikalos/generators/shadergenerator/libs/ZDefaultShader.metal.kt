@@ -108,7 +108,7 @@ typedef struct
     #endif
     #ifdef USE_SKINNING
         float4 boneWeights [[attribute(${ZAttributeId.BONE_WEIGHT.id})]];
-        float4 boneIndices [[attribute(${ZAttributeId.BONE_INDEX.id})]];
+        uint4 boneIndices [[attribute(${ZAttributeId.BONE_INDEX.id})]];
     #endif
 } Vertex;
 """
@@ -132,7 +132,7 @@ ColorInOut computeOutColor(Vertex in, constant Uniforms &uniforms, float4 finalP
  */
 float4 calculateSkinnedPosition(
     float3 basePosition,
-    float4 boneIndices,
+    uint4 boneIndices,
     float4 boneWeights,
     constant SkinningUniforms &skinUniforms,
     constant ModelSkinningUniforms &modelSkinning
@@ -143,7 +143,7 @@ float4 calculateSkinnedPosition(
 
     for (int i = 0; i < 4; ++i) {
         if (boneWeights[i] > 0.0) {
-            int boneID = int(boneIndices[i]);
+            uint boneID = boneIndices[i];
             matrix_float4x4 skinMatrix = skinUniforms.bones[boneID] * skinUniforms.invBindMatrix[boneID];
             skinnedPosition += skinMatrix * posInSkeletonSpace * boneWeights[i];
             totalWeight += boneWeights[i];

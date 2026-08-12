@@ -8,10 +8,16 @@
 
 package zernikalos.generators.uniformgenerator
 
+import zernikalos.context.backendCorrectionMatrix
 import zernikalos.math.ZMatrix4
 
 val ZModelViewProjectionMatrixGenerator: ZUniformGenerator = { sceneContext, obj ->
-    val modelMatrix = ZModelMatrixGenerator(sceneContext, obj) as ZMatrix4
-    val viewProjectionMatrix = sceneContext.activeCamera?.viewProjectionMatrix ?: ZMatrix4.Identity
-    viewProjectionMatrix * modelMatrix
+    val camera = sceneContext.activeCamera
+    if (camera == null) {
+        ZMatrix4.Identity
+    } else {
+        val modelMatrix = ZModelMatrixGenerator(sceneContext, obj) as ZMatrix4
+        val correctedProjection = backendCorrectionMatrix() * camera.projectionMatrix
+        correctedProjection * camera.viewMatrix * modelMatrix
+    }
 }

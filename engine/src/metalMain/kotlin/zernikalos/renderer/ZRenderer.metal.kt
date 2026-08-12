@@ -12,8 +12,6 @@ import platform.Metal.*
 import platform.MetalKit.MTKView
 import zernikalos.context.ZContext
 import zernikalos.context.ZMtlRenderingContext
-import zernikalos.context.ZCullMode
-import zernikalos.context.ZFrontFace
 import zernikalos.context.gpu.ZGpuFrame
 import zernikalos.context.gpu.ZGpuPassState
 
@@ -53,10 +51,7 @@ actual class ZRenderer actual constructor(ctx: ZContext) : ZRendererBase(ctx) {
         val pass = ctx.renderingContext.activePass ?: return
 
         pass.applyPassState(
-            ZGpuPassState(
-                cullMode = ZCullMode.Front,
-                frontFace = ZFrontFace.CW,
-            )
+            ZGpuPassState()
         )
     }
 

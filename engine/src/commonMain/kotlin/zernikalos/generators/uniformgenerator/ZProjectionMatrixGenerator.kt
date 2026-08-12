@@ -8,12 +8,13 @@
 
 package zernikalos.generators.uniformgenerator
 
+import zernikalos.context.backendCorrectionMatrix
 import zernikalos.math.ZMatrix4
 
 val ZProjectionMatrixGenerator: ZUniformGenerator = { sceneContext, obj ->
     val activeCamera = sceneContext.activeCamera
     if (activeCamera != null) {
-        activeCamera.projectionMatrix
+        backendCorrectionMatrix() * activeCamera.projectionMatrix
     } else {
         ZMatrix4.Identity
     }
