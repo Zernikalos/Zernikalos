@@ -66,7 +66,7 @@ actual class ZMeshRenderer actual constructor(ctx: ZRenderingContext, private va
         val pass = ctx.activePass ?: return
         val indices = data.indexBuffer ?: return
         val indexBuffer = indices.renderer.buffer ?: return
-        pass.setIndexBuffer(indexBuffer)
+        pass.setIndexBuffer(indexBuffer, toMtlIndexType(indices.dataType))
     }
 
     actual override fun render() {

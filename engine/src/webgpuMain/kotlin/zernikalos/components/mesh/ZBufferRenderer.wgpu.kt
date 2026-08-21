@@ -54,7 +54,7 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     fun bindIndexBuffer() {
         val pass = ctx.activePass ?: return
 
-        pass.setIndexBuffer(data.content.renderer.wgpuBuffer)
+        pass.setIndexBuffer(data.content.renderer.wgpuBuffer, typeToWebGpuIndexFormat(data.dataType))
     }
 
     actual override fun unbind() {

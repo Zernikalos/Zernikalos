@@ -35,7 +35,7 @@ actual class ZGpuRenderPass internal constructor(
         encoder.setVertexBuffer(slot, buffer)
     }
 
-    fun setIndexBuffer(buffer: GPUBuffer, format: String = "uint16") {
+    fun setIndexBuffer(buffer: GPUBuffer, format: String) {
         encoder.setIndexBuffer(buffer, format)
     }
 

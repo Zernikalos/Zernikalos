@@ -1,6 +1,7 @@
 package zernikalos.components.mesh
 
 import platform.Metal.*
+import zernikalos.ZBaseType
 import zernikalos.ZDataType
 import zernikalos.ZTypes
 
@@ -43,4 +44,10 @@ fun toMtlFormat(dataType: ZDataType): MTLVertexFormat {
 
         else -> 0u
     }
+}
+
+fun toMtlIndexType(dataType: ZDataType): ULong = when (dataType.type) {
+    ZBaseType.UNSIGNED_SHORT -> MTLIndexTypeUInt16
+    ZBaseType.UNSIGNED_INT -> MTLIndexTypeUInt32
+    else -> error("Unsupported index buffer type for Metal: $dataType")
 }
