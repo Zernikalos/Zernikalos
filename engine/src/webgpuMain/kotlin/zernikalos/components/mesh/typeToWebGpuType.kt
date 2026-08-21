@@ -1,7 +1,9 @@
 package zernikalos.components.mesh
 
+import zernikalos.ZBaseType
 import zernikalos.ZDataType
 import zernikalos.ZTypes
+import zernikalos.context.webgpu.GPUIndexFormat
 import zernikalos.context.webgpu.GPUVertexFormat
 
 // TODO: Fulfill this
@@ -43,4 +45,10 @@ fun typeToWebGpuType(type: ZDataType): String = when (type) {
     // Types not supported as vertex formats in WebGPU (e.g., matrices, doubles, x3 integer vectors)
     // are handled elsewhere or should be converted/padded.
     else -> error("Unsupported or invalid ZType for WebGPU vertex format: $type")
+}
+
+fun typeToWebGpuIndexFormat(type: ZDataType): String = when (type.type) {
+    ZBaseType.UNSIGNED_SHORT -> GPUIndexFormat.UINT16
+    ZBaseType.UNSIGNED_INT -> GPUIndexFormat.UINT32
+    else -> error("Unsupported index buffer type for WebGPU: $type")
 }

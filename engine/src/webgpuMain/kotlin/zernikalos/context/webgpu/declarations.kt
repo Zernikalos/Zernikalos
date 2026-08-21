@@ -547,6 +547,8 @@ external class GPUShaderModule {
 external class GPUSwapChain
 
 external interface GPUTexture {
+    val width: Int
+    val height: Int
     fun createView(): GPUTextureView
     fun destroy()
 }
@@ -858,6 +860,11 @@ object GPUVertexFormat {
     // Packed formats
     val UNORM10_10_10_2 = "unorm10-10-10-2"
     val UNORM8X4_BGRA = "unorm8x4-bgra"
+}
+
+object GPUIndexFormat {
+    val UINT16 = "uint16"
+    val UINT32 = "uint32"
 }
 
 typealias GPUVertexStepModeFlags = String

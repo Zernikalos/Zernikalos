@@ -24,36 +24,33 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
     private var lastSwapchainTexture: GPUTexture? = null
     private var lastBuiltWidth: Int = -1
     private var lastBuiltHeight: Int = -1
+    private var depthTexWidth: Int = -1
+    private var depthTexHeight: Int = -1
 
     actual override fun initialize() {
         ctx as ZWebGPURenderingContext
         createDepthTexture()
     }
 
-    private fun createDepthTexture() {
+    private fun createDepthTexture(width: Int = data.viewBox.width, height: Int = data.viewBox.height) {
         ctx as ZWebGPURenderingContext
 
-        // TODO: weird hack to avoid initial failures
-        var width = data.viewBox.width
-        var height = data.viewBox.height
-        if (width == 0) {
-            width = 100
-        }
-        if (height == 0) {
-            height = 100
-        }
+        val depthWidth = if (width <= 0) 100 else width
+        val depthHeight = if (height <= 0) 100 else height
 
         depthTexture?.destroy()
         depthTexture = ctx.device.createTexture(
             GPUTextureDescriptor(
                 size = GPUExtent3D(
-                    width = width,
-                    height = height,
+                    width = depthWidth,
+                    height = depthHeight,
                 ),
                 format = GPUTextureFormat.Depth24Plus,
                 usage = GPUTextureUsage.RENDER_ATTACHMENT
             ).toGpu()
         )
+        depthTexWidth = depthWidth
+        depthTexHeight = depthHeight
         invalidateDescriptorCache()
     }
 
@@ -79,6 +76,10 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
             return null
         }
 
+        if (swapchainTexture.width != depthTexWidth || swapchainTexture.height != depthTexHeight) {
+            createDepthTexture(swapchainTexture.width, swapchainTexture.height)
+        }
+
         val depthView = depthTexture?.createView() ?: run {
             cachedPassDescriptor = null
             return null
@@ -87,8 +88,8 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
         val passDescriptor = buildSwapchainPassDescriptor(data.clearColor)
         val needsFullRebuild = cachedPassDescriptor == null
             || lastSwapchainTexture !== swapchainTexture
-            || lastBuiltWidth != data.viewBox.width
-            || lastBuiltHeight != data.viewBox.height
+            || lastBuiltWidth != swapchainTexture.width
+            || lastBuiltHeight != swapchainTexture.height
             || colorAttachment == null
             || depthAttachment == null
 
@@ -109,8 +110,8 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
                 depthClearValue = 1.0f
             )
             lastSwapchainTexture = swapchainTexture
-            lastBuiltWidth = data.viewBox.width
-            lastBuiltHeight = data.viewBox.height
+            lastBuiltWidth = swapchainTexture.width
+            lastBuiltHeight = swapchainTexture.height
         } else {
             val clearColor = passDescriptor.colorAttachments.first().clearValue
             colorAttachment!!.view = swapchainTexture.createView()
@@ -135,12 +136,14 @@ actual class ZViewportRenderer actual constructor(ctx: ZRenderingContext, privat
 
     actual fun onViewportResize(width: Int, height: Int) {
         ctx as ZWebGPURenderingContext
-        createDepthTexture()
+        createDepthTexture(width, height)
     }
 
     override fun dispose() {
         depthTexture?.destroy()
         depthTexture = null
+        depthTexWidth = -1
+        depthTexHeight = -1
         invalidateDescriptorCache()
     }
 }
