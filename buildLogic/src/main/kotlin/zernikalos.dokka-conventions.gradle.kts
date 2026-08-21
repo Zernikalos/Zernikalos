@@ -22,7 +22,7 @@ dokka {
     dokkaSourceSets.configureEach {
         sourceLink {
             localDirectory.set(project.projectDir.resolve("src"))
-            remoteUrl("https://github.com/$githubOwner/$githubRepo/tree/main/src")
+            remoteUrl("https://github.com/$githubOwner/$githubRepo/tree/main/engine/src")
             remoteLineSuffix.set("#L")
         }
     }

@@ -20,7 +20,7 @@ jobs:
       GITHUB_ACTOR: ${{ github.actor }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-env
@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew publishAllPublicationsToMavenRepository -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
 
       - name: Upload build artifacts for JS job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-dir
           path: build
@@ -53,17 +53,17 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@zernikalos'
 
       - name: Download build artifacts from Android job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-dir
           path: build
