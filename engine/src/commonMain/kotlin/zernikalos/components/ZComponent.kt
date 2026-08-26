@@ -152,7 +152,9 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
     /**
      * Override in subclasses to release component-owned resources. Called at most once by [dispose].
      */
-    protected open fun internalDispose() {}
+    protected open fun internalDispose() {
+
+    }
 
     final override val isRenderizable: Boolean
         get() = this is ZRenderCapability
@@ -219,7 +221,7 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
             return _renderer ?: throw Error("Renderer was requested before it was created")
         }
 
-    override fun initialize(ctx: ZRenderingContext) {
+    final override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
         if (!isInitialized) {
             return
@@ -315,7 +317,7 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
             return _renderer ?: throw Error("Renderer was requested before it was created")
         }
 
-    override fun initialize(ctx: ZRenderingContext) {
+    final override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
         if (!isInitialized) {
             return

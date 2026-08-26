@@ -86,8 +86,7 @@ class ZUniform internal constructor(private val data: ZUniformBlockData):
         return ZUniformRenderer(ctx, data)
     }
 
-    override fun initialize(ctx: ZRenderingContext) {
-        super.initialize(ctx)
+    override fun internalInitialize(ctx: ZRenderingContext) {
         logger.debug("Initialized uniform: ${data.uniformBlockName} (${data.byteSize} bytes)")
     }
 

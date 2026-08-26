@@ -42,9 +42,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     }
 
     private fun initialzeBuffer(ctx: ZRenderingContext, data: ZBufferData) {
-        if (data.content.isInitialized) {
-            return
-        }
+//        if (data.content.isInitialized) {
+//            return
+//        }
         data.content.initialize(ctx)
     }
 
