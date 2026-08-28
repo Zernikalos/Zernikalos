@@ -11,9 +11,10 @@ package zernikalos.components.camera
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
-import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZResizable
 import zernikalos.components.ZSerializableComponent
+import zernikalos.loader.ZLoaderContext
 import zernikalos.math.Angles
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
@@ -36,7 +37,6 @@ import kotlin.math.PI
  *
  * @see ZResizable
  */
-@Serializable(with = ZPerspectiveLensSerializer::class)
 @JsExport
 open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
     ZSerializableComponent<ZPerspectiveLensData>(data), ZResizable {
@@ -135,7 +135,8 @@ class ZPerspectiveLensData(): ZLensData() {
     }
 }
 
-class ZPerspectiveLensSerializer: ZComponentSerializer<ZPerspectiveLens, ZPerspectiveLensData>() {
+internal class ZPerspectiveLensSerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZPerspectiveLens, ZPerspectiveLensData>(loaderContext) {
     override val kSerializer: KSerializer<ZPerspectiveLensData>
         get() = ZPerspectiveLensData.serializer()
 

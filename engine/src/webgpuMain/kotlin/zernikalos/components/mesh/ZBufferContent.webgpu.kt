@@ -8,7 +8,6 @@
 
 package zernikalos.components.mesh
 
-import kotlinx.serialization.Transient
 import zernikalos.components.ZComponentRenderer
 import zernikalos.context.ZRenderingContext
 import zernikalos.context.ZWebGPURenderingContext
@@ -21,7 +20,6 @@ actual class ZBufferContentRenderer actual constructor(
     private val data: ZBufferContentData
 ) : ZComponentRenderer(ctx) {
 
-    @Transient
     lateinit var wgpuBuffer: GPUBuffer
 
     private var isIndexBuffer = false

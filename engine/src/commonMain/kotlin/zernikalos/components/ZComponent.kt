@@ -13,7 +13,11 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import zernikalos.components.mesh.ZMesh
+import zernikalos.components.mesh.ZMeshData
+import zernikalos.components.mesh.ZRawMeshData
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.uuid.Uuid
@@ -454,6 +458,36 @@ abstract class ZComponentSerializer<
     override fun deserialize(decoder: Decoder): T {
         val data = decoder.decodeSerializableValue(kSerializer)
         return createComponentInstance(data)
+    }
+
+    override fun serialize(encoder: Encoder, value: T) {
+        if (value !is ZHasComponentData<*>) {
+            throw Error("Component does not support serialization")
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val data = value.data as D
+
+        encoder.encodeSerializableValue(kSerializer, data)
+    }
+
+}
+
+abstract class ZComponentSerializerWithLoader<
+    T: ZComponent,
+    D: ZRef>
+    (protected val loaderContext: ZLoaderContext)
+    : ZComponentSerializer<T, D>() {
+
+    override fun deserialize(decoder: Decoder): T {
+        val data = decoder.decodeSerializableValue(kSerializer)
+
+        if (loaderContext.hasComponent(data.refId)) {
+            return loaderContext.getComponent(data.refId) as T
+        }
+        val component = createComponentInstance(data)
+        loaderContext.addComponent(data.refId, component)
+        return component
     }
 
     override fun serialize(encoder: Encoder, value: T) {

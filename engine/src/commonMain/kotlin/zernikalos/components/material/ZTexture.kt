@@ -255,7 +255,7 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 /**
  * @suppress
  */
-internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZTexture, ZTextureData>() {
+internal class ZTextureSerializer2(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZTexture, ZTextureData>() {
 
     override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
 
@@ -269,3 +269,18 @@ internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZC
     }
 
 }
+
+/**
+ * @suppress
+ */
+internal class ZTextureSerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZTexture, ZTextureData>(loaderContext) {
+
+    override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
+
+    override fun createComponentInstance(data: ZTextureData): ZTexture {
+        return ZTexture(data)
+    }
+
+}
+

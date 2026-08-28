@@ -8,6 +8,7 @@
 
 package zernikalos.objects
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import zernikalos.components.ZViewport
 import zernikalos.context.ZContext
@@ -19,6 +20,7 @@ class ZScene(): ZObject() {
 
     override val type = ZObjectType.SCENE
 
+    @Contextual
     var viewport: ZViewport = ZViewport()
 
     override fun internalInitialize(ctx: ZContext) {

@@ -15,11 +15,11 @@ import zernikalos.ZDataType
 import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZBufferKeySerializer::class)
 class ZBufferKey internal constructor(data: ZBufferKeyData): ZDataRenderComponent<ZBufferKeyData, ZBufferKeyRenderer>(data), ZBindeable {
 
     /**
@@ -161,7 +161,8 @@ expect class ZBufferKeyRenderer(ctx: ZRenderingContext, data: ZBufferKeyData): Z
     override fun dispose()
 }
 
-class ZBufferKeySerializer: ZComponentSerializer<ZBufferKey, ZBufferKeyData>() {
+internal class ZBufferKeySerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZBufferKey, ZBufferKeyData>(loaderContext) {
     override val kSerializer: KSerializer<ZBufferKeyData> = ZBufferKeyData.serializer()
 
     override fun createComponentInstance(data: ZBufferKeyData): ZBufferKey {

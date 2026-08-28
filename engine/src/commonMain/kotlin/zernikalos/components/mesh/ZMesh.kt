@@ -11,6 +11,7 @@ package zernikalos.components.mesh
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZTypes
 import zernikalos.components.*
@@ -237,14 +238,14 @@ data class ZMeshData(
 @Serializable
 internal data class ZRawMeshData(
     @ProtoNumber(1)
-    var refId: String = "",
+    override var refId: String = "",
     @ProtoNumber(11)
     var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
-    private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
+    private var bufferKeys: ArrayList<@Contextual ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
-    private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
-) {
+    private var bufferContents: ArrayList<@Contextual ZBufferContent> = arrayListOf()
+): ZRef {
 
     @Transient
     val buffers: HashMap<String, ZBuffer> = HashMap()
@@ -284,20 +285,16 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal class ZMeshSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZMesh, ZRawMeshData>() {
+internal class ZMeshSerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZMesh, ZRawMeshData>(loaderContext) {
     override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
 
     override fun createComponentInstance(data: ZRawMeshData): ZMesh {
-        if (loaderContext.hasComponent(data.refId)) {
-            return loaderContext.getComponent(data.refId) as ZMesh
-        }
         val meshData = ZMeshData(
             data.drawMode,
             data.buffers
         )
-        val mesh = ZMesh(meshData)
-        loaderContext.addComponent(data.refId, mesh)
-        return mesh
+        return ZMesh(meshData)
     }
 
 }

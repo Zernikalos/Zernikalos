@@ -8,6 +8,7 @@
 
 package zernikalos.objects
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -30,7 +31,7 @@ class ZSkeleton: ZObject() {
 
     override val type = ZObjectType.SKELETON
 
-    @ProtoNumber(101)
+    @Contextual @ProtoNumber(101)
     var root: ZBone = ZBone()
 
     val bones: Array<ZBone>

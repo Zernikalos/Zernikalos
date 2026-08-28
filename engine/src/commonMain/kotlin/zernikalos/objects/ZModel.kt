@@ -42,7 +42,7 @@ open class ZModel: ZObject() {
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null
-    @ProtoNumber(8)
+    @Contextual @ProtoNumber(8)
     var skinning: ZSkinning? = null
 
     val hasTextures: Boolean

@@ -13,11 +13,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@Serializable(with = ZBufferContentSerializer::class)
 class ZBufferContent internal constructor(data: ZBufferContentData): ZDataRenderComponent<ZBufferContentData, ZBufferContentRenderer>(data), ZBindeable {
 
     /**
@@ -91,7 +91,8 @@ expect class ZBufferContentRenderer(ctx: ZRenderingContext, data: ZBufferContent
     override fun dispose()
 }
 
-class ZBufferContentSerializer: ZComponentSerializer<ZBufferContent, ZBufferContentData>() {
+internal class ZBufferContentSerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZBufferContent, ZBufferContentData>(loaderContext) {
     override val kSerializer: KSerializer<ZBufferContentData> = ZBufferContentData.serializer()
 
     override fun createComponentInstance(data: ZBufferContentData): ZBufferContent {

@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZColor
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -30,7 +31,6 @@ import kotlin.math.max
  * @param data The material data containing PBR, Phong, and texture information.
  */
 @JsExport
-@Serializable(with = ZMaterialSerializer::class)
 class ZMaterial
 internal constructor(data: ZMaterialData):
     ZDataRenderComponent<ZMaterialData, ZMaterialRenderer>(data), ZBindeable {
@@ -209,7 +209,8 @@ class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData)
 
 }
 
-class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData>() {
+internal class ZMaterialSerializer(loaderContext: ZLoaderContext)
+    : ZComponentSerializerWithLoader<ZMaterial, ZMaterialData>(loaderContext) {
     override val kSerializer: KSerializer<ZMaterialData> = ZMaterialData.serializer()
 
     override fun createComponentInstance(data: ZMaterialData): ZMaterial {

@@ -14,11 +14,25 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
 import zernikalos.action.ZSkeletalAction
+import zernikalos.components.ZViewport
+import zernikalos.components.ZViewportSerializer
+import zernikalos.components.camera.ZPerspectiveLens
+import zernikalos.components.camera.ZPerspectiveLensSerializer
 import zernikalos.components.light.*
+import zernikalos.components.material.ZMaterial
+import zernikalos.components.material.ZMaterialSerializer
 import zernikalos.components.material.ZTexture
 import zernikalos.components.material.ZTextureSerializer
+import zernikalos.components.mesh.ZBufferContent
+import zernikalos.components.mesh.ZBufferContentSerializer
+import zernikalos.components.mesh.ZBufferKey
+import zernikalos.components.mesh.ZBufferKeySerializer
 import zernikalos.components.mesh.ZMesh
 import zernikalos.components.mesh.ZMeshSerializer
+import zernikalos.components.skeleton.ZBone
+import zernikalos.components.skeleton.ZBoneSerializer
+import zernikalos.components.skeleton.ZSkinning
+import zernikalos.components.skeleton.ZSkinningSerializer
 import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
@@ -47,6 +61,13 @@ fun createZerializerModule(): SerializersModule {
         contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}
         contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
         contextual(ZMesh::class) { _ -> ZMeshSerializer(loaderContext) }
+        contextual(ZMaterial::class) { _ -> ZMaterialSerializer(loaderContext) }
+        contextual(ZBone::class) { _ -> ZBoneSerializer(loaderContext) }
+        contextual(ZSkinning::class) { _ -> ZSkinningSerializer(loaderContext) }
+        contextual(ZViewport::class) { _ -> ZViewportSerializer(loaderContext) }
+        contextual(ZPerspectiveLens::class) { _ -> ZPerspectiveLensSerializer(loaderContext) }
+        contextual(ZBufferKey::class) { _ -> ZBufferKeySerializer(loaderContext) }
+        contextual(ZBufferContent::class) { _ -> ZBufferContentSerializer(loaderContext) }
         contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
     }
 
