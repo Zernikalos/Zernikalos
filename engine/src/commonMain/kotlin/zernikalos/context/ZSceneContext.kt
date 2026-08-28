@@ -8,7 +8,6 @@
 
 package zernikalos.context
 
-import zernikalos.generators.uniformgenerator.ZUniformGenerator
 import zernikalos.objects.ZCamera
 import zernikalos.objects.ZScene
 import kotlin.js.JsExport
@@ -25,21 +24,8 @@ open class ZSceneContext {
 
     var activeCamera: ZCamera? = null
 
-    private val uniformsGeneratorMap = HashMap<String, ZUniformGenerator>()
-
     val isInitialized: Boolean
         get() = scene?.isInitialized == true
-
-    fun getUniform(key: String): ZUniformGenerator? {
-        if (uniformsGeneratorMap.containsKey(key)) {
-            return uniformsGeneratorMap[key]
-        }
-        return null
-    }
-
-    fun addUniformGenerator(key: String, generator: ZUniformGenerator) {
-        uniformsGeneratorMap[key] = generator
-    }
 
 }
 
