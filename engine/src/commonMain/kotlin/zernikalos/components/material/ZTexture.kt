@@ -15,7 +15,6 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZBaseType
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -81,6 +80,7 @@ enum class ZTextureColorSpace {
  *
  */
 @JsExport
+@Serializable(with = ZTextureSerializer::class)
 class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
@@ -255,26 +255,8 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 /**
  * @suppress
  */
-internal class ZTextureSerializer2(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZTexture, ZTextureData>() {
-
-    override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
-
-    override fun createComponentInstance(data: ZTextureData): ZTexture {
-        if (loaderContext.hasComponent(data.id)) {
-            return loaderContext.getComponent(data.id) as ZTexture
-        }
-        val texture = ZTexture(data)
-        loaderContext.addComponent(texture.id, texture)
-        return texture
-    }
-
-}
-
-/**
- * @suppress
- */
-internal class ZTextureSerializer(loaderContext: ZLoaderContext)
-    : ZComponentSerializerWithLoader<ZTexture, ZTextureData>(loaderContext) {
+internal object ZTextureSerializer
+    : ZComponentSerializerWithLoader<ZTexture, ZTextureData>() {
 
     override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
 

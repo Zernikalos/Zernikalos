@@ -6,7 +6,6 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZSerializableComponent
-import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -28,6 +27,7 @@ import kotlin.js.JsName
  * [ZModelSkinningMatrixGenerator] supplies [modelSkinBindMatrix] / mesh–skeleton node offset separately.
  */
 @JsExport
+@Serializable(with = ZSkinningSerializer::class)
 class ZSkinning internal constructor(data: ZSkinningData): ZSerializableComponent<ZSkinningData>(data) {
 
     @JsName("init")
@@ -110,8 +110,8 @@ data class ZSkinningData(
 /**
  * @suppress
  */
-internal class ZSkinningSerializer(loaderContext: ZLoaderContext)
-    : ZComponentSerializerWithLoader<ZSkinning, ZSkinningData>(loaderContext) {
+internal object ZSkinningSerializer
+    : ZComponentSerializerWithLoader<ZSkinning, ZSkinningData>() {
     override val kSerializer: KSerializer<ZSkinningData>
         get() = ZSkinningData.serializer()
 

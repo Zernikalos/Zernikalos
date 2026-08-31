@@ -16,7 +16,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.objects.*
 
-@Serializable
+@Serializable(with = ZkoObjectProtoSerializer::class)
 data class ZkoObjectProto(
     val type: ZObjectType,
     val refId: String,
@@ -38,7 +38,7 @@ data class ZkoObjectProtoDef(
     @ProtoNumber(106) val light: ZLight?,
 )
 
-class ZkoObjectProtoSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZkoObjectProto> {
+internal object ZkoObjectProtoSerializer : KSerializer<ZkoObjectProto> {
     override val descriptor: SerialDescriptor
         get() = ZkoObjectProtoDef.serializer().descriptor
 
@@ -47,6 +47,7 @@ class ZkoObjectProtoSerializer(private val loaderContext: ZLoaderContext): KSeri
     }
 
     override fun deserialize(decoder: Decoder): ZkoObjectProto {
+        val loaderContext = ZkoLoader.requireLoaderContext()
         val data = decoder.decodeSerializableValue(ZkoObjectProtoDef.serializer())
         val zobj = detectZObject(data)
         loaderContext.addComponent(zobj.refId, zobj)

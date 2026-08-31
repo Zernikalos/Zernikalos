@@ -18,6 +18,7 @@ import zernikalos.components.mesh.ZMeshData
 import zernikalos.components.mesh.ZRawMeshData
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
+import zernikalos.loader.ZkoLoader
 import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.uuid.Uuid
@@ -476,8 +477,10 @@ abstract class ZComponentSerializer<
 abstract class ZComponentSerializerWithLoader<
     T: ZComponent,
     D: ZRef>
-    (protected val loaderContext: ZLoaderContext)
     : ZComponentSerializer<T, D>() {
+
+    protected val loaderContext: ZLoaderContext
+        get() = ZkoLoader.requireLoaderContext()
 
     override fun deserialize(decoder: Decoder): T {
         val data = decoder.decodeSerializableValue(kSerializer)

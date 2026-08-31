@@ -8,7 +8,6 @@
 
 package zernikalos.objects
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -18,7 +17,7 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZKeyFrame
 import zernikalos.components.skeleton.ZBone
 import zernikalos.context.ZContext
-import zernikalos.loader.ZLoaderContext
+import zernikalos.loader.ZkoLoader
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZTransform
 import zernikalos.search.findInTree
@@ -31,7 +30,7 @@ class ZSkeleton: ZObject() {
 
     override val type = ZObjectType.SKELETON
 
-    @Contextual @ProtoNumber(101)
+    @ProtoNumber(101)
     var root: ZBone = ZBone()
 
     val bones: Array<ZBone>
@@ -85,6 +84,9 @@ class ZSkeleton: ZObject() {
 
 }
 
+/**
+ * @suppress
+ */
 @Serializable
 data class ZSkeletonProtoRef(
     @ProtoNumber(1)
@@ -97,7 +99,7 @@ data class ZSkeletonProtoRef(
     val data: ZSkeleton? = null
 )
 
-class ZSkeletonSerializer(private val loaderContext: ZLoaderContext): KSerializer<ZSkeleton> {
+internal object ZSkeletonSerializer : KSerializer<ZSkeleton> {
     override val descriptor: SerialDescriptor
         get() = ZSkeletonProtoRef.serializer().descriptor
 
@@ -106,6 +108,7 @@ class ZSkeletonSerializer(private val loaderContext: ZLoaderContext): KSerialize
     }
 
     override fun deserialize(decoder: Decoder): ZSkeleton {
+        val loaderContext = ZkoLoader.requireLoaderContext()
         val data = decoder.decodeSerializableValue(ZSkeletonProtoRef.serializer())
         return if (data.isReference) {
             loaderContext.getComponent(data.refId) as ZSkeleton
@@ -115,5 +118,4 @@ class ZSkeletonSerializer(private val loaderContext: ZLoaderContext): KSerialize
             skeleton
         }
     }
-
 }

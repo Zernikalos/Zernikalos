@@ -12,12 +12,10 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
-import kotlinx.serialization.Contextual
 import zernikalos.components.ZComponentData
 import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZSerializableComponent
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import zernikalos.math.ZMatrix4
 import zernikalos.math.ZTransform
 import zernikalos.search.ZTreeNode
@@ -25,6 +23,7 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
+@Serializable(with = ZBoneSerializer::class)
 class ZBone internal constructor(data: ZBoneData): ZSerializableComponent<ZBoneData>(data), ZTreeNode<ZBone> {
 
     @JsName("init")
@@ -133,12 +132,12 @@ data class ZBoneData(
     @ProtoNumber(4)
     var transform: ZTransform = ZTransform(),
     @ProtoNumber(5)
-    val children: ArrayList<@Contextual ZBone> = arrayListOf()
+    val children: ArrayList<ZBone> = arrayListOf()
 ): ZComponentData()
 
 
-internal class ZBoneSerializer(loaderContext: ZLoaderContext)
-    : ZComponentSerializerWithLoader<ZBone, ZBoneData>(loaderContext) {
+internal object ZBoneSerializer
+    : ZComponentSerializerWithLoader<ZBone, ZBoneData>() {
     override val kSerializer: KSerializer<ZBoneData>
         get() = ZBoneData.serializer()
 

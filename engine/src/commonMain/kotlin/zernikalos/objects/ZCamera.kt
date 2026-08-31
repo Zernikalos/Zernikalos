@@ -8,7 +8,6 @@
 
 package zernikalos.objects
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -42,7 +41,7 @@ class ZCamera(): ZObject() {
      *   and [ZPerspectiveLens.fromVerticalFovDegrees] for degree-based authoring).
      * @property aspectRatio The aspect ratio (width/height)
      * */
-    @Contextual @ProtoNumber(4)
+    @ProtoNumber(4)
     var lens: ZPerspectiveLens
 
     /**

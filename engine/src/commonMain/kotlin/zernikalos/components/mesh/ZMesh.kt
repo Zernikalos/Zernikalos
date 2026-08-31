@@ -11,13 +11,11 @@ package zernikalos.components.mesh
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -27,6 +25,7 @@ import kotlin.js.JsName
  * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
  */
 @JsExport
+@Serializable(with = ZMeshSerializer::class)
 class ZMesh internal constructor(data: ZMeshData):
     ZDataRenderComponent<ZMeshData, ZMeshRenderer>(data),
     ZBindeable,
@@ -242,9 +241,9 @@ internal data class ZRawMeshData(
     @ProtoNumber(11)
     var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
-    private var bufferKeys: ArrayList<@Contextual ZBufferKey> = arrayListOf(),
+    private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
-    private var bufferContents: ArrayList<@Contextual ZBufferContent> = arrayListOf()
+    private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
 ): ZRef {
 
     @Transient
@@ -285,8 +284,8 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal class ZMeshSerializer(loaderContext: ZLoaderContext)
-    : ZComponentSerializerWithLoader<ZMesh, ZRawMeshData>(loaderContext) {
+internal object ZMeshSerializer
+    : ZComponentSerializerWithLoader<ZMesh, ZRawMeshData>() {
     override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
 
     override fun createComponentInstance(data: ZRawMeshData): ZMesh {

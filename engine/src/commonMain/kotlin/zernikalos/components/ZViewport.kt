@@ -11,7 +11,6 @@ package zernikalos.components
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import zernikalos.context.ZGpuColorAttachmentDesc
-import zernikalos.loader.ZLoaderContext
 import zernikalos.context.ZGpuDepthStencilAttachmentDesc
 import zernikalos.context.ZGpuRenderPassDescriptor
 import zernikalos.context.ZLoadOp
@@ -26,6 +25,7 @@ import kotlin.js.JsName
  * Represents a viewport box for rendering objects in Zernikalos.
  */
 @JsExport
+@Serializable(with = ZViewportSerializer::class)
 class ZViewport
 internal constructor(data: ZViewportData):
     ZDataRenderComponent<ZViewportData, ZViewportRenderer>(data),
@@ -119,8 +119,8 @@ expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZCo
     fun onViewportResize(width: Int, height: Int)
 }
 
-internal class ZViewportSerializer(loaderContext: ZLoaderContext)
-    : ZComponentSerializerWithLoader<ZViewport, ZViewportData>(loaderContext) {
+internal object ZViewportSerializer
+    : ZComponentSerializerWithLoader<ZViewport, ZViewportData>() {
     override val kSerializer: KSerializer<ZViewportData>
         get() = ZViewportData.serializer()
 
