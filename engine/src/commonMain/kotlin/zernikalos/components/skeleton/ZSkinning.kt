@@ -110,7 +110,7 @@ data class ZSkinningData(
 /**
  * @suppress
  */
-internal object ZSkinningSerializer
+internal class ZSkinningSerializer
     : ZComponentSerializerWithLoader<ZSkinning, ZSkinningData>() {
     override val kSerializer: KSerializer<ZSkinningData>
         get() = ZSkinningData.serializer()

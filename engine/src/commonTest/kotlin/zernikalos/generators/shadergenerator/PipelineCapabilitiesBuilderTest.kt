@@ -45,7 +45,7 @@ class PipelineCapabilitiesBuilderTest {
     @Test
     fun builderEnablesTextureOnlyWhenModelHasTextureAndUvBuffer() {
         val material = ZMaterial().apply {
-            texture = ZTexture("texture", 1, 1, flipX = false, flipY = true, dataArray = byteArrayOf())
+            texture = ZTexture(1, 1, flipX = false, flipY = true, dataArray = byteArrayOf())
         }
         val modelWithoutUv = ZModel().apply {
             this.material = material

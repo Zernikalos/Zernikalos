@@ -208,7 +208,7 @@ class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData)
 
 }
 
-internal object ZMaterialSerializer
+internal class ZMaterialSerializer
     : ZComponentSerializerWithLoader<ZMaterial, ZMaterialData>() {
     override val kSerializer: KSerializer<ZMaterialData> = ZMaterialData.serializer()
 

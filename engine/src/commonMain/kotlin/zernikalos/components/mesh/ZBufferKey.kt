@@ -161,7 +161,7 @@ expect class ZBufferKeyRenderer(ctx: ZRenderingContext, data: ZBufferKeyData): Z
     override fun dispose()
 }
 
-internal object ZBufferKeySerializer
+internal class ZBufferKeySerializer
     : ZComponentSerializerWithLoader<ZBufferKey, ZBufferKeyData>() {
     override val kSerializer: KSerializer<ZBufferKeyData> = ZBufferKeyData.serializer()
 

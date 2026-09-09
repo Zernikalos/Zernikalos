@@ -136,7 +136,7 @@ data class ZBoneData(
 ): ZComponentData()
 
 
-internal object ZBoneSerializer
+internal class ZBoneSerializer
     : ZComponentSerializerWithLoader<ZBone, ZBoneData>() {
     override val kSerializer: KSerializer<ZBoneData>
         get() = ZBoneData.serializer()

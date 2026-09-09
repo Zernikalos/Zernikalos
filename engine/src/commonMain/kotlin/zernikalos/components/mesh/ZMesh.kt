@@ -284,7 +284,7 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal object ZMeshSerializer
+internal class ZMeshSerializer
     : ZComponentSerializerWithLoader<ZMesh, ZRawMeshData>() {
     override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
 
