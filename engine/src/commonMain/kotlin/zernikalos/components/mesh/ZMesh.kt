@@ -235,16 +235,14 @@ data class ZMeshData(
 }
 
 @Serializable
-internal data class ZRawMeshData(
-    @ProtoNumber(1)
-    override var refId: String = "",
+internal data class ZMeshDataDTO(
     @ProtoNumber(11)
     var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
     private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
-): ZRef {
+): ZComponentData() {
 
     @Transient
     val buffers: HashMap<String, ZBuffer> = HashMap()
@@ -285,10 +283,10 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
  * @suppress
  */
 internal class ZMeshSerializer
-    : ZComponentSerializerWithLoader<ZMesh, ZRawMeshData>() {
-    override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
+    : ZComponentSerializerWithLoader<ZMesh, ZMeshDataDTO>() {
+    override val kSerializer: KSerializer<ZMeshDataDTO> = ZMeshDataDTO.serializer()
 
-    override fun createComponentInstance(data: ZRawMeshData): ZMesh {
+    override fun createComponentInstance(data: ZMeshDataDTO): ZMesh {
         val meshData = ZMeshData(
             data.drawMode,
             data.buffers

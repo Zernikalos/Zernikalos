@@ -209,8 +209,6 @@ class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZT
  */
 @Serializable
 data class ZTextureData(
-    @ProtoNumber(1)
-    override var refId: String = "",
     @ProtoNumber(10)
     var width: Int = 0,
     @ProtoNumber(11)

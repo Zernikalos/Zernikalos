@@ -9,13 +9,12 @@
 package zernikalos.components
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import zernikalos.components.mesh.ZMesh
-import zernikalos.components.mesh.ZMeshData
-import zernikalos.components.mesh.ZRawMeshData
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
 import zernikalos.loader.ZLoaderContext
 import zernikalos.loader.ZkoLoader
@@ -369,8 +368,10 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
  * to their components.
  */
 @JsExport
+@Serializable
 abstract class ZComponentData: ZLoggable, ZRef {
 
+    @ProtoNumber(1)
     internal var uuid: Uuid? = null
 
     @Transient
