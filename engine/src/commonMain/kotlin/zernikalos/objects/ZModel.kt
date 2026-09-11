@@ -34,11 +34,11 @@ open class ZModel: ZObject() {
     @Transient
     override val type = ZObjectType.MODEL
 
-    @Contextual @ProtoNumber(4)
+    @ProtoNumber(4)
     var mesh: ZMesh = ZMesh()
     @Transient
     var shaderProgram: ZShaderProgram = ZShaderProgram()
-    @Contextual @ProtoNumber(6)
+    @ProtoNumber(6)
     var material: ZMaterial? = null
     @Contextual @ProtoNumber(7)
     var skeleton: ZSkeleton? = null

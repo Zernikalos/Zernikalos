@@ -9,11 +9,15 @@
 package zernikalos.components
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.context.ZRenderingContext
+import zernikalos.loader.ZLoaderContext
+import zernikalos.loader.ZkoLoader
 import zernikalos.logger.ZLoggable
 import kotlin.js.JsExport
 import kotlin.uuid.Uuid
@@ -152,7 +156,9 @@ abstract class ZBaseComponent(): ZComponent, ZLoggable {
     /**
      * Override in subclasses to release component-owned resources. Called at most once by [dispose].
      */
-    protected open fun internalDispose() {}
+    protected open fun internalDispose() {
+
+    }
 
     final override val isRenderizable: Boolean
         get() = this is ZRenderCapability
@@ -219,7 +225,7 @@ abstract class ZRenderizableComponent<R: ZComponentRenderer>(): ZBaseComponent()
             return _renderer ?: throw Error("Renderer was requested before it was created")
         }
 
-    override fun initialize(ctx: ZRenderingContext) {
+    final override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
         if (!isInitialized) {
             return
@@ -315,7 +321,7 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
             return _renderer ?: throw Error("Renderer was requested before it was created")
         }
 
-    override fun initialize(ctx: ZRenderingContext) {
+    final override fun initialize(ctx: ZRenderingContext) {
         super.initialize(ctx)
         if (!isInitialized) {
             return
@@ -362,8 +368,10 @@ abstract class ZDataRenderComponent<D: ZComponentData, R: ZComponentRenderer>(
  * to their components.
  */
 @JsExport
+@Serializable
 abstract class ZComponentData: ZLoggable, ZRef {
 
+    @ProtoNumber(1)
     internal var uuid: Uuid? = null
 
     @Transient
@@ -452,6 +460,38 @@ abstract class ZComponentSerializer<
     override fun deserialize(decoder: Decoder): T {
         val data = decoder.decodeSerializableValue(kSerializer)
         return createComponentInstance(data)
+    }
+
+    override fun serialize(encoder: Encoder, value: T) {
+        if (value !is ZHasComponentData<*>) {
+            throw Error("Component does not support serialization")
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val data = value.data as D
+
+        encoder.encodeSerializableValue(kSerializer, data)
+    }
+
+}
+
+abstract class ZComponentSerializerWithLoader<
+    T: ZComponent,
+    D: ZRef>
+    : ZComponentSerializer<T, D>() {
+
+    protected val loaderContext: ZLoaderContext
+        get() = ZkoLoader.requireLoaderContext()
+
+    override fun deserialize(decoder: Decoder): T {
+        val data = decoder.decodeSerializableValue(kSerializer)
+
+        if (loaderContext.hasComponent(data.refId)) {
+            return loaderContext.getComponent(data.refId) as T
+        }
+        val component = createComponentInstance(data)
+        loaderContext.addComponent(data.refId, component)
+        return component
     }
 
     override fun serialize(encoder: Encoder, value: T) {

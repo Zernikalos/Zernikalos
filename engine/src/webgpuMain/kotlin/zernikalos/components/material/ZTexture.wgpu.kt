@@ -30,7 +30,7 @@ actual class ZTextureRenderer actual constructor(
 
         val device = ctx.device
 
-        logger.debug("[ZTextureRenderer] Initializing texture id=${data.id}")
+        logger.debug("[ZTextureRenderer] Initializing texture id=${data.refId}")
         logger.debug("[ZTextureRenderer] data.width=${data.width}, data.height=${data.height}")
 
         val bitmap = ZBitmap(data.dataArray)

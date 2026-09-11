@@ -11,11 +11,11 @@ package zernikalos.components.material
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.ZBaseType
 import zernikalos.components.*
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import zernikalos.logger.logger
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -81,15 +81,15 @@ enum class ZTextureColorSpace {
  *
  */
 @JsExport
+@Serializable(with = ZTextureSerializer::class)
 class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZTextureData, ZTextureRenderer>(data), ZBindeable {
 
     @JsName("init")
     constructor(): this(ZTextureData())
 
     @JsName("initWithArgs")
-    constructor(id: String, width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(
+    constructor(width: Int, height: Int, flipX: Boolean, flipY: Boolean, dataArray: ByteArray): this(
         ZTextureData(
-            id = id,
             width = width,
             height = height,
             flipX = flipX,
@@ -97,8 +97,6 @@ class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZT
             dataArray = dataArray
         )
     )
-
-    var id: String by data::id
 
     /**
      * Represents the width of the texture image
@@ -177,6 +175,33 @@ class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZT
 
     override fun bind() = renderer.bind()
     override fun unbind() = renderer.unbind()
+
+    /**
+     * Helper function to build a format string from texture components.
+     * Useful for debugging and logging.
+     */
+    internal fun getFormatString(): String {
+        val channelStr = when(channels) {
+            ZTextureChannels.R -> "r"
+            ZTextureChannels.RG -> "rg"
+            ZTextureChannels.RGB -> "rgb"
+            ZTextureChannels.RGBA -> "rgba"
+            ZTextureChannels.BGRA -> "bgra"
+        }
+        val typeStr = when(pixelType) {
+            ZBaseType.UNSIGNED_BYTE -> "8"
+            ZBaseType.UNSIGNED_SHORT -> "16"
+            ZBaseType.FLOAT -> "32float"
+            else -> "8"
+        }
+        val normStr = if(normalized) "unorm" else "uint"
+        val csStr = when(colorSpace) {
+            ZTextureColorSpace.SRGB -> "-srgb"
+            ZTextureColorSpace.LINEAR -> ""
+        }
+        return "$channelStr$typeStr$normStr$csStr"
+    }
+
 }
 
 /**
@@ -184,61 +209,36 @@ class ZTexture internal constructor(data: ZTextureData): ZDataRenderComponent<ZT
  */
 @Serializable
 data class ZTextureData(
-    @ProtoNumber(1)
-    var id: String = "",
-    @ProtoNumber(2)
-    var width: Int = 0,
-    @ProtoNumber(3)
-    var height: Int = 0,
-    @ProtoNumber(4)
-    var flipX: Boolean = false,
-    @ProtoNumber(5)
-    var flipY: Boolean = false,
-    @ProtoNumber(6)
-    var minFilter: ZTextureFilterMode = ZTextureFilterMode.LINEAR,
-    @ProtoNumber(7)
-    var magFilter: ZTextureFilterMode = ZTextureFilterMode.LINEAR,
-    @ProtoNumber(8)
-    var wrapModeU: ZTextureWrapMode = ZTextureWrapMode.CLAMP_TO_EDGE,
-    @ProtoNumber(9)
-    var wrapModeV: ZTextureWrapMode = ZTextureWrapMode.CLAMP_TO_EDGE,
     @ProtoNumber(10)
-    var pixelType: ZBaseType = ZBaseType.UNSIGNED_BYTE,
+    var width: Int = 0,
     @ProtoNumber(11)
-    var channels: ZTextureChannels = ZTextureChannels.RGBA,
+    var height: Int = 0,
     @ProtoNumber(12)
-    var colorSpace: ZTextureColorSpace = ZTextureColorSpace.LINEAR,
+    var flipX: Boolean = false,
     @ProtoNumber(13)
+    var flipY: Boolean = false,
+    @ProtoNumber(14)
+    var minFilter: ZTextureFilterMode = ZTextureFilterMode.LINEAR,
+    @ProtoNumber(15)
+    var magFilter: ZTextureFilterMode = ZTextureFilterMode.LINEAR,
+
+    @ProtoNumber(16)
+    var wrapModeU: ZTextureWrapMode = ZTextureWrapMode.CLAMP_TO_EDGE,
+    @ProtoNumber(17)
+    var wrapModeV: ZTextureWrapMode = ZTextureWrapMode.CLAMP_TO_EDGE,
+
+    @ProtoNumber(18)
+    var pixelType: ZBaseType = ZBaseType.UNSIGNED_BYTE,
+    @ProtoNumber(19)
+    var channels: ZTextureChannels = ZTextureChannels.RGBA,
+    @ProtoNumber(20)
+    var colorSpace: ZTextureColorSpace = ZTextureColorSpace.LINEAR,
+    @ProtoNumber(21)
     var normalized: Boolean = true,
+
     @ProtoNumber(100)
     var dataArray: ByteArray = byteArrayOf(),
 ): ZComponentData()
-
-/**
- * Helper function to build a format string from texture components.
- * Useful for debugging and logging.
- */
-fun ZTextureData.getFormatString(): String {
-    val channelStr = when(channels) {
-        ZTextureChannels.R -> "r"
-        ZTextureChannels.RG -> "rg"
-        ZTextureChannels.RGB -> "rgb"
-        ZTextureChannels.RGBA -> "rgba"
-        ZTextureChannels.BGRA -> "bgra"
-    }
-    val typeStr = when(pixelType) {
-        ZBaseType.UNSIGNED_BYTE -> "8"
-        ZBaseType.UNSIGNED_SHORT -> "16"
-        ZBaseType.FLOAT -> "32float"
-        else -> "8"
-    }
-    val normStr = if(normalized) "unorm" else "uint"
-    val csStr = when(colorSpace) {
-        ZTextureColorSpace.SRGB -> "-srgb"
-        ZTextureColorSpace.LINEAR -> ""
-    }
-    return "$channelStr$typeStr$normStr$csStr"
-}
 
 /**
  * @suppress
@@ -255,17 +255,18 @@ expect class ZTextureRenderer(ctx: ZRenderingContext, data: ZTextureData): ZComp
 /**
  * @suppress
  */
-internal class ZTextureSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZTexture, ZTextureData>() {
+internal class ZTextureSerializer
+    : ZComponentSerializerWithLoader<ZTexture, ZTextureData>() {
 
     override val kSerializer: KSerializer<ZTextureData> = ZTextureData.serializer()
 
     override fun createComponentInstance(data: ZTextureData): ZTexture {
-        if (loaderContext.hasComponent(data.id)) {
-            return loaderContext.getComponent(data.id) as ZTexture
-        }
-        val texture = ZTexture(data)
-        loaderContext.addComponent(texture.id, texture)
-        return texture
+        return ZTexture(data)
+    }
+
+    override fun deserialize(decoder: Decoder): ZTexture {
+        return super.deserialize(decoder)
     }
 
 }
+

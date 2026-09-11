@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZSerializableComponent
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZMatrix4
@@ -136,7 +136,8 @@ data class ZBoneData(
 ): ZComponentData()
 
 
-class ZBoneSerializer: ZComponentSerializer<ZBone, ZBoneData>() {
+internal class ZBoneSerializer
+    : ZComponentSerializerWithLoader<ZBone, ZBoneData>() {
     override val kSerializer: KSerializer<ZBoneData>
         get() = ZBoneData.serializer()
 

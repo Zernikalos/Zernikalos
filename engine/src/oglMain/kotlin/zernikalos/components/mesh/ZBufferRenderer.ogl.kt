@@ -31,9 +31,9 @@ actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private 
     private fun initializeBufferContent(ctx: ZRenderingContext) {
         ctx as ZGLRenderingContext
 
-        if (data.content.isInitialized) {
-            return
-        }
+//        if (data.content.isInitialized) {
+//            return
+//        }
         data.content.initialize(ctx)
         data.content.renderer.initializeAs(data.isIndexBuffer)
     }

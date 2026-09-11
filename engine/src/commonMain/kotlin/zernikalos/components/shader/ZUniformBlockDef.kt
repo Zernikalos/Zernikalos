@@ -14,18 +14,18 @@ import zernikalos.generators.uniformgenerator.ZUniformGenerator
 
 /**
  * Declarative definition of a single member inside a uniform block.
- * Used by [UniformBlockDef] to describe block layout and to build [ZUniformData].
+ * Used by [ZUniformBlockDef] to describe block layout and to build [ZUniformData].
  *
  * @param key Unified key (id + name) for this uniform (e.g. [UNIFORM_KEYS.BONES]).
  * @param dataType Shader data type (e.g. [zernikalos.ZTypes.MAT4F]).
  * @param count Element count for arrays (e.g. 100 for bone matrices).
- * @param glslName GLSL/variable name for this member in shader code (e.g. "u_bones").
+ * @param shaderName Shader variable name for this member in shader code (e.g. "u_bones").
  */
-data class UniformMember(
-    val key: UniformKey,
+data class ZUniformMember(
+    val key: ZUniformKey,
     val dataType: ZDataType,
     val count: Int = 1,
-    val glslName: String = "u_${key.name.replaceFirstChar { it.lowercase() }}"
+    val shaderName: String = "u_${key.name.replaceFirstChar { it.lowercase() }}"
 ) {
     val id: Int get() = key.id
     val name: String get() = key.name
@@ -34,14 +34,16 @@ data class UniformMember(
 /**
  * Factory for uniform blocks. Defines block id, GLSL name, members (layout), and generators.
  * Builds [ZUniform] instances with embedded generators via [toZUniform].
- * Call [registerGenerators] to register per-member generators in context (for entries flow).
  */
-abstract class UniformBlockDef(
-    val blockKey: UniformKey,
-    val glslName: String,
-    val members: List<UniformMember>,
-    val generators: Map<String, ZUniformGenerator>
+abstract class ZUniformBlockDef(
+    val blockKey: ZUniformKey,
+    val shaderName: String,
+    val members: List<ZUniformMember>,
+    generators: Map<ZUniformKey, ZUniformGenerator>
 ) {
+
+    private val _generators: Map<String, ZUniformGenerator> = generators.mapKeys { it.key.name }
+
     /** Total byte size of this block (sum of all members). */
     val byteSize: Int
         get() = members.sumOf { it.dataType.byteSize * it.count }
@@ -52,17 +54,11 @@ abstract class UniformBlockDef(
      */
     fun toZUniform(): ZUniform {
         val pairs = members.map { m ->
-            m.name to ZUniformData(m.id, m.glslName, m.count, m.dataType)
+            m.name to ZUniformData(m.id, m.shaderName, m.count, m.dataType)
         }
-        val unif = ZUniform(blockKey.id, glslName, pairs)
-        unif.addGenerators(generators)
+        val unif = ZUniform(blockKey.id, shaderName, pairs)
+        unif.addGenerators(_generators)
         return unif
-    }
-
-    fun registerGenerators(context: ZSceneContext) {
-        generators.forEach { (name, generator) ->
-            context.addUniformGenerator(name, generator)
-        }
     }
 
 }

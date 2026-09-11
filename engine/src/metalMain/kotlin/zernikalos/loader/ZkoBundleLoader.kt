@@ -19,7 +19,7 @@ import kotlin.experimental.ExperimentalObjCName
 
 @OptIn(ExperimentalObjCName::class)
 @ObjCName("ZkoLoader")
-class ZkoLoader {
+class ZkoBundleLoader {
 
     companion object {
         /**
@@ -44,7 +44,7 @@ class ZkoLoader {
                 val data = NSData.dataWithContentsOfURL(fileURL)
                 if (data != null) {
                     val byteArray = data.bytes!!.readBytes(data.length.toInt())
-                    return loadFromProto(byteArray)
+                    return ZkoLoader().load(byteArray)
                 }
                 println("Error loading the file.")
             }
@@ -62,5 +62,3 @@ class ZkoLoader {
         }
     }
 }
-
-

@@ -4,7 +4,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentData
-import zernikalos.components.ZComponentSerializer
+import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZSerializableComponent
 import zernikalos.math.ZMatrix4
 import kotlin.js.JsExport
@@ -110,7 +110,8 @@ data class ZSkinningData(
 /**
  * @suppress
  */
-class ZSkinningSerializer: ZComponentSerializer<ZSkinning, ZSkinningData>() {
+internal class ZSkinningSerializer
+    : ZComponentSerializerWithLoader<ZSkinning, ZSkinningData>() {
     override val kSerializer: KSerializer<ZSkinningData>
         get() = ZSkinningData.serializer()
 

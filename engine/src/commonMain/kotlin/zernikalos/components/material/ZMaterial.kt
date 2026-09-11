@@ -8,7 +8,6 @@
 
 package zernikalos.components.material
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -186,7 +185,7 @@ data class ZMaterialData(
     var pbr: ZPbrMaterialData? = null,
     @ProtoNumber(11)
     var phong: ZPhongMaterialData? = null,
-    @Contextual @ProtoNumber(100)
+    @ProtoNumber(100)
     var texture: ZTexture? = null
 ): ZComponentData()
 
@@ -209,7 +208,8 @@ class ZMaterialRenderer(ctx: ZRenderingContext, private val data: ZMaterialData)
 
 }
 
-class ZMaterialSerializer: ZComponentSerializer<ZMaterial, ZMaterialData>() {
+internal class ZMaterialSerializer
+    : ZComponentSerializerWithLoader<ZMaterial, ZMaterialData>() {
     override val kSerializer: KSerializer<ZMaterialData> = ZMaterialData.serializer()
 
     override fun createComponentInstance(data: ZMaterialData): ZMaterial {

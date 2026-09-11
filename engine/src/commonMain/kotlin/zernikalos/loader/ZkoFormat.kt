@@ -8,7 +8,6 @@
 
 package zernikalos.loader
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.protobuf.ProtoNumber
@@ -41,8 +40,8 @@ data class ZkoHeader(
 
 @Serializable
 data class ZkoComponentCollection(
-    @ProtoNumber(1) val meshes: List<@Contextual ZMesh>,
-    @ProtoNumber(2) val textures: List<@Contextual ZTexture>
+    @ProtoNumber(1) val meshes: List<ZMesh>,
+    @ProtoNumber(2) val textures: List<ZTexture>
 )
 
 
@@ -62,7 +61,7 @@ data class ZkoComponentCollection(
 data class ZkoFormat(
     @ProtoNumber(1) val header: ZkoHeader,
     @ProtoNumber(2) val components: ZkoComponentCollection,
-    @ProtoNumber(3) val objects: List<@Contextual ZkoObjectProto>,
+    @ProtoNumber(3) val objects: List<ZkoObjectProto>,
     @ProtoNumber(4) val hierarchy: ZkoHierarchyNode,
     @ProtoNumber(5) val actions: List<ZSkeletalAction>? = null
 )

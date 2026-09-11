@@ -16,7 +16,6 @@ import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
-import zernikalos.loader.ZLoaderContext
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -26,6 +25,7 @@ import kotlin.js.JsName
  * A relationship between the BufferKey and its RawBuffers in a more cohesive way providing just Buffers
  */
 @JsExport
+@Serializable(with = ZMeshSerializer::class)
 class ZMesh internal constructor(data: ZMeshData):
     ZDataRenderComponent<ZMeshData, ZMeshRenderer>(data),
     ZBindeable,
@@ -235,16 +235,14 @@ data class ZMeshData(
 }
 
 @Serializable
-internal data class ZRawMeshData(
-    @ProtoNumber(1)
-    var refId: String = "",
+internal data class ZMeshDataDTO(
     @ProtoNumber(11)
     var drawMode: ZDrawMode = ZDrawMode.TRIANGLES,
     @ProtoNumber(101)
     private var bufferKeys: ArrayList<ZBufferKey> = arrayListOf(),
     @ProtoNumber(102)
     private var bufferContents: ArrayList<ZBufferContent> = arrayListOf()
-) {
+): ZComponentData() {
 
     @Transient
     val buffers: HashMap<String, ZBuffer> = HashMap()
@@ -284,20 +282,16 @@ expect class ZMeshRenderer internal constructor(ctx: ZRenderingContext, data: ZM
 /**
  * @suppress
  */
-internal class ZMeshSerializer(private val loaderContext: ZLoaderContext): ZComponentSerializer<ZMesh, ZRawMeshData>() {
-    override val kSerializer: KSerializer<ZRawMeshData> = ZRawMeshData.serializer()
+internal class ZMeshSerializer
+    : ZComponentSerializerWithLoader<ZMesh, ZMeshDataDTO>() {
+    override val kSerializer: KSerializer<ZMeshDataDTO> = ZMeshDataDTO.serializer()
 
-    override fun createComponentInstance(data: ZRawMeshData): ZMesh {
-        if (loaderContext.hasComponent(data.refId)) {
-            return loaderContext.getComponent(data.refId) as ZMesh
-        }
+    override fun createComponentInstance(data: ZMeshDataDTO): ZMesh {
         val meshData = ZMeshData(
             data.drawMode,
             data.buffers
         )
-        val mesh = ZMesh(meshData)
-        loaderContext.addComponent(data.refId, mesh)
-        return mesh
+        return ZMesh(meshData)
     }
 
 }

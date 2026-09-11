@@ -15,19 +15,13 @@ import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.protobuf.ProtoBuf
 import zernikalos.action.ZSkeletalAction
 import zernikalos.components.light.*
-import zernikalos.components.material.ZTexture
-import zernikalos.components.material.ZTextureSerializer
-import zernikalos.components.mesh.ZMesh
-import zernikalos.components.mesh.ZMeshSerializer
 import zernikalos.objects.*
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
-fun createZerializerModule(): SerializersModule {
-    val loaderContext = ZLoaderContext()
-
+private fun createZerializerModule(): SerializersModule {
     @OptIn(ExperimentalSerializationApi::class, ExperimentalJsExport::class)
-    val zObjectModule = SerializersModule {
+    return SerializersModule {
         polymorphic(ZObject::class) {
             subclass(ZModel::class)
             subclass(ZGroup::class)
@@ -44,24 +38,46 @@ fun createZerializerModule(): SerializersModule {
             subclass(ZAmbientLamp::class)
         }
 
-        contextual(ZkoObjectProto::class) { _ -> ZkoObjectProtoSerializer(loaderContext)}
-        contextual(ZTexture::class) { _ -> ZTextureSerializer(loaderContext)}
-        contextual(ZMesh::class) { _ -> ZMeshSerializer(loaderContext) }
-        contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer(loaderContext)}
+        contextual(ZSkeleton::class) { _ -> ZSkeletonSerializer }
     }
-
-    return zObjectModule
 }
 
 private fun createProtoSerializersModule(): ProtoBuf {
     val zObjectModule = createZerializerModule()
 
-    val protoFormat = ProtoBuf {
+    return ProtoBuf {
         serializersModule = zObjectModule
         encodeDefaults = true
     }
+}
 
-    return protoFormat
+/**
+ * Loads ZKO protobuf payloads into runtime [ZKo] / [ZObject] graphs.
+ *
+ * @property loaderContext Component registry used for reference deduplication during decode.
+ */
+@JsExport
+class ZkoLoader(
+    val loaderContext: ZLoaderContext = ZLoaderContext()
+) {
+
+    /**
+     * Decodes a byte array into a [ZKo] instance.
+     */
+    fun load(byteArray: ByteArray): ZKo {
+        return loaderSession.withContext(loaderContext) {
+            val protoFormat = createProtoSerializersModule()
+            val zkoFormat = protoFormat.decodeFromByteArray(ZkoFormat.serializer(), byteArray)
+            val root = ZkoHierarchyNode.transformHierarchy(zkoFormat.hierarchy, zkoFormat.objects)
+            ZKo(zkoFormat.header, root, zkoFormat.actions)
+        }
+    }
+
+    internal companion object {
+        private val loaderSession = LoaderContextStack()
+
+        internal fun requireLoaderContext(): ZLoaderContext = loaderSession.require()
+    }
 }
 
 /**
@@ -89,12 +105,4 @@ data class ZKo(
  * @return A [ZKo] instance reconstructed from the provided data.
  */
 @JsExport
-fun loadFromProto(byteArray: ByteArray): ZKo {
-    val protoFormat = createProtoSerializersModule()
-    val zkoFormat = protoFormat.decodeFromByteArray(ZkoFormat.serializer(), byteArray)
-    val header = zkoFormat.header
-    val obj = ZkoHierarchyNode.transformHierarchy(zkoFormat.hierarchy, zkoFormat.objects)
-    val actions = zkoFormat.actions
-    return ZKo(header, obj, actions)
-}
-
+fun loadFromProto(byteArray: ByteArray): ZKo = ZkoLoader().load(byteArray)

@@ -21,10 +21,11 @@ import zernikalos.context.gpu.ZGpuRenderPass
 actual class ZBufferRenderer actual constructor(ctx: ZRenderingContext, private val data: ZBufferData) : ZComponentRenderer(ctx) {
 
     actual override fun initialize() {
-        if (!data.content.isInitialized) {
-            data.content.initialize(ctx)
-            data.content.renderer.initializeAs(data.attributeId.id, data.isIndexBuffer)
-        }
+//        if (data.content.isInitialized) {
+//            return
+//        }
+        data.content.initialize(ctx)
+        data.content.renderer.initializeAs(data.attributeId.id, data.isIndexBuffer)
     }
 
     fun createLayout(): GPUVertexBufferLayout {

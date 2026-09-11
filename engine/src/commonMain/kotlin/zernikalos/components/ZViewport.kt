@@ -119,7 +119,8 @@ expect class ZViewportRenderer(ctx: ZRenderingContext, data: ZViewportData): ZCo
     fun onViewportResize(width: Int, height: Int)
 }
 
-class ZViewportSerializer: ZComponentSerializer<ZViewport, ZViewportData>() {
+internal class ZViewportSerializer
+    : ZComponentSerializerWithLoader<ZViewport, ZViewportData>() {
     override val kSerializer: KSerializer<ZViewportData>
         get() = ZViewportData.serializer()
 
