@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
+import zernikalos.collider.ZBounds
 import zernikalos.components.ZRef
 import zernikalos.context.ZContext
 import zernikalos.events.ZEventManager
@@ -69,6 +70,9 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
 
     @ProtoNumber(3)
     var transform: ZTransform = ZTransform()
+
+    @ProtoNumber(4)
+    var bounds: ZBounds = ZBounds()
 
     override var children: Array<@Polymorphic ZObject>
         get() = _children.toTypedArray()

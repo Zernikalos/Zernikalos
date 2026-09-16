@@ -23,6 +23,7 @@ class ZSphereTest {
         assertVectorEquals(ZVector3.Zero, sphere.center)
         assertEquals(0f, sphere.radius)
         assertTrue(sphere.isValid)
+        assertTrue(sphere.isEmpty)
     }
 
     @Test

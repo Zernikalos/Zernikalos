@@ -28,6 +28,7 @@ class ZBox3DTest {
         assertEquals(0f, box.width)
         assertEquals(0f, box.height)
         assertEquals(0f, box.depth)
+        assertTrue(box.isEmpty)
     }
 
     @Test

@@ -85,3 +85,17 @@ fun ByteArray.toFloatArray(littleEndian: Boolean = true): FloatArray {
     return floats
 }
 
+/**
+ * Reads a little-endian IEEE-754 float starting at [index].
+ *
+ * Caller must ensure `index + 3` is within bounds.
+ */
+fun ByteArray.readFloatLE(index: Int): Float {
+    val intBits =
+        (this[index].toInt() and 0xFF) or
+            ((this[index + 1].toInt() and 0xFF) shl 8) or
+            ((this[index + 2].toInt() and 0xFF) shl 16) or
+            ((this[index + 3].toInt() and 0xFF) shl 24)
+    return Float.fromBits(intBits)
+}
+

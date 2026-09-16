@@ -63,6 +63,13 @@ class ZBox3D(
             front + depth * 0.5f
         )
 
+    /**
+     * True when all extents are zero (default / uninitialized empty box).
+     * A flat AABB with only one axis at zero is not considered empty.
+     */
+    val isEmpty: Boolean
+        get() = width == 0f && height == 0f && depth == 0f
+
     fun contains(point: ZVector3): Boolean {
         return contains(this, point)
     }

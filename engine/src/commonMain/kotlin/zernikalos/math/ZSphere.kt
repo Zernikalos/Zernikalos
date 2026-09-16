@@ -42,6 +42,12 @@ class ZSphere(
     val isValid: Boolean
         get() = radius >= 0f
 
+    /**
+     * True when the sphere has zero radius (default / uninitialized empty sphere).
+     */
+    val isEmpty: Boolean
+        get() = radius == 0f
+
     fun contains(point: ZVector3): Boolean {
         return contains(this, point)
     }
