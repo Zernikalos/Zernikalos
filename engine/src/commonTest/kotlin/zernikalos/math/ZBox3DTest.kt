@@ -8,8 +8,6 @@
 
 package zernikalos.math
 
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -109,8 +107,8 @@ class ZBox3DTest {
     @Test
     fun testProtobufRoundTripUsesMinMax() {
         val original = ZBox3D(left = 1f, top = 2f, front = 3f, width = 4f, height = 5f, depth = 6f)
-        val bytes = ProtoBuf.encodeToByteArray(original)
-        val restored = ProtoBuf.decodeFromByteArray<ZBox3D>(bytes)
+        val bytes = ProtoBuf.encodeToByteArray(ZBox3D.serializer(), original)
+        val restored = ProtoBuf.decodeFromByteArray<ZBox3D>(ZBox3D.serializer(), bytes)
 
         assertVectorEquals(original.min, restored.min)
         assertVectorEquals(original.max, restored.max)

@@ -31,8 +31,10 @@ class ZSphere(
     }
 
     /**
-     * Builds the smallest sphere that encloses [box] using the box center and
-     * the distance to a corner (half-diagonal).
+     * Builds a sphere that fully encloses [box]: center at the box center and
+     * radius equal to the half-diagonal (distance from center to a corner).
+     *
+     * This is deterministic and cheap; it is not a minimal sphere over mesh vertices.
      */
     @JsName("initFromBox")
     constructor(box: ZBox3D) : this() {

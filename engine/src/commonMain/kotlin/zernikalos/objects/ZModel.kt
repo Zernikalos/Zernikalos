@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZKeyFrame
+import zernikalos.collider.ZBounds
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
@@ -25,6 +26,7 @@ import zernikalos.generators.shadergenerator.ZShaderGeneratorType
 import zernikalos.generators.shadergenerator.createShaderGenerator
 import zernikalos.generators.shadergenerator.pipelineCapabilitiesBuilder
 import zernikalos.math.ZMatrix4
+import zernikalos.math.ZSphere
 import kotlin.js.JsExport
 
 @JsExport
@@ -34,15 +36,15 @@ open class ZModel: ZObject() {
     @Transient
     override val type = ZObjectType.MODEL
 
-    @ProtoNumber(4)
+    @ProtoNumber(10)
     var mesh: ZMesh = ZMesh()
     @Transient
     var shaderProgram: ZShaderProgram = ZShaderProgram()
-    @ProtoNumber(6)
+    @ProtoNumber(11)
     var material: ZMaterial? = null
-    @Contextual @ProtoNumber(7)
+    @Contextual @ProtoNumber(12)
     var skeleton: ZSkeleton? = null
-    @ProtoNumber(8)
+    @ProtoNumber(13)
     var skinning: ZSkinning? = null
 
     val hasTextures: Boolean
@@ -62,6 +64,8 @@ open class ZModel: ZObject() {
 
     override fun internalInitialize(ctx: ZContext) {
         renderer = ZModelRenderer(ctx.renderingContext, this)
+
+        computeBounds()
 
         val shaderProgramParams = pipelineCapabilitiesBuilder(this, shaderProgram)
 
@@ -99,6 +103,24 @@ open class ZModel: ZObject() {
         material?.dispose()
         skinning?.dispose()
         renderer.dispose()
+    }
+    
+    /**
+     * Fills missing local bounds after deserialization.
+     *
+     * Authored/non-empty volumes from `.zko` are kept. Empty box is derived from
+     * mesh positions; empty sphere is then built from the resolved box so we do
+     * not walk the POSITION buffer a second time.
+     */
+    fun computeBounds() {
+        // Prefer serialized box; otherwise derive AABB from mesh POSITION data.
+        if (bounds.isBoxEmpty) {
+            bounds.box = mesh.computeBoundingBox()
+        }
+        // Prefer serialized sphere; otherwise enclose the (authored or derived) box.
+        if (bounds.isSphereEmpty) {
+            bounds.sphere = ZSphere(bounds.box)
+        }
     }
 }
 

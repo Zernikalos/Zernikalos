@@ -72,7 +72,7 @@ abstract class ZObject: ZRef, ZTreeNode<ZObject>, ZLoggable {
     var transform: ZTransform = ZTransform()
 
     @ProtoNumber(4)
-    var bounds: ZBounds = ZBounds()
+    open var bounds: ZBounds = ZBounds()
 
     override var children: Array<@Polymorphic ZObject>
         get() = _children.toTypedArray()

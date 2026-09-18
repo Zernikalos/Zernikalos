@@ -41,7 +41,7 @@ class ZCamera(): ZObject() {
      *   and [ZPerspectiveLens.fromVerticalFovDegrees] for degree-based authoring).
      * @property aspectRatio The aspect ratio (width/height)
      * */
-    @ProtoNumber(4)
+    @ProtoNumber(10)
     var lens: ZPerspectiveLens
 
     /**

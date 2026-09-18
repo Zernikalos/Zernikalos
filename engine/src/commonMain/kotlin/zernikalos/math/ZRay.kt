@@ -84,6 +84,7 @@ class ZRay(
             result.direction.z = ray.direction.z
         }
 
+        @JsName("pointAtIp")
         fun pointAt(result: ZVector3, ray: ZRay, distance: Float) {
             result.setValues(
                 ray.origin.x + ray.direction.x * distance,

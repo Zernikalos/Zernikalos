@@ -25,8 +25,8 @@ import kotlin.js.JsName
  *
  * Serialization persists only [min] and [max] via [ZBox3DDto].
  */
-@Serializable(with = ZBox3DSerializer::class)
 @JsExport
+@Serializable(with = ZBox3DSerializer::class)
 class ZBox3D(
     var top: Float = 0f,
     var left: Float = 0f,
