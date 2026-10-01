@@ -10,15 +10,8 @@ package zernikalos.math
 
 import kotlin.math.PI
 
-/**
- * Shared conversion between degrees and radians for authoring and UI boundaries.
- * Stored engine angles remain radians; use these helpers at the edge or inside `*Degrees` APIs.
- */
-object Angles {
+/** Converts [degrees] to radians. */
+fun degreesToRadians(degrees: Float): Float = degrees * (PI.toFloat() / 180f)
 
-    /** Converts [degrees] to radians. */
-    fun degreesToRadians(degrees: Float): Float = degrees * (PI.toFloat() / 180f)
-
-    /** Converts [radians] to degrees. */
-    fun radiansToDegrees(radians: Float): Float = radians * (180f / PI.toFloat())
-}
+/** Converts [radians] to degrees. */
+fun radiansToDegrees(radians: Float): Float = radians * (180f / PI.toFloat())

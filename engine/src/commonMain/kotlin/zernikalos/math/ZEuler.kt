@@ -81,9 +81,9 @@ class ZEuler(): ZAlgebraObject {
          */
         fun fromDegrees(roll: Float, pitch: Float, yaw: Float): ZEuler =
             ZEuler(
-                Angles.degreesToRadians(roll),
-                Angles.degreesToRadians(pitch),
-                Angles.degreesToRadians(yaw),
+                degreesToRadians(roll),
+                degreesToRadians(pitch),
+                degreesToRadians(yaw),
             )
 
         fun copy(result: ZEuler, e: ZEuler) {

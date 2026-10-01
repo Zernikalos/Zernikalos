@@ -14,8 +14,8 @@ import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.components.ZComponentSerializerWithLoader
 import zernikalos.components.ZResizable
 import zernikalos.components.ZSerializableComponent
-import zernikalos.math.Angles
 import zernikalos.math.ZMatrix4
+import zernikalos.math.degreesToRadians
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.math.PI
@@ -58,7 +58,7 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
 
     /** Sets vertical field of view from [verticalFovDegrees]; [fov] is stored in radians. */
     fun setVerticalFovDegrees(verticalFovDegrees: Float) {
-        fov = Angles.degreesToRadians(verticalFovDegrees)
+        fov = degreesToRadians(verticalFovDegrees)
     }
 
     companion object {
@@ -69,7 +69,7 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
         /** Constructs a lens with vertical FOV given in degrees (stored as radians). */
         @JsName("fromVerticalFovDegrees")
         fun fromVerticalFovDegrees(near: Float, far: Float, verticalFovDegrees: Float): ZPerspectiveLens =
-            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees))
+            ZPerspectiveLens(near, far, degreesToRadians(verticalFovDegrees))
 
         /** Constructs a lens with vertical FOV in degrees and explicit aspect ratio (stored as radians). */
         @JsName("fromVerticalFovDegreesWithAspect")
@@ -79,7 +79,7 @@ open class ZPerspectiveLens internal constructor(data: ZPerspectiveLensData):
             verticalFovDegrees: Float,
             aspectRatio: Float,
         ): ZPerspectiveLens =
-            ZPerspectiveLens(near, far, Angles.degreesToRadians(verticalFovDegrees), aspectRatio)
+            ZPerspectiveLens(near, far, degreesToRadians(verticalFovDegrees), aspectRatio)
     }
 
     override fun onViewportResize(width: Int, height: Int) {
