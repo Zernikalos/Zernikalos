@@ -17,7 +17,7 @@ import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
 import zernikalos.math.ZBox3D
-import zernikalos.math.ZSphere
+import zernikalos.math.ZBoundingSphere
 import zernikalos.math.ZVector3
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
@@ -209,7 +209,7 @@ class ZMesh internal constructor(data: ZMeshData):
             ),
         )
     }
-    
+
     /**
      * Computes a local-space AABB from the POSITION buffer.
      *
@@ -247,14 +247,14 @@ class ZMesh internal constructor(data: ZMeshData):
      * Uses the AABB center and the maximum vertex distance to that center
      * (deterministic enclosing sphere, not a minimal one).
      *
-     * @return the enclosing sphere, or an empty [ZSphere] when bounds cannot be derived
+     * @return the enclosing sphere, or an empty [ZBoundingSphere] when bounds cannot be derived
      */
-    fun computeBoundingSphere(): ZSphere {
+    fun computeBoundingSphere(): ZBoundingSphere {
         val box = computeBoundingBox()
         if (box.isEmpty) {
-            return ZSphere()
+            return ZBoundingSphere()
         }
-        val positions = position ?: return ZSphere()
+        val positions = position ?: return ZBoundingSphere()
         val center = box.center
 
         var maxDistSq = 0f
@@ -268,10 +268,10 @@ class ZMesh internal constructor(data: ZMeshData):
             }
         }
         if (!ok) {
-            return ZSphere()
+            return ZBoundingSphere()
         }
 
-        return ZSphere(center, sqrt(maxDistSq))
+        return ZBoundingSphere(center, sqrt(maxDistSq))
     }
 
     override fun bind() = renderer.bind()

@@ -81,9 +81,9 @@ class ZBox3DTest {
     @Test
     fun testIntersectsSphere() {
         val box = ZBox3D(left = 0f, top = 0f, front = 0f, width = 2f, height = 2f, depth = 2f)
-        val inside = ZSphere(ZVector3(1f, 1f, 1f), 0.1f)
-        val overlappingCorner = ZSphere(ZVector3(3f, 1f, 1f), 1.1f)
-        val outside = ZSphere(ZVector3(5f, 5f, 5f), 1f)
+        val inside = ZBoundingSphere(ZVector3(1f, 1f, 1f), 0.1f)
+        val overlappingCorner = ZBoundingSphere(ZVector3(3f, 1f, 1f), 1.1f)
+        val outside = ZBoundingSphere(ZVector3(5f, 5f, 5f), 1f)
 
         assertTrue(box.intersects(inside))
         assertTrue(ZBox3D.intersects(box, overlappingCorner))

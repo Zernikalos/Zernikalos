@@ -80,7 +80,7 @@ class ZBox3D(
     }
 
     @JsName("intersectsSphere")
-    fun intersects(sphere: ZSphere): Boolean {
+    fun intersects(sphere: ZBoundingSphere): Boolean {
         return intersects(this, sphere)
     }
 
@@ -115,7 +115,7 @@ class ZBox3D(
          * True when the sphere overlaps the AABB (including containment either way).
          */
         @JsName("intersectsSphere")
-        fun intersects(box: ZBox3D, sphere: ZSphere): Boolean {
+        fun intersects(box: ZBox3D, sphere: ZBoundingSphere): Boolean {
             val closestX = sphere.center.x.coerceIn(box.left, box.left + box.width)
             val closestY = sphere.center.y.coerceIn(box.top, box.top + box.height)
             val closestZ = sphere.center.z.coerceIn(box.front, box.front + box.depth)

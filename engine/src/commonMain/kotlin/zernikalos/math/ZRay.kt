@@ -67,7 +67,7 @@ class ZRay(
      * @return non-negative entry distance, `0` when the origin is inside, or `null` on miss
      */
     @JsName("intersectSphere")
-    fun intersect(sphere: ZSphere): Float? {
+    fun intersect(sphere: ZBoundingSphere): Float? {
         return intersect(this, sphere)
     }
 
@@ -171,7 +171,7 @@ class ZRay(
          * @return non-negative entry distance, `0` when the origin is inside, or `null` on miss
          */
         @JsName("intersectSphere")
-        fun intersect(ray: ZRay, sphere: ZSphere): Float? {
+        fun intersect(ray: ZRay, sphere: ZBoundingSphere): Float? {
             val dx = ray.origin.x - sphere.center.x
             val dy = ray.origin.y - sphere.center.y
             val dz = ray.origin.z - sphere.center.z

@@ -11,7 +11,7 @@ package zernikalos.collider
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.math.ZBox3D
-import zernikalos.math.ZSphere
+import zernikalos.math.ZBoundingSphere
 import kotlin.js.JsExport
 
 /**
@@ -32,7 +32,7 @@ class ZBounds(
     @ProtoNumber(1)
     var box: ZBox3D = ZBox3D(),
     @ProtoNumber(2)
-    var sphere: ZSphere = ZSphere()
+    var sphere: ZBoundingSphere = ZBoundingSphere()
 ) {
 
     /** True when [box] has zero usable volume. */

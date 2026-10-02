@@ -89,7 +89,7 @@ class ZRayTest {
 
     @Test
     fun testIntersectSphereHit() {
-        val sphere = ZSphere(ZVector3(0f, 0f, 0f), 1f)
+        val sphere = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
         val ray = ZRay(ZVector3(-3f, 0f, 0f), ZVector3(1f, 0f, 0f))
 
         val t = assertNotNull(ray.intersect(sphere))
@@ -99,7 +99,7 @@ class ZRayTest {
 
     @Test
     fun testIntersectSphereMiss() {
-        val sphere = ZSphere(ZVector3(0f, 0f, 0f), 1f)
+        val sphere = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
         val ray = ZRay(ZVector3(-3f, 2f, 0f), ZVector3(1f, 0f, 0f))
 
         assertNull(ray.intersect(sphere))
@@ -108,7 +108,7 @@ class ZRayTest {
 
     @Test
     fun testIntersectSphereOriginInsideReturnsZero() {
-        val sphere = ZSphere(ZVector3(0f, 0f, 0f), 1f)
+        val sphere = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
         val ray = ZRay(ZVector3(0.2f, 0f, 0f), ZVector3(1f, 0f, 0f))
 
         assertEquals(0f, ray.intersect(sphere))
@@ -116,7 +116,7 @@ class ZRayTest {
 
     @Test
     fun testIntersectSphereBehindRayMisses() {
-        val sphere = ZSphere(ZVector3(0f, 0f, 0f), 1f)
+        val sphere = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
         val ray = ZRay(ZVector3(3f, 0f, 0f), ZVector3(1f, 0f, 0f))
 
         assertNull(ray.intersect(sphere))

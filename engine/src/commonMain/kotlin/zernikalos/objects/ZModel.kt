@@ -13,7 +13,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.protobuf.ProtoNumber
 import zernikalos.action.ZKeyFrame
-import zernikalos.collider.ZBounds
 import zernikalos.components.material.ZMaterial
 import zernikalos.components.mesh.ZDrawMode
 import zernikalos.components.mesh.ZMesh
@@ -26,7 +25,7 @@ import zernikalos.generators.shadergenerator.ZShaderGeneratorType
 import zernikalos.generators.shadergenerator.createShaderGenerator
 import zernikalos.generators.shadergenerator.pipelineCapabilitiesBuilder
 import zernikalos.math.ZMatrix4
-import zernikalos.math.ZSphere
+import zernikalos.math.ZBoundingSphere
 import kotlin.js.JsExport
 
 @JsExport
@@ -104,7 +103,7 @@ open class ZModel: ZObject() {
         skinning?.dispose()
         renderer.dispose()
     }
-    
+
     /**
      * Fills missing local bounds after deserialization.
      *
@@ -119,7 +118,7 @@ open class ZModel: ZObject() {
         }
         // Prefer serialized sphere; otherwise enclose the (authored or derived) box.
         if (bounds.isSphereEmpty) {
-            bounds.sphere = ZSphere(bounds.box)
+            bounds.sphere = ZBoundingSphere(bounds.box)
         }
     }
 }

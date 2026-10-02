@@ -9,7 +9,7 @@
 package zernikalos.collider
 
 import zernikalos.math.ZBox3D
-import zernikalos.math.ZSphere
+import zernikalos.math.ZBoundingSphere
 import zernikalos.math.ZVector3
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -29,7 +29,7 @@ class ZBoundsTest {
     fun testBoxOnly() {
         val bounds = ZBounds(
             box = ZBox3D(left = 0f, top = 0f, front = 0f, width = 1f, height = 1f, depth = 1f),
-            sphere = ZSphere()
+            sphere = ZBoundingSphere()
         )
         assertFalse(bounds.isBoxEmpty)
         assertTrue(bounds.isSphereEmpty)
@@ -40,7 +40,7 @@ class ZBoundsTest {
     fun testSphereOnly() {
         val bounds = ZBounds(
             box = ZBox3D(),
-            sphere = ZSphere(ZVector3.Zero, 1f)
+            sphere = ZBoundingSphere(ZVector3.Zero, 1f)
         )
         assertTrue(bounds.isBoxEmpty)
         assertFalse(bounds.isSphereEmpty)
@@ -51,7 +51,7 @@ class ZBoundsTest {
     fun testBoth() {
         val bounds = ZBounds(
             box = ZBox3D(left = 0f, top = 0f, front = 0f, width = 1f, height = 1f, depth = 1f),
-            sphere = ZSphere(ZVector3.Zero, 1f)
+            sphere = ZBoundingSphere(ZVector3.Zero, 1f)
         )
         assertFalse(bounds.isBoxEmpty)
         assertFalse(bounds.isSphereEmpty)

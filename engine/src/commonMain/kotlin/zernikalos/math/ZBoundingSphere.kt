@@ -21,7 +21,7 @@ import kotlin.math.sqrt
  */
 @Serializable
 @JsExport
-class ZSphere(
+class ZBoundingSphere(
     var center: ZVector3 = ZVector3.Zero,
     var radius: Float = 0f
 ) {
@@ -55,7 +55,7 @@ class ZSphere(
     }
 
     @JsName("intersectsSphere")
-    fun intersects(other: ZSphere): Boolean {
+    fun intersects(other: ZBoundingSphere): Boolean {
         return intersects(this, other)
     }
 
@@ -66,14 +66,14 @@ class ZSphere(
 
     companion object Op {
 
-        fun copy(result: ZSphere, sphere: ZSphere) {
+        fun copy(result: ZBoundingSphere, sphere: ZBoundingSphere) {
             result.center.x = sphere.center.x
             result.center.y = sphere.center.y
             result.center.z = sphere.center.z
             result.radius = sphere.radius
         }
 
-        fun fromBox(result: ZSphere, box: ZBox3D) {
+        fun fromBox(result: ZBoundingSphere, box: ZBox3D) {
             result.center.x = box.left + box.width * 0.5f
             result.center.y = box.top + box.height * 0.5f
             result.center.z = box.front + box.depth * 0.5f
@@ -84,7 +84,7 @@ class ZSphere(
             )
         }
 
-        fun contains(sphere: ZSphere, point: ZVector3): Boolean {
+        fun contains(sphere: ZBoundingSphere, point: ZVector3): Boolean {
             val dx = point.x - sphere.center.x
             val dy = point.y - sphere.center.y
             val dz = point.z - sphere.center.z
@@ -92,7 +92,7 @@ class ZSphere(
         }
 
         @JsName("intersectsSphere")
-        fun intersects(a: ZSphere, b: ZSphere): Boolean {
+        fun intersects(a: ZBoundingSphere, b: ZBoundingSphere): Boolean {
             val dx = b.center.x - a.center.x
             val dy = b.center.y - a.center.y
             val dz = b.center.z - a.center.z
@@ -101,7 +101,7 @@ class ZSphere(
         }
 
         @JsName("intersectsBox")
-        fun intersects(sphere: ZSphere, box: ZBox3D): Boolean {
+        fun intersects(sphere: ZBoundingSphere, box: ZBox3D): Boolean {
             return ZBox3D.intersects(box, sphere)
         }
     }

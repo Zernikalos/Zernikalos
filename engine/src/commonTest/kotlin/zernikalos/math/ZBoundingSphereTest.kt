@@ -15,11 +15,11 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ZSphereTest {
+class ZBoundingSphereTest {
 
     @Test
     fun testDefaultConstructor() {
-        val sphere = ZSphere()
+        val sphere = ZBoundingSphere()
         assertVectorEquals(ZVector3.Zero, sphere.center)
         assertEquals(0f, sphere.radius)
         assertTrue(sphere.isValid)
@@ -29,61 +29,61 @@ class ZSphereTest {
     @Test
     fun testRejectsNegativeRadius() {
         assertFailsWith<IllegalArgumentException> {
-            ZSphere(ZVector3.Zero, -1f)
+            ZBoundingSphere(ZVector3.Zero, -1f)
         }
     }
 
     @Test
     fun testFromBox() {
         val box = ZBox3D(left = 0f, top = 0f, front = 0f, width = 2f, height = 2f, depth = 2f)
-        val sphere = ZSphere(box)
+        val sphere = ZBoundingSphere(box)
 
         assertVectorEquals(ZVector3(1f, 1f, 1f), sphere.center)
         assertEquals(sqrt(3f), sphere.radius, epsilon)
 
-        val filled = ZSphere()
-        ZSphere.fromBox(filled, box)
+        val filled = ZBoundingSphere()
+        ZBoundingSphere.fromBox(filled, box)
         assertVectorEquals(sphere.center, filled.center)
         assertEquals(sphere.radius, filled.radius, epsilon)
     }
 
     @Test
     fun testContainsPoint() {
-        val sphere = ZSphere(ZVector3(0f, 0f, 0f), 1f)
+        val sphere = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
 
         assertTrue(sphere.contains(ZVector3(0f, 0f, 0f)))
         assertTrue(sphere.contains(ZVector3(1f, 0f, 0f)))
         assertFalse(sphere.contains(ZVector3(1.1f, 0f, 0f)))
-        assertTrue(ZSphere.contains(sphere, ZVector3(0f, 0.5f, 0f)))
+        assertTrue(ZBoundingSphere.contains(sphere, ZVector3(0f, 0.5f, 0f)))
     }
 
     @Test
     fun testIntersectsSphere() {
-        val a = ZSphere(ZVector3(0f, 0f, 0f), 1f)
-        val overlapping = ZSphere(ZVector3(1.5f, 0f, 0f), 1f)
-        val touching = ZSphere(ZVector3(2f, 0f, 0f), 1f)
-        val separated = ZSphere(ZVector3(3f, 0f, 0f), 0.5f)
+        val a = ZBoundingSphere(ZVector3(0f, 0f, 0f), 1f)
+        val overlapping = ZBoundingSphere(ZVector3(1.5f, 0f, 0f), 1f)
+        val touching = ZBoundingSphere(ZVector3(2f, 0f, 0f), 1f)
+        val separated = ZBoundingSphere(ZVector3(3f, 0f, 0f), 0.5f)
 
         assertTrue(a.intersects(overlapping))
-        assertTrue(ZSphere.intersects(a, touching))
+        assertTrue(ZBoundingSphere.intersects(a, touching))
         assertFalse(a.intersects(separated))
     }
 
     @Test
     fun testIntersectsBoxDelegates() {
         val box = ZBox3D(left = 0f, top = 0f, front = 0f, width = 2f, height = 2f, depth = 2f)
-        val sphere = ZSphere(ZVector3(3f, 1f, 1f), 1.1f)
+        val sphere = ZBoundingSphere(ZVector3(3f, 1f, 1f), 1.1f)
 
         assertTrue(sphere.intersects(box))
-        assertTrue(ZSphere.intersects(sphere, box))
+        assertTrue(ZBoundingSphere.intersects(sphere, box))
         assertEquals(box.intersects(sphere), sphere.intersects(box))
     }
 
     @Test
     fun testCopy() {
-        val source = ZSphere(ZVector3(1f, 2f, 3f), 4f)
-        val result = ZSphere()
-        ZSphere.copy(result, source)
+        val source = ZBoundingSphere(ZVector3(1f, 2f, 3f), 4f)
+        val result = ZBoundingSphere()
+        ZBoundingSphere.copy(result, source)
 
         assertVectorEquals(source.center, result.center)
         assertEquals(4f, result.radius)
