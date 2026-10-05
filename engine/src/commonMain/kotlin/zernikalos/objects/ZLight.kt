@@ -27,12 +27,12 @@ class ZLight: ZObject() {
     @Transient
     override val type: ZObjectType = ZObjectType.LIGHT
 
-    @ProtoNumber(5)
+    @ProtoNumber(10)
     var color: ZColor = ZColor.WHITE
-    @ProtoNumber(6)
+    @ProtoNumber(11)
     var intensity: Float = 1.0f
 
-    @ProtoNumber(10)
+    @ProtoNumber(12)
     @Contextual
     var lamp: ZLamp? = null
 

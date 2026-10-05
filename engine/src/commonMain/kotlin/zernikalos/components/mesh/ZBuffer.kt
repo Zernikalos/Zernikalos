@@ -8,6 +8,7 @@
 
 package zernikalos.components.mesh
 
+import zernikalos.ZBaseType
 import zernikalos.ZDataType
 import zernikalos.components.ZBindeable
 import zernikalos.components.ZComponentData
@@ -15,6 +16,7 @@ import zernikalos.components.ZComponentRenderer
 import zernikalos.components.ZDataRenderComponent
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
+import zernikalos.utils.readFloatLE
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
@@ -134,6 +136,45 @@ class ZBuffer internal constructor(data: ZBufferData): ZDataRenderComponent<ZBuf
      * Indicates whether the [data] has any data.
      */
     val hasData: Boolean by data::hasData
+
+    /**
+     * Invokes [action] for each float triplet (x, y, z) stored in this buffer.
+     *
+     * Honors byte [offset] / [stride]. When [stride] is 0, tightly packed layout
+     * uses [ZDataType.byteSize].
+     *
+     * @return `false` if the buffer is empty, is not float with at least 3 components,
+     * any vertex range is out of bounds, or a component is non-finite
+     */
+    fun forEachVec3F(action: (Float, Float, Float) -> Unit): Boolean {
+        if (!hasData || count <= 0) {
+            return false
+        }
+        if (dataType.type != ZBaseType.FLOAT || dataType.size < 3) {
+            return false
+        }
+
+        val bytes = dataArray
+        val strideBytes = if (stride == 0) dataType.byteSize else stride
+        val floatBytes = Float.SIZE_BYTES
+        val vertexBytes = 3 * floatBytes
+
+        for (i in 0 until count) {
+            val base = offset + i * strideBytes
+            if (base < 0 || base + vertexBytes > bytes.size) {
+                return false
+            }
+
+            val x = bytes.readFloatLE(base)
+            val y = bytes.readFloatLE(base + floatBytes)
+            val z = bytes.readFloatLE(base + 2 * floatBytes)
+            if (!x.isFinite() || !y.isFinite() || !z.isFinite()) {
+                return false
+            }
+            action(x, y, z)
+        }
+        return true
+    }
 
     override fun createRenderer(ctx: ZRenderingContext): ZBufferRenderer {
         return ZBufferRenderer(ctx, data)

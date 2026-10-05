@@ -16,9 +16,13 @@ import zernikalos.ZTypes
 import zernikalos.components.*
 import zernikalos.components.shader.ZAttributeId
 import zernikalos.context.ZRenderingContext
+import zernikalos.math.ZBox3D
+import zernikalos.math.ZBoundingSphere
+import zernikalos.math.ZVector3
 import zernikalos.utils.toByteArray
 import kotlin.js.JsExport
 import kotlin.js.JsName
+import kotlin.math.sqrt
 
 /**
  * Mesh will provide:
@@ -204,6 +208,70 @@ class ZMesh internal constructor(data: ZMeshData):
                 dataArray = indices.toByteArray(),
             ),
         )
+    }
+
+    /**
+     * Computes a local-space AABB from the POSITION buffer.
+     *
+     * @return the enclosing box, or an empty [ZBox3D] when position data is missing,
+     * empty, unsupported, out of range, or contains non-finite values
+     */
+    fun computeBoundingBox(): ZBox3D {
+        val positions = position ?: return ZBox3D()
+
+        var minX = Float.POSITIVE_INFINITY
+        var minY = Float.POSITIVE_INFINITY
+        var minZ = Float.POSITIVE_INFINITY
+        var maxX = Float.NEGATIVE_INFINITY
+        var maxY = Float.NEGATIVE_INFINITY
+        var maxZ = Float.NEGATIVE_INFINITY
+
+        val ok = positions.forEachVec3F { x, y, z ->
+            if (x < minX) minX = x
+            if (y < minY) minY = y
+            if (z < minZ) minZ = z
+            if (x > maxX) maxX = x
+            if (y > maxY) maxY = y
+            if (z > maxZ) maxZ = z
+        }
+        if (!ok) {
+            return ZBox3D()
+        }
+
+        return ZBox3D(ZVector3(minX, minY, minZ), ZVector3(maxX, maxY, maxZ))
+    }
+
+    /**
+     * Computes a local bounding sphere from POSITION data.
+     *
+     * Uses the AABB center and the maximum vertex distance to that center
+     * (deterministic enclosing sphere, not a minimal one).
+     *
+     * @return the enclosing sphere, or an empty [ZBoundingSphere] when bounds cannot be derived
+     */
+    fun computeBoundingSphere(): ZBoundingSphere {
+        val box = computeBoundingBox()
+        if (box.isEmpty) {
+            return ZBoundingSphere()
+        }
+        val positions = position ?: return ZBoundingSphere()
+        val center = box.center
+
+        var maxDistSq = 0f
+        val ok = positions.forEachVec3F { x, y, z ->
+            val dx = x - center.x
+            val dy = y - center.y
+            val dz = z - center.z
+            val distSq = dx * dx + dy * dy + dz * dz
+            if (distSq > maxDistSq) {
+                maxDistSq = distSq
+            }
+        }
+        if (!ok) {
+            return ZBoundingSphere()
+        }
+
+        return ZBoundingSphere(center, sqrt(maxDistSq))
     }
 
     override fun bind() = renderer.bind()

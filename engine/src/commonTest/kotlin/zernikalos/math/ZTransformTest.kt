@@ -109,7 +109,7 @@ class ZTransformTest {
     fun yawPitchRollDegrees_consistentWithRadians() {
         val t = ZTransform()
         t.setRotationDegrees(90f, ZVector3.Up)
-        assertEquals(Angles.radiansToDegrees(t.yaw), t.yawDegrees, 0.01f)
+        assertEquals(radiansToDegrees(t.yaw), t.yawDegrees, 0.01f)
     }
 
     @Test
