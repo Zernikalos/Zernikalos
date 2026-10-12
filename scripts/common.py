@@ -25,11 +25,11 @@ class Colors:
 class BaseScript:
     """Base class for all Zernikalos scripts with common functionality"""
     
-    def __init__(self, script_name: str = "Zernikalos Script"):
+    def __init__(self, script_name: str = "Zernikalos Script", project_root: Path = None):
         self.script_name = script_name
         self.github_user = os.environ.get('GITHUB_ACTOR') or os.environ.get('GITHUB_USER', 'Zernikalos')
         self.github_token = os.environ.get('GITHUB_TOKEN')
-        self.project_root = Path.cwd()
+        self.project_root = project_root or Path.cwd()
         
         # Initialize tools
         self.git = GitTool(self.project_root)

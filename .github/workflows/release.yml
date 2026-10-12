@@ -7,83 +7,78 @@ on:
   workflow_dispatch:
 
 permissions:
-  packages: write
   contents: read
-  actions: read
+
+concurrency:
+  group: zernikalos-package-publication
+  cancel-in-progress: false
 
 jobs:
-  build-and-publish-android:
-    name: Build and Publish Android artifacts
+  publish-packages:
+    name: Build and publish Maven and JS packages
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-      GITHUB_ACTOR: ${{ github.actor }}
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate publication ref and determine versions
+        id: version
+        run: python3 scripts/zmanager.py version --validate-tag "$GITHUB_REF" --output=github >> "$GITHUB_OUTPUT"
 
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-env
 
-      - name: Build
-        run: ./gradlew build
-
-      - name: Verify build output
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Build directory contents:"
-          ls -la build/ || echo "Build directory does not exist!"
-          echo "Gradle build status: $?"
-
-      - name: Publish all publications to Maven Repository
-        run: ./gradlew publishAllPublicationsToMavenRepository -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
-
-      - name: Upload build artifacts for JS job
-        uses: actions/upload-artifact@v5
-        with:
-          name: build-dir
-          path: build
-          retention-days: 1
-
-  publish-js:
-    name: Publish JS package
-    needs: build-and-publish-android
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Build and publish Maven packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_VERSION: ${{ steps.version.outputs.maven_version }}
+        run: >-
+          ./gradlew build publishAllPublicationsToMavenRepository
+          --no-daemon --no-configuration-cache
+          "-Pversion=$MAVEN_VERSION"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
+          package-manager-cache: false
           registry-url: 'https://npm.pkg.github.com'
           scope: '@zernikalos'
 
-      - name: Download build artifacts from Android job
-        uses: actions/download-artifact@v5
-        with:
-          name: build-dir
-          path: build
+      - name: Set npm package version
+        working-directory: build/js
+        env:
+          NPM_VERSION: ${{ steps.version.outputs.npm_version }}
+        run: npm version "$NPM_VERSION" --workspace=@zernikalos/zernikalos --no-git-tag-version --allow-same-version --ignore-scripts --workspaces-update=false
 
       - name: Publish JS package
         working-directory: build/js
-        run: npm publish --workspace=@zernikalos/zernikalos
+        run: npm publish --workspace=@zernikalos/zernikalos --ignore-scripts --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
 
   create-github-release:
-    if: startsWith(github.ref, 'refs/tags/')
     name: Create GitHub Release
-    needs: publish-js
+    needs: publish-packages
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Create release for tag
-        uses: ncipollo/release-action@v1
+      - name: Create release for validated tag
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           tag: ${{ github.ref_name }}
           name: ${{ github.ref_name }}

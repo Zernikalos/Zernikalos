@@ -9,7 +9,6 @@ from pathlib import Path
 from common import BaseScript, validate_version
 from versioning import VersionManager
 from versioning.types import VersionInfo
-from tools import VersionBump
 
 
 def add_version_arguments(parser: argparse.ArgumentParser) -> None:
@@ -18,12 +17,15 @@ def add_version_arguments(parser: argparse.ArgumentParser) -> None:
     version_group.add_argument('version', nargs='?', help='Version to release (format: X.Y.Z)')
     version_group.add_argument('--auto', action='store_true',
                                help='Automatically calculate version from Conventional Commits')
+    version_group.add_argument('--show-next', action='store_true',
+                               help='Show calculated next version based on Conventional Commits')
+    version_group.add_argument('--validate-tag', metavar='REF',
+                               help='Validate an existing release ref (refs/tags/vX.Y.Z) for publication without creating a release')
+
     parser.add_argument('--no-push', action='store_true',
                        help='Create local release without pushing to remote')
-    parser.add_argument('--show-next', action='store_true',
-                       help='Show calculated next version based on Conventional Commits')
     parser.add_argument('--output', choices=['human', 'github'], default='human',
-                       help='Output format for --show-next: human (default) or github (key=value for GITHUB_OUTPUT)')
+                       help='Output format for --show-next or --validate-tag: human (default) or github (key=value for GITHUB_OUTPUT)')
 
 
 def add_release_arguments(parser: argparse.ArgumentParser) -> None:
@@ -135,6 +137,12 @@ def show_next_version_info(base: BaseScript, version_info: VersionInfo) -> None:
     print(f"  npm:   {version_info.npm_version}")
 
 
+def write_github_versions(maven_version: str, npm_version: str) -> None:
+    """Write package versions to stdout for the workflow's GITHUB_OUTPUT redirect."""
+    print(f"maven_version={maven_version}")
+    print(f"npm_version={npm_version}")
+
+
 def handle_version_command(args, project_root: Path = None) -> int:
     """
     Handle version subcommand
@@ -146,28 +154,38 @@ def handle_version_command(args, project_root: Path = None) -> int:
     Returns:
         Exit code (0 for success, 1 for failure)
     """
-    base = BaseScript("Zernikalos Version Manager")
-    if project_root:
-        base.project_root = project_root
-    
     manager = VersionManager(project_root)
+    github_output = args.output == 'github'
+
+    # Validate the tag already checked out by the release workflow.
+    if args.validate_tag is not None:
+        project_version = manager.get_project_version(silent=github_output)
+        if not project_version:
+            return 1
+        validation = manager.validate_publication(args.validate_tag, project_version)
+        if not validation.is_valid:
+            print(f"Publication validation failed: {validation.error_message}", file=sys.stderr)
+            return 1
+        if github_output:
+            write_github_versions(project_version, project_version)
+        else:
+            manager.print_success(f"Validated {args.validate_tag} for publication")
+        return 0
     
     # Handle --show-next flag
     if args.show_next:
-        machine_output = getattr(args, 'output', 'human') == 'github'
-        version_info = manager.calculate_next_version(silent=machine_output)
+        version_info = manager.calculate_next_version(silent=github_output)
         if not version_info:
-            base.print_error("Could not calculate next version")
+            manager.print_error("Could not calculate next version")
             return 1
         
-        if args.output == 'github':
+        if github_output:
             # Machine-readable output for GitHub Actions (append to GITHUB_OUTPUT)
-            print(f"maven_version={version_info.maven_version}")
-            print(f"npm_version={version_info.npm_version}")
+            write_github_versions(version_info.maven_version, version_info.npm_version)
             print(f"Publishing Maven version: {version_info.maven_version}", file=sys.stderr)
             print(f"Publishing npm version: {version_info.npm_version}", file=sys.stderr)
         else:
-            show_next_version_info(base, version_info)
+            show_next_version_info(manager, version_info)
         return 0
     
     # Determine version (either from --auto or explicit version)
@@ -175,18 +193,18 @@ def handle_version_command(args, project_root: Path = None) -> int:
         # Calculate version automatically
         version_info = manager.calculate_next_version()
         if not version_info:
-            base.print_error("Failed to calculate next version")
+            manager.print_error("Failed to calculate next version")
             return 1
         version = version_info.next_version
-        base.print_status(f"Auto-calculated version: {version}")
+        manager.print_status(f"Auto-calculated version: {version}")
     else:
         # Use explicit version
         if not args.version:
-            base.print_error("version is required unless --auto or --show-next is used")
+            manager.print_error("version is required unless --auto, --show-next or --validate-tag is used")
             return 1
         
         if not validate_version(args.version):
-            base.print_error("Invalid version format. Use X.Y.Z (e.g., 0.4.1)")
+            manager.print_error("Invalid version format. Use X.Y.Z (e.g., 0.4.1)")
             return 1
         
         version = args.version
@@ -195,57 +213,57 @@ def handle_version_command(args, project_root: Path = None) -> int:
     validation = manager.validate_release(version)
     if not validation.is_valid:
         if validation.error_message:
-            base.print_error(validation.error_message)
+            manager.print_error(validation.error_message)
         return 1
     
     # Get current version for confirmation
     current_version = manager.get_current_version()
     if not current_version:
-        base.print_error("Could not read VERSION.txt")
+        manager.print_error("Could not read VERSION.txt")
         return 1
     
     # Confirm release
-    if not confirm_release(base, current_version, version, args.no_push):
-        base.print_error("Release cancelled")
+    if not confirm_release(manager, current_version, version, args.no_push):
+        manager.print_error("Release cancelled")
         return 1
     
     # Execute release
-    base.print_status(f"Starting release process for version {version}...")
+    manager.print_status(f"Starting release process for version {version}...")
     release_result = manager.execute_release(version)
     
     if not release_result.success:
-        base.print_error(f"Release failed: {release_result.error_message}")
+        manager.print_error(f"Release failed: {release_result.error_message}")
         if release_result.steps_completed:
-            base.print_status(f"Completed steps: {', '.join(release_result.steps_completed)}")
+            manager.print_status(f"Completed steps: {', '.join(release_result.steps_completed)}")
         return 1
     
     # Show progress for each step
     for step in release_result.steps_completed:
         if step == "set_version":
-            base.print_status(f"✓ Set version to {version}")
+            manager.print_status(f"✓ Set version to {version}")
         elif step == "upgrade_kotlin_package_lock":
-            base.print_status("✓ Upgraded Kotlin package lock")
+            manager.print_status("✓ Upgraded Kotlin package lock")
         elif step == "update_version":
-            base.print_status("✓ Generated version-dependent files")
+            manager.print_status("✓ Generated version-dependent files")
         elif step == "release_commit":
-            base.print_status("✓ Created release commit and tag")
+            manager.print_status("✓ Created release commit and tag")
     
-    base.print_success("Release files generated successfully!")
+    manager.print_success("Release files generated successfully!")
     
     # Push changes (if not --no-push)
     if not args.no_push:
-        base.print_status("Pushing changes to remote repository...")
+        manager.print_status("Pushing changes to remote repository...")
         push_result = manager.push_release(version)
         
         if not push_result.success:
-            base.print_error(f"Failed to push: {push_result.error_message}")
+            manager.print_error(f"Failed to push: {push_result.error_message}")
             return 1
         
-        base.print_success("Changes pushed successfully!")
-        base.print_success(f"CI/CD pipeline will now build and publish version {version}")
-        show_next_steps(base, version)
+        manager.print_success("Changes pushed successfully!")
+        manager.print_success(f"CI/CD pipeline will now build and publish version {version}")
+        show_next_steps(manager, version)
     else:
-        show_local_release_info(base, version)
+        show_local_release_info(manager, version)
     
     return 0
 
@@ -361,4 +379,3 @@ def handle_release_command(args, project_root: Path = None) -> int:
     
     show_next_steps(base, version)
     return 0
-

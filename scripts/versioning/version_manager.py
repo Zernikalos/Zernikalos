@@ -4,6 +4,7 @@ Pure business logic for version management - no I/O
 """
 
 from pathlib import Path
+import re
 from typing import Optional
 from common import BaseScript, validate_version
 from tools import ConventionalCommitsTool
@@ -20,9 +21,7 @@ class VersionManager(BaseScript):
         Args:
             project_root: Root directory of the project
         """
-        super().__init__("Zernikalos Version Manager")
-        if project_root:
-            self.project_root = project_root
+        super().__init__("Zernikalos Version Manager", project_root=project_root)
         self.conventional_commits = ConventionalCommitsTool(self.project_root)
         
     def get_current_version(self) -> Optional[str]:
@@ -145,6 +144,22 @@ class VersionManager(BaseScript):
         except Exception:
             return None
     
+    def validate_publication(self, ref: str, project_version: str) -> ValidationResult:
+        """Validate an existing stable tag before publishing its packages."""
+        tag_prefix = "refs/tags/v"
+        stable_version = r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)"
+        if not re.fullmatch(tag_prefix + stable_version, ref):
+            return ValidationResult(False, "Stable packages require a vX.Y.Z tag")
+
+        tag_version = ref.removeprefix(tag_prefix)
+        if tag_version != project_version:
+            return ValidationResult(False, "Release tag does not match VERSION.txt")
+
+        if not self.git.is_ancestor("HEAD", "refs/remotes/origin/main"):
+            return ValidationResult(False, "Release commit must be integrated into origin/main; fetch the full history first")
+
+        return ValidationResult(is_valid=True)
+
     def validate_release(self, version: str) -> ValidationResult:
         """
         Validate version and check prerequisites for release

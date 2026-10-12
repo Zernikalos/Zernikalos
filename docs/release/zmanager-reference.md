@@ -77,7 +77,8 @@ python3 scripts/zmanager.py version [VERSION] [OPTIONS]
 **Options:**
 - `--auto`: Automatically calculate version from Conventional Commits
 - `--show-next`: Show next calculated version without creating it
-- `--output {human|github}`: With `--show-next`, output format: `human` (default) or `github` (key=value for GitHub Actions `GITHUB_OUTPUT`)
+- `--validate-tag REF`: Validate a stable publication ref (`refs/tags/vX.Y.Z`) against `VERSION.txt` and verify that the checked-out commit is integrated into `origin/main`. Requires the full Git history; run after checking out the release tag. This mode does not modify files, create commits, or publish packages.
+- `--output {human|github}`: With `--show-next` or `--validate-tag`, output format: `human` (default) or `github` (key=value for GitHub Actions `GITHUB_OUTPUT`)
 - `--no-push`: Create local version without pushing (no CI/CD trigger)
 
 **Examples:**
@@ -90,6 +91,9 @@ python3 scripts/zmanager.py version --auto
 
 # Show next calculated version (without creating)
 python3 scripts/zmanager.py version --show-next
+
+# Validate the tag checked out by the stable release workflow and export versions
+python3 scripts/zmanager.py version --validate-tag "$GITHUB_REF" --output=github
 
 # Create local version without pushing
 python3 scripts/zmanager.py version 1.2.3 --no-push
@@ -129,6 +133,8 @@ python3 scripts/zmanager.py publish [OPTIONS]
 **Common Options:**
 - `--user USER`: GitHub username/organization
 - `--token TOKEN`: GitHub access token
+
+Maven publication uses the project's Gradle tasks directly. `zmanager` passes credentials to Gradle through the subprocess environment and disables persistent daemons and the configuration cache for publication. Release workflows build and publish Maven and npm sequentially in one job, using the generated JS workspace directly. Each publication step receives its token through its own environment, and only the separate GitHub release job receives `contents: write`.
 
 **Examples:**
 ```bash
