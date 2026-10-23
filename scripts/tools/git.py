@@ -281,3 +281,14 @@ class GitTool:
         except FileNotFoundError:
             return None
 
+    def is_ancestor(self, ancestor: str, descendant: str) -> bool:
+        """Check whether a commit is integrated into another ref; fail closed on Git errors."""
+        try:
+            result = subprocess.run(
+                ['git', 'merge-base', '--is-ancestor', ancestor, descendant],
+                capture_output=True,
+                cwd=self.project_root,
+            )
+            return result.returncode == 0
+        except FileNotFoundError:
+            return False

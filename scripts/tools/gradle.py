@@ -3,6 +3,7 @@ Gradle Tool
 Provides Gradle operations for Zernikalos scripts
 """
 
+import os
 import subprocess
 from pathlib import Path
 from typing import Optional, Tuple, List
@@ -43,7 +44,8 @@ class GradleTool:
         except FileNotFoundError:
             return False, "Gradle wrapper not found or not executable"
     
-    def run_command(self, command: str, *args, capture_output: bool = True, show_output: bool = False) -> Tuple[bool, Optional[str], Optional[str]]:
+    def run_command(self, command: str, *args, capture_output: bool = True, show_output: bool = False,
+                    env: Optional[dict] = None) -> Tuple[bool, Optional[str], Optional[str]]:
         """
         Run a Gradle command
         
@@ -52,6 +54,7 @@ class GradleTool:
             *args: Additional arguments to pass to gradle
             capture_output: Whether to capture output (default: True)
             show_output: Whether to print output to console (default: False)
+            env: Optional subprocess environment, including publication credentials
             
         Returns:
             Tuple of (success: bool, stdout: Optional[str], stderr: Optional[str])
@@ -59,27 +62,20 @@ class GradleTool:
         try:
             cmd = [self.gradlew_path, command] + list(args)
             
-            if capture_output:
-                result = subprocess.run(
-                    cmd,
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                    cwd=self.project_root
-                )
-                if show_output:
-                    if result.stdout:
-                        print(result.stdout)
-                    if result.stderr:
-                        print(result.stderr)
-                return True, result.stdout, result.stderr
-            else:
-                result = subprocess.run(
-                    cmd,
-                    check=True,
-                    cwd=self.project_root
-                )
-                return True, None, None
+            result = subprocess.run(
+                cmd,
+                check=True,
+                capture_output=capture_output,
+                text=True,
+                cwd=self.project_root,
+                env=env
+            )
+            if show_output:
+                if result.stdout:
+                    print(result.stdout)
+                if result.stderr:
+                    print(result.stderr)
+            return True, result.stdout, result.stderr
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr if e.stderr else str(e)
             stdout_msg = e.stdout if hasattr(e, 'stdout') and e.stdout else None
@@ -90,7 +86,7 @@ class GradleTool:
                 print(f"Command failed with exit code {e.returncode}")
             return False, stdout_msg, error_msg
         except FileNotFoundError:
-            error_msg = "Gradle wrapper not found or not executable"
+            error_msg = f"Gradle executable not found: {self.gradlew_path}"
             if show_output:
                 print(f"Error: {error_msg}")
             return False, None, error_msg
@@ -200,13 +196,10 @@ class GradleTool:
         Returns:
             True if successful, False otherwise
         """
-        success, _, _ = self.run_command(
+        return self._publish_maven(
             'publishAndroidDebugPublicationToMavenRepository',
-            f'-Puser={user}',
-            f'-Paccess_token={access_token}',
-            show_output=True
+            user, access_token
         )
-        return success
     
     def publish_android_release(self, user: str, access_token: str) -> bool:
         """
@@ -219,13 +212,10 @@ class GradleTool:
         Returns:
             True if successful, False otherwise
         """
-        success, _, _ = self.run_command(
+        return self._publish_maven(
             'publishAndroidReleasePublicationToMavenRepository',
-            f'-Puser={user}',
-            f'-Paccess_token={access_token}',
-            show_output=True
+            user, access_token
         )
-        return success
     
     def publish_all_publications(self, user: str, access_token: str, version: Optional[str] = None) -> bool:
         """
@@ -239,16 +229,20 @@ class GradleTool:
         Returns:
             True if successful, False otherwise
         """
-        args = [
-            f'-Puser={user}',
-            f'-Paccess_token={access_token}',
-        ]
+        return self._publish_maven('publishAllPublicationsToMavenRepository', user, access_token, version)
+
+    def _publish_maven(self, task: str, user: str, access_token: str, version: Optional[str] = None) -> bool:
+        """Pass Maven credentials through the environment instead of command arguments."""
+        environment = os.environ.copy()
+        environment.update({'GITHUB_ACTOR': user, 'GITHUB_TOKEN': access_token})
+        args = ['--no-daemon', '--no-configuration-cache']
         if version:
             args.append(f'-Pversion={version}')
         success, _, _ = self.run_command(
-            'publishAllPublicationsToMavenRepository',
+            task,
             *args,
-            show_output=True
+            show_output=True,
+            env=environment
         )
         return success
     
@@ -284,4 +278,3 @@ class GradleTool:
             'project_root': str(self.project_root),
             'message': version_info if not is_available else f"Gradle {version or 'available'}"
         }
-

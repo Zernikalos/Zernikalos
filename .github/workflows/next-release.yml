@@ -4,59 +4,65 @@ on:
   workflow_dispatch:
 
 permissions:
-  packages: write
   contents: read
-  actions: read
+
+concurrency:
+  group: zernikalos-package-publication
+  cancel-in-progress: false
 
 jobs:
-  publish-next:
-    name: Publish Next Release
+  publish-packages:
+    name: Build and publish Maven and JS packages
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Skip if commit message starts with "release:" (release commits have this format)
-    # if: ${{ !startsWith(github.event.head_commit.message, 'release:') }}
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-      GITHUB_ACTOR: ${{ github.actor }}
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          # Full history needed so version script sees all commits since last tag (Conventional Commits)
           fetch-depth: 0
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build-env
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Generate Next Version
+      - name: Determine next package versions
         id: version
-        run: |
-          python3 scripts/zmanager.py version --show-next --output=github >> $GITHUB_OUTPUT
+        run: python3 scripts/zmanager.py version --show-next --output=github >> "$GITHUB_OUTPUT"
 
-      - name: Verify Version Configuration
-        run: ./gradlew printVersion -Pversion=${{ steps.version.outputs.maven_version }}
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build-env
 
-      - name: Build
-        run: ./gradlew build -Pversion=${{ steps.version.outputs.maven_version }}
-
-      - name: Publish to Maven Repository
-        run: ./gradlew publishAllPublicationsToMavenRepository -Pversion=${{ steps.version.outputs.maven_version }} -Puser=$GITHUB_ACTOR -Paccess_token=$GITHUB_TOKEN
+      - name: Build and publish Maven packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_VERSION: ${{ steps.version.outputs.maven_version }}
+        run: >-
+          ./gradlew build publishAllPublicationsToMavenRepository
+          --no-daemon --no-configuration-cache
+          "-Pversion=$MAVEN_VERSION"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
+          package-manager-cache: false
           registry-url: 'https://npm.pkg.github.com'
           scope: '@zernikalos'
 
-      - name: Publish JS Package
+      - name: Set npm package version
         working-directory: build/js
-        run: |
-          npm version ${{ steps.version.outputs.npm_version }} --no-git-tag-version
-          npm publish --workspace=@zernikalos/zernikalos --tag next
+        env:
+          NPM_VERSION: ${{ steps.version.outputs.npm_version }}
+        run: npm version "$NPM_VERSION" --workspace=@zernikalos/zernikalos --no-git-tag-version --allow-same-version --ignore-scripts --workspaces-update=false
+
+      - name: Publish JS package
+        working-directory: build/js
+        run: npm publish --workspace=@zernikalos/zernikalos --ignore-scripts --tag next
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
